@@ -1,0 +1,61 @@
+{
+	"name": "FlowEHR",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"mounts": [ "source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind" ],
+	"overrideCommand": false,
+	"runArgs": ["--init", "--env-file",".env"],
+    "remoteEnv": {
+		// Sets environment variables required for terrafom remote backend
+		"CORE_RESOURCE_GROUP" : "${containerEnv:CORE_RESOURCE_GROUP}",
+		"ARM_LOCATION": "${containerEnv:ARM_LOCATION}",
+		"CORE_STORAGE_ACCOUNT" : "${containerEnv:CORE_STORAGE_ACCOUNT}",                
+		"TF_BACKEND_CONTAINER" : "${containerEnv:TF_BACKEND_CONTAINER}",
+		"TF_BACKEND_BLOB" : "${containerEnv:TF_BACKEND_BLOB}"
+	},
+	// Configure tool-specific properties.
+	"customizations": {
+		// Configure properties specific to VS Code.
+		"vscode": {
+			// Set *default* container specific settings.json values on container create.
+			"settings": { 
+				"terraform.languageServer": {
+					"enabled": true,
+					"args": []
+				},
+				"azureTerraform.terminal": "integrated"
+				},
+
+			// Add the IDs of extensions you want installed when the container is created.
+			"extensions": [
+				"hashicorp.terraform",
+				"ms-vscode.azurecli",
+				"ms-azuretools.vscode-azureterraform",
+				"ms-azuretools.vscode-docker"
+			]
+		}
+	},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "terraform --version",
+
+	// Set `remoteUser` to `root` to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+	"remoteUser": "vscode",
+	"features": {
+		"terraform": {
+			"version": "latest",
+			"tflint": "latest",
+			"terragrunt": "latest"
+		},
+		"azure-cli": "latest",
+		"ghcr.io/devcontainers/features/azure-cli:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers/features/python:1": {},
+		"ghcr.io/stuartleeks/dev-container-features/azure-cli-persistence:0": {},
+		"ghcr.io/stuartleeks/dev-container-features/shell-history:0": {}
+	}
+}
