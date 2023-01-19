@@ -1,6 +1,10 @@
 resource "azurerm_resource_group" "core" {
   name     = "${var.prefix}-${var.environment}-rg-core"
   location = var.location
+
+  tags = {
+    environment = var.environment
+  }
 }
 
 resource "azurerm_virtual_network" "core" {
@@ -20,10 +24,6 @@ resource "azurerm_subnet" "core" {
   virtual_network_name = azurerm_virtual_network.core.name
   address_prefixes     = ["10.0.2.0/24"]
   service_endpoints    = ["Microsoft.Sql", "Microsoft.Storage"]
-
-  tags = {
-    environment = var.environment
-  }
 }
 
 resource "azurerm_storage_account" "core" {
@@ -70,5 +70,9 @@ resource "azurerm_key_vault" "example" {
     storage_permissions = [
       "Get",
     ]
+  }
+
+  tags = {
+    environment = var.environment
   }
 }

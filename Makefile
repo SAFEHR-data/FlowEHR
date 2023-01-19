@@ -41,5 +41,5 @@ bootstrap: az-login ## Boostrap Terraform backend
 core: az-login  ## Deploy core infrastructure
 	$(call target_title, "Deploy Core") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
-	&& cd ${MAKEFILE_DIR}/infrastructure \
+	&& cd ${MAKEFILE_DIR}/infrastructure/core \
 	&& terragrunt apply
