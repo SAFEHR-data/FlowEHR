@@ -5,15 +5,7 @@
 	},
 	"mounts": [ "source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind" ],
 	"overrideCommand": false,
-	"runArgs": ["--init", "--env-file",".env"],
-    "remoteEnv": {
-		// Sets environment variables required for terrafom remote backend
-		"CORE_RESOURCE_GROUP" : "${containerEnv:CORE_RESOURCE_GROUP}",
-		"ARM_LOCATION": "${containerEnv:ARM_LOCATION}",
-		"CORE_STORAGE_ACCOUNT" : "${containerEnv:CORE_STORAGE_ACCOUNT}",                
-		"TF_BACKEND_CONTAINER" : "${containerEnv:TF_BACKEND_CONTAINER}",
-		"TF_BACKEND_BLOB" : "${containerEnv:TF_BACKEND_BLOB}"
-	},
+	"runArgs": ["--init", "--env-file", ".env"],
 	// Configure tool-specific properties.
 	"customizations": {
 		// Configure properties specific to VS Code.
@@ -42,7 +34,7 @@
 		"ghcr.io/devcontainers/features/terraform:1": {
 			"version": "1.3.6",
 			"tflint": "latest",
-			"terragrunt": "none"
+			"terragrunt": "0.42.8"
 		},
 		"ghcr.io/devcontainers/features/azure-cli:1": {
 			"version": "2.44.1"
