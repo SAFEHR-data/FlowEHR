@@ -17,17 +17,17 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-core_rg="${PREFIX}-${ENVIRONMENT}-rg-core"
-core_storage="${PREFIX}${ENVIRONMENT}strcore"
+mgmt_rg="${PREFIX}-${ENVIRONMENT}-rg-mgmt"
+mgmt_storage="${PREFIX}${ENVIRONMENT}strmgmt"
+state_container="tfstate"
 
-echo "Boostrapping Terraform..."
-echo "Creating resource group..."
-az group create --name $core_rg --location $ARM_LOCATION
+echo "Creating management resource group..."
+az group create --resource-group $mgmt_rg --location $LOCATION
 
-echo "Creating storage account..."
-az storage account create --resource-group $core_rg --name $core_storage --sku Standard_LRS --encryption-services blob
+echo "Creating management storage account..."
+az storage account create --resource-group $mgmt_rg --name $mgmt_storage --sku Standard_LRS --encryption-services blob
 
 echo "Creating blob container for TF state..."
-az storage container create --name $TF_BACKEND_CONTAINER --account-name $core_storage --auth-mode login -o table
+az storage container create --name $state_container --account-name $mgmt_storage --auth-mode login -o table
 
 echo "Bootstrapping complete."

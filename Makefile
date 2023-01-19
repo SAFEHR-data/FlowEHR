@@ -30,13 +30,16 @@ help: ## Show this help
 	@echo
 
 az-login:  ## Check logged in/log into azure with a service principal 
-	$(call target_title, "Login to azure...") \
+	$(call target_title, "Log-in to Azure") \
 	&& . ${MAKEFILE_DIR}/scripts/az_login.sh
 
-bootstrap: ## Boostrap Terraform backend
-	$(call target_title, "Bootstrap...") \
+bootstrap: az-login ## Boostrap Terraform backend
+	$(call target_title, "Bootstrap") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& . ${MAKEFILE_DIR}/infrastructure/bootstrap.sh
 
 core: az-login  ## Deploy core infrastructure
-	$(call target_title, "Deploying core...") \
-	&& ./scripts/export_env_file.sh && cd ${MAKEFILE_DIR}/infrastructure/core && ./deploy.sh
+	$(call target_title, "Deploy Core") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& cd ${MAKEFILE_DIR}/infrastructure \
+	&& terragrunt apply

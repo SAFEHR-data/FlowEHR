@@ -5,7 +5,6 @@
 	},
 	"mounts": [ "source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind" ],
 	"overrideCommand": false,
-	"runArgs": ["--init", "--env-file", ".env"],
 	// Configure tool-specific properties.
 	"customizations": {
 		// Configure properties specific to VS Code.
@@ -16,6 +15,7 @@
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
 				"hashicorp.terraform",
+				"hashicorp.hcl",
 				"ms-vscode.azurecli",
 				"ms-azuretools.vscode-docker"
 			]
@@ -26,7 +26,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "terraform --version",
+	"postCreateCommand": "git config --global --add safe.directory /workspaces/FlowEHR",
 
 	// Set `remoteUser` to `root` to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode",
@@ -41,7 +41,6 @@
 		},
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
 		"ghcr.io/devcontainers/features/github-cli:1": {},
-		"ghcr.io/devcontainers/features/python:1": {},
 		"ghcr.io/stuartleeks/dev-container-features/azure-cli-persistence:0": {},
 		"ghcr.io/stuartleeks/dev-container-features/shell-history:0": {}
 	}
