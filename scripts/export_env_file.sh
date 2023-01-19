@@ -17,11 +17,22 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-echo "Creating resource group..."
-az group create --name $CORE_RESOURCE_GROUP --location $ARM_LOCATION
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+ENV_FILE_PATH="${SCRIPT_DIR}/../.env"
 
-echo "Creating storage account..."
-az storage account create --resource-group $CORE_RESOURCE_GROUP --name $CORE_STORAGE_ACCOUNT --sku Standard_LRS --encryption-services blob
+if [ -f "$ENV_FILE_PATH" ]; then  # if a .env file exits
+    if [ "${TF_IN_AUTOMATION:-}" ]; then
+        echo "Found .env file while TF_IN_AUTOMATION was true. Expecting set env vars"
+        exit 1
+    fi
 
-echo "Creating blob container for TF state..."
-az storage container create --name $TF_BACKEND_CONTAINER --account-name $CORE_STORAGE_ACCOUNT --auth-mode login -o table
+    echo "Exporting varaibles in .env file into envrionment"
+
+    read -ra args < <(grep -v '^#' "$ENV_FILE_PATH" | xargs)
+    export "${args[@]}"
+
+elif [ ! "${TF_IN_AUTOMATION:-}" ]; then
+  echo "Not in automation but found no .env file"
+  exit 1
+
+fi

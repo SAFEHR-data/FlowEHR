@@ -1,0 +1,70 @@
+#  Copyright (c) University College London Hospitals NHS Foundation Trust
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+# limitations under the License.
+---
+name: Make command
+
+on:
+  workflow_call:
+    inputs:
+      command:
+        type: string
+        required: true
+      environment:
+        type: string
+        required: true
+    secrets:
+      AZURE_CREDENTIALS:
+        required: true
+      DEVCONTAINER_ACR_NAME:
+        required: true
+      DEVCONTAINER_FULL_TAG:
+        required: true
+
+jobs:
+  make_command:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: ACR Login
+        run: |
+          az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
+
+      - name: Run command in DevContainer
+        run: |
+          docker run --rm --mount \
+            "type=bind,src=${{ github.workspace }},dst=/workspaces/devcontainer" \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            --workdir /workspaces/devcontainer \
+            --user vscode \
+            -e DOCKER_BUILDKIT=1 \
+            -e TF_INPUT="0" \
+            -e TF_IN_AUTOMATION="1" \
+            -e ARM_CLIENT_ID="${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}" \
+            -e ARM_CLIENT_SECRET="${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}" \
+            -e ARM_TENANT_ID="${{ fromJSON(secrets.AZURE_CREDENTIALS).tenantId }}" \
+            -e ARM_SUBSCRIPTION_ID="${{ fromJSON(secrets.AZURE_CREDENTIALS).subscriptionId }}" \
+
+            # TODO: other env
+
+            "${{ secrets.DEVCONTAINER_FULL_TAG }}" \
+          bash -c 'sudo chown -R vscode . && make ${{ inputs.command }}'

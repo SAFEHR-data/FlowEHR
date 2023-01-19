@@ -1,0 +1,38 @@
+#  Copyright (c) University College London Hospitals NHS Foundation Trust
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+# limitations under the License.
+.PHONY: help
+
+SHELL:=/bin/bash
+MAKEFILE_FULLPATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+MAKEFILE_DIR := $(dir $(MAKEFILE_FULLPATH))
+LINTER_REGEX_INCLUDE?=all # regex to specify which files to include in local linting (defaults to "all")
+
+target_title = @echo -e "\n\e[34m»»» 🧩 \e[96m$(1)\e[0m..."
+
+all: help
+
+help: ## Show this help
+	@echo
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
+		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%s\033[0m|%s\n", $$1, $$2}' \
+        | column -t -s '|'
+	@echo
+
+core: az-login  ## Deploy core infrastructure
+	$(call target_title, "Deploying core...") \
+	&& ./scripts/export_env_file.sh && cd ${MAKEFILE_DIR}/infrastructure/core && ./deploy.sh
+
+az-login:  ## Check logged in/log into azure with a service principal 
+	$(call target_title, "Login to azure...") \
+	&& . ${MAKEFILE_DIR}/devops/az_login.sh

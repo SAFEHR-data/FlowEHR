@@ -5,6 +5,9 @@
 *.tfstate
 *.tfstate.*
 
+# Envrionment files
+.env
+
 # Crash log files
 crash.log
 

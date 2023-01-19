@@ -1,4 +1,3 @@
-#!/bin/bash
 #  Copyright (c) University College London Hospitals NHS Foundation Trust
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,16 +11,15 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 # limitations under the License.
+---
+extends: default
 
-set -o errexit
-set -o pipefail
-set -o nounset
-
-echo "Creating resource group..."
-az group create --name $CORE_RESOURCE_GROUP --location $ARM_LOCATION
-
-echo "Creating storage account..."
-az storage account create --resource-group $CORE_RESOURCE_GROUP --name $CORE_STORAGE_ACCOUNT --sku Standard_LRS --encryption-services blob
-
-echo "Creating blob container for TF state..."
-az storage container create --name $TF_BACKEND_CONTAINER --account-name $CORE_STORAGE_ACCOUNT --auth-mode login -o table
+rules:
+  line-length:
+    max: 120  # Keep this updated with the editorconfig file
+    level: warning
+  comments:
+    min-spaces-from-content: 1 # Used to follow prettier standard: https://github.com/prettier/prettier/pull/10926
+  truthy:
+    allowed-values: ['true', 'false']
+    check-keys: false
