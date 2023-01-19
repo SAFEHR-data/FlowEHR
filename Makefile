@@ -18,9 +18,9 @@ MAKEFILE_FULLPATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MAKEFILE_DIR := $(dir $(MAKEFILE_FULLPATH))
 LINTER_REGEX_INCLUDE?=all # regex to specify which files to include in local linting (defaults to "all")
 
-target_title = @echo -e "\n\e[34m»»» 🧩 \e[96m$(1)\e[0m..."
+target_title = @echo -e "\n\e[34m»»» 🌺 \e[96m$(1)\e[0m..."
 
-all: help
+all: bootstrap core
 
 help: ## Show this help
 	@echo
@@ -29,10 +29,14 @@ help: ## Show this help
         | column -t -s '|'
 	@echo
 
+az-login:  ## Check logged in/log into azure with a service principal 
+	$(call target_title, "Login to azure...") \
+	&& . ${MAKEFILE_DIR}/scripts/az_login.sh
+
+bootstrap: ## Boostrap Terraform backend
+	$(call target_title, "Bootstrap...") \
+	&& . ${MAKEFILE_DIR}/infrastructure/bootstrap.sh
+
 core: az-login  ## Deploy core infrastructure
 	$(call target_title, "Deploying core...") \
 	&& ./scripts/export_env_file.sh && cd ${MAKEFILE_DIR}/infrastructure/core && ./deploy.sh
-
-az-login:  ## Check logged in/log into azure with a service principal 
-	$(call target_title, "Login to azure...") \
-	&& . ${MAKEFILE_DIR}/devops/az_login.sh
