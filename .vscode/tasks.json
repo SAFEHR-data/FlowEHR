@@ -20,20 +20,20 @@
             "problemMatcher": [],
             "args": [
                 "init",
-                "-backend-config=\"storage_account_name=${env:CORE_STORAGE_ACCOUNT}\"",
+                "-backend-config=\"storage_account_name=${env:PREFIX}${env:ENVIRONMENT}strcore\"",
                 "-backend-config=\"container_name=${env:TF_BACKEND_CONTAINER}\"",
-                "-backend-config=\"key=${env:TF_BACKEND_BLOB}\"",
+                "-backend-config=\"key=${env:PREFIX}-${env:ENVIRONMENT}\"",
                 "-backend-config=\"resource_group_name=${env:CORE_RESOURCE_GROUP}\"",                             
             ],
             "options": {
-                "cwd": "${workspaceFolder}/infrastructure/core"
+                "cwd": "${workspaceFolder}/infrastructure"
             }
         },
         {
             "label": "terraform format",
             "type": "shell",
             "options": {
-                "cwd": "${workspaceFolder}/infrastructure/core"
+                "cwd": "${workspaceFolder}/infrastructure"
             },
             "command": "terraform",
             "problemMatcher": [],
@@ -46,7 +46,7 @@
             "label": "terraform lint",
             "type": "shell",
             "options": {
-                "cwd": "${workspaceFolder}/infrastructure/core"
+                "cwd": "${workspaceFolder}/infrastructure"
             },
             "command": "tflint",
             "problemMatcher": []
