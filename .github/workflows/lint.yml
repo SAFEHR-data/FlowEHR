@@ -1,0 +1,67 @@
+#  Copyright (c) University College London Hospitals NHS Foundation Trust
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+# limitations under the License.
+---
+name: Lint
+
+on:  # yamllint disable-line rule:truthy
+  pull_request:
+    branches: main
+
+# for each ref (branch/pr) run just the most recent,
+# cancel other pending/running ones
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref }}"
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          # Full git history is needed to get a proper list of
+          # changed files within `super-linter`
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Ensure copyright and license header are present
+        run: ./.github/linters/check_headers_exist.sh
+
+      - name: Terraform format check
+        run: terraform fmt -check -recursive
+
+      # find all terraform folders and run validate to catch
+      # configuration errors
+      - name: Terraform validation
+        run: |
+          find . -type d -name 'terraform' -not -path '*cnab*' -print0 \
+          | xargs -0 -I{} sh -c 'echo "***** Validating: {} *****"; \
+          terraform -chdir={} init -backend=false; terraform -chdir={} validate'
+
+      - name: Lint code base
+        uses: github/super-linter/slim@v4.9.7
+        env:
+          VALIDATE_ALL_CODEBASE: false
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_MARKDOWN: true
+          VALIDATE_PYTHON_FLAKE8: true
+          VALIDATE_YAML: true
+          VALIDATE_TERRAFORM_TFLINT: true
+          VALIDATE_BASH: true
+          VALIDATE_BASH_EXEC: true
+          VALIDATE_GITHUB_ACTIONS: true
+          VALIDATE_DOCKERFILE_HADOLINT: true

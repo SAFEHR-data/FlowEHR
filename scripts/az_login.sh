@@ -17,17 +17,19 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-core_rg="${PREFIX}-${ENVIRONMENT}-rg-core"
-core_storage="${PREFIX}${ENVIRONMENT}strcore"
+if [ -n "${TF_IN_AUTOMATION:-}" ]; then
+    az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID"
+    az account set -s "$ARM_SUBSCRIPTION_ID"
+fi
 
-echo "Boostrapping Terraform..."
-echo "Creating resource group..."
-az group create --name $core_rg --location $ARM_LOCATION
+SUB_NAME=$(az account show --query name -o tsv)
+TENANT_ID=$(az account show --query tenantId -o tsv)
 
-echo "Creating storage account..."
-az storage account create --resource-group $core_rg --name $core_storage --sku Standard_LRS --encryption-services blob
+if [ -z "$SUB_NAME" ]; then
+  echo -e "\n\e[31m»»» ⚠️ You are not logged in to Azure!"
+  exit 1
+fi
 
-echo "Creating blob container for TF state..."
-az storage container create --name $TF_BACKEND_CONTAINER --account-name $core_storage --auth-mode login -o table
-
-echo "Bootstrapping complete."
+echo -e "\e[34m»»» 🔨 \e[96mAzure details from logged on user \e[0m"
+echo -e "\e[34m»»»   • \e[96mSubscription: \e[33m$SUB_NAME\e[0m"
+echo -e "\e[34m»»»   • \e[96mTenant:       \e[33m$TENANT_ID\e[0m\n"

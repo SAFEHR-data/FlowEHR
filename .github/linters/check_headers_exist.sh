@@ -13,21 +13,17 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -o errexit
-set -o pipefail
-set -o nounset
-
-core_rg="${PREFIX}-${ENVIRONMENT}-rg-core"
-core_storage="${PREFIX}${ENVIRONMENT}strcore"
-
-echo "Boostrapping Terraform..."
-echo "Creating resource group..."
-az group create --name $core_rg --location $ARM_LOCATION
-
-echo "Creating storage account..."
-az storage account create --resource-group $core_rg --name $core_storage --sku Standard_LRS --encryption-services blob
-
-echo "Creating blob container for TF state..."
-az storage container create --name $TF_BACKEND_CONTAINER --account-name $core_storage --auth-mode login -o table
-
-echo "Bootstrapping complete."
+for ext in ".tf" ".yml" ".yaml" ".sh" "Dockerfile" ".py"
+do
+    # shellcheck disable=SC2044
+    for path in $(find . -name "*$ext" -not .devcontainer*)
+    do
+        if [[ $path = *"override.tf"* ]]; then  # Ignore gitignored file
+            continue
+        fi
+        if ! grep -q "Copyright" "$path"; then
+            echo -e "\n\e[31m»»» ⚠️  No copyright/license header in $path"
+            exit 1
+        fi
+    done || exit 1
+done

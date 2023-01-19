@@ -17,17 +17,22 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-core_rg="${PREFIX}-${ENVIRONMENT}-rg-core"
-core_storage="${PREFIX}${ENVIRONMENT}strcore"
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+ENV_FILE_PATH="${SCRIPT_DIR}/../.env"
 
-echo "Boostrapping Terraform..."
-echo "Creating resource group..."
-az group create --name $core_rg --location $ARM_LOCATION
+if [ -f "$ENV_FILE_PATH" ]; then  # if a .env file exits
+    if [ "${TF_IN_AUTOMATION:-}" ]; then
+        echo "Found .env file while TF_IN_AUTOMATION was true. Expecting set env vars"
+        exit 1
+    fi
 
-echo "Creating storage account..."
-az storage account create --resource-group $core_rg --name $core_storage --sku Standard_LRS --encryption-services blob
+    echo "Exporting varaibles in .env file into envrionment"
 
-echo "Creating blob container for TF state..."
-az storage container create --name $TF_BACKEND_CONTAINER --account-name $core_storage --auth-mode login -o table
+    read -ra args < <(grep -v '^#' "$ENV_FILE_PATH" | xargs)
+    export "${args[@]}"
 
-echo "Bootstrapping complete."
+elif [ ! "${TF_IN_AUTOMATION:-}" ]; then
+  echo "Not in automation but found no .env file"
+  exit 1
+
+fi
