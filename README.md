@@ -110,6 +110,13 @@ be created in a private repository created from this template repository.
 
 
 2. <details>
+    <summary>Run `Build and push devcontainer`</summary>
+
+    Trigger a build of the devcontainer
+</details>
+
+
+3. <details>
     <summary>Run `Deploy infra test`</summary>
 
     Trigger a deployment using a workflow dispatch trigger on the `Actions` tab.

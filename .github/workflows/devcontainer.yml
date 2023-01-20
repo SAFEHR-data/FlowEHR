@@ -92,9 +92,10 @@ jobs:
           USER_UID=$(id -u)
           USER_GID=$(id -g)
 
+          cd .devcontainer/
+
           docker build . \
             -t "$DEVCONTAINER_FULL_TAG" \
-            -f ".devcontainer/Dockerfile" \
             --build-arg BUILDKIT_INLINE_CACHE=1 \
             --build-arg USER_UID="${USER_UID}" \
             --build-arg USER_GID="${USER_GID}"
