@@ -36,10 +36,10 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Run pre-commit
+      - name: Check file headers exist
         uses: pre-commit/action@v3.0.0
         with:
-          extra_args: --all-files
+          extra_args: check-headers-exist --all-files
 
       # find all terraform folders and run validate to catch
       # configuration errors
