@@ -1,0 +1,94 @@
+#  Copyright (c) University College London Hospitals NHS Foundation Trust
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+# limitations under the License.
+---
+name: Build and push devcontainer
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+    secrets:
+      AZURE_CREDENTIALS:
+        required: true
+      DEVCONTAINER_ACR_NAME:
+        required: true
+      DEVCONTAINER_FULL_TAG:
+        required: true
+
+
+# for each ref run just the most recent and cancel any pending/running ones
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref }}"
+  cancel-in-progress: true
+
+jobs:
+  paths_filter:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    outputs:
+      needsbuild: ${{ steps.filter.outputs.devcontainer }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |  # filters based on changes vs. main
+            devcontainer:
+              - '.devcontainer/**'
+
+  build_and_push_devcontainer:
+    name: Build and push devcontainer
+    runs-on: ubuntu-latest
+    needs: paths_filter
+    environment: ${{ inputs.environment }}
+    if: needs.paths_filter.outputs.needsbuild == 'true'
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Docker BuildKit
+        uses: docker/setup-buildx-action@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: ACR Login
+        id: acr_login
+        run: az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
+
+      - name: Build and push new devcontainer
+        env:
+          DOCKER_BUILDKIT: 1
+        run: |
+          set -e
+
+          USER_UID=$(id -u)
+          USER_GID=$(id -g)
+
+          docker build . \
+            -t "${{ secrets.DEVCONTAINER_FULL_TAG }}" \
+            -f ".devcontainer/Dockerfile" \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            --build-arg USER_UID="${USER_UID}" \
+            --build-arg USER_GID="${USER_GID}"
+
+          docker push "${{ secrets.DEVCONTAINER_FULL_TAG }}"
