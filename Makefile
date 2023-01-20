@@ -29,7 +29,15 @@ help: ## Show this help
         | column -t -s '|'
 	@echo
 
-az-login:  ## Check logged in/log into azure with a service principal 
+lint: ## Lint the codebase
+	$(call target_title, "Lint") \
+	&& tflint ${MAKEFILE_DIR}/infrastructure \
+	&& find -name '*.sh' | xargs shellcheck \
+	&& flake8 \
+	&& yamllint . \
+	&& echo "Linting complete. Everything looks good 👌"
+
+az-login: ## Check logged in/log into azure with a service principal 
 	$(call target_title, "Log-in to Azure") \
 	&& . ${MAKEFILE_DIR}/scripts/az_login.sh
 
@@ -43,22 +51,27 @@ bootstrap-destroy: az-login ## Destroy boostrap rg
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& . ${MAKEFILE_DIR}/infrastructure/bootstrap.sh -d
 
-deploy-all: az-login  ## Deploy all infrastructure
+deploy-all: az-login ## Deploy all infrastructure
 	$(call target_title, "Deploy All") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& terragrunt run-all apply --terragrunt-working-dir ${MAKEFILE_DIR}/infrastructure --terragrunt-non-interactive
 
-deploy-core: az-login  ## Deploy core infrastructure
+deploy-core: az-login ## Deploy core infrastructure
 	$(call target_title, "Deploy Core") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& terragrunt apply ${MAKEFILE_DIR}/infrastructure/core
 
-deploy-transform: az-login  ## Deploy transform infrastructure
+deploy-transform: az-login ## Deploy transform infrastructure
 	$(call target_title, "Deploy Transform") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& terragrunt apply ${MAKEFILE_DIR}/infrastructure/transform
 
-destroy-all: az-login  ## Destroy all infrastructure
+deploy-serve: az-login ## Deploy serve infrastructure
+	$(call target_title, "Deploy Serve") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& terragrunt apply ${MAKEFILE_DIR}/infrastructure/serve
+
+destroy-all: az-login ## Destroy all infrastructure
 	$(call target_title, "Destroy All") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& terragrunt run-all destroy --terragrunt-working-dir ${MAKEFILE_DIR}/infrastructure --terragrunt-non-interactive

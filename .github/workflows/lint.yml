@@ -48,18 +48,3 @@ jobs:
           find . -type d -name 'terraform' -not -path '*cnab*' -print0 \
           | xargs -0 -I{} sh -c 'echo "***** Validating: {} *****"; \
           terraform -chdir={} init -backend=false; terraform -chdir={} validate'
-
-      - name: Lint code base
-        uses: github/super-linter/slim@v4.9.7
-        env:
-          VALIDATE_ALL_CODEBASE: false
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_MARKDOWN: true
-          VALIDATE_PYTHON_FLAKE8: true
-          VALIDATE_YAML: true
-          VALIDATE_TERRAFORM_TFLINT: true
-          VALIDATE_BASH: true
-          VALIDATE_BASH_EXEC: true
-          VALIDATE_GITHUB_ACTIONS: true
-          VALIDATE_DOCKERFILE_HADOLINT: true

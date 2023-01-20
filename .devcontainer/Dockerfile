@@ -47,14 +47,19 @@ RUN su $USERNAME -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install 
 ENTRYPOINT [ "/usr/local/share/docker-init.sh" ]
 CMD [ "sleep", "infinity" ]
 
-# [Optional] Uncomment this section to install additional OS packages.
-# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends <your-package-list-here>
-
 # Install additional tools
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends yamllint
+
 ARG YQ_VERSION="v4.30.6"
-RUN curl -L --fail -o /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_$(dpkg --print-architecture)" \
+RUN export ARCH=$(dpkg --print-architecture); curl -L --fail -o /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_${ARCH}" \
     && chmod +x /usr/local/bin/yq
+
+# ARG SC_VERSION="v0.9.0"
+# RUN export ARCH=$(dpkg --print-architecture); \
+#     if [ $ARCH == "arm64" ]; then export ARCH=aarch64; fi; \
+#     curl -L --fail -o /usr/local/bin/shellcheck "https://github.com/koalaman/shellcheck/releases/download/${SC_VERSION}/shellcheck-${SC_VERSION}.linux.${ARCH}.tar.xz" | tar -xJv \
+#     && chmod +x /usr/local/bin/shellcheck
 
 ARG PAJV_VERSION="1.2.0"
 RUN npm install -g pajv@${PAJV_VERSION}
