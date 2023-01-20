@@ -14,9 +14,8 @@
 ---
 name: Lint
 
-on:  # yamllint disable-line rule:truthy
+on:
   pull_request:
-    branches: main
 
 # for each ref (branch/pr) run just the most recent,
 # cancel other pending/running ones
@@ -37,11 +36,10 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Ensure copyright and license header are present
-        run: ./.github/linters/check_headers_exist.sh
-
-      - name: Terraform format check
-        run: terraform fmt -check -recursive
+      - name: Check file headers exist
+        uses: pre-commit/action@v3.0.0
+        with:
+          extra_args: check-headers-exist --all-files
 
       # find all terraform folders and run validate to catch
       # configuration errors

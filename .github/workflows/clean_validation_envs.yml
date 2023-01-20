@@ -15,9 +15,8 @@
 name: TODO
 
 on:
-  schedule:
-    # Every 2 hours
-    - cron: "0 */2 * * *"
+  # schedule:
+  #  - cron: "0 */2 * * *"  # Every 2 hours
   workflow_dispatch:
 
 jobs:

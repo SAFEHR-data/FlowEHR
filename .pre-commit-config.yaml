@@ -18,10 +18,21 @@ repos:
     hooks:
       - id: flake8
 
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.77.0
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_tflint
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.2
+    hooks:
+      - id: shellcheck
+
   - repo: local
     hooks:
       - id: check-headers-exist
-        name: check-headers-exist
+        name: Ensure copyright and license headers are present
         entry: .github/linters/check_headers_exist.sh
         language: script
         pass_filenames: false

@@ -1,3 +1,15 @@
+terraform {
+  required_version = "1.3.7"
+
+  # In modules we should only specify the min version
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 3.32"
+    }
+  }
+}
+
 resource "azurerm_resource_group" "core" {
   name     = "${var.prefix}-${var.environment}-rg-core"
   location = var.location
@@ -44,7 +56,7 @@ resource "azurerm_storage_account" "core" {
   }
 }
 
-resource "azurerm_key_vault" "example" {
+resource "azurerm_key_vault" "core" {
   name                        = "${var.prefix}-${var.environment}-kv-core"
   location                    = azurerm_resource_group.core.location
   resource_group_name         = azurerm_resource_group.core.name
