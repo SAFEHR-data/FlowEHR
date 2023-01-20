@@ -11,13 +11,13 @@ terraform {
 }
 
 resource "azurerm_resource_group" "core" {
-  name     = "${var.prefix}-${var.environment}-rg-core"
+  name     = "${var.prefix}-${var.environment}-rg"
   location = var.location
   tags     = var.tags
 }
 
 resource "azurerm_virtual_network" "core" {
-  name                = "${var.prefix}-${var.environment}-vnet-core"
+  name                = "${var.prefix}-${var.environment}-vnet"
   resource_group_name = azurerm_resource_group.core.name
   location            = azurerm_resource_group.core.location
   address_space       = ["10.0.0.0/16"]
@@ -33,7 +33,7 @@ resource "azurerm_subnet" "core" {
 }
 
 resource "azurerm_storage_account" "core" {
-  name                     = "${var.prefix}${var.environment}strcore"
+  name                     = "${var.prefix}${var.environment}strg"
   resource_group_name      = azurerm_resource_group.core.name
   location                 = azurerm_resource_group.core.location
   account_tier             = "Standard"
@@ -48,7 +48,7 @@ resource "azurerm_storage_account" "core" {
 }
 
 resource "azurerm_key_vault" "core" {
-  name                        = "${var.prefix}-${var.environment}-kv-core"
+  name                        = "${var.prefix}-${var.environment}-kv"
   location                    = azurerm_resource_group.core.location
   resource_group_name         = azurerm_resource_group.core.name
   enabled_for_disk_encryption = true
