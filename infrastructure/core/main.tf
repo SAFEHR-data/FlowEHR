@@ -1,5 +1,5 @@
 terraform {
-  required_version = "0.13"
+  required_version = "1.3.7"
 
   # In modules we should only specify the min version
   required_providers {
