@@ -18,6 +18,7 @@ set -o pipefail
 set -o nounset
 
 mgmt_rg="${PREFIX}-${ENVIRONMENT}-rg-mgmt"
+mgmt_acr="${PREFIX}-${ENVIRONMENT}-acr-mgmt"
 mgmt_storage="${PREFIX}${ENVIRONMENT}strmgmt"
 state_container="tfstate"
 
@@ -39,5 +40,8 @@ az storage account create --resource-group "$mgmt_rg" --name "$mgmt_storage" --s
 
 echo "Creating blob container for TF state..."
 az storage container create --name "$state_container" --account-name "$mgmt_storage" --auth-mode login -o table
+
+echo "Creating management container registry..."
+az acr create --resource-group "$mgmt_rg" --name "$mgmt_acr" --sku Standard
 
 echo "Bootstrapping complete."
