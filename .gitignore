@@ -35,3 +35,5 @@ backend.tf
 .env
 *.env
 config.yaml
+
+.DS_store
