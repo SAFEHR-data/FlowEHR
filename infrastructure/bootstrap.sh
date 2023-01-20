@@ -21,8 +21,11 @@ while getopts ":d" option; do
    case $option in
       d) # destroy bootstrap rg
         echo "Destroying management resource group..."
-        az group delete --resource-group $MGMT_RG --yes
+        az group delete --resource-group "$MGMT_RG" --yes
         echo "Management rg destroyed."
+        exit;;
+      *) 
+        echo "Invalid flag. Exiting."
         exit;;
    esac
 done

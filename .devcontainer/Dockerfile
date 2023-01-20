@@ -55,11 +55,11 @@ ARG YQ_VERSION="v4.30.6"
 RUN export ARCH=$(dpkg --print-architecture); curl -L --fail -o /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_${ARCH}" \
     && chmod +x /usr/local/bin/yq
 
-# ARG SC_VERSION="v0.9.0"
-# RUN export ARCH=$(dpkg --print-architecture); \
-#     if [ $ARCH == "arm64" ]; then export ARCH=aarch64; fi; \
-#     curl -L --fail -o /usr/local/bin/shellcheck "https://github.com/koalaman/shellcheck/releases/download/${SC_VERSION}/shellcheck-${SC_VERSION}.linux.${ARCH}.tar.xz" | tar -xJv \
-#     && chmod +x /usr/local/bin/shellcheck
+ARG SC_VERSION="v0.9.0"
+RUN export ARCH="$(dpkg --print-architecture)"; \
+    if [ "$ARCH" = arm64 ]; then export ARCH=aarch64; fi; \
+    wget -qO- "https://github.com/koalaman/shellcheck/releases/download/${SC_VERSION}/shellcheck-${SC_VERSION}.linux.${ARCH}.tar.xz" | tar -xJv \
+    && cp "shellcheck-${SC_VERSION}/shellcheck" /usr/local/bin/
 
 ARG PAJV_VERSION="1.2.0"
 RUN npm install -g pajv@${PAJV_VERSION}
