@@ -84,7 +84,7 @@ jobs:
         with:
           node-version: 16
 
-      - run: npm install @devcontainers/cli
+      - run: npm install -g @devcontainers/cli
 
       - name: Build and push new devcontainer
         env:
