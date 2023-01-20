@@ -24,7 +24,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
+  devcontainer:
+    uses: ./.github/workflows/devcontainer.yml
+    with:
+      environment: Infra-Test
+    secrets: inherit
+  validate:
     name: Lint
     runs-on: ubuntu-latest
     steps:
@@ -48,3 +53,9 @@ jobs:
           find . -type d -name 'terraform' -not -path '*cnab*' -print0 \
           | xargs -0 -I{} sh -c 'echo "***** Validating: {} *****"; \
           terraform -chdir={} init -backend=false; terraform -chdir={} validate'
+  lint:
+    uses: ./.github/workflows/devcontainer_make_command.yml
+    needs: devcontainer
+    with:
+      command: lint
+    secrets: inherit
