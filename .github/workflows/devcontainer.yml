@@ -15,6 +15,13 @@
 name: Build and push devcontainer
 
 on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Envrionment name to run this in'
+        required: true
+        default: 'Infra-Test'
+        type: string
   workflow_call:
     inputs:
       environment:
