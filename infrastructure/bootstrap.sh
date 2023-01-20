@@ -21,6 +21,16 @@ mgmt_rg="${PREFIX}-${ENVIRONMENT}-rg-mgmt"
 mgmt_storage="${PREFIX}${ENVIRONMENT}strmgmt"
 state_container="tfstate"
 
+while getopts ":d" option; do
+   case $option in
+      d) # destroy bootstrap rg
+        echo "Destroying management resource group..."
+        az group delete --resource-group $mgmt_rg --yes
+        echo "Management rg destroyed."
+        exit;;
+   esac
+done
+
 echo "Creating management resource group..."
 az group create --resource-group "$mgmt_rg" --location "$LOCATION"
 

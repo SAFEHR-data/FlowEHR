@@ -38,6 +38,11 @@ bootstrap: az-login ## Boostrap Terraform backend
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& . ${MAKEFILE_DIR}/infrastructure/bootstrap.sh
 
+bootstrap-destroy: az-login ## Destroy boostrap rg
+	$(call target_title, "Destroy Bootstrap Env") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& . ${MAKEFILE_DIR}/infrastructure/bootstrap.sh -d
+
 core: az-login  ## Deploy core infrastructure
 	$(call target_title, "Deploy Core") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
