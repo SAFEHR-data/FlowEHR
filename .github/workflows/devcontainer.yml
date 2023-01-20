@@ -80,6 +80,12 @@ jobs:
         id: acr_login
         run: az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
 
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - run: npm install @devcontainers/cli
+
       - name: Build and push new devcontainer
         env:
           DOCKER_BUILDKIT: 1
@@ -92,12 +98,4 @@ jobs:
           USER_UID=$(id -u)
           USER_GID=$(id -g)
 
-          cd .devcontainer/
-
-          docker build . \
-            -t "$DEVCONTAINER_FULL_TAG" \
-            --build-arg BUILDKIT_INLINE_CACHE=1 \
-            --build-arg USER_UID="${USER_UID}" \
-            --build-arg USER_GID="${USER_GID}"
-
-          docker push $DEVCONTAINER_FULL_TAG
+          devcontainer build --image-name $DEVCONTAINER_FULL_TAG --workspace-folder . --push
