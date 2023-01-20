@@ -29,7 +29,7 @@ remote_state {
     resource_group_name  = get_env("MGMT_RG")
     storage_account_name = get_env("MGMT_STORAGE")
     container_name       = get_env("STATE_CONTAINER")
-    key                  = "bootstrap.tfstate"
+    key                  = "${path_relative_to_include()}/terraform.tfstate"
   }
   generate = {
     path      = "backend.tf"
