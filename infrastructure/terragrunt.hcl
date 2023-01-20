@@ -23,19 +23,18 @@ terraform {
 EOF
 }
 
-generate "backend" {
-  path      = "backend.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-terraform {
-  backend "azurerm" {
-    resource_group_name  = "${get_env("PREFIX")}-${get_env("ENVIRONMENT")}-rg-mgmt"
-    storage_account_name = "${get_env("PREFIX")}${get_env("ENVIRONMENT")}strmgmt"
-    container_name       = "tfstate"
+remote_state {
+  backend = "azurerm"
+  config = {
+    resource_group_name  = get_env("MGMT_RG")
+    storage_account_name = get_env("MGMT_STORAGE")
+    container_name       = get_env("STATE_CONTAINER")
     key                  = "bootstrap.tfstate"
   }
-}
-EOF
+  generate = {
+    path      = "backend.tf"
+    if_exists = "overwrite_terragrunt"
+  }
 }
 
 generate "provider" {
