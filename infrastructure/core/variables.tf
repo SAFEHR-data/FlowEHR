@@ -12,3 +12,7 @@ variable "location" {
   type        = string
   description = "The location to deploy resources"
 }
+
+variable "tags" {
+  type = map
+}

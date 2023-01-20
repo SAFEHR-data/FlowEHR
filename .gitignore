@@ -23,6 +23,7 @@ override.tf.json
 
 # Ignore Terragrunt-generated files
 backend.tf
+provider.tf
 
 # Ignore plan output
 .tfplan
