@@ -6,6 +6,23 @@ terraform {
   }
 }
 
+generate "terraform" {
+  path      = "terraform.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+terraform {
+  required_version = "1.3.7"
+
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 3.32"
+    }
+  }
+}
+EOF
+}
+
 generate "backend" {
   path      = "backend.tf"
   if_exists = "overwrite_terragrunt"

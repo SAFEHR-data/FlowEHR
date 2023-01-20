@@ -18,8 +18,8 @@ set -o pipefail
 set -o nounset
 
 mgmt_rg="${PREFIX}-${ENVIRONMENT}-rg-mgmt"
-mgmt_acr="${PREFIX}-${ENVIRONMENT}-acr-mgmt"
-mgmt_storage="${PREFIX}${ENVIRONMENT}strmgmt"
+mgmt_acr="${PREFIX}${ENVIRONMENT}acrmgmt"
+mgmt_storage="${PREFIX}${ENVIRONMENT}strgmgmt"
 state_container="tfstate"
 
 while getopts ":d" option; do
