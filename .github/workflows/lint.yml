@@ -14,9 +14,8 @@
 ---
 name: Lint
 
-on:  # yamllint disable-line rule:truthy
+on:
   pull_request:
-    branches: main
 
 # for each ref (branch/pr) run just the most recent,
 # cancel other pending/running ones
