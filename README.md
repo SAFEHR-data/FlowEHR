@@ -36,13 +36,13 @@ FlowEHR is a safe, secure &amp; cloud-native development &amp; deployment platfo
 
 
 2. <details>
-    <summary>Copy and edit the sample environment file</summary>
+    <summary>Copy and edit the sample configuration file</summary>
    
-    Local deployment i.e. non CI/CD requires a `.env` file. Copy and edit as appropriate.
+    Local deployment i.e. non CI/CD requires a `config.yaml` file. Copy and edit as appropriate.
     For example, adding a naming prefix
    
     ```bash
-    cp .env.sample .env
+    cp config.sample.yaml config.yaml
     ```
 </details>
 

@@ -58,3 +58,5 @@ RUN curl -L --fail -o /usr/local/bin/yq "https://github.com/mikefarah/yq/release
 
 ARG PAJV_VERSION="1.2.0"
 RUN npm install -g pajv@${PAJV_VERSION}
+
+RUN pip3 install pre-commit
