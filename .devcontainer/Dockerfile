@@ -27,7 +27,7 @@ ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && bash /tmp/library-scripts/common-debian.sh "${INSTALL_ZSH}" "${USERNAME}" "${USER_UID}" "${USER_GID}" "${UPGRADE_PACKAGES}" "true" "true" \ 
-    && apt-get install -y graphviz \
+    && apt-get install -y graphviz --no-install-recommends \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # [Option] Install Docker CLI
@@ -36,7 +36,7 @@ ARG INSTALL_DOCKER="true"
 RUN if [ "${INSTALL_DOCKER}" = "true" ]; then \
         bash /tmp/library-scripts/docker-debian.sh "true" "/var/run/docker-host.sock" "/var/run/docker.sock" "${USERNAME}"; \
     else \
-        echo '#!/bin/bash\n"$@"' > /usr/local/share/docker-init.sh && chmod +x /usr/local/share/docker-init.sh; \
+        printf '#!/bin/bash\n"$@"' > /usr/local/share/docker-init.sh && chmod +x /usr/local/share/docker-init.sh; \
     fi \
     && rm -rf /var/lib/apt/lists/*
 
@@ -59,4 +59,5 @@ RUN curl -L --fail -o /usr/local/bin/yq "https://github.com/mikefarah/yq/release
 ARG PAJV_VERSION="1.2.0"
 RUN npm install -g pajv@${PAJV_VERSION}
 
-RUN pip3 install pre-commit
+ARG PRECOMMIT_VERSION="2.21.0"
+RUN pip3 install pre-commit=="${PRECOMMIT_VERSION}" --no-cache-dir
