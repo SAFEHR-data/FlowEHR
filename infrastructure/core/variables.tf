@@ -1,3 +1,8 @@
+variable "core_rg_name" {
+  type        = string
+  description = "Resource group name"
+}
+
 variable "prefix" {
   type        = string
   description = "The prefix to apply to resource names (i.e. to differentiate organisations/projects)"
@@ -11,4 +16,8 @@ variable "environment" {
 variable "location" {
   type        = string
   description = "The location to deploy resources"
+}
+
+variable "tags" {
+  type = map(any)
 }

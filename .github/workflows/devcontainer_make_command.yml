@@ -23,12 +23,17 @@ on:
       environment:
         type: string
         required: true
+      prefix_override:
+        type: string
+        required: false
     secrets:
       AZURE_CREDENTIALS:
         required: true
       DEVCONTAINER_ACR_NAME:
         required: true
-      DEVCONTAINER_FULL_TAG:
+      PREFIX:
+        required: true
+      LOCATION:
         required: true
 
 jobs:
@@ -50,6 +55,8 @@ jobs:
           az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
 
       - name: Run command in DevContainer
+        env:
+          DC_FULLTAG: "${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer:${{ inputs.environment }}"
         run: |
           docker run --rm --mount \
             "type=bind,src=${{ github.workspace }},dst=/workspaces/devcontainer" \
@@ -63,8 +70,8 @@ jobs:
             -e ARM_CLIENT_SECRET="${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}" \
             -e ARM_TENANT_ID="${{ fromJSON(secrets.AZURE_CREDENTIALS).tenantId }}" \
             -e ARM_SUBSCRIPTION_ID="${{ fromJSON(secrets.AZURE_CREDENTIALS).subscriptionId }}" \
-
-            # TODO: other env
-
-            "${{ secrets.DEVCONTAINER_FULL_TAG }}" \
+            -e PREFIX="${{ (inputs.prefix_override != '' && inputs.prefix_override) || secrets.PREFIX }}" \
+            -e LOCATION="${{ secrets.LOCATION }}" \
+            -e ENVIRONMENT=${{ inputs.environment }} \
+            "$DC_FULLTAG" \
           bash -c 'sudo chown -R vscode . && make ${{ inputs.command }}'

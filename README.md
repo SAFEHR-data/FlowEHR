@@ -69,6 +69,48 @@ FlowEHR is a safe, secure &amp; cloud-native development &amp; deployment platfo
 CI deployment workflows are run in [Github environments](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment). These should
 be created in a private repository created from this template repository.
 
-<!-- 
-very much a work in progress here...
--->
+0. <details>
+    <summary>Create a service principal</summary>
+
+    CI deployments require a service principal with access to deploy resources
+    in the subscription. Follow the steps above and then run
+
+    ```bash
+    make auth
+    ```
+
+    The output will be used in the next step.
+
+</details>
+
+
+1. <details>
+    <summary>Create and populate a GitHub environment</summary>
+
+    Add an envrionment called `Infra-Test` with following secrets
+
+    - `AZURE_CREDENTIALS`: json containing the credentials of the service principal in the format
+
+    ```json
+    {
+    "clientId": "xxx",
+    "clientSecret": "xxx",
+    "tenantId": "xxx",
+    "subscriptionId": "xxx",
+    "resourceManagerEndpointUrl": "management.azure.com"
+    }
+    ```
+
+    - `PREFIX`: Prefix used for naming resources. Must be unique to this repository e.g. `abcd`
+    - `LOCATION`: Name of an Azure location e.g. `uksouth`. These can be listed with `az account list-locations -o table`
+    - `ENVIRONMENT`: Name of the envrionment e.g. `dev`, also used to name resources
+    - `DEVCONTAINER_ACR_NAME`: Name of the azure container registry to use for the devcontainer build. This may or may not exist. e.g. `flowehrmgmtacr`
+
+</details>
+
+
+2. <details>
+    <summary>Run `Deploy infra test`</summary>
+
+    Trigger a deployment using a workflow dispatch trigger on the `Actions` tab.
+</details>

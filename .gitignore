@@ -23,6 +23,11 @@ override.tf.json
 
 # Ignore Terragrunt-generated files
 backend.tf
+provider.tf
+terraform.tf
+
+# Ignore plan output
+.tfplan
 
 # Include override files you do wish to add to version control using negated pattern
 #

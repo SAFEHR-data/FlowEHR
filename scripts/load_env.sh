@@ -55,3 +55,9 @@ else
   # shellcheck disable=SC2046
   export $(yq e "$GET_LEAF_KEYS|$TF_KEYS| $FORMAT_FOR_ENV_EXPORT" config.yaml)
 fi
+
+MGMT_RG=$("${script_dir}/name.sh" management rg)
+MGMT_STORAGE=$("${script_dir}/name.sh" management str)
+CORE_RG=$("${script_dir}/name.sh" core rg)
+
+export MGMT_RG MGMT_STORAGE CORE_RG STATE_CONTAINER="tfstate"

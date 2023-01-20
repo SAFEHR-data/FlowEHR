@@ -16,7 +16,7 @@ rule "terraform_typed_variables" {
 }
 
 rule "terraform_required_providers" {
-  enabled = true
+  enabled = false
 }
 
 rule "terraform_unused_required_providers" {

@@ -25,8 +25,6 @@ on:
         required: true
       DEVCONTAINER_ACR_NAME:
         required: true
-      DEVCONTAINER_FULL_TAG:
-        required: true
 
 
 # for each ref run just the most recent and cancel any pending/running ones
@@ -81,14 +79,17 @@ jobs:
         run: |
           set -e
 
+          ACR_URI="${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io"
+          DEVCONTAINER_TAG=${{ inputs.environment }}
+          DEVCONTAINER_FULL_TAG="${ACR_URI}/flowehr/devcontainer:${DEVCONTAINER_TAG}"
           USER_UID=$(id -u)
           USER_GID=$(id -g)
 
           docker build . \
-            -t "${{ secrets.DEVCONTAINER_FULL_TAG }}" \
+            -t "$DEVCONTAINER_FULL_TAG" \
             -f ".devcontainer/Dockerfile" \
             --build-arg BUILDKIT_INLINE_CACHE=1 \
             --build-arg USER_UID="${USER_UID}" \
             --build-arg USER_GID="${USER_GID}"
 
-          docker push "${{ secrets.DEVCONTAINER_FULL_TAG }}"
+          docker push $DEVCONTAINER_FULL_TAG

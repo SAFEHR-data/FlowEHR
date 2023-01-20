@@ -1,3 +1,4 @@
+#!/bin/bash
 #  Copyright (c) University College London Hospitals NHS Foundation Trust
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,25 +12,13 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 # limitations under the License.
----
-name: Deploy infra test
 
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+set -o errexit
+set -o pipefail
+set -o nounset
 
-jobs:
-  devcontainer:
-    uses: ./.github/workflows/devcontainer.yml
-    with:
-      environment: Infra-Test
-    secrets: inherit
+SUB_ID="$(az account show --query id -o tsv)"
 
-  deploy:
-    uses: ./.github/workflows/devcontainer_make_command.yml
-    needs: devcontainer
-    with:
-      command: all
-      environment: Infra-Test
-    secrets: inherit
+
+az ad sp create-for-rbac --scopes "/subscriptions/${SUB_ID}" --name "$SERVICE_PRINCIPAL_NAME"
+# TODO - make this work!

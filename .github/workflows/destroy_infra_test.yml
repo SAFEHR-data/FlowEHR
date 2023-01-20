@@ -12,24 +12,15 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-name: Deploy infra test
+name: Destroy infra test
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
-  devcontainer:
-    uses: ./.github/workflows/devcontainer.yml
-    with:
-      environment: Infra-Test
-    secrets: inherit
-
-  deploy:
+  destroy:
     uses: ./.github/workflows/devcontainer_make_command.yml
-    needs: devcontainer
     with:
-      command: all
+      command: destroy-all
       environment: Infra-Test
     secrets: inherit

@@ -20,7 +20,7 @@ LINTER_REGEX_INCLUDE?=all # regex to specify which files to include in local lin
 
 target_title = @echo -e "\n\e[34m»»» 🌺 \e[96m$(1)\e[0m..."
 
-all: bootstrap core
+all: bootstrap deploy-all
 
 help: ## Show this help
 	@echo
@@ -38,8 +38,34 @@ bootstrap: az-login ## Boostrap Terraform backend
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& . ${MAKEFILE_DIR}/infrastructure/bootstrap.sh
 
-core: az-login  ## Deploy core infrastructure
+bootstrap-destroy: az-login ## Destroy boostrap rg
+	$(call target_title, "Destroy Bootstrap Env") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& . ${MAKEFILE_DIR}/infrastructure/bootstrap.sh -d
+
+deploy-all: az-login  ## Deploy all infrastructure
+	$(call target_title, "Deploy All") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& terragrunt run-all apply --terragrunt-working-dir ${MAKEFILE_DIR}/infrastructure --terragrunt-non-interactive
+
+deploy-core: az-login  ## Deploy core infrastructure
 	$(call target_title, "Deploy Core") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
-	&& cd ${MAKEFILE_DIR}/infrastructure/core \
-	&& terragrunt apply
+	&& terragrunt apply --terragrunt-working-dir ${MAKEFILE_DIR}/infrastructure/core
+
+deploy-transform: az-login  ## Deploy transform infrastructure
+	$(call target_title, "Deploy Transform") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& terragrunt apply --terragrunt-working-dir ${MAKEFILE_DIR}/infrastructure/transform
+
+destroy-all: az-login  ## Destroy all infrastructure
+	$(call target_title, "Destroy All") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& terragrunt run-all destroy --terragrunt-working-dir ${MAKEFILE_DIR}/infrastructure --terragrunt-non-interactive
+
+test: bootstrap deploy-all destroy-all bootstrap-destroy  ## Test by deploy->destroy
+
+destroy-no-terraform:
+	$(call target_title, "Destroy no terraform") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& . ${MAKEFILE_DIR}/scripts/destroy_no_terraform.sh
