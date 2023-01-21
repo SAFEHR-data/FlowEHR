@@ -34,7 +34,7 @@
 	"features": {
 		"ghcr.io/devcontainers/features/terraform:1": {
 			"version": "1.3.7",
-			"tflint": "latest",
+			"tflint": "0.44.1",
 			"terragrunt": "0.42.8"
 		},
 		"ghcr.io/devcontainers/features/azure-cli:1": {
