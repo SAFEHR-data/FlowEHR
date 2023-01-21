@@ -35,11 +35,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          # Full git history is needed to get a proper list of
-          # changed files within `super-linter`
-          fetch-depth: 0
-          persist-credentials: false
 
       - name: Check file headers exist
         uses: pre-commit/action@v3.0.0
@@ -54,6 +49,7 @@ jobs:
           | xargs -0 -I{} sh -c 'echo "***** Validating: {} *****"; \
           terraform -chdir={} init -backend=false; terraform -chdir={} validate'
   lint:
+    name: Lint
     uses: ./.github/workflows/devcontainer_make_command.yml
     needs: devcontainer
     with:
