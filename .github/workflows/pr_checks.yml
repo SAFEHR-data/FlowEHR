@@ -30,7 +30,7 @@ jobs:
     name: Validate
     runs-on: ubuntu-latest
     concurrency:
-      group: "${{ github.workflow }}-${{ github.head_ref }}"
+      group: "${{ github.workflow }}-${{ github.head_ref }}-validate"
       cancel-in-progress: true
     steps:
       - name: Checkout code
@@ -53,7 +53,7 @@ jobs:
     uses: ./.github/workflows/devcontainer_make_command.yml
     needs: devcontainer
     concurrency:
-      group: "${{ github.workflow }}-${{ github.head_ref }}"
+      group: "${{ github.workflow }}-${{ github.head_ref }}-lint"
       cancel-in-progress: true
     with:
       command: lint
