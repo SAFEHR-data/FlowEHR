@@ -54,5 +54,5 @@ jobs:
     needs: devcontainer
     with:
       command: lint
-      environment: pr${{ github.event.issue.number }}
+      environment: pr-"${{ github.workflow }}-${{ github.head_ref }}"
     secrets: inherit
