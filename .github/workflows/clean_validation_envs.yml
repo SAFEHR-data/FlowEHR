@@ -40,7 +40,7 @@ jobs:
       - name: Run clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository}}
+          GITHUB_REPOSITORY: ${{ github.repository }}
           BRANCH_LAST_ACTIVITY_IN_HOURS_FOR_STOP: 2
           BRANCH_LAST_ACTIVITY_IN_HOURS_FOR_DESTROY: 48
         run: scripts/remove_stale_ci_builds.sh

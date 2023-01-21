@@ -30,7 +30,7 @@ jobs:
       environment: Infra-Test
     secrets: inherit
   validate:
-    name: Lint
+    name: Validate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -58,4 +58,5 @@ jobs:
     needs: devcontainer
     with:
       command: lint
+      environment: pr${{ github.event.issue.number }}
     secrets: inherit
