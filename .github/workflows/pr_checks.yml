@@ -12,16 +12,13 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-name: Lint
+name: PR Checks
 
 on:
   pull_request:
-
-# for each ref (branch/pr) run just the most recent,
-# cancel other pending/running ones
-concurrency:
-  group: "${{ github.workflow }}-${{ github.head_ref }}"
-  cancel-in-progress: true
+    branches:
+      - main
+      - 'feature/**'
 
 jobs:
   devcontainer:
@@ -32,6 +29,9 @@ jobs:
   validate:
     name: Validate
     runs-on: ubuntu-latest
+    concurrency:
+      group: "${{ github.workflow }}-${{ github.head_ref }}"
+      cancel-in-progress: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -52,7 +52,10 @@ jobs:
     name: Lint
     uses: ./.github/workflows/devcontainer_make_command.yml
     needs: devcontainer
+    concurrency:
+      group: "${{ github.workflow }}-${{ github.head_ref }}"
+      cancel-in-progress: true
     with:
       command: lint
-      environment: pr-"${{ github.workflow }}-${{ github.head_ref }}"
+      environment: pr${{ github.event.issue.number }}
     secrets: inherit
