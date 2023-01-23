@@ -20,7 +20,7 @@ LINTER_REGEX_INCLUDE?=all # regex to specify which files to include in local lin
 
 target_title = @echo -e "\n\e[34m»»» 🌺 \e[96m$(1)\e[0m..."
 
-all: bootstrap deploy-all
+all: bootstrap deploy
 
 help: ## Show this help
 	@echo
