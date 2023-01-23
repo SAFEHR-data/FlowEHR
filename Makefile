@@ -35,6 +35,7 @@ lint: ## Call pre-commit hooks to lint files & check for headers
 
 az-login: ## Check logged in/log into azure with a service principal 
 	$(call target_title, "Log-in to Azure") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& . ${MAKEFILE_DIR}/scripts/az_login.sh
 
 bootstrap: az-login ## Boostrap Terraform backend

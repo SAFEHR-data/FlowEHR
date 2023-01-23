@@ -23,10 +23,17 @@ if [ -n "${TF_IN_AUTOMATION:-}" ]; then
 fi
 
 SUB_NAME=$(az account show --query name -o tsv)
+SUB_ID=$(az account show --query id -o tsv)
 TENANT_ID=$(az account show --query tenantId -o tsv)
 
-if [ -z "$SUB_NAME" ]; then
-  echo -e "\n\e[31m»»» ⚠️ You are not logged in to Azure!"
+if [ -z "$SUB_ID" ]; then
+  echo -e "\n\e[31m»»» ⚠️ Unable to find Azure subscription."
+  exit 1
+elif [ "$SUB_ID" != "$ARM_SUBSCRIPTION_ID" ]; then
+  echo -e "\n\e[31m»»» ⚠️ The subscription that's currently set doesn't match the subscription in your config."
+  echo -e "\e[34m»»»   • \e[96mCurrently set: \e[33m$SUB_ID\e[0m"
+  echo -e "\e[34m»»»   • \e[96mIn config:       \e[33m$ARM_SUBSCRIPTION_ID\e[0m\n"
+  echo -e "\e[34m»»»   • \e[96mConsider running az account set -s SUBSCRIPTION_ID to set the correct subscription. \n"
   exit 1
 fi
 

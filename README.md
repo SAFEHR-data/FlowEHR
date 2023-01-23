@@ -36,10 +36,10 @@ Then edit `config.yaml` and specify the following values:
 
 1. Log in to Azure
 
-    Run the `az-login` make command to authenticate to Azure
+    Run `az login` to authenticate to Azure
 
     ```bash
-    make az-login
+    az login
     ```
 
 2. Run `make all`
