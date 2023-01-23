@@ -55,9 +55,10 @@ else
   # shellcheck disable=SC2046
   export $(yq e "$GET_LEAF_KEYS|$TF_KEYS| $FORMAT_FOR_ENV_EXPORT" config.yaml)
 
-  # Export additional required variables
-  export MGMT_RG="${PREFIX}-${ENVIRONMENT}-rg-mgmt"
-  export MGMT_ACR="${PREFIX}${ENVIRONMENT}acrmgmt"
-  export MGMT_STORAGE="${PREFIX}${ENVIRONMENT}strgmgmt"
-  export STATE_CONTAINER="tfstate"
 fi
+
+# Export additional required variables
+export MGMT_RG="${PREFIX}-${ENVIRONMENT}-rg-mgmt"
+export MGMT_ACR="${PREFIX}${ENVIRONMENT}acrmgmt"
+export MGMT_STORAGE="${PREFIX}${ENVIRONMENT}strgmgmt"
+export STATE_CONTAINER="tfstate"
