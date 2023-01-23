@@ -21,9 +21,24 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 
+# Ignore Terragrunt-generated files
+backend.tf
+provider.tf
+terraform.tf
+
+# Ignore plan output
+.tfplan
+
 # Include override files you do wish to add to version control using negated pattern
 #
 # !example_override.tf
 
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
 # example: *tfplan*
+
+# .env and config files
+.env
+*.env
+config.yaml
+
+.DS_store
