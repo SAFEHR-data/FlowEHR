@@ -68,7 +68,7 @@ deploy-serve: az-login ## Deploy serve infrastructure
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& terragrunt apply ${MAKEFILE_DIR}/infrastructure/serve
 
-destroy-all: az-login ## Destroy all infrastructure
+destroy: az-login ## Destroy all infrastructure
 	$(call target_title, "Destroy All") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& terragrunt run-all destroy --terragrunt-working-dir ${MAKEFILE_DIR}/infrastructure --terragrunt-non-interactive
