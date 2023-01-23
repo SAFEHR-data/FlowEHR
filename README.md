@@ -34,27 +34,23 @@ Then edit `config.yaml` and specify the following values:
 ## Deploying
 ### Locally
 
-2. <details>
-    <summary>Log in to Azure</summary>
+1. Log in to Azure
 
     Run the `az-login` make command to authenticate to Azure
 
     ```bash
     make az-login
     ```
-</details>
 
+2. Run `make all`
 
-3. <details>
-    <summary>Run a `make` command</summary>
-
-    For example, to make all infrastructure:
+    To bootstrap Terraform, and deploy all infrastructure, run
 
     ```bash
-    make deploy
+    make all
     ```
 
-    Or to deploy only a single module, for example core:
+    Alternatively, you can deploy individual modules separately with their corresponding make command:
 
     ```bash
     make deploy-core
@@ -65,8 +61,8 @@ Then edit `config.yaml` and specify the following values:
     ```bash
     make help
     ```
-</details>
 
+    > Note: If you're deploying for the first time and not using `make all` (i.e. using `make deploy-core`), ensure you have ran `make bootstrap` first.
 
 ### CI (GitHub Actions)
 
