@@ -23,7 +23,7 @@ variable "environment" {
 }
 
 variable "tags" {
-  type = map
+  type = map(any)
 }
 
 variable "core_rg_name" {

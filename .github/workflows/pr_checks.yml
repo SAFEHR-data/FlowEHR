@@ -16,17 +16,9 @@ name: PR Checks
 
 on:
   pull_request:
-    branches:
-      - main
-      - 'feature/**'
 
 jobs:
-  devcontainer:
-    uses: ./.github/workflows/devcontainer.yml
-    with:
-      environment: Infra-Test
-    secrets: inherit
-  validate:
+  lint:
     name: Validate
     runs-on: ubuntu-latest
     concurrency:
@@ -36,10 +28,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Check file headers exist
+      - name: Pre-commit linting
         uses: pre-commit/action@v3.0.0
-        with:
-          extra_args: check-headers-exist --all-files
 
       # find all terraform folders and run validate to catch
       # configuration errors
@@ -48,14 +38,3 @@ jobs:
           find . -type d -name 'terraform' -not -path '*cnab*' -print0 \
           | xargs -0 -I{} sh -c 'echo "***** Validating: {} *****"; \
           terraform -chdir={} init -backend=false; terraform -chdir={} validate'
-  lint:
-    name: Lint
-    uses: ./.github/workflows/devcontainer_make_command.yml
-    needs: devcontainer
-    concurrency:
-      group: "${{ github.workflow }}-${{ github.head_ref }}-lint"
-      cancel-in-progress: true
-    with:
-      command: lint
-      environment: pr${{ github.event.issue.number }}
-    secrets: inherit

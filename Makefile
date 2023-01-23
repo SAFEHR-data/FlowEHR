@@ -29,14 +29,6 @@ help: ## Show this help
         | column -t -s '|'
 	@echo
 
-lint: ## Lint the codebase
-	$(call target_title, "Lint") \
-	&& tflint ${MAKEFILE_DIR}/infrastructure \
-	&& find -name '*.sh' | xargs shellcheck \
-	&& flake8 \
-	&& yamllint . \
-	&& echo "Linting complete. Everything looks good 👌"
-
 az-login: ## Check logged in/log into azure with a service principal 
 	$(call target_title, "Log-in to Azure") \
 	&& . ${MAKEFILE_DIR}/scripts/az_login.sh
