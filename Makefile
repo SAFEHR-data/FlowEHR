@@ -29,6 +29,10 @@ help: ## Show this help
         | column -t -s '|'
 	@echo
 
+lint: ## Call pre-commit hooks to lint files & check for headers 
+	$(call target_title, "Linting") \
+	&& pre-commit run --all-files
+
 az-login: ## Check logged in/log into azure with a service principal 
 	$(call target_title, "Log-in to Azure") \
 	&& . ${MAKEFILE_DIR}/scripts/az_login.sh
@@ -43,7 +47,7 @@ bootstrap-destroy: az-login ## Destroy boostrap rg
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& . ${MAKEFILE_DIR}/infrastructure/bootstrap.sh -d
 
-deploy-all: az-login ## Deploy all infrastructure
+deploy: az-login ## Deploy all infrastructure
 	$(call target_title, "Deploy All") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& terragrunt run-all apply --terragrunt-working-dir ${MAKEFILE_DIR}/infrastructure --terragrunt-non-interactive
