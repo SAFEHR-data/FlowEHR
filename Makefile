@@ -54,19 +54,19 @@ deploy: az-login ## Deploy all infrastructure
 	&& terragrunt run-all apply --terragrunt-working-dir ${MAKEFILE_DIR}/infrastructure --terragrunt-non-interactive
 
 deploy-core: az-login ## Deploy core infrastructure
-	$(call target_title, "Deploy Core") \
+	$(call target_title, "Deploy Core Infrastructure") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& terragrunt apply ${MAKEFILE_DIR}/infrastructure/core
 
 deploy-transform: az-login ## Deploy transform infrastructure
-	$(call target_title, "Deploy Transform") \
+	$(call target_title, "Deploy Transform Infrastructure") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
-	&& terragrunt apply ${MAKEFILE_DIR}/infrastructure/transform
+	&& terragrunt apply --terragrunt-working-dir ${MAKEFILE_DIR}/infrastructure/transform
 
 deploy-serve: az-login ## Deploy serve infrastructure
-	$(call target_title, "Deploy Serve") \
+	$(call target_title, "Deploy Serve Infrastructure") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
-	&& terragrunt apply ${MAKEFILE_DIR}/infrastructure/serve
+	&& terragrunt apply --terragrunt-working-dir ${MAKEFILE_DIR}/infrastructure/serve
 
 destroy: az-login ## Destroy all infrastructure
 	$(call target_title, "Destroy All") \
