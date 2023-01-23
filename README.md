@@ -31,6 +31,8 @@ Then edit `config.yaml` and specify the following values:
 - `location` - the [Azure region](https://azuretracks.com/2021/04/current-azure-region-names-reference/) you wish to deploy resources to
 - `arm_subscription_id` - the [Azure subscription id](https://learn.microsoft.com/en-us/azure/azure-portal/get-subscription-tenant-id) you wish to deploy to
 
+For the full reference of possible configuration values, see the [config schema file](./config_schema.json).
+
 ## Deploying
 ### Locally
 
