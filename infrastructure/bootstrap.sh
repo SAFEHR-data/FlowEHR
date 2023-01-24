@@ -24,9 +24,9 @@ while getopts ":d" option; do
         az group delete --resource-group "$MGMT_RG" --yes
         echo "Management rg destroyed."
         exit;;
-      *) 
-        echo "Invalid flag. Exiting."
-        exit;;
+      *) # unknown
+         echo "Unknown flag $option"
+         exit 1
    esac
 done
 
@@ -39,7 +39,11 @@ az storage account create --resource-group "$MGMT_RG" --name "$MGMT_STORAGE" --s
 echo "Creating blob container for TF state..."
 az storage container create --name "$STATE_CONTAINER" --account-name "$MGMT_STORAGE" --auth-mode login -o table
 
-echo "Creating management container registry..."
-az acr create --resource-group "$MGMT_RG" --name "$MGMT_ACR" --sku Standard
+echo "Creating container registry for devcontainer..."
+if az acr list | grep -q "$DEVCONTAINER_ACR_NAME"; then
+   echo "ACR already exists. Not attempting to create it"
+else
+   az acr create --resource-group "$MGMT_RG" --name "$DEVCONTAINER_ACR_NAME" --sku Basic -o table
+fi
 
 echo "Bootstrapping complete."

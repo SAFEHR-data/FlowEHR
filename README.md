@@ -26,7 +26,7 @@ cp config.sample.yaml config.yaml
 
 Then edit `config.yaml` and specify the following values:
 
-- `prefix` - a prefix (max length 4 chars) to apply to all deployed resources (i.e. `flwr`)
+- `prefix` - a prefix to apply to all deployed resources (i.e. `flowehr-uclh`)
 - `environment` - a unique name for your environment (i.e. `jgdev`)
 - `location` - the [Azure region](https://azuretracks.com/2021/04/current-azure-region-names-reference/) you wish to deploy resources to
 - `arm_subscription_id` - the [Azure subscription id](https://learn.microsoft.com/en-us/azure/azure-portal/get-subscription-tenant-id) you wish to deploy to
@@ -64,13 +64,53 @@ For the full reference of possible configuration values, see the [config schema 
     make help
     ```
 
-    > Note: If you're deploying for the first time and not using `make all` (i.e. using `make deploy-core`), ensure you have ran `make bootstrap` first.
-
 ### CI (GitHub Actions)
 
 CI deployment workflows are run in [Github environments](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment). These should
 be created in a private repository created from this template repository.
 
-<!-- 
-very much a work in progress here...
--->
+0. <details>
+    <summary>Create a service principal</summary>
+
+    CI deployments require a service principal with access to deploy resources
+    in the subscription. Follow the steps above and then run
+
+    ```bash
+    make auth
+    ```
+
+    The output will be used in the next step.
+
+</details>
+
+
+1. <details>
+    <summary>Create and populate a GitHub environment</summary>
+
+    Add an envrionment called `Infra-Test` with following secrets
+
+    - `AZURE_CREDENTIALS`: json containing the credentials of the service principal in the format
+
+    ```json
+    {
+    "clientId": "xxx",
+    "clientSecret": "xxx",
+    "tenantId": "xxx",
+    "subscriptionId": "xxx",
+    "resourceManagerEndpointUrl": "management.azure.com"
+    }
+    ```
+
+    - `PREFIX`: Prefix used for naming resources. Must be unique to this repository e.g. `abcd`
+    - `LOCATION`: Name of an Azure location e.g. `uksouth`. These can be listed with `az account list-locations -o table`
+    - `ENVIRONMENT`: Name of the envrionment e.g. `dev`, also used to name resources
+    - `DEVCONTAINER_ACR_NAME`: Name of the azure container registry to use for the devcontainer build. This may or may not exist. e.g. `flowehrmgmtacr`
+
+</details>
+
+
+2. <details>
+    <summary>Run `Deploy infra test`</summary>
+
+    Trigger a deployment using a workflow dispatch trigger on the `Actions` tab.
+</details>

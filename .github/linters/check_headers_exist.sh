@@ -13,7 +13,7 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 
-for ext in ".tf" ".yml" ".yaml" ".sh" "Dockerfile" ".py"
+for ext in ".tf" ".yml" ".yaml" ".sh" "Dockerfile" ".py" ".hcl"
 do
     # shellcheck disable=SC2044
     for path in $(find . -name "*$ext" -not .devcontainer*)

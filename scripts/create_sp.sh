@@ -1,3 +1,4 @@
+#!/bin/bash
 #  Copyright (c) University College London Hospitals NHS Foundation Trust
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -10,30 +11,14 @@
 #  distributed under the License is distributed on an "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
-#  limitations under the License.
+# limitations under the License.
 
-variable "naming_prefix" {
-  type        = string
-  description = "Prefix used to name resources"
-}
+set -o errexit
+set -o pipefail
+set -o nounset
 
-variable "truncated_naming_prefix" {
-  type        = string
-  description = "Truncated (max 20 chars, no hyphens etc.) prefix for e.g storage accounts"
-}
+SUB_ID="$(az account show --query id -o tsv)"
 
-variable "tags" {
-  type = map(any)
-}
 
-variable "core_rg_name" {
-  type = string
-}
-
-variable "core_rg_location" {
-  type = string
-}
-
-variable "core_kv_id" {
-  type = string
-}
+az ad sp create-for-rbac --scopes "/subscriptions/${SUB_ID}" --name "$SERVICE_PRINCIPAL_NAME"
+# TODO - make this work!

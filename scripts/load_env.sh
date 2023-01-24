@@ -16,7 +16,6 @@
 set -o errexit
 set -o pipefail
 set -o nounset
-
 script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 env_file_path="${script_dir}/../config.yaml"
 
@@ -57,8 +56,11 @@ else
 
 fi
 
-# Export additional required variables
-export MGMT_RG="${PREFIX}-${ENVIRONMENT}-rg-mgmt"
-export MGMT_ACR="${PREFIX}${ENVIRONMENT}acrmgmt"
-export MGMT_STORAGE="${PREFIX}${ENVIRONMENT}strgmgmt"
-export STATE_CONTAINER="tfstate"
+NAMING_PREFIX=$("${script_dir}/name_prefix.py")
+echo "Naming resources with prefixed with: ${NAMING_PREFIX}"
+
+TRUNCATED_NAMING_PREFIX=$("${script_dir}/name_prefix.py" --truncated)
+MGMT_RG="${NAMING_PREFIX}-rg-mgmt"
+MGMT_STORAGE="${TRUNCATED_NAMING_PREFIX}strm"
+
+export NAMING_PREFIX TRUNCATED_NAMING_PREFIX MGMT_RG MGMT_STORAGE STATE_CONTAINER="tfstate"
