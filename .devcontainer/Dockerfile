@@ -58,6 +58,7 @@ RUN export ARCH=$(dpkg --print-architecture); curl -L --fail -o /usr/local/bin/y
 ARG SC_VERSION="v0.9.0"
 RUN export ARCH="$(dpkg --print-architecture)"; \
     if [ "$ARCH" = arm64 ]; then export ARCH=aarch64; fi; \
+    if [ "$ARCH" = amd64 ]; then export ARCH=x86_64; fi; \
     wget -qO- "https://github.com/koalaman/shellcheck/releases/download/${SC_VERSION}/shellcheck-${SC_VERSION}.linux.${ARCH}.tar.xz" | tar -xJv \
     && cp "shellcheck-${SC_VERSION}/shellcheck" /usr/local/bin/
 
