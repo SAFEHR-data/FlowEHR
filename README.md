@@ -100,6 +100,6 @@ be created in a private repository created from this template repository.
     - `DEVCONTAINER_ACR_NAME`: Name of the azure container registry to use for the devcontainer build. This may or may not exist. e.g. `flowehrmgmtacr`
 
 
-3. >Run `Deploy infra test`
+3. Run `Deploy infra test`
 
     Trigger a deployment using a workflow dispatch trigger on the `Actions` tab.

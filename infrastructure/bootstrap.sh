@@ -25,8 +25,8 @@ while getopts ":d" option; do
         echo "Management rg destroyed."
         exit;;
       *) # unknown
-         echo "Unknown flag $option"
-         exit 1
+        echo "Unknown flag $option"
+        exit 1
    esac
 done
 
