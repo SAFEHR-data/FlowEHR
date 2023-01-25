@@ -40,10 +40,6 @@ For the full reference of possible configuration values, see the [config schema 
 
     Run `az login` to authenticate to Azure
 
-    ```bash
-    az login
-    ```
-
 2. Run `make all`
 
     To bootstrap Terraform, and deploy all infrastructure, run
@@ -69,25 +65,22 @@ For the full reference of possible configuration values, see the [config schema 
 CI deployment workflows are run in [Github environments](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment). These should
 be created in a private repository created from this template repository.
 
-0. <details>
-    <summary>Create a service principal</summary>
+1. Create a service principal
 
     CI deployments require a service principal with access to deploy resources
-    in the subscription. Follow the steps above and then run
+    in the subscription. Create one with:
 
     ```bash
-    make auth
+    subscription_id=<e.g 00000000-0000-0000-0000-00000000>
+    az ad sp create-for-rbac --name "sp-flowehr-cicd" --role Owner --scopes "/subscriptions/${subscription_id}"
     ```
 
     The output will be used in the next step.
 
-</details>
 
+2. Create and populate a GitHub environment
 
-1. <details>
-    <summary>Create and populate a GitHub environment</summary>
-
-    Add an envrionment called `Infra-Test` with following secrets
+    Add an environment called `Infra-Test` with following secrets
 
     - `AZURE_CREDENTIALS`: json containing the credentials of the service principal in the format
 
@@ -103,14 +96,10 @@ be created in a private repository created from this template repository.
 
     - `PREFIX`: Prefix used for naming resources. Must be unique to this repository e.g. `abcd`
     - `LOCATION`: Name of an Azure location e.g. `uksouth`. These can be listed with `az account list-locations -o table`
-    - `ENVIRONMENT`: Name of the envrionment e.g. `dev`, also used to name resources
+    - `ENVIRONMENT`: Name of the environment e.g. `dev`, also used to name resources
     - `DEVCONTAINER_ACR_NAME`: Name of the azure container registry to use for the devcontainer build. This may or may not exist. e.g. `flowehrmgmtacr`
 
-</details>
 
-
-2. <details>
-    <summary>Run `Deploy infra test`</summary>
+3. >Run `Deploy infra test`
 
     Trigger a deployment using a workflow dispatch trigger on the `Actions` tab.
-</details>
