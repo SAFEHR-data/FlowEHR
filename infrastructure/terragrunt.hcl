@@ -57,6 +57,9 @@ generate "provider" {
   contents  = <<EOF
 provider "azurerm" {
   features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
     key_vault {
       # Don't purge on destroy (this would fail due to purge protection being enabled on keyvault)
       purge_soft_delete_on_destroy               = false
