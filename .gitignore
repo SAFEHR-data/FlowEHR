@@ -42,3 +42,8 @@ terraform.tf
 config.yaml
 
 .DS_store
+
+# Python artifacts
+**/__pycache__/**
+**/*egg-info/**
+transform/pipeline/dist/**
