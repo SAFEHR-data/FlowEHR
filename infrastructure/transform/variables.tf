@@ -33,3 +33,7 @@ variable "core_rg_name" {
 variable "core_rg_location" {
   type = string
 }
+
+variable "spark_version" {
+  type = string
+}

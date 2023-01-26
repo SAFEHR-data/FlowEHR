@@ -32,6 +32,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 3.32"
     }
+    databricks = {
+      source = "databricks/databricks"
+      version = "1.9.0"
+    }
   }
 }
 EOF
@@ -70,6 +74,9 @@ provider "azurerm" {
       recover_soft_deleted_keys         = true
     }
   }
+}
+provider "databricks" {
+  host = azurerm_databricks_workspace.databricks.workspace_url
 }
 EOF
 }
