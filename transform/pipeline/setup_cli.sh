@@ -1,7 +1,6 @@
 #!/bin/bash
 # Run this script as follows:
-# DATABRICKS_URI=https://adb-177476396091008.8.azuredatabricks.net ./setup_cli.sh
-# You need to have databricks CLI already installed
+# DATABRICKS_URI=https://<your-databricks-instance>.azuredatabricks.net ./setup_cli.sh
 
 set +e
 
