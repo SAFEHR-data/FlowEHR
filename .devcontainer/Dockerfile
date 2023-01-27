@@ -68,7 +68,7 @@ RUN npm install -g pajv@${PAJV_VERSION}
 ARG PRECOMMIT_VERSION="2.21.0"
 RUN python3 -m pip install pre-commit=="${PRECOMMIT_VERSION}" --no-cache-dir
 
-# Install Spark and PySpark for running tests for data transform pipeline
+# Install Python dependencies for data transform pipeline
 ARG SPARK_VERSION="3.3.1"
 RUN python3 -m pip install pyspark==3.3.1 build numpy databricks-cli --no-cache-dir
 
