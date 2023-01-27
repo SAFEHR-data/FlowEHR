@@ -2,6 +2,8 @@ from setuptools import setup, find_packages
 
 import src
 
+# This is a Python wheel set up file
+# See https://peps.python.org/pep-0427/
 setup(
   name='src',
   version=src.__version__,
@@ -9,6 +11,8 @@ setup(
   description='Package with example data pipeline code',
   packages=find_packages(include=['src']),
   entry_points={
+    # ADF-Databricks job ignores this,
+    # and instead requires an entrypoint.py file
   },
   install_requires=[
     'setuptools'
