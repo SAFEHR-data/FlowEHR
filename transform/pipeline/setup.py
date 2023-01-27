@@ -11,7 +11,7 @@ setup(
   description='Package with example data pipeline code',
   packages=find_packages(include=['src']),
   entry_points={
-    # ADF-Databricks job ignores this,
+    # Unlike a pure Databricks job, ADF-Databricks job ignores this,
     # and instead requires an entrypoint.py file
   },
   install_requires=[
