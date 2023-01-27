@@ -68,7 +68,8 @@ be created in a private repository created from this template repository.
 1. Create a service principal
 
     CI deployments require a service principal with access to deploy resources
-    in the subscription. Create one with:
+    in the subscription. One will be required for each subscription into which the
+    environment deploys. Create one with:
 
     ```bash
     subscription_id=<e.g 00000000-0000-0000-0000-00000000>

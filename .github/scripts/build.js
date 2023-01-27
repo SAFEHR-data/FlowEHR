@@ -12,9 +12,9 @@
 //  See the License for the specific language governing permissions and
 // limitations under the License.
 //
+//
 // This file contains functions that are used in GitHub workflows
 // (e.g. to implement the pr-bot for running tests
-// These tests can be run from the dev container using the run-tests.sh script
 //
 const { createHash } = require('crypto');
 
