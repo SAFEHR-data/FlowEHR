@@ -4,3 +4,5 @@ location: __CHANGE_ME__
 environment: __CHANGE_ME__
 arm_subscription_id: __CHANGE_ME__
 devcontainer_acr_name: __CHANGE_ME__
+transform:
+ spark_version: 3.3.1
