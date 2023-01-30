@@ -32,6 +32,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 3.32"
     }
+    databricks = {
+      source = "databricks/databricks"
+      version = "1.9.1"
+    }
   }
 }
 EOF
@@ -74,11 +78,19 @@ provider "azurerm" {
     }
   }
 }
+provider "databricks" {
+  host = azurerm_databricks_workspace.databricks.workspace_url
+}
 EOF
 }
 
 # Here we can define additional variables to be inhereted by each module
 inputs = {
+
+  location = get_env("LOCATION")
+  naming_prefix = get_env("NAMING_PREFIX")
+  truncated_naming_prefix = get_env("TRUNCATED_NAMING_PREFIX")
+
   tags = {
     environment = get_env("ENVIRONMENT")
   }

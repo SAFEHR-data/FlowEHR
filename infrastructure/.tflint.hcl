@@ -22,3 +22,13 @@ plugin "azurerm" {
     version = "0.20.0"
     source  = "github.com/terraform-linters/tflint-ruleset-azurerm"
 }
+
+# The required version and providers are specified in the top-level directory and
+# injected by terragrunt so these rules can be safely ignored
+rule "terraform_required_version" {
+  enabled = false
+}
+
+rule "terraform_required_providers" {
+  enabled = false
+}

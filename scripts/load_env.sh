@@ -57,8 +57,14 @@ else
 
 fi
 
-# Export additional required variables
-export MGMT_RG="${PREFIX}-${ENVIRONMENT}-rg-mgmt"
-export MGMT_ACR="${PREFIX}${ENVIRONMENT}acrmgmt"
-export MGMT_STORAGE="${PREFIX}${ENVIRONMENT}strgmgmt"
+NAMING_PREFIX=$("${script_dir}/name_prefix.py")
+echo "Naming resources with prefixed with: ${NAMING_PREFIX}"
+export NAMING_PREFIX
+
+TRUNCATED_NAMING_PREFIX=$("${script_dir}/name_prefix.py" --truncated)
+echo "Naming resources that have naming restrictions with: ${TRUNCATED_NAMING_PREFIX}"
+export TRUNCATED_NAMING_PREFIX 
+
+export MGMT_RG="${NAMING_PREFIX}-rg-mgmt"
+export MGMT_STORAGE="${TRUNCATED_NAMING_PREFIX}strm"
 export STATE_CONTAINER="tfstate"

@@ -13,17 +13,16 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 
-for ext in ".tf" ".yml" ".yaml" ".sh" "Dockerfile" ".py" ".hcl" ".js"
-do
-    # shellcheck disable=SC2044
-    for path in $(find . -name "*$ext" -not .devcontainer*)
-    do
-        if [[ $path = *"override.tf"* ]]; then  # Ignore gitignored file
-            continue
-        fi
-        if ! grep -q "Copyright" "$path"; then
-            echo -e "\n\e[31m»»» ⚠️  No copyright/license header in $path"
-            exit 1
-        fi
-    done || exit 1
+set -o errexit
+set -o pipefail
+set -o nounset
+
+az group list -o table | while read -r line ; do
+
+  if echo "$line" | grep -q "${NAMING_PREFIX}"; then
+    rg_name=$(echo "$line" | awk '{print $1;}')
+    echo "Deleting ${rg_name}..."
+    az group delete --resource-group "$rg_name" --yes
+  fi
+
 done
