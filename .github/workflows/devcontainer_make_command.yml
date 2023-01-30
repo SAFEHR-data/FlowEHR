@@ -91,3 +91,4 @@ jobs:
             LOCATION=${{ secrets.LOCATION }}
             ENVIRONMENT=${{ inputs.environment }}
             DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
+            SPARK_VERSION=${{ vars.SPARK_VERSION }}
