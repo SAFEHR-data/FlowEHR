@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-name: Destroy infra test
+name: Destroy Infra-Test
 
 on:
   workflow_dispatch:

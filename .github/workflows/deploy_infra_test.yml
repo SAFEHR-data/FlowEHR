@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-name: Deploy infra test
+name: Deploy Infra-Test
 
 on:
   push:
@@ -27,6 +27,7 @@ permissions:
 jobs:
   deploy:
     uses: ./.github/workflows/devcontainer_make_command.yml
+    name: Make Deploy
     with:
       command: deploy
       environment: Infra-Test
