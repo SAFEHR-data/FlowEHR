@@ -13,19 +13,22 @@
         "prefix": {
             "description": "Unique identifier (i.e. for differentiating organisations/projects)",
             "type": "string",
-            "pattern": "^[a-zA-Z 0-9\\_]*$",
-            "maxLength": 4
+            "pattern": "^[a-zA-Z 0-9\\_-]*$"
         },
         "environment": {
             "description": "Unique environment name for differentiating deployment environments",
             "type": "string",
-            "pattern": "^[a-zA-Z 0-9\\_]*$",
-            "maxLength": 5
+            "pattern": "^[a-zA-Z 0-9\\_-]*$"
         },
         "arm_subscription_id": {
             "description": "Subscription Id for the Azure subscription to deploy to",
             "type": "string",
             "pattern": "^[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$"
+        },
+        "devcontainer_acr_name": {
+            "description": "Azure Container Registry name. If this does not exist then make bootstrap will create it",
+            "type": "string",
+            "pattern": "[0-9a-z]{5,50}"
         },
         "transform": {
             "description": "Configuration for Data Transformation",

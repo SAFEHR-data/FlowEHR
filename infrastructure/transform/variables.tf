@@ -12,14 +12,9 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-variable "prefix" {
+variable "naming_prefix" {
   type        = string
-  description = "The prefix to apply to resource names (i.e. to differentiate organisations/projects)"
-}
-
-variable "environment" {
-  type        = string
-  description = "The environment to apply to resource names (to differentiate environments)"
+  description = "Prefix used to name resources"
 }
 
 variable "tags" {

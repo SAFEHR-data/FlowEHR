@@ -41,4 +41,11 @@ terraform.tf
 *.env
 config.yaml
 
+# Mac specific metadata
 .DS_store
+
+# Python cache
+__pycache__/
+
+# vs code settings
+.vscode/

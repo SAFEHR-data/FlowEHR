@@ -86,6 +86,11 @@ EOF
 
 # Here we can define additional variables to be inhereted by each module
 inputs = {
+
+  location = get_env("LOCATION")
+  naming_prefix = get_env("NAMING_PREFIX")
+  truncated_naming_prefix = get_env("TRUNCATED_NAMING_PREFIX")
+
   tags = {
     environment = get_env("ENVIRONMENT")
   }

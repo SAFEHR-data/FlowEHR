@@ -48,24 +48,25 @@ bootstrap-destroy: az-login ## Destroy boostrap rg
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& . ${MAKEFILE_DIR}/infrastructure/bootstrap.sh -d
 
-deploy: az-login ## Deploy all infrastructure
+deploy: bootstrap ## Deploy all infrastructure
 	$(call target_title, "Deploy All") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
-	&& terragrunt run-all apply --terragrunt-working-dir ${MAKEFILE_DIR}/infrastructure --terragrunt-non-interactive
+	&& cd ${MAKEFILE_DIR}/infrastructure \
+	&& terragrunt run-all apply --terragrunt-non-interactive
 
-deploy-core: az-login ## Deploy core infrastructure
+deploy-core: bootstrap ## Deploy core infrastructure
 	$(call target_title, "Deploy Core Infrastructure") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/infrastructure/core \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
 
-deploy-transform: az-login ## Deploy transform infrastructure
+deploy-transform: bootstrap ## Deploy transform infrastructure
 	$(call target_title, "Deploy Transform Infrastructure") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/infrastructure/transform \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
 
-deploy-serve: az-login ## Deploy serve infrastructure
+deploy-serve: bootstrap ## Deploy serve infrastructure
 	$(call target_title, "Deploy Serve Infrastructure") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/infrastructure/serve \
@@ -74,4 +75,19 @@ deploy-serve: az-login ## Deploy serve infrastructure
 destroy: az-login ## Destroy all infrastructure
 	$(call target_title, "Destroy All") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
-	&& terragrunt run-all destroy --terragrunt-working-dir ${MAKEFILE_DIR}/infrastructure --terragrunt-non-interactive
+	&& cd ${MAKEFILE_DIR}/infrastructure \
+	&& terragrunt run-all destroy --terragrunt-non-interactive
+
+test: deploy destroy bootstrap-destroy  ## Test by deploy->destroy
+
+test-transform: deploy-transform destroy bootstrap-destroy  ## Test transform deploy->destroy
+
+test-serve: deploy-serve destroy bootstrap-destroy  ## Test transform deploy->destroy
+
+destroy-no-terraform: az-login ## Destroy all resource groups associated with this deployment
+	$(call target_title, "Destroy no terraform") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& . ${MAKEFILE_DIR}/scripts/destroy_no_terraform.sh
+
+clean: ## Remove all local terraform state
+	find ${MAKEFILE_DIR} -type d -name ".terraform" -exec rm -rf "{}" \;
