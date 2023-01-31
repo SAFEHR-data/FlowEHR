@@ -85,15 +85,15 @@ be created in a private repository created from this template repository.
 
     - `AZURE_CREDENTIALS`: json containing the credentials of the service principal in the format:
 
-    ```json
-    {
-    "clientId": "xxx",
-    "clientSecret": "xxx",
-    "tenantId": "xxx",
-    "subscriptionId": "xxx",
-    "resourceManagerEndpointUrl": "management.azure.com"
-    }
-    ```
+        ```json
+        {
+            "clientId": "xxx",
+            "clientSecret": "xxx",
+            "tenantId": "xxx",
+            "subscriptionId": "xxx",
+            "resourceManagerEndpointUrl": "management.azure.com"
+        }
+        ```
 
     - `PREFIX`: Prefix used for naming resources. Must be unique to this repository e.g. `abcd`
     - `LOCATION`: Name of an Azure location e.g. `uksouth`. These can be listed with `az account list-locations -o table`

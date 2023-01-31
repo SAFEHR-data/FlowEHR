@@ -65,7 +65,7 @@ def truncated_naming_prefix():
         1. Cannot start with a non-letter, due to key vault naming requirements
         azure.github.io/PSRule.Rules.Azure/en/rules/Azure.KeyVault.Name/
 
-        2. Cannot be longer than 20 characters, given a conventional "strg" suffix
+        2. Cannot be longer than 18 characters, given a conventional "strg" suffix
            for storage accounts. And the storage account naming requirements:
            learn.microsoft.com/en-us/azure/storage/common/storage-account-overview
 
@@ -76,7 +76,7 @@ def truncated_naming_prefix():
     if prefix[0].isdigit():
         prefix = f"a{prefix}"
 
-    return _last_n_characters(prefix.lower(), n=20)
+    return _last_n_characters(prefix.lower(), n=18)
 
 
 def test_naming() -> None:
