@@ -44,8 +44,10 @@ config.yaml
 # Mac specific metadata
 .DS_store
 
-# Python cache
-__pycache__/
+# Python artifacts
+**/__pycache__/**
+**/*egg-info/**
+transform/pipeline/dist/**
 
 # vs code settings
 .vscode/
