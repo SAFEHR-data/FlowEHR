@@ -32,7 +32,8 @@ def _remove_non_alpha_numeric_chars(string: str) -> str:
 def naming_suffix():
     """
     Construct a naming suffix that satisfies the naming requirements for a resource
-    group. Any hyphens, underscores or spaces in $SUFFIX and $ENVIRONMENT will be delted
+    group. Any hyphens, underscores or spaces in $SUFFIX and $ENVIRONMENT will be
+    deleted
     """
 
     def transform(string: str) -> str:
