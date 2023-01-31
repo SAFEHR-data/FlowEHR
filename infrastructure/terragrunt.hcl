@@ -88,8 +88,8 @@ EOF
 inputs = {
 
   location = get_env("LOCATION")
-  naming_prefix = get_env("NAMING_PREFIX")
-  truncated_naming_prefix = get_env("TRUNCATED_NAMING_PREFIX")
+  naming_suffix = get_env("NAMING_SUFFIX")
+  truncated_naming_suffix = get_env("TRUNCATED_NAMING_SUFFIX")
 
   tags = {
     environment = get_env("ENVIRONMENT")

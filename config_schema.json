@@ -10,7 +10,7 @@
             "type": "string",
             "pattern": "[a-z]+"
         },
-        "prefix": {
+        "suffix": {
             "description": "Unique identifier (i.e. for differentiating organisations/projects)",
             "type": "string",
             "pattern": "^[a-zA-Z 0-9\\_-]*$"
@@ -46,7 +46,7 @@
     },
     "required": [
       "location",
-      "prefix",
+      "suffix",
       "environment",
       "arm_subscription_id"
     ]

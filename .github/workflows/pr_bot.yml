@@ -127,7 +127,7 @@ jobs:
     name: Destroy PR
     uses: ./.github/workflows/devcontainer_make_command.yml
     with:
-      prefix_override: ${{ needs.pr_comment.outputs.prRefId }}
+      suffix_override: ${{ needs.pr_comment.outputs.prRefId }}
       environment: Infra-Test
       command: destroy-no-terraform
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}
@@ -141,7 +141,7 @@ jobs:
     name: Deploy PR
     uses: ./.github/workflows/devcontainer_make_command.yml
     with:
-      prefix_override: ${{ needs.pr_comment.outputs.prRefId }}
+      suffix_override: ${{ needs.pr_comment.outputs.prRefId }}
       environment: Infra-Test
       command: ${{ needs.pr_comment.outputs.makeCommand }}
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}

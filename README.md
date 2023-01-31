@@ -26,7 +26,7 @@ cp config.sample.yaml config.yaml
 
 Then edit `config.yaml` and specify the following values:
 
-- `prefix` - a prefix to apply to all deployed resources (i.e. `flowehr-uclh`)
+- `suffix` - a suffix to apply to all deployed resources (i.e. `flowehr-uclh`)
 - `environment` - a unique name for your environment (i.e. `jgdev`)
 - `location` - the [Azure region](https://azuretracks.com/2021/04/current-azure-region-names-reference/) you wish to deploy resources to
 - `arm_subscription_id` - the [Azure subscription id](https://learn.microsoft.com/en-us/azure/azure-portal/get-subscription-tenant-id) you wish to deploy to
@@ -95,7 +95,7 @@ be created in a private repository created from this template repository.
         }
         ```
 
-    - `PREFIX`: Prefix used for naming resources. Must be unique to this repository e.g. `abcd`
+    - `SUFFIX`: Suffix used for naming resources. Must be unique to this repository e.g. `abcd`
     - `LOCATION`: Name of an Azure location e.g. `uksouth`. These can be listed with `az account list-locations -o table`
     - `ENVIRONMENT`: Name of the environment e.g. `dev`, also used to name resources
     - `DEVCONTAINER_ACR_NAME`: Name of the Azure Container Registry to use for the devcontainer build. This may or may not exist. e.g. `flowehrmgmtacr`

@@ -12,9 +12,9 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-variable "naming_prefix" {
+variable "naming_suffix" {
   type        = string
-  description = "Prefix used to name resources"
+  description = "Suffix used to name resources"
 }
 
 variable "tags" {

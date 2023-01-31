@@ -12,14 +12,14 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-variable "naming_prefix" {
+variable "naming_suffix" {
   type        = string
-  description = "Prefix used to name resources"
+  description = "Suffix used to name resources"
 }
 
-variable "truncated_naming_prefix" {
+variable "truncated_naming_suffix" {
   type        = string
-  description = "Truncated (max 20 chars, no hyphens etc.) prefix to name e.g storage accounts"
+  description = "Truncated (max 20 chars, no hyphens etc.) suffix to name e.g storage accounts"
 }
 
 variable "location" {

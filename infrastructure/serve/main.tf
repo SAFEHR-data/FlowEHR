@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 resource "azurerm_application_insights" "serve" {
-  name                = "${var.naming_prefix}-aml-ai"
+  name                = "aml-ai-${var.naming_suffix}"
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
   application_type    = "web"
@@ -21,7 +21,7 @@ resource "azurerm_application_insights" "serve" {
 }
 
 resource "azurerm_storage_account" "serve" {
-  name                     = "${var.truncated_naming_prefix}amlstrg"
+  name                     = "strgaml${var.truncated_naming_suffix}"
   location                 = var.core_rg_location
   resource_group_name      = var.core_rg_name
   account_tier             = "Standard"
@@ -30,7 +30,7 @@ resource "azurerm_storage_account" "serve" {
 }
 
 resource "azurerm_machine_learning_workspace" "serve" {
-  name                    = "${var.naming_prefix}-aml"
+  name                    = "aml-${var.naming_suffix}"
   location                = var.core_rg_location
   resource_group_name     = var.core_rg_name
   application_insights_id = azurerm_application_insights.serve.id

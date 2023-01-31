@@ -43,7 +43,7 @@ else
   GET_LEAF_KEYS=".. | select(. == \"*\") | {(path | .[-1]): .}"
   # Map keys to uppercase yq query
   UPCASE_KEYS="with_entries(.key |= upcase)"
-  # Prefix keys with TF_VAR_ yq query
+  # Suffix keys with TF_VAR_ yq query
   TF_KEYS="with_entries(.key |= \"TF_VAR_\" + .)"
   # Yq query to format the output to be in form: key=value
   FORMAT_FOR_ENV_EXPORT="to_entries| map(.key + \"=\" +  .value)|join(\" \")"
@@ -57,14 +57,14 @@ else
 
 fi
 
-NAMING_PREFIX=$("${script_dir}/name_prefix.py")
-echo "Naming resources with prefixed with: ${NAMING_PREFIX}"
-export NAMING_PREFIX
+NAMING_SUFFIX=$("${script_dir}/name_suffix.py")
+echo "Naming resources with suffixed with: ${NAMING_SUFFIX}"
+export NAMING_SUFFIX
 
-TRUNCATED_NAMING_PREFIX=$("${script_dir}/name_prefix.py" --truncated)
-echo "Naming resources that have naming restrictions with: ${TRUNCATED_NAMING_PREFIX}"
-export TRUNCATED_NAMING_PREFIX 
+TRUNCATED_NAMING_SUFFIX=$("${script_dir}/name_suffix.py" --truncated)
+echo "Naming resources that have naming restrictions with: ${TRUNCATED_NAMING_SUFFIX}"
+export TRUNCATED_NAMING_SUFFIX 
 
-export MGMT_RG="${NAMING_PREFIX}-rg-mgmt"
-export MGMT_STORAGE="${TRUNCATED_NAMING_PREFIX}strm"
+export MGMT_RG="rg-mgmt-${NAMING_SUFFIX}"
+export MGMT_STORAGE="strgm${TRUNCATED_NAMING_SUFFIX}"
 export STATE_CONTAINER="tfstate"
