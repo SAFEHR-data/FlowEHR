@@ -23,4 +23,5 @@ dependency "core" {
 inputs = {
   core_rg_name     = dependency.core.outputs.core_rg_name
   core_rg_location = dependency.core.outputs.core_rg_location
+  spark_version    = get_env("SPARK_VERSION", "3.3.1") // This only needs a default for CICD, which can be removed following https://github.com/UCLH-Foundry/FlowEHR/issues/42 
 }
