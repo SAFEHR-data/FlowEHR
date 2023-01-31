@@ -65,6 +65,6 @@ TRUNCATED_NAMING_SUFFIX=$("${script_dir}/name_suffix.py" --truncated)
 echo "Naming resources that have naming restrictions with: ${TRUNCATED_NAMING_SUFFIX}"
 export TRUNCATED_NAMING_SUFFIX 
 
-export MGMT_RG="${NAMING_SUFFIX}-rg-mgmt"
-export MGMT_STORAGE="${TRUNCATED_NAMING_SUFFIX}strm"
+export MGMT_RG="rg-mgmt-${NAMING_SUFFIX}"
+export MGMT_STORAGE="strgm${TRUNCATED_NAMING_SUFFIX}"
 export STATE_CONTAINER="tfstate"
