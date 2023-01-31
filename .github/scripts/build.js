@@ -99,8 +99,12 @@ async function getCommandFromComment({ core, context, github }) {
         }
 
       case "/destroy-env":
-        command = "destroy-env";
-        break;
+        {
+          command = "destroy-env";
+          const message = `Destroying environment (with refid ${prRefId})`;
+          await addActionComment({ github }, repoOwner, repoName, prNumber, commentUsername, commentLink, message);
+          break;
+        }
 
       case "/help":
         showHelp({ github }, repoOwner, repoName, prNumber, commentUsername, commentLink, null);
