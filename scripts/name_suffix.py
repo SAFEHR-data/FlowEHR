@@ -21,14 +21,6 @@ import re
 import argparse
 
 
-def _remove_whitespace(string: str) -> str:
-    return string.replace(" ", "")
-
-
-def _replace_hyphens_with_underscores(string: str) -> str:
-    return string.replace("-", "_")
-
-
 def _last_n_characters(string: str, n: int) -> str:
     return string[-n:]
 
@@ -40,11 +32,14 @@ def _remove_non_alpha_numeric_chars(string: str) -> str:
 def naming_suffix():
     """
     Construct a naming suffix that satisfies the naming requirements for a resource
-    group. Any hyphens in $SUFFIX and $ENVIRONMENT to separate "blocks"
+    group. Any hyphens, underscores or spaces in $SUFFIX and $ENVIRONMENT will be delted
     """
 
     def transform(string: str) -> str:
-        return _replace_hyphens_with_underscores(_remove_whitespace(string))
+        for excluded_character in (" ", "-", "_"):
+            string = string.replace(excluded_character, "")
+
+        return string
 
     suffix = f"{transform(os.environ['SUFFIX'])}-{transform(os.environ['ENVIRONMENT'])}"
 
@@ -83,11 +78,11 @@ def test_naming() -> None:
 
     test_data = {
         ("flowehr", "dev"): ("flowehr-dev", "flowehrdev"),
-        ("a", "infra-test"): ("a-infra_test", "ainfratest"),
+        ("a", "infra-test"): ("a-infratest", "ainfratest"),
         ("a b", "prod"): ("ab-prod", "abprod"),
         ("a-long-suffix", "a-long-env-name"): (
-            "a_long_suffix-a_long_env_name",
-            "refixalongenvname",
+            "alongsuffix-alongenvname",
+            "uffixalongenvname",
         ),
         ("1asuffix", "dev"): ("1asuffix-dev", "a1asuffixdev"),
     }
