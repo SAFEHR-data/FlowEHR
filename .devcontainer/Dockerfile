@@ -66,4 +66,19 @@ ARG PAJV_VERSION="1.2.0"
 RUN npm install -g pajv@${PAJV_VERSION}
 
 ARG PRECOMMIT_VERSION="2.21.0"
-RUN pip3 install pre-commit=="${PRECOMMIT_VERSION}" --no-cache-dir
+RUN python3 -m pip install pre-commit=="${PRECOMMIT_VERSION}" --no-cache-dir
+
+# Install Python dependencies for data transform pipeline
+ARG SPARK_VERSION="3.3.1"
+RUN python3 -m pip install pyspark==3.3.1 build numpy databricks-cli --no-cache-dir
+
+# Get the local Spark installed to be able to run unit tests
+# Borrowed from https://github.com/beandrad/pyspark-sample/blob/main/.devcontainer/Dockerfile#L36
+RUN mkdir -p /tmp/docker-downloads \
+    && sudo apt-get update && sudo apt-get -y install openjdk-11-jdk wget \
+    && wget https://downloads.apache.org/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz -O /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
+    && tar -xvzf /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
+    && mv spark-${SPARK_VERSION}-bin-hadoop3 /opt/spark \
+    && rm -rf /tmp/docker-downloads
+ENV SPARK_HOME=/opt/spark
+ENV PATH=$PATH:$SPARK_HOME/bin
