@@ -13,9 +13,9 @@
 #  limitations under the License.
 
 resource "azurerm_databricks_workspace" "databricks" {
-  name                        = "${var.naming_prefix}-dbks"
+  name                        = "dbks-${var.naming_suffix}"
   resource_group_name         = var.core_rg_name
-  managed_resource_group_name = "${var.naming_prefix}-rg-dbks"
+  managed_resource_group_name = "rg-dbks-${var.naming_suffix}"
   location                    = var.core_rg_location
   sku                         = "standard"
   tags                        = var.tags
@@ -57,7 +57,7 @@ resource "azurerm_role_assignment" "adf_can_create_clusters" {
 }
 
 resource "azurerm_data_factory" "adf" {
-  name                = replace("${var.naming_prefix}-adf", "_", "")
+  name                = replace("adf-${var.naming_suffix}", "_", "")
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
   identity {

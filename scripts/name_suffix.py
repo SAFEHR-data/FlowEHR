@@ -14,7 +14,7 @@
 # limitations under the License.
 """
 Script used to name azure resources given the environment variables
-$PREFIX and $ENVIRONMENT
+$SUFFIX and $ENVIRONMENT
 """
 import os
 import re
@@ -37,29 +37,29 @@ def _remove_non_alpha_numeric_chars(string: str) -> str:
     return re.sub("[^a-zA-Z0-9]+", "", string)
 
 
-def naming_prefix():
+def naming_suffix():
     """
-    Construct a naming prefix that satisfies the naming requirements for a resource
-    group. Any hyphens in $PREFIX and $ENVIRONMENT to separate "blocks"
+    Construct a naming suffix that satisfies the naming requirements for a resource
+    group. Any hyphens in $SUFFIX and $ENVIRONMENT to separate "blocks"
     """
 
     def transform(string: str) -> str:
         return _replace_hyphens_with_underscores(_remove_whitespace(string))
 
-    prefix = f"{transform(os.environ['PREFIX'])}-{transform(os.environ['ENVIRONMENT'])}"
+    suffix = f"{transform(os.environ['SUFFIX'])}-{transform(os.environ['ENVIRONMENT'])}"
 
-    if len(prefix) == 0:
+    if len(suffix) == 0:
         raise RuntimeError(
-            "Cannot create a prefix with no chars. At least one of $PREFIX and "
+            "Cannot create a suffix with no chars. At least one of $SUFFIX and "
             "$ENVIRONMENT must be set to a non-empty string"
         )
 
-    return _last_n_characters(prefix, n=90)
+    return _last_n_characters(suffix, n=90)
 
 
-def truncated_naming_prefix():
+def truncated_naming_suffix():
     """
-    Construct a naming prefix from both the base prefix and environment
+    Construct a naming suffix from both the base suffix and environment
     variables with the following requirements:
 
         1. Cannot start with a non-letter, due to key vault naming requirements
@@ -71,12 +71,12 @@ def truncated_naming_prefix():
 
         3. Must not contain any non-alpha numeric characters or upper case letters
     """
-    prefix = _remove_non_alpha_numeric_chars(naming_prefix())
+    suffix = _remove_non_alpha_numeric_chars(naming_suffix())
 
-    if prefix[0].isdigit():
-        prefix = f"a{prefix}"
+    if suffix[0].isdigit():
+        suffix = f"a{suffix}"
 
-    return _last_n_characters(prefix.lower(), n=17)
+    return _last_n_characters(suffix.lower(), n=17)
 
 
 def test_naming() -> None:
@@ -85,18 +85,18 @@ def test_naming() -> None:
         ("flowehr", "dev"): ("flowehr-dev", "flowehrdev"),
         ("a", "infra-test"): ("a-infra_test", "ainfratest"),
         ("a b", "prod"): ("ab-prod", "abprod"),
-        ("a-long-prefix", "a-long-env-name"): (
-            "a_long_prefix-a_long_env_name",
+        ("a-long-suffix", "a-long-env-name"): (
+            "a_long_suffix-a_long_env_name",
             "refixalongenvname",
         ),
-        ("1aprefix", "dev"): ("1aprefix-dev", "a1aprefixdev"),
+        ("1asuffix", "dev"): ("1asuffix-dev", "a1asuffixdev"),
     }
 
-    for (prefix, environment), (expected, expected_t) in test_data.items():
-        os.environ["PREFIX"] = prefix
+    for (suffix, environment), (expected, expected_t) in test_data.items():
+        os.environ["SUFFIX"] = suffix
         os.environ["ENVIRONMENT"] = environment
-        assert naming_prefix() == expected
-        assert truncated_naming_prefix() == expected_t
+        assert naming_suffix() == expected
+        assert truncated_naming_suffix() == expected_t
 
 
 if __name__ == "__main__":
@@ -106,11 +106,11 @@ if __name__ == "__main__":
         "-t",
         "--truncated",
         action="store_true",
-        help="Print the truncated naming prefix suitable for storage accounts etc.",
+        help="Print the truncated naming suffix suitable for storage accounts etc.",
     )
     args = parser.parse_args()
 
     if args.truncated:
-        print(truncated_naming_prefix())
+        print(truncated_naming_suffix())
     else:
-        print(naming_prefix())
+        print(naming_suffix())

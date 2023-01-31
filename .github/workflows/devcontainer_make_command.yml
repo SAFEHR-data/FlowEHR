@@ -25,10 +25,10 @@ on:
         type: string
         required: true
         description: The GitHub environment in which to run
-      prefix_override:
+      suffix_override:
         type: string
         required: false
-        description: An override for the naming prefix
+        description: An override for the naming suffix
       sha:
         type: string
         required: false
@@ -38,7 +38,7 @@ on:
         required: true
       DEVCONTAINER_ACR_NAME:
         required: true
-      PREFIX:
+      SUFFIX:
         required: true
       LOCATION:
         required: true
@@ -87,7 +87,7 @@ jobs:
             ARM_CLIENT_SECRET=${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
             ARM_TENANT_ID=${{ fromJSON(secrets.AZURE_CREDENTIALS).tenantId }}
             ARM_SUBSCRIPTION_ID=${{ fromJSON(secrets.AZURE_CREDENTIALS).subscriptionId }}
-            PREFIX=${{ (inputs.prefix_override != '' && inputs.prefix_override) || secrets.PREFIX }}
+            SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
             LOCATION=${{ secrets.LOCATION }}
             ENVIRONMENT=${{ inputs.environment }}
             DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}

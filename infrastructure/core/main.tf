@@ -13,13 +13,13 @@
 #  limitations under the License.
 
 resource "azurerm_resource_group" "core" {
-  name     = "${var.naming_prefix}-rg"
+  name     = "rg-${var.naming_suffix}"
   location = var.location
   tags     = var.tags
 }
 
 resource "azurerm_virtual_network" "core" {
-  name                = "${var.naming_prefix}-vnet"
+  name                = "vnet-${var.naming_suffix}"
   resource_group_name = azurerm_resource_group.core.name
   location            = azurerm_resource_group.core.location
   address_space       = ["10.0.0.0/16"]
@@ -27,15 +27,15 @@ resource "azurerm_virtual_network" "core" {
 }
 
 resource "azurerm_subnet" "core" {
-  name                 = "${var.naming_prefix}-subnet-core"
+  name                 = "subnet-core-${var.naming_suffix}"
   resource_group_name  = azurerm_resource_group.core.name
   virtual_network_name = azurerm_virtual_network.core.name
-  address_prefixes     = ["10.0.2.0/24"]
+  address_suffixes     = ["10.0.2.0/24"]
   service_endpoints    = ["Microsoft.Sql", "Microsoft.Storage"]
 }
 
 resource "azurerm_storage_account" "core" {
-  name                     = "${var.truncated_naming_prefix}strg"
+  name                     = "strg${var.truncated_naming_suffix}"
   resource_group_name      = azurerm_resource_group.core.name
   location                 = azurerm_resource_group.core.location
   account_tier             = "Standard"
@@ -50,7 +50,7 @@ resource "azurerm_storage_account" "core" {
 }
 
 resource "azurerm_key_vault" "core" {
-  name                        = "${var.truncated_naming_prefix}-kv"
+  name                        = "kv-${var.truncated_naming_suffix}"
   location                    = azurerm_resource_group.core.location
   resource_group_name         = azurerm_resource_group.core.name
   enabled_for_disk_encryption = true
