@@ -98,7 +98,9 @@ jobs:
       # If we don't run the actual deploy (see the run_test job below) we won't receive
       # a check-run status, and will have to send it "manually"
       - name: Bypass E2E check-runs status
-        if: ${{ steps.check_command.outputs.command == 'test-force-approve' }}
+        if: |
+          (steps.check_command.outputs.command == 'test-force-approve') ||
+          (steps.set_make_command.outputs.makeCommand == 'none')
         uses: LouisBrunner/checks-action@v1.5.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
