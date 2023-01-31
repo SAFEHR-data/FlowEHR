@@ -57,7 +57,7 @@ resource "azurerm_role_assignment" "adf_can_create_clusters" {
 }
 
 resource "azurerm_data_factory" "adf" {
-  name                = "${var.naming_prefix}-adf"
+  name                = replace("${var.naming_prefix}-adf", "_", "")
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
   identity {
