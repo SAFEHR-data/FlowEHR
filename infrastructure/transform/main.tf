@@ -67,9 +67,18 @@ resource "azurerm_data_factory" "adf" {
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
 
+  managed_virtual_network_enabled = true
+
   identity {
     type = "SystemAssigned"
   }
+}
+
+resource "azurerm_data_factory_integration_runtime_azure" "ir" {
+  name                    = "Azure Integration Runtime"
+  data_factory_id         = azurerm_data_factory.adf.id
+  location                = var.core_rg_location
+  virtual_network_enabled = true
 }
 
 resource "azurerm_role_assignment" "adf_can_create_clusters" {
