@@ -19,17 +19,27 @@ resource "azurerm_databricks_workspace" "databricks" {
   location                    = var.core_rg_location
   sku                         = "standard"
   tags                        = var.tags
+
+  custom_parameters {
+    no_public_ip         = true
+    nat_gateway_name     = "natgw-dbks-${var.naming_suffix}"
+    storage_account_name = "stgdbfs${var.truncated_naming_suffix}"
+  }
 }
 
 data "databricks_spark_version" "latest_lts" {
   spark_version = var.spark_version
 
-  depends_on = [azurerm_databricks_workspace.databricks]
+  depends_on = [
+    azurerm_databricks_workspace.databricks
+  ]
 }
 
 data "databricks_node_type" "smallest" {
   # Providing no required configuration, Databricks will pick the smallest node possible
-  depends_on = [azurerm_databricks_workspace.databricks]
+  depends_on = [
+    azurerm_databricks_workspace.databricks
+  ]
 }
 
 resource "databricks_cluster" "fixed_single_node" {
@@ -47,22 +57,25 @@ resource "databricks_cluster" "fixed_single_node" {
     "ResourceClass" = "SingleNode"
   }
 
-  depends_on = [azurerm_databricks_workspace.databricks]
-}
-
-resource "azurerm_role_assignment" "adf_can_create_clusters" {
-  scope                = azurerm_databricks_workspace.databricks.id
-  role_definition_name = "Contributor"
-  principal_id         = azurerm_data_factory.adf.identity[0].principal_id
+  depends_on = [
+    azurerm_databricks_workspace.databricks
+  ]
 }
 
 resource "azurerm_data_factory" "adf" {
   name                = "adf-${var.naming_suffix}"
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
+
   identity {
     type = "SystemAssigned"
   }
+}
+
+resource "azurerm_role_assignment" "adf_can_create_clusters" {
+  scope                = azurerm_databricks_workspace.databricks.id
+  role_definition_name = "Contributor"
+  principal_id         = azurerm_data_factory.adf.identity[0].principal_id
 }
 
 resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
@@ -72,6 +85,5 @@ resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
   adb_domain      = "https://${azurerm_databricks_workspace.databricks.workspace_url}"
 
   msi_work_space_resource_id = azurerm_databricks_workspace.databricks.id
-
-  existing_cluster_id = databricks_cluster.fixed_single_node.cluster_id
+  existing_cluster_id        = databricks_cluster.fixed_single_node.cluster_id
 }

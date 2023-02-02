@@ -13,11 +13,24 @@
 #  limitations under the License.
 
 include "root" {
-  path = find_in_parent_folders()
+  path   = find_in_parent_folders()
+  expose = true
 }
 
 dependency "core" {
   config_path = "../core"
+}
+
+generate "provider" {
+  path      = "provider.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+${include.root.locals.azure_provider}
+
+provider "databricks" {
+  host                        = azurerm_databricks_workspace.databricks.workspace_url
+}
+EOF
 }
 
 inputs = {
