@@ -75,7 +75,7 @@ resource "azurerm_data_factory" "adf" {
 }
 
 resource "azurerm_data_factory_integration_runtime_azure" "ir" {
-  name                    = "Azure Integration Runtime"
+  name                    = "FlowEHRIntegrationRuntime"
   data_factory_id         = azurerm_data_factory.adf.id
   location                = var.core_rg_location
   virtual_network_enabled = true
