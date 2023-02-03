@@ -49,31 +49,16 @@ resource "azurerm_storage_account" "core" {
 }
 
 resource "azurerm_key_vault" "core" {
-  name                       = "kv-${var.truncated_naming_suffix}"
-  location                   = azurerm_resource_group.core.location
-  resource_group_name        = azurerm_resource_group.core.name
-  tenant_id                  = data.azurerm_client_config.current.tenant_id
-  soft_delete_retention_days = 7
-  purge_protection_enabled   = false
-  sku_name                   = "standard"
-  tags                       = var.tags
-
-  access_policy {
-    tenant_id = data.azurerm_client_config.current.tenant_id
-    object_id = data.azurerm_client_config.current.object_id
-
-    key_permissions = [
-      "Get",
-    ]
-
-    secret_permissions = [
-      "Get",
-    ]
-
-    storage_permissions = [
-      "Get",
-    ]
-  }
+  name                          = "kv-${var.truncated_naming_suffix}"
+  location                      = azurerm_resource_group.core.location
+  resource_group_name           = azurerm_resource_group.core.name
+  tenant_id                     = data.azurerm_client_config.current.tenant_id
+  soft_delete_retention_days    = 7
+  purge_protection_enabled      = false
+  enable_rbac_authorization     = true
+  sku_name                      = "standard"
+  public_network_access_enabled = false
+  tags                          = var.tags
 
   network_acls {
     bypass                     = "AzureServices"

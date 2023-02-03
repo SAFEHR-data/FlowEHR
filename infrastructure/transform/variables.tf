@@ -34,6 +34,14 @@ variable "core_rg_location" {
   type = string
 }
 
+variable "core_kv_id" {
+  type = string
+}
+
+variable "core_kv_uri" {
+  type = string
+}
+
 variable "spark_version" {
   type = string
 }
