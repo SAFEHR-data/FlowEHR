@@ -66,3 +66,9 @@ resource "azurerm_key_vault" "core" {
     virtual_network_subnet_ids = [azurerm_subnet.core.id]
   }
 }
+
+resource "azurerm_role_assignment" "deployer_can_administrate_kv" {
+  scope                = azurerm_key_vault.core.id
+  role_definition_name = "Key Vault Administrator"
+  principal_id         = data.azurerm_client_config.current.object_id
+}
