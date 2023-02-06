@@ -1,0 +1,17 @@
+{
+    "name": "FlowehrAzureDatabricksLinkedService",
+    "type": "Microsoft.DataFactory/factories/linkedservices",
+    "properties": {
+        "annotations": [],
+        "type": "AzureDatabricks",
+        "typeProperties": {
+            "domain": "<domain>",
+            "newClusterNodeType": "<newClusterNodeType>",
+            "newClusterNumOfWorker": "<newClusterNumOfWorker>",
+            "newClusterVersion": "<newClusterVersion>",
+            "newClusterInitScripts": [],
+            "clusterOption": "Fixed",
+            "encryptedCredential": "<encryptedCredential>"
+        }
+    }
+}

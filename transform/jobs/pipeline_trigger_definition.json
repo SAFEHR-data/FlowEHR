@@ -1,6 +1,6 @@
 {
     "properties": {
-      "name": "flowehrPipelineTrigger",
+      "name": "FlowehrPipelineTrigger",
       "type": "ScheduleTrigger",
       "typeProperties": {
         "recurrence": {

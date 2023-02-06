@@ -1,0 +1,13 @@
+{
+    "name": "FlowehrPipeline",
+    "properties": {
+      "description": "Pipeline to run wheel(whl) jobs to transform data to produce features for dashboard and research purposes.",
+      "activities": [
+        {
+            "name": "FlowehrNotebook",
+            "type": "DatabricksNotebook",
+            "linkedServiceName": "FlowehrAzureDatabricksLinkedService"
+        }
+      ]
+    }
+  }
