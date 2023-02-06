@@ -66,16 +66,16 @@ resource "azurerm_role_assignment" "databricks_kv_backed_secret_scopes" {
   scope                = var.core_kv_id
   role_definition_name = "Key Vault Secrets User"
 
-  // This is fixed for the AzureDatabricks provider.
-  // https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secret-scopes
+  # This is fixed for the AzureDatabricks provider.
+  # https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secret-scopes
   principal_id = "21afe959-3777-4668-b79b-65148b2d4721"
 }
 
 resource "databricks_secret_scope" "kv" {
   name = "keyvault-managed"
 
-  // "Creator" (& access control) is only supported in Databricks Premium, so All Users will have MANAGE permission for this secret scope
-  // https://learn.microsoft.com/en-us/azure/databricks/security/access-control/secret-acl
+  # "Creator" (& access control) is only supported in Databricks Premium, so All Users will have MANAGE permission for this secret scope
+  # https://learn.microsoft.com/en-us/azure/databricks/security/access-control/secret-acl
   initial_manage_principal = "users"
 
   keyvault_metadata {
