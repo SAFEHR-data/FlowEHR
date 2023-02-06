@@ -1,0 +1,22 @@
+{
+    "properties": {
+      "name": "flowehrPipelineTrigger",
+      "type": "ScheduleTrigger",
+      "typeProperties": {
+        "recurrence": {
+          "frequency": "minute",
+          "interval": 5,
+          "startTime": "2023-01-01T09:00:00-00:00",
+          "endTime": "2025-01-01T22:00:00-00:00"
+        }
+      },
+      "pipelines": [{
+          "pipelineReference": {
+            "type": "PipelineReference",
+            "referenceName": "FlowehrPipeline"
+          },
+          "parameters": {}
+        }
+      ]
+    }
+  }
