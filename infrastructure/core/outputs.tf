@@ -23,3 +23,7 @@ output "core_rg_location" {
 output "core_kv_id" {
   value = azurerm_key_vault.core.id
 }
+
+output "core_kv_uri" {
+  value = azurerm_key_vault.core.vault_uri
+}

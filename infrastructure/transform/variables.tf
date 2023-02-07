@@ -17,6 +17,11 @@ variable "naming_suffix" {
   description = "Suffix used to name resources"
 }
 
+variable "truncated_naming_suffix" {
+  type        = string
+  description = "Truncated (max 20 chars, no hyphens etc.) suffix to name e.g storage accounts"
+}
+
 variable "tags" {
   type = map(any)
 }
@@ -26,6 +31,14 @@ variable "core_rg_name" {
 }
 
 variable "core_rg_location" {
+  type = string
+}
+
+variable "core_kv_id" {
+  type = string
+}
+
+variable "core_kv_uri" {
   type = string
 }
 
