@@ -60,10 +60,47 @@ resource "azurerm_data_factory" "adf" {
   name                = "adf-${var.naming_suffix}"
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
+
   identity {
     type = "SystemAssigned"
   }
 }
+
+
+resource "azurerm_data_factory_pipeline" "pipeline" {
+  name            = "databricks-pipeline-${var.naming_suffix}"
+  data_factory_id = azurerm_data_factory.adf.id
+  activities_json = <<JSON
+[
+  {
+    "name": "DatabricksPythonActivity",
+    "type": "DatabricksSparkPython",
+    "typeProperties": {
+        "pythonFile": "dbfs:/entrypoint.py",
+        "libraries": [
+            {
+                "whl": "dbfs:/src-0.0.1-py3-none-any.whl"
+            }
+        ]
+    },
+    "linkedServiceName": {
+        "referenceName": "ADBLinkedServiceViaMSI",
+        "type": "LinkedServiceReference"
+    }
+  }
+]
+  JSON
+}
+
+resource "azurerm_data_factory_trigger_schedule" "trigger" {
+  name            = "databricks-pipeline-trigger-${var.naming_suffix}"
+  data_factory_id = azurerm_data_factory.adf.id
+  pipeline_name   = azurerm_data_factory_pipeline.pipeline.name
+  interval        = 5
+  frequency       = "Minute"
+}
+
+
 
 resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
   name            = "ADBLinkedServiceViaMSI"
