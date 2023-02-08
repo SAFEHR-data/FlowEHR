@@ -60,7 +60,6 @@ resource "azurerm_data_factory" "adf" {
   name                = "adf-${var.naming_suffix}"
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
-
   identity {
     type = "SystemAssigned"
   }
@@ -104,8 +103,6 @@ resource "azurerm_data_factory_trigger_schedule" "trigger" {
   interval        = 5
   frequency       = "Minute"
 }
-
-
 
 resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
   name            = "ADBLinkedServiceViaMSI"
