@@ -94,8 +94,8 @@ resource "azurerm_data_factory_pipeline" "pipeline" {
 
 # TODO: Handle file not found.
 resource "databricks_dbfs_file" "dbfs_file_upload" {
-  source = "../../transform/features/dist/src-0.0.1-py3-none-any.whl"
-  path   = "/src-0.0.1-py3-none-any.whl"
+  source = "${var.whl_file_local_path}/${var.whl_file_name}"
+  path   = "/${var.whl_file_name}"
 }
 
 resource "azurerm_data_factory_trigger_schedule" "trigger" {

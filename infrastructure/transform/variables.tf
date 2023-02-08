@@ -32,3 +32,11 @@ variable "core_rg_location" {
 variable "spark_version" {
   type = string
 }
+
+variable "whl_file_local_path" {
+  type = string
+}
+
+variable "whl_file_name" {
+  type = string
+}
