@@ -92,7 +92,6 @@ resource "azurerm_data_factory_pipeline" "pipeline" {
   JSON
 }
 
-# TODO: Handle file not found.
 resource "databricks_dbfs_file" "dbfs_file_upload" {
   source = "${var.whl_file_local_path}/${var.whl_file_name}"
   path   = "/${var.whl_file_name}"
