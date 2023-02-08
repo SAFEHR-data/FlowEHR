@@ -92,6 +92,12 @@ resource "azurerm_data_factory_pipeline" "pipeline" {
   JSON
 }
 
+# TODO: Handle file not found.
+resource "databricks_dbfs_file" "dbfs_file_upload" {
+  source = "../../transform/features/dist/src-0.0.1-py3-none-any.whl"
+  path   = "/src-0.0.1-py3-none-any.whl"
+}
+
 resource "azurerm_data_factory_trigger_schedule" "trigger" {
   name            = "databricks-pipeline-trigger-${var.naming_suffix}"
   data_factory_id = azurerm_data_factory.adf.id
