@@ -65,7 +65,6 @@ resource "azurerm_data_factory" "adf" {
   }
 }
 
-
 resource "azurerm_data_factory_pipeline" "pipeline" {
   name            = "databricks-pipeline-${var.naming_suffix}"
   data_factory_id = azurerm_data_factory.adf.id
@@ -100,7 +99,7 @@ resource "azurerm_data_factory_trigger_schedule" "trigger" {
   name            = "databricks-pipeline-trigger-${var.naming_suffix}"
   data_factory_id = azurerm_data_factory.adf.id
   pipeline_name   = azurerm_data_factory_pipeline.pipeline.name
-  interval        = 5
+  interval        = 15
   frequency       = "Minute"
 }
 
