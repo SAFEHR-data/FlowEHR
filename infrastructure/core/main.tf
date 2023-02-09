@@ -22,7 +22,7 @@ resource "azurerm_virtual_network" "core" {
   name                = "vnet-${var.naming_suffix}"
   resource_group_name = azurerm_resource_group.core.name
   location            = azurerm_resource_group.core.location
-  address_space       = ["10.0.0.0/16"]
+  address_space       = [var.core_address_space]
   tags                = var.tags
 }
 
@@ -30,7 +30,7 @@ resource "azurerm_subnet" "core" {
   name                 = "subnet-core-${var.naming_suffix}"
   resource_group_name  = azurerm_resource_group.core.name
   virtual_network_name = azurerm_virtual_network.core.name
-  address_prefixes     = ["10.0.2.0/24"]
+  address_prefixes     = [local.subnet_address_spaces[0]]
   service_endpoints    = ["Microsoft.KeyVault", "Microsoft.Storage"]
 }
 
@@ -46,6 +46,20 @@ resource "azurerm_storage_account" "core" {
     default_action             = "Deny"
     virtual_network_subnet_ids = [azurerm_subnet.core.id]
   }
+}
+
+resource "azurerm_private_dns_zone" "blobcore" {
+  name                = "privatelink.blob.core.windows.net"
+  resource_group_name = azurerm_resource_group.core.name
+  tags                = var.tags
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "blobcore" {
+  name                  = "vnl-blob-${var.naming_suffix}"
+  resource_group_name   = azurerm_resource_group.core.name
+  private_dns_zone_name = azurerm_private_dns_zone.blobcore.name
+  virtual_network_id    = azurerm_virtual_network.core.id
+  tags                  = var.tags
 }
 
 resource "azurerm_key_vault" "core" {

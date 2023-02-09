@@ -20,10 +20,22 @@ output "core_rg_location" {
   value = azurerm_resource_group.core.location
 }
 
+output "core_vnet_name" {
+  value = azurerm_virtual_network.core.name
+}
+
+output "core_subnet_id" {
+  value = azurerm_subnet.core.id
+}
+
 output "core_kv_id" {
   value = azurerm_key_vault.core.id
 }
 
 output "core_kv_uri" {
   value = azurerm_key_vault.core.vault_uri
+}
+
+output "subnet_address_spaces" {
+  value = local.subnet_address_spaces
 }

@@ -21,6 +21,7 @@ terraform {
 }
 
 locals {
+  terraform_version = "1.3.7"
   azure_provider = <<EOF
 provider "azurerm" {
   features {
@@ -42,6 +43,12 @@ provider "azurerm" {
   }
 }
 EOF
+  required_provider_azure = <<EOF
+azurerm = {
+  source  = "hashicorp/azurerm"
+  version = ">= 3.32"
+}
+EOF
 }
 
 generate "terraform" {
@@ -49,17 +56,10 @@ generate "terraform" {
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
 terraform {
-  required_version = "1.3.7"
+  required_version = "${local.terraform_version}"
 
   required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = ">= 3.32"
-    }
-    databricks = {
-      source = "databricks/databricks"
-      version = "1.9.1"
-    }
+    ${local.required_provider_azure}
   }
 }
 EOF
