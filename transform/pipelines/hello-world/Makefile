@@ -25,3 +25,6 @@ build: ## Build the Python wheel(s)
 
 test: ## Run Python unit tests
 	python3 -m unittest
+
+artifacts: build # Upload artifacts to where they will need to be on DBFS
+	echo "NOT IMPLEMENTED"

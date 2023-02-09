@@ -1,0 +1,18 @@
+  [
+    {
+      "name": "DatabricksPythonActivity",
+      "type": "DatabricksSparkPython",
+      "typeProperties": {
+          "pythonFile": "dbfs:/pipelines/hello-world/entrypoint.py",
+          "libraries": [
+              {
+                  "whl": "dbfs:/artifacts/hello-world/library.whl"
+              }
+          ]
+      },
+      "linkedServiceName": {
+          "referenceName": "ADBLinkedServiceViaMSI",
+          "type": "LinkedServiceReference"
+      }
+    }
+  ]

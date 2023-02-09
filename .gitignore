@@ -47,7 +47,7 @@ config.yaml
 # Python artifacts
 **/__pycache__/**
 **/*egg-info/**
-transform/pipeline/dist/**
+transform/pipelines/**/dist/**
 
 # vs code settings
 .vscode/
