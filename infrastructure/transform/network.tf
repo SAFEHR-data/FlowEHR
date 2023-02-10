@@ -18,7 +18,7 @@ resource "azurerm_network_security_group" "databricks" {
   }
 
   security_rule {
-    name                       = "AllowOutboundDatabricksWorkerNodesToControlPlain"
+    name                       = "AllowOutboundDatabricksWorkerNodesToControlPlane"
     description                = "Required for workers communication with Databricks Webapp."
     priority                   = 100
     direction                  = "Outbound"
