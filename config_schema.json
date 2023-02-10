@@ -48,6 +48,7 @@
       "location",
       "suffix",
       "environment",
-      "arm_subscription_id"
+      "arm_subscription_id",
+      "devcontainer_acr_name"
     ]
 }

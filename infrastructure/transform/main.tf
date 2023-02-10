@@ -19,27 +19,17 @@ resource "azurerm_databricks_workspace" "databricks" {
   location                    = var.core_rg_location
   sku                         = "standard"
   tags                        = var.tags
-
-  custom_parameters {
-    no_public_ip         = true
-    nat_gateway_name     = "natgw-dbks-${var.naming_suffix}"
-    storage_account_name = "stgdbfs${var.truncated_naming_suffix}"
-  }
 }
 
 data "databricks_spark_version" "latest_lts" {
   spark_version = var.spark_version
 
-  depends_on = [
-    azurerm_databricks_workspace.databricks
-  ]
+  depends_on = [azurerm_databricks_workspace.databricks]
 }
 
 data "databricks_node_type" "smallest" {
   # Providing no required configuration, Databricks will pick the smallest node possible
-  depends_on = [
-    azurerm_databricks_workspace.databricks
-  ]
+  depends_on = [azurerm_databricks_workspace.databricks]
 }
 
 resource "databricks_cluster" "fixed_single_node" {
@@ -57,30 +47,7 @@ resource "databricks_cluster" "fixed_single_node" {
     "ResourceClass" = "SingleNode"
   }
 
-  depends_on = [
-    azurerm_databricks_workspace.databricks
-  ]
-}
-
-resource "azurerm_data_factory" "adf" {
-  name                = "adf-${var.naming_suffix}"
-  location            = var.core_rg_location
-  resource_group_name = var.core_rg_name
-
-  managed_virtual_network_enabled = true
-
-  identity {
-    type = "SystemAssigned"
-  }
-}
-
-resource "azurerm_data_factory_integration_runtime_azure" "ir" {
-  name                    = "FlowEHRIntegrationRuntime"
-  data_factory_id         = azurerm_data_factory.adf.id
-  location                = var.core_rg_location
-  virtual_network_enabled = true
-  description             = "Integration runtime in managed vnet"
-  time_to_live_min        = 5
+  depends_on = [azurerm_databricks_workspace.databricks]
 }
 
 resource "azurerm_role_assignment" "adf_can_create_clusters" {
@@ -89,11 +56,34 @@ resource "azurerm_role_assignment" "adf_can_create_clusters" {
   principal_id         = azurerm_data_factory.adf.identity[0].principal_id
 }
 
-resource "azurerm_role_assignment" "adf_can_access_kv_secrets" {
-  scope                = azurerm_databricks_workspace.databricks.id
-  role_definition_name = "Key Vault Secrets User"
-  principal_id         = azurerm_data_factory.adf.identity[0].principal_id
+resource "azurerm_data_factory" "adf" {
+  name                = "adf-${var.naming_suffix}"
+  location            = var.core_rg_location
+  resource_group_name = var.core_rg_name
+  identity {
+    type = "SystemAssigned"
+  }
 }
+
+/* locals {
+  activity_files = fileset("${path.module}/../transform/pipelines/**", "activities.json")
+} */
+
+resource "azurerm_data_factory_pipeline" "pipeline" {
+  for_each = fileset("${path.module}/../transform/pipelines/**", "activities.json")
+
+  name            = "databricks-pipeline-${var.naming_suffix}"
+  data_factory_id = azurerm_data_factory.adf.id
+  activities_json = file(each.value)
+}
+
+/* resource "azurerm_data_factory_trigger_schedule" "trigger" {
+  name            = "databricks-pipeline-trigger-${var.naming_suffix}"
+  data_factory_id = azurerm_data_factory.adf.id
+  pipeline_name   = azurerm_data_factory_pipeline.pipeline.name
+  interval        = 5
+  frequency       = "Minute"
+} */
 
 resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
   name            = "ADBLinkedServiceViaMSI"
@@ -102,12 +92,6 @@ resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
   adb_domain      = "https://${azurerm_databricks_workspace.databricks.workspace_url}"
 
   msi_work_space_resource_id = azurerm_databricks_workspace.databricks.id
-  existing_cluster_id        = databricks_cluster.fixed_single_node.cluster_id
-}
 
-resource "azurerm_data_factory_linked_service_key_vault" "msi_linked" {
-  name            = "KVLinkedServiceViaMSI"
-  data_factory_id = azurerm_data_factory.adf.id
-  description     = "Key Vault linked service via MSI"
-  key_vault_id    = var.core_kv_id
+  existing_cluster_id = databricks_cluster.fixed_single_node.cluster_id
 }
