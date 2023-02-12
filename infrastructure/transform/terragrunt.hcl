@@ -20,21 +20,6 @@ dependency "core" {
   config_path = "../core"
 }
 
-generate "provider" {
-  path      = "provider.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-${include.root.locals.azure_provider}
-
-provider "databricks" {
-  azure_workspace_resource_id = azurerm_databricks_workspace.databricks.id
-  host                        = azurerm_databricks_workspace.databricks.workspace_url
-}
-
-provider "local" {}
-EOF
-}
-
 inputs = {
   core_rg_name     = dependency.core.outputs.core_rg_name
   core_rg_location = dependency.core.outputs.core_rg_location

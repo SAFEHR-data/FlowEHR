@@ -61,52 +61,28 @@ resource "azurerm_data_factory" "adf" {
   }
 }
 
-
 resource "azurerm_role_assignment" "adf_can_create_clusters" {
   scope                = azurerm_databricks_workspace.databricks.id
   role_definition_name = "Contributor"
   principal_id         = azurerm_data_factory.adf.identity[0].principal_id
 }
 
-/* data "local_file" "foo" {
-  for_each = fileset("${path.module}/../../transform/pipelines/**", "activities.json")
-  filename = each.value
-} */
-
+# Get all directories that have activities.json in them and say that they are pipeline directories
 resource "azurerm_data_factory_pipeline" "pipeline" {
-  for_each        = fileset(path.module, "../../transform/pipelines/**/activities.json")
-  name            = "databricks-pipeline-${var.naming_suffix}"
+  for_each        = local.pipeline_dirs
+  name            = "databricks-pipeline-${basename(each.value)}-${var.naming_suffix}"
   data_factory_id = azurerm_data_factory.adf.id
-  activities_json = file(each.value)
+  activities_json = file("${each.value}/${local.activities_file}")
 }
 
-/*
-[
-  {
-      linkedServiceName = {
-          referenceName = "ADBLinkedServiceViaMSI"
-          type          = "LinkedServiceReference"
-      }
-      name              = "DatabricksPythonActivity"
-      type              = "DatabricksSparkPython"
-      typeProperties    = {
-          libraries  = [
-              {
-                  whl = "dbfs:/artifacts/hello-world/library.whl"
-              },
-            ]
-          pythonFile = "dbfs:/pipelines/hello-world/entrypoint.py"
-        }
-  },
-] */
-
-/* resource "azurerm_data_factory_trigger_schedule" "trigger" {
-  name            = "databricks-pipeline-trigger-${var.naming_suffix}"
-  data_factory_id = azurerm_data_factory.adf.id
-  pipeline_name   = azurerm_data_factory_pipeline.pipeline.name
-  interval        = 5
-  frequency       = "Minute"
-} */
+# Assuming that all artifacts will be built 
+resource "databricks_dbfs_file" "dbfs_artifact_upload" {
+  for_each = { for artifact in local.artifacts: artifact.artifact_path => artifact.pipeline}
+  # Source path on local filesystem
+  source   = each.key
+  # Path on DBFS
+  path     = "/pipelines/${each.value}/${local.artifacts_dir}/${basename(each.key)}"
+}
 
 resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
   name            = "ADBLinkedServiceViaMSI"
