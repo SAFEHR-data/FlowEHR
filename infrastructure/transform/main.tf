@@ -65,17 +65,36 @@ resource "azurerm_data_factory" "adf" {
   }
 }
 
-/* locals {
-  activity_files = fileset("${path.module}/../transform/pipelines/**", "activities.json")
+/* data "local_file" "foo" {
+  for_each = fileset("${path.module}/../../transform/pipelines/**", "activities.json")
+  filename = each.value
 } */
 
 resource "azurerm_data_factory_pipeline" "pipeline" {
-  for_each = fileset("${path.module}/../transform/pipelines/**", "activities.json")
-
+  for_each        = fileset(path.module, "../../transform/pipelines/**/activities.json") 
   name            = "databricks-pipeline-${var.naming_suffix}"
   data_factory_id = azurerm_data_factory.adf.id
   activities_json = file(each.value)
 }
+/* 
+[
+  {
+      linkedServiceName = {
+          referenceName = "ADBLinkedServiceViaMSI"
+          type          = "LinkedServiceReference"
+      }
+      name              = "DatabricksPythonActivity"
+      type              = "DatabricksSparkPython"
+      typeProperties    = {
+          libraries  = [
+              {
+                  whl = "dbfs:/artifacts/hello-world/library.whl"
+              },
+            ]
+          pythonFile = "dbfs:/pipelines/hello-world/entrypoint.py"
+        }
+  },
+] */
 
 /* resource "azurerm_data_factory_trigger_schedule" "trigger" {
   name            = "databricks-pipeline-trigger-${var.naming_suffix}"

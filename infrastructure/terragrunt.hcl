@@ -60,6 +60,10 @@ terraform {
       source = "databricks/databricks"
       version = "1.9.1"
     }
+    local = {
+      source = "hashicorp/local"
+      version = "2.3.0"
+    }
   }
 }
 EOF
