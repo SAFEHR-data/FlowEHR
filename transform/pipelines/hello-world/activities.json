@@ -3,10 +3,10 @@
       "name": "DatabricksPythonActivity",
       "type": "DatabricksSparkPython",
       "typeProperties": {
-          "pythonFile": "dbfs:/pipelines/hello-world/entrypoint.py",
+          "pythonFile": "dbfs:/pipelines/hello-world/artifacts/entrypoint.py",
           "libraries": [
               {
-                  "whl": "dbfs:/artifacts/hello-world/library.whl"
+                  "whl": "dbfs:/pipelines/hello-world/artifacts/library.whl"
               }
           ]
       },
