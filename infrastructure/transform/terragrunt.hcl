@@ -13,8 +13,7 @@
 #  limitations under the License.
 
 include "root" {
-  path   = find_in_parent_folders()
-  expose = true
+  path = find_in_parent_folders()
 }
 
 dependency "core" {
@@ -39,7 +38,5 @@ EOF
 inputs = {
   core_rg_name     = dependency.core.outputs.core_rg_name
   core_rg_location = dependency.core.outputs.core_rg_location
-  core_kv_id       = dependency.core.outputs.core_kv_id
-  core_kv_uri      = dependency.core.outputs.core_kv_uri
-  spark_version    = get_env("SPARK_VERSION", "3.3.1") // This only needs a default for CICD, which can be removed following https://github.com/UCLH-Foundry/FlowEHR/issues/42 
+  spark_version    = get_env("SPARK_VERSION", "3.3.1") // This only needs a default for CICD, which can be removed following https://github.com/UCLH-Foundry/FlowEHR/issues/42
 }
