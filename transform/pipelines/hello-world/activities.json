@@ -6,7 +6,7 @@
           "pythonFile": "dbfs:/pipelines/hello-world/artifacts/entrypoint.py",
           "libraries": [
               {
-                  "whl": "dbfs:/pipelines/hello-world/artifacts/library.whl"
+                  "whl": "dbfs:/pipelines/hello-world/artifacts/src-0.0.1-py3-none-any.whl"
               }
           ]
       },
