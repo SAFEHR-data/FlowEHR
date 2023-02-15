@@ -11,6 +11,17 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+locals {
+  linked_service_name = "ADBLinkedServiceViaMSI"
+
+  python_file_local_path = "../../transform/features"
+  python_file_dbfs_path  = "dbfs:"
+  python_file_name       = "entrypoint.py"
+
+  whl_file_local_path = "../../transform/features/dist"
+  whl_file_dbfs_path  = "dbfs:"
+  whl_file_name       = "src-0.0.1-py3-none-any.whl"
+}
 
 resource "azurerm_databricks_workspace" "databricks" {
   name                        = "dbks-${var.naming_suffix}"
@@ -65,34 +76,50 @@ resource "azurerm_data_factory" "adf" {
   }
 }
 
+resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
+  name            = local.linked_service_name
+  data_factory_id = azurerm_data_factory.adf.id
+  description     = "Azure Databricks linked service via MSI"
+  adb_domain      = "https://${azurerm_databricks_workspace.databricks.workspace_url}"
+
+  msi_work_space_resource_id = azurerm_databricks_workspace.databricks.id
+
+  existing_cluster_id = databricks_cluster.fixed_single_node.cluster_id
+}
+
 resource "azurerm_data_factory_pipeline" "pipeline" {
   name            = "databricks-pipeline-${var.naming_suffix}"
   data_factory_id = azurerm_data_factory.adf.id
-  activities_json = <<JSON
-[
-  {
-    "name": "DatabricksPythonActivity",
-    "type": "DatabricksSparkPython",
-    "typeProperties": {
-        "pythonFile": "dbfs:/entrypoint.py",
-        "libraries": [
+  activities_json = jsonencode(
+    [
+      {
+        "name" : "DatabricksPythonActivity",
+        "type" : "DatabricksSparkPython",
+        "typeProperties" : {
+          "pythonFile" : "${local.python_file_dbfs_path}/${local.python_file_name}",
+          "libraries" : [
             {
-                "whl": "dbfs:/src-0.0.1-py3-none-any.whl"
+              "whl" : "${local.whl_file_dbfs_path}/${local.whl_file_name}"
             }
-        ]
-    },
-    "linkedServiceName": {
-        "referenceName": "ADBLinkedServiceViaMSI",
-        "type": "LinkedServiceReference"
-    }
-  }
-]
-  JSON
+          ]
+        },
+        "linkedServiceName" : {
+          "referenceName" : "${local.linked_service_name}",
+          "type" : "LinkedServiceReference"
+        }
+      }
+    ]
+  )
 }
 
-resource "databricks_dbfs_file" "dbfs_file_upload" {
-  source = "${var.whl_file_local_path}/${var.whl_file_name}"
-  path   = "/${var.whl_file_name}"
+resource "databricks_dbfs_file" "dbfs_whl_file_upload" {
+  source = "${local.whl_file_local_path}/${local.whl_file_name}"
+  path   = "/${local.whl_file_name}"
+}
+
+resource "databricks_dbfs_file" "dbfs_pythong_file_upload" {
+  source = "${local.python_file_local_path}/${local.python_file_name}"
+  path   = "/${local.python_file_name}"
 }
 
 resource "azurerm_data_factory_trigger_schedule" "trigger" {
@@ -101,15 +128,4 @@ resource "azurerm_data_factory_trigger_schedule" "trigger" {
   pipeline_name   = azurerm_data_factory_pipeline.pipeline.name
   interval        = 15
   frequency       = "Minute"
-}
-
-resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
-  name            = "ADBLinkedServiceViaMSI"
-  data_factory_id = azurerm_data_factory.adf.id
-  description     = "Azure Databricks linked service via MSI"
-  adb_domain      = "https://${azurerm_databricks_workspace.databricks.workspace_url}"
-
-  msi_work_space_resource_id = azurerm_databricks_workspace.databricks.id
-
-  existing_cluster_id = databricks_cluster.fixed_single_node.cluster_id
 }
