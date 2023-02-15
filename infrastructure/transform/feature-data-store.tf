@@ -59,6 +59,18 @@ resource "azurerm_mssql_database" "feature_database" {
   tags                 = var.tags
 }
 
+# AAD App + SPN for Databricks -> SQL Access
+resource "azuread_application" "flowehr_databricks_sql" {
+  display_name = "FlowEHR-Databricks-SQL"
+}
+resource "azuread_service_principal" "flowehr_databricks_sql" {
+  application_id = azuread_application.flowehr_databricks_sql.application_id
+}
+resource "azuread_service_principal_password" "flowehr_databricks_sql" {
+  service_principal_id = azuread_service_principal.flowehr_databricks_sql.object_id
+}
+
+
 # Push secrets to KV
 resource "azurerm_key_vault_secret" "sql_server_features_admin_username" {
   name         = "sql-server-features-admin-username"
@@ -68,6 +80,16 @@ resource "azurerm_key_vault_secret" "sql_server_features_admin_username" {
 resource "azurerm_key_vault_secret" "sql_server_features_admin_password" {
   name         = "sql-server-features-admin-password"
   value        = random_password.sql_admin_password.result
+  key_vault_id = var.core_kv_id
+}
+resource "azurerm_key_vault_secret" "flowehr_databricks_sql_spn_application_id" {
+  name         = "databricks-sql-application-id"
+  value        = azuread_service_principal.flowehr_databricks_sql.application_id
+  key_vault_id = var.core_kv_id
+}
+resource "azurerm_key_vault_secret" "flowehr_databricks_sql_spn_application_secret" {
+  name         = "databricks-sql-application-secret"
+  value        = azuread_service_principal_password.flowehr_databricks_sql.value
   key_vault_id = var.core_kv_id
 }
 
