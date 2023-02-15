@@ -20,22 +20,46 @@ terraform {
   }
 }
 
+locals {
+  terraform_version = "1.3.7"
+  azure_provider = <<EOF
+provider "azurerm" {
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+    key_vault {
+      # Don't purge on destroy (this would fail due to purge protection being enabled on keyvault)
+      purge_soft_delete_on_destroy               = false
+      purge_soft_deleted_secrets_on_destroy      = false
+      purge_soft_deleted_certificates_on_destroy = false
+      purge_soft_deleted_keys_on_destroy         = false
+      # When recreating an environment, recover any previously soft deleted secrets - set to true by default
+      recover_soft_deleted_key_vaults   = true
+      recover_soft_deleted_secrets      = true
+      recover_soft_deleted_certificates = true
+      recover_soft_deleted_keys         = true
+    }
+  }
+}
+EOF
+  required_provider_azure = <<EOF
+azurerm = {
+  source  = "hashicorp/azurerm"
+  version = ">= 3.32"
+}
+EOF
+}
+
 generate "terraform" {
   path      = "terraform.tf"
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
 terraform {
-  required_version = "1.3.7"
+  required_version = "${local.terraform_version}"
 
   required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = ">= 3.32"
-    }
-    databricks = {
-      source = "databricks/databricks"
-      version = "1.9.1"
-    }
+    ${local.required_provider_azure}
   }
 }
 EOF

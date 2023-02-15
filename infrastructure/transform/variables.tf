@@ -17,6 +17,21 @@ variable "naming_suffix" {
   description = "Suffix used to name resources"
 }
 
+variable "truncated_naming_suffix" {
+  type        = string
+  description = "Truncated (max 20 chars, no hyphens etc.) suffix to name e.g storage accounts"
+}
+
+variable "access_databricks_management_publicly" {
+  type        = bool
+  description = "Whether to allow access to the Databricks workspace management plane via a public network"
+  default     = true
+}
+
+variable "subnet_address_spaces" {
+  type = list(string)
+}
+
 variable "tags" {
   type = map(any)
 }
@@ -26,6 +41,22 @@ variable "core_rg_name" {
 }
 
 variable "core_rg_location" {
+  type = string
+}
+
+variable "core_vnet_name" {
+  type = string
+}
+
+variable "core_subnet_id" {
+  type = string
+}
+
+variable "core_kv_id" {
+  type = string
+}
+
+variable "core_kv_uri" {
   type = string
 }
 

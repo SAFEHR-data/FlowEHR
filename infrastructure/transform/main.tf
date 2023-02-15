@@ -13,12 +13,30 @@
 #  limitations under the License.
 
 resource "azurerm_databricks_workspace" "databricks" {
-  name                        = "dbks-${var.naming_suffix}"
-  resource_group_name         = var.core_rg_name
-  managed_resource_group_name = "rg-dbks-${var.naming_suffix}"
-  location                    = var.core_rg_location
-  sku                         = "standard"
-  tags                        = var.tags
+  name                                  = "dbks-${var.naming_suffix}"
+  resource_group_name                   = var.core_rg_name
+  managed_resource_group_name           = "rg-dbks-${var.naming_suffix}"
+  location                              = var.core_rg_location
+  sku                                   = "premium"
+  infrastructure_encryption_enabled     = true
+  public_network_access_enabled         = var.access_databricks_management_publicly
+  network_security_group_rules_required = "NoAzureDatabricksRules"
+  tags                                  = var.tags
+
+  custom_parameters {
+    no_public_ip                                         = true
+    storage_account_name                                 = local.storage_account_name
+    public_subnet_name                                   = azurerm_subnet.databricks_host.name
+    private_subnet_name                                  = azurerm_subnet.databricks_container.name
+    virtual_network_id                                   = data.azurerm_virtual_network.core.id
+    public_subnet_network_security_group_association_id  = azurerm_subnet_network_security_group_association.databricks_host.id
+    private_subnet_network_security_group_association_id = azurerm_subnet_network_security_group_association.databricks_container.id
+  }
+
+  depends_on = [
+    azurerm_subnet_network_security_group_association.databricks_host,
+    azurerm_subnet_network_security_group_association.databricks_container
+  ]
 }
 
 data "databricks_spark_version" "latest_lts" {
@@ -47,7 +65,11 @@ resource "databricks_cluster" "fixed_single_node" {
     "ResourceClass" = "SingleNode"
   }
 
-  depends_on = [azurerm_databricks_workspace.databricks]
+  depends_on = [
+    azurerm_databricks_workspace.databricks,
+    azurerm_private_endpoint.databricks_control_plane,
+    azurerm_private_endpoint.databricks_filesystem
+  ]
 }
 
 resource "azurerm_data_factory" "adf" {
@@ -75,7 +97,7 @@ resource "azurerm_data_factory_pipeline" "pipeline" {
   activities_json = file("${each.value}/${local.activities_file}")
 }
 
-# Assuming that all artifacts will be built 
+# Assuming that all artifacts will be built
 resource "databricks_dbfs_file" "dbfs_artifact_upload" {
   for_each = { for artifact in local.artifacts: artifact.artifact_path => artifact.pipeline}
   # Source path on local filesystem
