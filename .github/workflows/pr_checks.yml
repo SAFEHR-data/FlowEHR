@@ -39,6 +39,11 @@ jobs:
         with:
           tflint_version: v0.44.1
 
+      - name: Init TFLint
+        run: tflint --init
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Pre-commit linting
         uses: pre-commit/action@v3.0.0
 

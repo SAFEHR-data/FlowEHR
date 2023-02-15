@@ -13,17 +13,53 @@
 #  limitations under the License.
 
 include "root" {
-  path = find_in_parent_folders()
+  path   = find_in_parent_folders()
+  expose = true
 }
 
 dependency "core" {
   config_path = "../core"
 }
 
+generate "terraform" {
+  path      = "terraform.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+terraform {
+  required_version = "${include.root.locals.terraform_version}"
+
+  required_providers {
+    ${include.root.locals.required_provider_azure}
+
+    databricks = {
+      source = "databricks/databricks"
+      version = "1.9.1"
+    }
+  }
+}
+EOF
+}
+
+generate "provider" {
+  path      = "provider.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+${include.root.locals.azure_provider}
+
+provider "databricks" {
+  azure_workspace_resource_id = azurerm_databricks_workspace.databricks.id
+  host                        = azurerm_databricks_workspace.databricks.workspace_url
+}
+EOF
+}
+
 inputs = {
-  core_rg_name     = dependency.core.outputs.core_rg_name
-  core_rg_location = dependency.core.outputs.core_rg_location
-  spark_version    = get_env("SPARK_VERSION", "3.3.1") // This only needs a default for CICD, which can be removed following https://github.com/UCLH-Foundry/FlowEHR/issues/42
-  whl_file_local_path  = "../../transform/features/dist"
-  whl_file_name    = "src-0.0.1-py3-none-any.whl"
+  core_rg_name          = dependency.core.outputs.core_rg_name
+  core_rg_location      = dependency.core.outputs.core_rg_location
+  core_vnet_name        = dependency.core.outputs.core_vnet_name
+  core_subnet_id        = dependency.core.outputs.core_subnet_id
+  core_kv_id            = dependency.core.outputs.core_kv_id
+  core_kv_uri           = dependency.core.outputs.core_kv_uri
+  subnet_address_spaces = dependency.core.outputs.subnet_address_spaces
+  spark_version         = get_env("SPARK_VERSION", "3.3.1") // This only needs a default for CICD, which can be removed following https://github.com/UCLH-Foundry/FlowEHR/issues/42 
 }

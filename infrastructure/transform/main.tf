@@ -24,12 +24,30 @@ locals {
 }
 
 resource "azurerm_databricks_workspace" "databricks" {
-  name                        = "dbks-${var.naming_suffix}"
-  resource_group_name         = var.core_rg_name
-  managed_resource_group_name = "rg-dbks-${var.naming_suffix}"
-  location                    = var.core_rg_location
-  sku                         = "standard"
-  tags                        = var.tags
+  name                                  = "dbks-${var.naming_suffix}"
+  resource_group_name                   = var.core_rg_name
+  managed_resource_group_name           = "rg-dbks-${var.naming_suffix}"
+  location                              = var.core_rg_location
+  sku                                   = "premium"
+  infrastructure_encryption_enabled     = true
+  public_network_access_enabled         = var.access_databricks_management_publicly
+  network_security_group_rules_required = "NoAzureDatabricksRules"
+  tags                                  = var.tags
+
+  custom_parameters {
+    no_public_ip                                         = true
+    storage_account_name                                 = local.storage_account_name
+    public_subnet_name                                   = azurerm_subnet.databricks_host.name
+    private_subnet_name                                  = azurerm_subnet.databricks_container.name
+    virtual_network_id                                   = data.azurerm_virtual_network.core.id
+    public_subnet_network_security_group_association_id  = azurerm_subnet_network_security_group_association.databricks_host.id
+    private_subnet_network_security_group_association_id = azurerm_subnet_network_security_group_association.databricks_container.id
+  }
+
+  depends_on = [
+    azurerm_subnet_network_security_group_association.databricks_host,
+    azurerm_subnet_network_security_group_association.databricks_container
+  ]
 }
 
 data "databricks_spark_version" "latest_lts" {
@@ -58,7 +76,11 @@ resource "databricks_cluster" "fixed_single_node" {
     "ResourceClass" = "SingleNode"
   }
 
-  depends_on = [azurerm_databricks_workspace.databricks]
+  depends_on = [
+    azurerm_databricks_workspace.databricks,
+    azurerm_private_endpoint.databricks_control_plane,
+    azurerm_private_endpoint.databricks_filesystem
+  ]
 }
 
 resource "azurerm_role_assignment" "adf_can_create_clusters" {
@@ -71,9 +93,27 @@ resource "azurerm_data_factory" "adf" {
   name                = "adf-${var.naming_suffix}"
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
+
+  managed_virtual_network_enabled = true
+
   identity {
     type = "SystemAssigned"
   }
+}
+
+resource "azurerm_data_factory_integration_runtime_azure" "ir" {
+  name                    = "FlowEHRIntegrationRuntime"
+  data_factory_id         = azurerm_data_factory.adf.id
+  location                = var.core_rg_location
+  virtual_network_enabled = true
+  description             = "Integration runtime in managed vnet"
+  time_to_live_min        = 5
+}
+
+resource "azurerm_role_assignment" "adf_can_access_kv_secrets" {
+  scope                = azurerm_databricks_workspace.databricks.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_data_factory.adf.identity[0].principal_id
 }
 
 resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
@@ -85,6 +125,13 @@ resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
   msi_work_space_resource_id = azurerm_databricks_workspace.databricks.id
 
   existing_cluster_id = databricks_cluster.fixed_single_node.cluster_id
+}
+
+resource "azurerm_data_factory_linked_service_key_vault" "msi_linked" {
+  name            = "KVLinkedServiceViaMSI"
+  data_factory_id = azurerm_data_factory.adf.id
+  description     = "Key Vault linked service via MSI"
+  key_vault_id    = var.core_kv_id
 }
 
 resource "azurerm_data_factory_pipeline" "pipeline" {
