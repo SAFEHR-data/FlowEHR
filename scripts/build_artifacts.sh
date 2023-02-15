@@ -20,12 +20,13 @@ set -o nounset
 # set -o xtrace
 
 
-ROOT=/workspaces/FlowEHR
+ROOT="/workspaces/FlowEHR"
+PIPELINE_DIR="${ROOT}"/transform/pipelines
 shopt -s globstar nullglob
 
 # Walk through files in /transform/pipelines
 # For each directory where activities.json has been found
-for activity_json_file in "${ROOT}"/transform/pipelines/**/activities.json; do 
+for activity_json_file in "${PIPELINE_DIR}"/**/activities.json; do 
     pipeline_dir=$(dirname "${activity_json_file}")
     pushd "${pipeline_dir}"
     make artifacts

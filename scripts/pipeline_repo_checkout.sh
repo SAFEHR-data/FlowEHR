@@ -6,12 +6,12 @@ set -o nounset
 # set -o xtrace
 
 ROOT=/workspaces/FlowEHR
+PIPELINE_DIR="${ROOT}"/transform/pipelines
 
 # shellcheck disable=SC1090
 source "${ROOT}/scripts/load_env.sh"
 
-
-pushd "${ROOT}/transform/pipelines" > /dev/null
+pushd "${PIPELINE_DIR}" > /dev/null
 export IFS=";"
 for repo in $REPOSITORIES; do
   # Name for the directory to check out to,

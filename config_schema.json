@@ -40,6 +40,10 @@
                     "pattern": "^[0-9]+(.[0-9])+$",
                     "maxLength": 5,
                     "default": "3.3.1"
+                },
+                "repositories": {
+                    "description": "List of links to pipeline repositories to use for Data Transformation",
+                    "type": "string"
                 }
             }
         }
