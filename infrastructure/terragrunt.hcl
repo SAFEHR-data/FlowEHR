@@ -44,10 +44,10 @@ provider "azurerm" {
 }
 EOF
   required_provider_azure = <<EOF
-azurerm = {
-  source  = "hashicorp/azurerm"
-  version = ">= 3.32"
-}
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 3.32"
+    }
 EOF
 }
 
@@ -101,9 +101,6 @@ provider "azurerm" {
       recover_soft_deleted_keys         = true
     }
   }
-}
-provider "databricks" {
-  host = azurerm_databricks_workspace.databricks.workspace_url
 }
 EOF
 }
