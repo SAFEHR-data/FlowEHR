@@ -34,6 +34,10 @@
             "description": "Dev mode will enable extra logging and add the deployer IP address to Azure Resource firewall exceptions",
             "type": "boolean"
         },
+        "deployer_ip_address": {
+            "description": "Optional manual override to deployer IP address. If absent the client IP will be auto populated",
+            "type": "string"
+        },
         "transform": {
             "description": "Configuration for Data Transformation",
             "type": "object",
