@@ -11,18 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-locals {
-  linked_service_name = "ADBLinkedServiceViaMSI"
-
-  python_file_local_path = "../../transform/features"
-  python_file_dbfs_path  = "dbfs:"
-  python_file_name       = "entrypoint.py"
-
-  whl_file_local_path = "../../transform/features/dist"
-  whl_file_dbfs_path  = "dbfs:"
-  whl_file_name       = "src-0.0.1-py3-none-any.whl"
-}
-
 resource "azurerm_databricks_workspace" "databricks" {
   name                                  = "dbks-${var.naming_suffix}"
   resource_group_name                   = var.core_rg_name
@@ -83,12 +71,6 @@ resource "databricks_cluster" "fixed_single_node" {
   ]
 }
 
-resource "azurerm_role_assignment" "adf_can_create_clusters" {
-  scope                = azurerm_databricks_workspace.databricks.id
-  role_definition_name = "Contributor"
-  principal_id         = azurerm_data_factory.adf.identity[0].principal_id
-}
-
 resource "azurerm_data_factory" "adf" {
   name                = "adf-${var.naming_suffix}"
   location            = var.core_rg_location
@@ -99,6 +81,12 @@ resource "azurerm_data_factory" "adf" {
   identity {
     type = "SystemAssigned"
   }
+}
+
+resource "azurerm_role_assignment" "adf_can_create_clusters" {
+  scope                = azurerm_databricks_workspace.databricks.id
+  role_definition_name = "Contributor"
+  principal_id         = azurerm_data_factory.adf.identity[0].principal_id
 }
 
 resource "azurerm_data_factory_integration_runtime_azure" "ir" {
@@ -123,8 +111,7 @@ resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
   adb_domain      = "https://${azurerm_databricks_workspace.databricks.workspace_url}"
 
   msi_work_space_resource_id = azurerm_databricks_workspace.databricks.id
-
-  existing_cluster_id = databricks_cluster.fixed_single_node.cluster_id
+  existing_cluster_id        = databricks_cluster.fixed_single_node.cluster_id
 }
 
 resource "azurerm_data_factory_linked_service_key_vault" "msi_linked" {
