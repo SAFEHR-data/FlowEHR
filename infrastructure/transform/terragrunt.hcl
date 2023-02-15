@@ -56,6 +56,7 @@ EOF
 }
 
 inputs = {
+<<<<<<< HEAD
   core_rg_name                       = dependency.core.outputs.core_rg_name
   core_rg_location                   = dependency.core.outputs.core_rg_location
   core_vnet_name                     = dependency.core.outputs.core_vnet_name
@@ -64,4 +65,16 @@ inputs = {
   core_kv_uri                        = dependency.core.outputs.core_kv_uri
   databricks_host_address_space      = dependency.core.outputs.databricks_host_address_space
   databricks_container_address_space = dependency.core.outputs.databricks_container_address_space
+=======
+  core_rg_name          = dependency.core.outputs.core_rg_name
+  core_rg_location      = dependency.core.outputs.core_rg_location
+  core_vnet_name        = dependency.core.outputs.core_vnet_name
+  core_subnet_id        = dependency.core.outputs.core_subnet_id
+  core_kv_id            = dependency.core.outputs.core_kv_id
+  core_kv_uri           = dependency.core.outputs.core_kv_uri
+  subnet_address_spaces = dependency.core.outputs.subnet_address_spaces
+  local_mode            = dependency.core.outputs.local_mode
+  deployer_ip_address   = dependency.core.outputs.deployer_ip_address
+  spark_version         = get_env("SPARK_VERSION", "3.3.1") // This only needs a default for CICD, which can be removed following https://github.com/UCLH-Foundry/FlowEHR/issues/42 
+>>>>>>> deployer IP, sql store, private endpoints, dns zone
 }

@@ -57,10 +57,20 @@ random = {
 }  
 EOF
 
+<<<<<<< HEAD:providers.hcl
   required_provider_databricks = <<EOF
 databricks = {
   source = "databricks/databricks"
   version = "1.9.1"
+=======
+  required_providers {
+    ${local.required_provider_azure}
+    random = {
+      source = "hashicorp/random"
+      version = "3.4.3"
+    }
+  }
+>>>>>>> deployer IP, sql store, private endpoints, dns zone:infrastructure/terragrunt.hcl
 }
 EOF
 
@@ -78,10 +88,23 @@ null = {
 }
 EOF
 
+<<<<<<< HEAD:providers.hcl
   required_provider_github = <<EOF
 github = {
   source  = "integrations/github"
   version = "5.18.3"
 }
 EOF
+=======
+# Here we define common variables to be inhereted by each module (as long as they're set in its variables.tf)
+inputs = {
+  location = get_env("LOCATION")
+  naming_suffix = get_env("NAMING_SUFFIX")
+  truncated_naming_suffix = get_env("TRUNCATED_NAMING_SUFFIX")
+  deployer_ip_address = get_env("DEPLOYER_IP_ADDRESS", "") // deployer's IP address is added to resource firewall exceptions IF in local_mode
+
+  tags = {
+    environment = get_env("ENVIRONMENT")
+  }
+>>>>>>> deployer IP, sql store, private endpoints, dns zone:infrastructure/terragrunt.hcl
 }

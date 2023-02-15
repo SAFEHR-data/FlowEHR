@@ -13,6 +13,7 @@
 #  limitations under the License.
 
 resource "random_password" "sql_admin_password" {
+<<<<<<< HEAD
   length      = 16
   min_lower   = 2
   min_upper   = 2
@@ -31,16 +32,25 @@ resource "azuread_application_password" "flowehr_sql_owner" {
 resource "azuread_service_principal" "flowehr_sql_owner" {
   application_id = azuread_application.flowehr_sql_owner.application_id
   owners         = [data.azurerm_client_config.current.object_id]
+=======
+  length  = 16
+  special = true
+>>>>>>> deployer IP, sql store, private endpoints, dns zone
 }
 
 # Azure SQL logical server, public access disabled - will use private endpoints for access
 resource "azurerm_mssql_server" "sql_server_features" {
+<<<<<<< HEAD
   name                                 = "sql-server-features-${lower(var.naming_suffix)}"
+=======
+  name                                 = "sql-server-features-${var.naming_suffix}"
+>>>>>>> deployer IP, sql store, private endpoints, dns zone
   location                             = var.core_rg_location
   resource_group_name                  = var.core_rg_name
   version                              = "12.0"
   administrator_login                  = local.sql_server_features_admin_username
   administrator_login_password         = random_password.sql_admin_password.result
+<<<<<<< HEAD
   public_network_access_enabled        = !var.tf_in_automation
   outbound_network_restriction_enabled = true
   tags                                 = var.tags
@@ -79,6 +89,16 @@ resource "azuread_app_role_assignment" "sql_application_read_all" {
 # optional firewall rule when running locally
 resource "azurerm_mssql_firewall_rule" "deployer_ip_exception" {
   count            = var.tf_in_automation ? 0 : 1
+=======
+  public_network_access_enabled        = var.local_mode
+  outbound_network_restriction_enabled = true
+  tags                                 = var.tags
+}
+
+# optional firewall rule when running in local_mode
+resource "azurerm_mssql_firewall_rule" "deployer_ip_exception" {
+  count            = var.local_mode == true ? 1 : 0
+>>>>>>> deployer IP, sql store, private endpoints, dns zone
   name             = "DeployerIP"
   server_id        = azurerm_mssql_server.sql_server_features.id
   start_ip_address = var.deployer_ip_address
@@ -101,6 +121,7 @@ resource "azurerm_mssql_database" "feature_database" {
   sku_name             = "Basic"
   storage_account_type = "Local"
   zone_redundant       = false
+<<<<<<< HEAD
   tags                 = var.tags
 }
 
@@ -167,10 +188,20 @@ resource "azurerm_key_vault_secret" "sql_server_owner_secret" {
 }
 resource "azurerm_key_vault_secret" "sql_server_features_admin_username" {
   name         = "sql-features-admin-username"
+=======
+  geo_backup_enabled   = false
+  tags                 = var.tags
+}
+
+# Push secrets to KV
+resource "azurerm_key_vault_secret" "sql_server_features_admin_username" {
+  name         = "sql-server-features-admin-username"
+>>>>>>> deployer IP, sql store, private endpoints, dns zone
   value        = local.sql_server_features_admin_username
   key_vault_id = var.core_kv_id
 }
 resource "azurerm_key_vault_secret" "sql_server_features_admin_password" {
+<<<<<<< HEAD
   name         = "sql-features-admin-password"
   value        = random_password.sql_admin_password.result
   key_vault_id = var.core_kv_id
@@ -185,6 +216,12 @@ resource "azurerm_key_vault_secret" "flowehr_databricks_sql_spn_app_secret" {
   value        = azuread_application_password.flowehr_databricks_sql.value
   key_vault_id = var.core_kv_id
 }
+=======
+  name         = "sql-server-features-admin-password"
+  value        = random_password.sql_admin_password.result
+  key_vault_id = var.core_kv_id
+}
+>>>>>>> deployer IP, sql store, private endpoints, dns zone
 
 # Private DNS + endpoint for SQL Server
 resource "azurerm_private_dns_zone" "sql" {
@@ -220,6 +257,7 @@ resource "azurerm_private_endpoint" "sql_server_features_pe" {
     private_dns_zone_ids = [azurerm_private_dns_zone.sql.id]
   }
 }
+<<<<<<< HEAD
 
 resource "azuread_group" "ad_group_apps" {
   display_name     = "${var.naming_suffix} flowehr-apps"
@@ -238,3 +276,5 @@ resource "azuread_group" "ad_group_data_scientists" {
   owners           = [data.azurerm_client_config.current.object_id]
   security_enabled = true
 }
+=======
+>>>>>>> deployer IP, sql store, private endpoints, dns zone

@@ -60,6 +60,7 @@ variable "deployer_ip_address" {
   type = string
 }
 
+<<<<<<< HEAD
 variable "tf_in_automation" {
   type = bool
 }
@@ -102,4 +103,12 @@ variable "data_source_connections" {
     )
   }))
   default = []
+=======
+variable "deployer_ip_address" {
+  type = string
+}
+
+variable "local_mode" {
+  type = bool
+>>>>>>> deployer IP, sql store, private endpoints, dns zone
 }

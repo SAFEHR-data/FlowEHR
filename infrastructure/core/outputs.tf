@@ -55,3 +55,11 @@ output "serve_webapps_address_space" {
 output "core_log_analytics_name" {
   value = azurerm_log_analytics_workspace.core.name
 }
+
+output "deployer_ip_address" {
+  value = var.deployer_ip_address
+}
+
+output "local_mode" {
+  value = var.local_mode
+}

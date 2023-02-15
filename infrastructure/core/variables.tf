@@ -37,6 +37,7 @@ variable "core_address_space" {
   default     = "10.0.0.0/24"
 }
 
+<<<<<<< HEAD
 variable "use_random_address_space" {
   type        = bool
   description = <<EOF
@@ -93,3 +94,14 @@ variable "github_repository" {
   description = "Github repository in which to create the build agent. e.g. UCLH-Foundry/FlowEHR"
   default     = ""
 }
+=======
+variable "deployer_ip_address" {
+  type = string
+}
+
+variable "local_mode" {
+  type        = bool
+  description = "Dev mode will enable more debugging, and set the deployer's IP address as an exception in resource firewalls"
+}
+
+>>>>>>> deployer IP, sql store, private endpoints, dns zone

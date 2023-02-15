@@ -13,6 +13,7 @@
 #  limitations under the License.
 
 locals {
+<<<<<<< HEAD
   sql_server_features_admin_username = "adminuser"
   sql_owner_app_name                 = "flowehr-sql-owner-${lower(var.naming_suffix)}"
   databricks_app_name                = "flowehr-databricks-datawriter-${lower(var.naming_suffix)}"
@@ -87,4 +88,8 @@ locals {
     { "name" : "${azuread_group.ad_group_developers.display_name}", "role" : "db_reader" },
     { "name" : "${azuread_group.ad_group_data_scientists.display_name}", "role" : "db_reader" },
   ]
+=======
+  storage_account_name               = "dbfs${var.truncated_naming_suffix}"
+  sql_server_features_admin_username = "adminuser"
+>>>>>>> deployer IP, sql store, private endpoints, dns zone
 }
