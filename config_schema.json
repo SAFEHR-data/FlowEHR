@@ -30,6 +30,10 @@
             "type": "string",
             "pattern": "[0-9a-z]{5,50}"
         },
+        "local_mode": {
+            "description": "Dev mode will enable extra logging and add the deployer IP address to Azure Resource firewall exceptions",
+            "type": "boolean"
+        },
         "transform": {
             "description": "Configuration for Data Transformation",
             "type": "object",
@@ -48,6 +52,7 @@
       "location",
       "suffix",
       "environment",
-      "arm_subscription_id"
+      "arm_subscription_id",
+      "local_mode"
     ]
 }

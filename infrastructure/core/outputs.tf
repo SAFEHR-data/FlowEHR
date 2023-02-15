@@ -39,3 +39,11 @@ output "core_kv_uri" {
 output "subnet_address_spaces" {
   value = local.subnet_address_spaces
 }
+
+output "deployer_ip_address" {
+  value = var.deployer_ip_address
+}
+
+output "local_mode" {
+  value = var.local_mode
+}

@@ -60,6 +60,10 @@ terraform {
 
   required_providers {
     ${local.required_provider_azure}
+    random = {
+      source = "hashicorp/random"
+      version = "3.4.3"
+    }
   }
 }
 EOF
@@ -90,6 +94,7 @@ inputs = {
   location = get_env("LOCATION")
   naming_suffix = get_env("NAMING_SUFFIX")
   truncated_naming_suffix = get_env("TRUNCATED_NAMING_SUFFIX")
+  deployer_ip_address = get_env("DEPLOYER_IP_ADDRESS", "") // deployer's IP address is added to resource firewall exceptions IF in local_mode
 
   tags = {
     environment = get_env("ENVIRONMENT")
