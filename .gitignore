@@ -48,4 +48,4 @@ config.yaml
 .vscode/
 
 # Checked out pipeline repos
-tranform/pipelines/**
+transform/pipelines/**
