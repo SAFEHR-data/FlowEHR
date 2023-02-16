@@ -86,5 +86,3 @@ resource "azurerm_monitor_autoscale_setting" "asp" {
   #   }
   # }
 }
-
-# Networking is provisioned at the 
