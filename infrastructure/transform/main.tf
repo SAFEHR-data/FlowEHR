@@ -99,11 +99,11 @@ resource "azurerm_data_factory_pipeline" "pipeline" {
 
 # Assuming that all artifacts will be built
 resource "databricks_dbfs_file" "dbfs_artifact_upload" {
-  for_each = { for artifact in local.artifacts: artifact.artifact_path => artifact.pipeline}
+  for_each = { for artifact in local.artifacts : artifact.artifact_path => artifact.pipeline }
   # Source path on local filesystem
-  source   = each.key
+  source = each.key
   # Path on DBFS
-  path     = "/pipelines/${each.value}/${local.artifacts_dir}/${basename(each.key)}"
+  path = "/pipelines/${each.value}/${local.artifacts_dir}/${basename(each.key)}"
 }
 
 resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
