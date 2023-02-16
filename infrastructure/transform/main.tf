@@ -11,6 +11,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+
 resource "azurerm_databricks_workspace" "databricks" {
   name                                  = "dbks-${var.naming_suffix}"
   resource_group_name                   = var.core_rg_name
