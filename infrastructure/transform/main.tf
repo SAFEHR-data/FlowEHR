@@ -84,6 +84,15 @@ resource "azurerm_data_factory" "adf" {
   }
 }
 
+resource "azurerm_data_factory_integration_runtime_azure" "ir" {
+  name                    = "FlowEHRIntegrationRuntime"
+  data_factory_id         = azurerm_data_factory.adf.id
+  location                = var.core_rg_location
+  virtual_network_enabled = true
+  description             = "Integration runtime in managed vnet"
+  time_to_live_min        = 5
+}
+
 resource "azurerm_role_assignment" "adf_can_create_clusters" {
   scope                = azurerm_databricks_workspace.databricks.id
   role_definition_name = "Contributor"
@@ -122,15 +131,6 @@ resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
   msi_work_space_resource_id = azurerm_databricks_workspace.databricks.id
 
   existing_cluster_id = databricks_cluster.fixed_single_node.cluster_id
-}
-
-resource "azurerm_data_factory_integration_runtime_azure" "ir" {
-  name                    = "FlowEHRIntegrationRuntime"
-  data_factory_id         = azurerm_data_factory.adf.id
-  location                = var.core_rg_location
-  virtual_network_enabled = true
-  description             = "Integration runtime in managed vnet"
-  time_to_live_min        = 5
 }
 
 resource "azurerm_data_factory_linked_service_key_vault" "msi_linked" {
