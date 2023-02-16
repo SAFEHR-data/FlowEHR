@@ -106,7 +106,7 @@ resource "azurerm_role_assignment" "adf_can_access_kv_secrets" {
 }
 
 resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
-  name            = local.linked_service_name
+  name            = local.adb_linked_service_name
   data_factory_id = azurerm_data_factory.adf.id
   description     = "Azure Databricks linked service via MSI"
   adb_domain      = "https://${azurerm_databricks_workspace.databricks.workspace_url}"
@@ -139,7 +139,7 @@ resource "azurerm_data_factory_pipeline" "pipeline" {
           ]
         },
         "linkedServiceName" : {
-          "referenceName" : "${local.linked_service_name}",
+          "referenceName" : "${local.adb_linked_service_name}",
           "type" : "LinkedServiceReference"
         }
       }

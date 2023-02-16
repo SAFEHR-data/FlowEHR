@@ -1,6 +1,6 @@
 locals {
   storage_account_name = "dbfs${var.truncated_naming_suffix}"
-  linked_service_name  = "ADBLinkedServiceViaMSI"
+  adb_linked_service_name  = "ADBLinkedServiceViaMSI"
 
   python_file_local_path = "../../transform/features"
   python_file_dbfs_path  = "dbfs:"
