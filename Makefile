@@ -69,7 +69,7 @@ deploy-transform-infrastructure: bootstrap ## Deploy transform infrastructure
 build-transform-library: ## Call make build from transform/features to build wheel file.
 	cd transform/features && $(MAKE) build
 
-deploy-transform: build-transform-library deploy-transform-terraform ## Deploy transform after building wheel file
+deploy-transform: build-transform-library deploy-transform-infrastructure ## Deploy transform after building wheel file
 	
 deploy-serve: bootstrap ## Deploy serve infrastructure
 	$(call target_title, "Deploy Serve Infrastructure") \
