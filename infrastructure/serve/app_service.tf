@@ -38,7 +38,7 @@ resource "azurerm_monitor_autoscale_setting" "asp" {
 
     rule {
       metric_trigger {
-        metric_name        = "Percentage CPU"
+        metric_name        = "CpuPercentage"
         metric_resource_id = azurerm_service_plan.serve.id
         time_grain         = "PT1M"
         statistic          = "Average"
@@ -58,7 +58,7 @@ resource "azurerm_monitor_autoscale_setting" "asp" {
 
     rule {
       metric_trigger {
-        metric_name        = "Percentage CPU"
+        metric_name        = "CpuPercentage"
         metric_resource_id = azurerm_service_plan.serve.id
         time_grain         = "PT1M"
         statistic          = "Average"
