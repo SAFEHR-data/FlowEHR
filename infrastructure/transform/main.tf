@@ -138,7 +138,7 @@ resource "azurerm_data_factory_pipeline" "pipeline" {
           ]
         },
         "linkedServiceName" : {
-          "referenceName" : "${local.linked_service_name}",
+          "referenceName" : "${local.adb_linked_service_name}",
           "type" : "LinkedServiceReference"
         }
       }
