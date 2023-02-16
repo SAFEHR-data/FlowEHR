@@ -17,4 +17,6 @@ locals {
     ]
   ])
   storage_account_name = "dbfs${var.truncated_naming_suffix}"
+
+  spark_version = yamldecode(file("../../config.transform.yaml")).spark_version
 }

@@ -40,7 +40,7 @@ resource "azurerm_databricks_workspace" "databricks" {
 }
 
 data "databricks_spark_version" "latest_lts" {
-  spark_version = var.spark_version
+  spark_version = local.spark_version
 
   depends_on = [azurerm_databricks_workspace.databricks]
 }
@@ -111,6 +111,10 @@ resource "azurerm_data_factory_pipeline" "pipeline" {
   name            = "databricks-pipeline-${basename(each.value)}-${var.naming_suffix}"
   data_factory_id = azurerm_data_factory.adf.id
   activities_json = file("${each.value}/${local.activities_file}")
+
+  depends_on = [
+    azurerm_data_factory_linked_service_azure_databricks.msi_linked
+  ]
 }
 
 # Assuming that all artifacts will be built
