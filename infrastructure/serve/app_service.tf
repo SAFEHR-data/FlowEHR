@@ -76,13 +76,4 @@ resource "azurerm_monitor_autoscale_setting" "asp" {
       }
     }
   }
-
-  # TODO? 
-  # notification {
-  #   email {
-  #     send_to_subscription_administrator    = true
-  #     send_to_subscription_co_administrator = true
-  #     custom_emails                         = ["admin@contoso.com"]
-  #   }
-  # }
 }
