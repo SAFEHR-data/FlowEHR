@@ -42,3 +42,15 @@ resource "azurerm_machine_learning_workspace" "serve" {
     type = "SystemAssigned"
   }
 }
+
+resource "azurerm_container_registry" "serve" {
+  name                          = "acrserve${var.truncated_naming_suffix}"
+  location                      = var.core_rg_location
+  resource_group_name           = var.core_rg_name
+  sku                           = "Basic"
+  admin_enabled                 = true
+  public_network_access_enabled = true
+}
+
+# networking?
+# admin creds in keyvault? or just use a data.azurerm_container_registry ?
