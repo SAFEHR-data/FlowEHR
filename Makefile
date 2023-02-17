@@ -54,7 +54,7 @@ deploy: bootstrap ## Deploy all infrastructure
 	&& cd ${MAKEFILE_DIR}/infrastructure \
 	&& terragrunt run-all apply --terragrunt-non-interactive
 
-deploy-core: bootstrap ## Deploy core infrastructure
+deploy-core: build-transform-library bootstrap ## Deploy core infrastructure
 	$(call target_title, "Deploy Core Infrastructure") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/infrastructure/core \
