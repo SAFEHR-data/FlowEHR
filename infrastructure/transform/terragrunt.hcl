@@ -32,11 +32,20 @@ terraform {
   required_version = "${local.providers.locals.terraform_version}"
 
   required_providers {
+<<<<<<< HEAD
     ${local.providers.locals.required_provider_azure}
     ${local.providers.locals.required_provider_azuread}
     ${local.providers.locals.required_provider_random}
     ${local.providers.locals.required_provider_databricks}
     ${local.providers.locals.required_provider_null}
+=======
+    ${include.root.locals.required_provider_azure}
+    ${include.root.locals.required_provider_azuread}
+    databricks = {
+      source = "databricks/databricks"
+      version = "1.9.1"
+    }
+>>>>>>> sql store, spn + secret scope
   }
 }
 EOF

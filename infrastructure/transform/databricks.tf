@@ -96,8 +96,63 @@ resource "databricks_cluster" "fixed_single_node" {
   ]
 }
 
+<<<<<<< HEAD:infrastructure/transform/databricks.tf
 # databricks secret scope, in-built. Not able to use key vault backed scope due to limitation in databricks:
 # https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secret-scopes#--create-an-azure-key-vault-backed-secret-scope-using-the-databricks-cli 
 resource "databricks_secret_scope" "secrets" {
   name = "flowehr-secrets"
+=======
+resource "databricks_secret_scope" "secrets" {
+  name = "flowehr-secrets"
+}
+
+resource "azurerm_data_factory" "adf" {
+  name                = "adf-${var.naming_suffix}"
+  location            = var.core_rg_location
+  resource_group_name = var.core_rg_name
+
+  managed_virtual_network_enabled = true
+
+  identity {
+    type = "SystemAssigned"
+  }
+}
+
+resource "azurerm_data_factory_integration_runtime_azure" "ir" {
+  name                    = "FlowEHRIntegrationRuntime"
+  data_factory_id         = azurerm_data_factory.adf.id
+  location                = var.core_rg_location
+  virtual_network_enabled = true
+  description             = "Integration runtime in managed vnet"
+  time_to_live_min        = 5
+}
+
+resource "azurerm_role_assignment" "adf_can_create_clusters" {
+  scope                = azurerm_databricks_workspace.databricks.id
+  role_definition_name = "Contributor"
+  principal_id         = azurerm_data_factory.adf.identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "adf_can_access_kv_secrets" {
+  scope                = azurerm_databricks_workspace.databricks.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_data_factory.adf.identity[0].principal_id
+}
+
+resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
+  name            = "ADBLinkedServiceViaMSI"
+  data_factory_id = azurerm_data_factory.adf.id
+  description     = "Azure Databricks linked service via MSI"
+  adb_domain      = "https://${azurerm_databricks_workspace.databricks.workspace_url}"
+
+  msi_work_space_resource_id = azurerm_databricks_workspace.databricks.id
+  existing_cluster_id        = databricks_cluster.fixed_single_node.cluster_id
+}
+
+resource "azurerm_data_factory_linked_service_key_vault" "msi_linked" {
+  name            = "KVLinkedServiceViaMSI"
+  data_factory_id = azurerm_data_factory.adf.id
+  description     = "Key Vault linked service via MSI"
+  key_vault_id    = var.core_kv_id
+>>>>>>> sql store, spn + secret scope:infrastructure/transform/main.tf
 }

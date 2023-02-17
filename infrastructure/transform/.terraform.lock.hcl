@@ -6,7 +6,6 @@ provider "registry.terraform.io/databricks/databricks" {
   constraints = "1.9.1"
   hashes = [
     "h1:0XIc4cNr+jEswewJQRpcqSmODBhJb5dSrxcpxhiTfFE=",
-    "h1:A5oD/Qf6MQYDLoMjoJ86+mHo073OOMGA5gcQYLBwP9I=",
     "zh:0abe153b02493780fc7bb6d6d6c817b4c1144b8850ceec4eb182ce7956521461",
     "zh:37e374515f36486b5729fd43ba094816c448d405f7673da53857b28947987571",
     "zh:441847508571125c9db8a30da32fa2344dbf6c00563fcd819a3e813e626c4b64",
@@ -21,6 +20,7 @@ provider "registry.terraform.io/databricks/databricks" {
 }
 
 provider "registry.terraform.io/hashicorp/azuread" {
+<<<<<<< HEAD
 <<<<<<< HEAD
   version     = "2.35.0"
   constraints = "2.35.0"
@@ -41,6 +41,10 @@ provider "registry.terraform.io/hashicorp/azuread" {
     "zh:faaa1686abc4861b96925d2f8f54ea35ec00c973fb2523f362d057ab953a76ed",
 =======
   version = "2.33.0"
+=======
+  version     = "2.33.0"
+  constraints = "2.33.0"
+>>>>>>> sql store, spn + secret scope
   hashes = [
     "h1:Z28tjly5UfKOE+HL/oALxCPhmCuBwUgZ4uaYt68VR3M=",
     "zh:0602d03d7d7e38819f78dc377e64f365427496edf1065bfbb113e3921ab1c34e",
@@ -60,6 +64,7 @@ provider "registry.terraform.io/hashicorp/azuread" {
 }
 
 provider "registry.terraform.io/hashicorp/azurerm" {
+<<<<<<< HEAD
   version     = "3.47.0"
   constraints = "3.47.0"
   hashes = [
@@ -134,6 +139,24 @@ provider "registry.terraform.io/hashicorp/random" {
     "zh:ea4739860c24dfeaac6c100b2a2e357106a89d18751f7693f3c31ecf6a996f8d",
     "zh:f0c76ac303fd0ab59146c39bc121c5d7d86f878e9a69294e29444d4c653786f8",
     "zh:f143a9a5af42b38fed328a161279906759ff39ac428ebcfe55606e05e1518b93",
+=======
+  version     = "3.44.1"
+  constraints = ">= 3.32.0"
+  hashes = [
+    "h1:EkFaulKIAb3nb7svbpM18Tf7rl+ajVCXnXvP//Yvw2M=",
+    "zh:0a1761b5aeec47d5019114976de5eb9832dea1d57d632ca6fa464b99b782d1c1",
+    "zh:0e9c96fa7ed6d55a3f3a646ff346298c8b7728331bb3a74875f78ecb7d245c16",
+    "zh:1aa953a692c7b5b10219343f0238f4624ac988e247721b6ec6b1bed2b81f7ceb",
+    "zh:237258af1a1ce8a0aed8f6cdb03c69ea83ff4f3a46d5bd1466cd503f0b5aded8",
+    "zh:542067eeeb3b4e286e92d646e0f40426e204ed268973343e585aa521f075f8dc",
+    "zh:8326d52460252fd335ae97d0fabd9f5d90061a4fbeb273618f4067be3eb4e75a",
+    "zh:97a2b802bf6e204476131ddb7a91e832568ee8da3b0515ed23361c9f72ca9706",
+    "zh:9ae5a52ec85e0ad218e2ce9d33859f17afbb2fb2a690bf60d5f48fc7680e7fb0",
+    "zh:b17e77aff310e232f541334ba1858b5125ea0e527a5d6824de017192d8d8a3a2",
+    "zh:c469ba6681535c07c58dad6c1b59b056912300a7c91137ddc0103ef16b1d5697",
+    "zh:cea6026ef8fb5512d14c1ba6fdf36b90a09de536d4e4afad96b926af39114f74",
+    "zh:f569b65999264a9416862bca5cd2a6177d94ccb0424f3a4ef424428912b9cb3c",
+>>>>>>> sql store, spn + secret scope
   ]
 }
 

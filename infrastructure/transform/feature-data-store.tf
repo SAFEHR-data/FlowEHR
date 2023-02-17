@@ -122,6 +122,7 @@ resource "azurerm_mssql_database" "feature_database" {
   storage_account_type = "Local"
   zone_redundant       = false
 <<<<<<< HEAD
+<<<<<<< HEAD
   tags                 = var.tags
 }
 
@@ -190,12 +191,14 @@ resource "azurerm_key_vault_secret" "sql_server_features_admin_username" {
   name         = "sql-features-admin-username"
 =======
   geo_backup_enabled   = false
+=======
+>>>>>>> sql store, spn + secret scope
   tags                 = var.tags
 }
 
 # AAD App + SPN for Databricks -> SQL Access
 resource "azuread_application" "flowehr_databricks_sql" {
-  display_name = "FlowEHR-Databricks-SQL"
+  display_name = "FlowEHR-Databricks-SQL-${var.naming_suffix}"
 }
 resource "azuread_service_principal" "flowehr_databricks_sql" {
   application_id = azuread_application.flowehr_databricks_sql.application_id
@@ -204,15 +207,19 @@ resource "azuread_service_principal_password" "flowehr_databricks_sql" {
   service_principal_id = azuread_service_principal.flowehr_databricks_sql.object_id
 }
 
-
 # Push secrets to KV
 resource "azurerm_key_vault_secret" "sql_server_features_admin_username" {
+<<<<<<< HEAD
   name         = "sql-server-features-admin-username"
 >>>>>>> deployer IP, sql store, private endpoints, dns zone
+=======
+  name         = "sql-features-admin-username"
+>>>>>>> sql store, spn + secret scope
   value        = local.sql_server_features_admin_username
   key_vault_id = var.core_kv_id
 }
 resource "azurerm_key_vault_secret" "sql_server_features_admin_password" {
+<<<<<<< HEAD
 <<<<<<< HEAD
   name         = "sql-features-admin-password"
   value        = random_password.sql_admin_password.result
@@ -238,15 +245,35 @@ resource "azurerm_key_vault_secret" "flowehr_databricks_sql_spn_app_secret" {
 =======
 resource "azurerm_key_vault_secret" "flowehr_databricks_sql_spn_application_id" {
   name         = "databricks-sql-application-id"
+=======
+  name         = "sql-features-admin-password"
+  value        = random_password.sql_admin_password.result
+  key_vault_id = var.core_kv_id
+}
+resource "azurerm_key_vault_secret" "flowehr_databricks_sql_spn_app_id" {
+  name         = "flowehr-dbks-sql-spn-app-id"
+>>>>>>> sql store, spn + secret scope
   value        = azuread_service_principal.flowehr_databricks_sql.application_id
   key_vault_id = var.core_kv_id
 }
-resource "azurerm_key_vault_secret" "flowehr_databricks_sql_spn_application_secret" {
-  name         = "databricks-sql-application-secret"
+resource "azurerm_key_vault_secret" "flowehr_databricks_sql_spn_app_secret" {
+  name         = "flowehr-dbks-sql-spn-app-secret"
   value        = azuread_service_principal_password.flowehr_databricks_sql.value
   key_vault_id = var.core_kv_id
 }
 >>>>>>> spn password + save to KV
+
+# Push SPN details to databricks secrets (backed by KV)
+resource "databricks_secret" "flowehr_databricks_sql_spn_app_id" {
+  key          = "flowehr-dbks-sql-spn-app-id"
+  string_value = azuread_service_principal.flowehr_databricks_sql.application_id
+  scope        = databricks_secret_scope.secrets.id
+}
+resource "databricks_secret" "flowehr_databricks_sql_spn_app_secret" {
+  key          = "flowehr-dbks-sql-spn-app-secret"
+  string_value = azuread_service_principal_password.flowehr_databricks_sql.value
+  scope        = databricks_secret_scope.secrets.id
+}
 
 # Private DNS + endpoint for SQL Server
 resource "azurerm_private_dns_zone" "sql" {
