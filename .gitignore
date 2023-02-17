@@ -44,6 +44,9 @@ config.yaml
 # Mac specific metadata
 .DS_store
 
+# Python artifacts
+**/__pycache__/**
+
 # vs code settings
 .vscode/
 

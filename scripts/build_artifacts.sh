@@ -19,9 +19,8 @@ set -o nounset
 # Uncomment this line to see each command for debugging (careful: this will show secrets!)
 # set -o xtrace
 
-
-ROOT="/workspaces/FlowEHR"
-PIPELINE_DIR="${ROOT}"/transform/pipelines
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+PIPELINE_DIR="${SCRIPT_DIR}/../transform/pipelines"
 shopt -s globstar nullglob
 
 # Walk through files in /transform/pipelines
