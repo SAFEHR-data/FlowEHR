@@ -30,7 +30,7 @@ terraform {
 
   required_providers {
     ${include.root.locals.required_provider_azure}
-
+    ${include.root.locals.required_provider_azuread}
     databricks = {
       source = "databricks/databricks"
       version = "1.9.1"

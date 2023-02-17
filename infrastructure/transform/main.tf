@@ -76,6 +76,10 @@ resource "databricks_cluster" "fixed_single_node" {
   ]
 }
 
+resource "databricks_secret_scope" "secrets" {
+  name = "flowehr-secrets"
+}
+
 resource "azurerm_data_factory" "adf" {
   name                = "adf-${var.naming_suffix}"
   location            = var.core_rg_location

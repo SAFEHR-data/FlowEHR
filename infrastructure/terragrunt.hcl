@@ -49,6 +49,20 @@ azurerm = {
   version = ">= 3.32"
 }
 EOF
+
+  required_provider_azuread = <<EOF
+azuread = {
+  source  = "hashicorp/azuread"
+  version = "2.33.0" # pinned due to https://github.com/hashicorp/terraform-provider-azuread/issues/1017
+}
+EOF
+
+  required_provider_random = <<EOF
+random = {
+  source = "hashicorp/random"
+  version = "3.4.3"
+}  
+EOF
 }
 
 generate "terraform" {
@@ -60,14 +74,8 @@ terraform {
 
   required_providers {
     ${local.required_provider_azure}
-    random = {
-      source = "hashicorp/random"
-      version = "3.4.3"
-    }
-    azuread = {
-      source  = "hashicorp/azuread"
-      version = "~> 2.33.0"
-    }
+    ${local.required_provider_azuread}
+    ${local.required_provider_random}
   }
 }
 EOF
