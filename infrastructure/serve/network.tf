@@ -12,8 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-resource "azurerm_subnet" "web_app" {
-  name                                          = "subnet-web-app-${var.naming_suffix}"
+resource "azurerm_subnet" "serve_webapps" {
+  name                                          = "subnet-serve-webapps-${var.naming_suffix}"
   resource_group_name                           = var.core_rg_name
   virtual_network_name                          = data.azurerm_virtual_network.core.name
   private_endpoint_network_policies_enabled     = false
