@@ -1,14 +1,17 @@
 #!/bin/bash
 set -o errexit
 set -o pipefail
-set -o nounset
 # Uncomment this line to see each command for debugging (careful: this will show secrets!)
 set -o xtrace
 
 ROOT=/workspaces/FlowEHR
 PIPELINE_DIR="${ROOT}"/transform/pipelines
 
-gh auth login
+if [[ -n "${ORG_GH_TOKEN}" ]]; then
+  echo "${ORG_GH_TOKEN}" | gh auth login --with-token
+else
+  gh auth login # Interactive login
+fi
 pushd "${PIPELINE_DIR}" > /dev/null
 
 while IFS=$'\n' read -r repo _; do
