@@ -24,11 +24,17 @@ PIPELINE_DIR="${SCRIPT_DIR}/../transform/pipelines"
 CONFIG_PATH="${SCRIPT_DIR}/../config.transform.yaml"
 ORG_GH_TOKEN="${ORG_GH_TOKEN:-}" # May be unset
 
-if [[ -n "${ORG_GH_TOKEN}" ]]; then
-  echo "${ORG_GH_TOKEN}" | gh auth login --with-token
+if [[ -n "${TF_IN_AUTOMATION:-}" ]]; then
+  if [[ -n "${ORG_GH_TOKEN}" ]]; then
+    echo "${ORG_GH_TOKEN}" | gh auth login --with-token
+    REPO_CHECKOUT_COMMAND="gh repo clone"
+  else
+    echo "ORG_GH_TOKEN secret must be set in order to check out the repositories"
+  fi
 else
-  gh auth login # Interactive login
+  REPO_CHECKOUT_COMMAND="git clone"
 fi
+
 pushd "${PIPELINE_DIR}" > /dev/null
 
 while IFS=$'\n' read -r repo _; do
@@ -41,7 +47,7 @@ while IFS=$'\n' read -r repo _; do
     rm -rf "${dir_name}"
   fi
 
-  gh repo clone "${repo}"
+  eval "${REPO_CHECKOUT_COMMAND}" "${repo}"
 done < <(yq e -I=0 '.repositories[]' "${CONFIG_PATH}")
 
 popd > /dev/null
