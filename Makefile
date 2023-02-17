@@ -48,13 +48,13 @@ bootstrap-destroy: az-login ## Destroy boostrap rg
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& . ${MAKEFILE_DIR}/infrastructure/bootstrap.sh -d
 
-deploy: bootstrap ## Deploy all infrastructure
+deploy: build-transform-library bootstrap ## Deploy all infrastructure
 	$(call target_title, "Deploy All") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/infrastructure \
 	&& terragrunt run-all apply --terragrunt-non-interactive
 
-deploy-core: build-transform-library bootstrap ## Deploy core infrastructure
+deploy-core: bootstrap ## Deploy core infrastructure
 	$(call target_title, "Deploy Core Infrastructure") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/infrastructure/core \
