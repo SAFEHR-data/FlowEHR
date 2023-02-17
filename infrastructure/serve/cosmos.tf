@@ -14,7 +14,7 @@
 
 
 resource "azurerm_cosmosdb_account" "serve" {
-  name                = "cosmos-db-${var.naming_suffix}"
+  name                = "cosmos-serve-${var.naming_suffix}"
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
   offer_type          = "Standard"

@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 resource "azurerm_service_plan" "serve" {
-  name                = "asp-test-${var.naming_suffix}"
+  name                = "asp-serve-${var.naming_suffix}"
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
   os_type             = "Linux"
