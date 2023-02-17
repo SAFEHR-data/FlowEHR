@@ -1,8 +1,9 @@
 #!/bin/bash
 set -o errexit
 set -o pipefail
+# set -o nounset  # Some arguments may not be set
 # Uncomment this line to see each command for debugging (careful: this will show secrets!)
-set -o xtrace
+# set -o xtrace
 
 ROOT=/workspaces/FlowEHR
 PIPELINE_DIR="${ROOT}"/transform/pipelines
