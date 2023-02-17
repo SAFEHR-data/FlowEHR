@@ -145,6 +145,10 @@ resource "azurerm_data_factory_pipeline" "pipeline" {
       }
     ]
   )
+
+  depends_on = [
+    azurerm_data_factory_linked_service_azure_databricks.msi_linked
+  ]
 }
 
 resource "databricks_dbfs_file" "dbfs_whl_file_upload" {
