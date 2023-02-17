@@ -3,6 +3,6 @@
 # There is a story to improve this: https://github.com/UCLH-Foundry/FlowEHR/issues/42
 # As part of this story, this file will likely disappear.
 ---
-spark_version: 3.3.0
+spark_version: 3.3.1
 repositories:
  - git@github.com:UCLH-Foundry/FlowEHR-Data-Forge.git
