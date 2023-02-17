@@ -32,6 +32,7 @@ if [[ -n "${TF_IN_AUTOMATION:-}" ]]; then
     echo "ORG_GH_TOKEN secret must be set in order to check out the repositories"
   fi
 else
+  # Using `git clone` for local flow instead of `gh` to avoid interactive prompt of `gh auth login`
   REPO_CHECKOUT_COMMAND="git clone"
 fi
 
