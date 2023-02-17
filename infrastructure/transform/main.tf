@@ -84,6 +84,12 @@ resource "azurerm_data_factory" "adf" {
   }
 }
 
+resource "azurerm_role_assignment" "adf_can_create_clusters" {
+  scope                = azurerm_databricks_workspace.databricks.id
+  role_definition_name = "Contributor"
+  principal_id         = azurerm_data_factory.adf.identity[0].principal_id
+}
+
 resource "azurerm_data_factory_integration_runtime_azure" "ir" {
   name                    = "FlowEHRIntegrationRuntime"
   data_factory_id         = azurerm_data_factory.adf.id
@@ -91,12 +97,6 @@ resource "azurerm_data_factory_integration_runtime_azure" "ir" {
   virtual_network_enabled = true
   description             = "Integration runtime in managed vnet"
   time_to_live_min        = 5
-}
-
-resource "azurerm_role_assignment" "adf_can_create_clusters" {
-  scope                = azurerm_databricks_workspace.databricks.id
-  role_definition_name = "Contributor"
-  principal_id         = azurerm_data_factory.adf.identity[0].principal_id
 }
 
 resource "azurerm_role_assignment" "adf_can_access_kv_secrets" {
@@ -127,7 +127,7 @@ resource "databricks_dbfs_file" "dbfs_artifact_upload" {
 }
 
 resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
-  name            = "ADBLinkedServiceViaMSI"
+  name            = local.adb_linked_service_name
   data_factory_id = azurerm_data_factory.adf.id
   description     = "Azure Databricks linked service via MSI"
   adb_domain      = "https://${azurerm_databricks_workspace.databricks.workspace_url}"
@@ -142,4 +142,51 @@ resource "azurerm_data_factory_linked_service_key_vault" "msi_linked" {
   data_factory_id = azurerm_data_factory.adf.id
   description     = "Key Vault linked service via MSI"
   key_vault_id    = var.core_kv_id
+}
+
+resource "azurerm_data_factory_pipeline" "pipeline" {
+  name            = "databricks-pipeline-${var.naming_suffix}"
+  data_factory_id = azurerm_data_factory.adf.id
+  activities_json = jsonencode(
+    [
+      {
+        "name" : "DatabricksPythonActivity",
+        "type" : "DatabricksSparkPython",
+        "typeProperties" : {
+          "pythonFile" : "${local.python_file_dbfs_path}/${local.python_file_name}",
+          "libraries" : [
+            {
+              "whl" : "${local.whl_file_dbfs_path}/${local.whl_file_name}"
+            }
+          ]
+        },
+        "linkedServiceName" : {
+          "referenceName" : "${local.adb_linked_service_name}",
+          "type" : "LinkedServiceReference"
+        }
+      }
+    ]
+  )
+
+  depends_on = [
+    azurerm_data_factory_linked_service_azure_databricks.msi_linked
+  ]
+}
+
+resource "databricks_dbfs_file" "dbfs_whl_file_upload" {
+  source = "${local.whl_file_local_path}/${local.whl_file_name}"
+  path   = "/${local.whl_file_name}"
+}
+
+resource "databricks_dbfs_file" "dbfs_pythong_file_upload" {
+  source = "${local.python_file_local_path}/${local.python_file_name}"
+  path   = "/${local.python_file_name}"
+}
+
+resource "azurerm_data_factory_trigger_schedule" "trigger" {
+  name            = "databricks-pipeline-trigger-${var.naming_suffix}"
+  data_factory_id = azurerm_data_factory.adf.id
+  pipeline_name   = azurerm_data_factory_pipeline.pipeline.name
+  interval        = 15
+  frequency       = "Minute"
 }
