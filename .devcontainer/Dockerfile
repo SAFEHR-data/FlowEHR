@@ -65,6 +65,7 @@ RUN export ARCH="$(dpkg --print-architecture)"; \
 ARG PRECOMMIT_VERSION="2.21.0"
 RUN python3 -m pip install pre-commit=="${PRECOMMIT_VERSION}" --no-cache-dir
 
+<<<<<<< HEAD
 # Install ODBC 18 driver for MS SQL 
 # https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server
 RUN sudo su \
@@ -88,3 +89,30 @@ RUN mkdir -p /tmp/actions-runner \
     && curl -o runner.tar.gz -L https://github.com/actions/runner/releases/download/${GH_RUNNER_VERSION}/actions-runner-linux-x64-2.302.1.tar.gz \
     && tar xzf runner.tar.gz -C /tmp/actions-runner \
     && rm runner.tar.gz
+=======
+# Install Python dependencies for data transform pipeline
+ARG SPARK_VERSION="3.3.1"
+RUN python3 -m pip install pyspark==${SPARK_VERSION} pyodbc build numpy databricks-cli --no-cache-dir
+
+# Get the local Spark installed to be able to run unit tests
+# Borrowed from https://github.com/beandrad/pyspark-sample/blob/main/.devcontainer/Dockerfile#L36
+RUN mkdir -p /tmp/docker-downloads \
+    && sudo apt-get update && sudo apt-get -y install openjdk-11-jdk wget \
+    && wget https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz -O /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
+    && tar -xvzf /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
+    && mv spark-${SPARK_VERSION}-bin-hadoop3 /opt/spark \
+    && rm -rf /tmp/docker-downloads
+ENV SPARK_HOME=/opt/spark
+ENV PATH=$PATH:$SPARK_HOME/bin
+
+# Install ODBC 18 driver for MS SQL 
+# https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server
+RUN sudo su \
+    && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    && exit
+
+RUN sudo apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql18 \
+    && echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc \
+    && sudo apt-get update && sudo apt-get install -y unixodbc unixodbc-dev
+>>>>>>> MS ODBC driver 18 install
