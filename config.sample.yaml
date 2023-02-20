@@ -21,6 +21,7 @@ data_source_connections:
 arm_subscription_id: __CHANGE_ME__
 devcontainer_acr_name: __CHANGE_ME__
 local_mode: false
+<<<<<<< HEAD
 >>>>>>> deployer IP, sql store, private endpoints, dns zone
 transform:
   spark_version: 3.3.1
@@ -33,3 +34,5 @@ serve:
   github_owner: __CHANGE_ME__
   github_app_id: __CHANGE_ME__
   github_app_installation_id: __CHANGE_ME__
+=======
+>>>>>>> fix config.sample merge error
