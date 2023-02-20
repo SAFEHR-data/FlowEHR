@@ -1,7 +1,8 @@
 {
 	"name": "FlowEHR",
 	"build": {
-		"dockerfile": "Dockerfile"
+		"dockerfile": "Dockerfile",
+		"context": ".."
 	},
 	"mounts": [ "source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind" ],
 	"overrideCommand": false,
@@ -27,7 +28,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "git config --global --add safe.directory /workspaces/FlowEHR && cd /workspaces/FlowEHR && pre-commit install",
+	"postCreateCommand": "git config --global --add safe.directory /workspaces/FlowEHR && cd /workspaces/FlowEHR && pre-commit install && ./scripts/pipeline_repo_checkout.sh",
 
 	// Set `remoteUser` to `root` to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode",

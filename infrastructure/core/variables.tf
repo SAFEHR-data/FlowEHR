@@ -47,4 +47,3 @@ variable "local_mode" {
   description = "Dev mode will enable more debugging, and set the deployer's IP address as an exception in resource firewalls"
   default     = false
 }
-

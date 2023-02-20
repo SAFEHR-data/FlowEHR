@@ -16,12 +16,24 @@ locals {
   sql_server_features_admin_username = "adminuser"
   storage_account_name               = "dbfs${var.truncated_naming_suffix}"
   adb_linked_service_name            = "ADBLinkedServiceViaMSI"
+  activities_file                    = "activities.json"
+  artifacts_dir                      = "artifacts"
 
-  python_file_local_path = "../../transform/features"
-  python_file_dbfs_path  = "dbfs:"
-  python_file_name       = "entrypoint.py"
+  all_activities_files = fileset(path.module, "../../transform/pipelines/**/${local.activities_file}")
 
-  whl_file_local_path = "../../transform/features/dist"
-  whl_file_dbfs_path  = "dbfs:"
-  whl_file_name       = "src-0.0.1-py3-none-any.whl"
+  # Example value: [ "../../transform/pipelines/hello-world" ]
+  pipeline_dirs = toset([
+    for activity_file in all_activities_files : dirname(activity_file)
+  ])
+
+  # Example value: [ { "artifact_path" = "path/to/entrypoint.py", "pipeline" = "hello-world" } ]
+  artifacts = flatten([
+    for pipeline in local.pipeline_dirs : [
+      for artifact in fileset("${pipeline}/${local.artifacts_dir}", "*") : {
+        artifact_path = "${pipeline}/${local.artifacts_dir}/${artifact}"
+        pipeline      = basename(pipeline)
+      }
+    ]
+  ])
+  spark_version = yamldecode(file("../../config.transform.yaml")).spark_version
 }

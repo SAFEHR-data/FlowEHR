@@ -63,5 +63,4 @@ inputs = {
   subnet_address_spaces = dependency.core.outputs.subnet_address_spaces
   local_mode            = dependency.core.outputs.local_mode
   deployer_ip_address   = dependency.core.outputs.deployer_ip_address
-  spark_version         = get_env("SPARK_VERSION", "3.3.1") // This only needs a default for CICD, which can be removed following https://github.com/UCLH-Foundry/FlowEHR/issues/42 
 }
