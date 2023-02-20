@@ -1,0 +1,13 @@
+---
+apps:
+  - id: dash_sample
+    name: Dash Sample
+    description: Hello world app for Dash
+    owner: __CHANGE_ME__
+    contributors:
+      - email: __CHANGE_ME__
+        gh_username: __CHANGE_ME__
+    managed_repo:
+      template: FlowEHR-Dash-Seedling
+      branch_approvers:
+        - __CHANGE_ME__

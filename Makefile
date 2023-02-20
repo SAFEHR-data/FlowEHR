@@ -41,12 +41,12 @@ az-login: ## Check logged in/log into azure with a service principal
 bootstrap: az-login ## Boostrap Terraform backend
 	$(call target_title, "Bootstrap") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
-	&& . ${MAKEFILE_DIR}/infrastructure/bootstrap.sh
+	&& . ${MAKEFILE_DIR}/scripts/bootstrap.sh
 
 bootstrap-destroy: az-login ## Destroy boostrap rg
 	$(call target_title, "Destroy Bootstrap Env") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
-	&& . ${MAKEFILE_DIR}/infrastructure/bootstrap.sh -d
+	&& . ${MAKEFILE_DIR}/scripts/bootstrap.sh -d
 
 deploy: bootstrap ## Deploy all infrastructure
 	$(call target_title, "Deploy All") \
