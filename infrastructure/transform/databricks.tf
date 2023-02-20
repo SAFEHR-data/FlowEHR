@@ -97,11 +97,16 @@ resource "databricks_cluster" "fixed_single_node" {
 }
 
 <<<<<<< HEAD:infrastructure/transform/databricks.tf
+<<<<<<< HEAD:infrastructure/transform/databricks.tf
 # databricks secret scope, in-built. Not able to use key vault backed scope due to limitation in databricks:
 # https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secret-scopes#--create-an-azure-key-vault-backed-secret-scope-using-the-databricks-cli 
 resource "databricks_secret_scope" "secrets" {
   name = "flowehr-secrets"
 =======
+=======
+# databricks secret scope, in-built. Not able to use key vault backed scope due to limitation in databricks:
+# https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secret-scopes#--create-an-azure-key-vault-backed-secret-scope-using-the-databricks-cli 
+>>>>>>> tidied comments!:infrastructure/transform/main.tf
 resource "databricks_secret_scope" "secrets" {
   name = "flowehr-secrets"
 }

@@ -267,7 +267,7 @@ resource "azurerm_key_vault_secret" "flowehr_databricks_sql_spn_app_secret" {
 }
 >>>>>>> spn password + save to KV
 
-# Push SPN details to databricks secrets (backed by KV)
+# Push SPN details to databricks secret scope
 resource "databricks_secret" "flowehr_databricks_sql_spn_app_id" {
   key          = "flowehr-dbks-sql-spn-app-id"
   string_value = azuread_service_principal.flowehr_databricks_sql.application_id
