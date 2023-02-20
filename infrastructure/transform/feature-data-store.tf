@@ -19,7 +19,7 @@ resource "random_password" "sql_admin_password" {
 
 # Azure SQL logical server, public access disabled - will use private endpoints for access
 resource "azurerm_mssql_server" "sql_server_features" {
-  name                                 = "sql-server-features-${var.naming_suffix}"
+  name                                 = "sql-server-features-${lower(var.naming_suffix)}"
   location                             = var.core_rg_location
   resource_group_name                  = var.core_rg_name
   version                              = "12.0"
