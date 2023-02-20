@@ -96,12 +96,14 @@ variable "github_repository" {
 }
 =======
 variable "deployer_ip_address" {
-  type = string
+  type    = string
+  default = ""
 }
 
 variable "local_mode" {
   type        = bool
   description = "Dev mode will enable more debugging, and set the deployer's IP address as an exception in resource firewalls"
+  default     = false
 }
 
 >>>>>>> deployer IP, sql store, private endpoints, dns zone
