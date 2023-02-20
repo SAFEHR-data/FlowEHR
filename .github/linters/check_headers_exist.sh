@@ -13,14 +13,21 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 
-for ext in ".tf" ".yml" ".yaml" ".sh" "Dockerfile" ".py" ".hcl" ".js"
+set -o errexit
+set -o pipefail
+
+for ext in ".tf" ".yml" ".sh" "Dockerfile" ".py" ".hcl" ".js"
 do
     # shellcheck disable=SC2044
-    for path in $(find . -name "*$ext" -not .devcontainer*)
+    for path in $(find . -type f -name "*$ext")
     do
-        if [[ $path = *"override.tf"* ]]; then  # Ignore gitignored file
+        if git check-ignore -q "$path" ; then  # Ignore any .gitignored files
             continue
         fi
+        if [[ "$path" == *".lock.hcl"* ]]; then # Ignore any lock files
+            continue
+        fi
+
         if ! grep -q "Copyright" "$path"; then
             echo -e "\n\e[31m»»» ⚠️  No copyright/license header in $path"
             exit 1
