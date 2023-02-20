@@ -41,10 +41,14 @@ resource "azuread_service_principal" "flowehr_sql_owner" {
 # Azure SQL logical server, public access disabled - will use private endpoints for access
 resource "azurerm_mssql_server" "sql_server_features" {
 <<<<<<< HEAD
+<<<<<<< HEAD
   name                                 = "sql-server-features-${lower(var.naming_suffix)}"
 =======
   name                                 = "sql-server-features-${var.naming_suffix}"
 >>>>>>> deployer IP, sql store, private endpoints, dns zone
+=======
+  name                                 = "sql-server-features-${lower(var.naming_suffix)}"
+>>>>>>> server name lower
   location                             = var.core_rg_location
   resource_group_name                  = var.core_rg_name
   version                              = "12.0"
