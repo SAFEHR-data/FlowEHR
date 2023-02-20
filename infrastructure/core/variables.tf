@@ -36,4 +36,3 @@ variable "core_address_space" {
   description = "The CIDR address space for the core virtual network (must be a min of /24)"
   default     = "10.0.0.0/24"
 }
-

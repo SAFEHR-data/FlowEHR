@@ -40,7 +40,7 @@ resource "azurerm_databricks_workspace" "databricks" {
 }
 
 data "databricks_spark_version" "latest_lts" {
-  spark_version = var.spark_version
+  spark_version = local.spark_version
 
   depends_on = [azurerm_databricks_workspace.databricks]
 }
@@ -105,6 +105,27 @@ resource "azurerm_role_assignment" "adf_can_access_kv_secrets" {
   principal_id         = azurerm_data_factory.adf.identity[0].principal_id
 }
 
+# Get all directories that have activities.json in them and say that they are pipeline directories
+resource "azurerm_data_factory_pipeline" "pipeline" {
+  for_each        = local.pipeline_dirs
+  name            = "databricks-pipeline-${basename(each.value)}-${var.naming_suffix}"
+  data_factory_id = azurerm_data_factory.adf.id
+  activities_json = file("${each.value}/${local.activities_file}")
+
+  depends_on = [
+    azurerm_data_factory_linked_service_azure_databricks.msi_linked
+  ]
+}
+
+# Assuming that all artifacts will be built
+resource "databricks_dbfs_file" "dbfs_artifact_upload" {
+  for_each = { for artifact in local.artifacts : artifact.artifact_path => artifact.pipeline }
+  # Source path on local filesystem
+  source = each.key
+  # Path on DBFS
+  path = "/pipelines/${each.value}/${local.artifacts_dir}/${basename(each.key)}"
+}
+
 resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
   name            = local.adb_linked_service_name
   data_factory_id = azurerm_data_factory.adf.id
@@ -112,7 +133,8 @@ resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
   adb_domain      = "https://${azurerm_databricks_workspace.databricks.workspace_url}"
 
   msi_work_space_resource_id = azurerm_databricks_workspace.databricks.id
-  existing_cluster_id        = databricks_cluster.fixed_single_node.cluster_id
+
+  existing_cluster_id = databricks_cluster.fixed_single_node.cluster_id
 }
 
 resource "azurerm_data_factory_linked_service_key_vault" "msi_linked" {

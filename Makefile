@@ -66,10 +66,11 @@ deploy-transform-infrastructure: bootstrap ## Deploy transform infrastructure
 	&& cd ${MAKEFILE_DIR}/infrastructure/transform \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
 
-build-transform-library: ## Call make build from transform/features to build wheel file.
-	cd transform/features && $(MAKE) build
+PIPELINE_DIR = ${MAKEFILE_DIR}/transform/pipelines
+build-transform-artifacts:
+	${MAKEFILE_DIR}/scripts/build_artifacts.sh
 
-deploy-transform: build-transform-library deploy-transform-infrastructure ## Deploy transform after building wheel file
+deploy-transform: build-transform-artifacts deploy-transform-infrastructure ## Deploy transform after building wheel file
 	
 deploy-serve: bootstrap ## Deploy serve infrastructure
 	$(call target_title, "Deploy Serve Infrastructure") \
