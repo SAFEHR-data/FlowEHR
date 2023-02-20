@@ -14,6 +14,7 @@
 
 locals {
 <<<<<<< HEAD
+<<<<<<< HEAD
   sql_server_features_admin_username = "adminuser"
   sql_owner_app_name                 = "flowehr-sql-owner-${lower(var.naming_suffix)}"
   databricks_app_name                = "flowehr-databricks-datawriter-${lower(var.naming_suffix)}"
@@ -54,6 +55,11 @@ locals {
       } : null
     ]
   ])
+=======
+  sql_server_features_admin_username = "adminuser"
+  storage_account_name               = "dbfs${var.truncated_naming_suffix}"
+  adb_linked_service_name            = "ADBLinkedServiceViaMSI"
+>>>>>>> merge error fixed
 
   storage_account_name = "dbfs${var.naming_suffix_truncated}"
 
