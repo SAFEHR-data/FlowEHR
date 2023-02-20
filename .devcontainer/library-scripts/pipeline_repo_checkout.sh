@@ -20,8 +20,8 @@ set -o nounset
 # set -o xtrace
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-PIPELINE_DIR="${SCRIPT_DIR}/../transform/pipelines"
-CONFIG_PATH="${SCRIPT_DIR}/../config.transform.yaml"
+PIPELINE_DIR="${SCRIPT_DIR}/../../transform/pipelines"
+CONFIG_PATH="${SCRIPT_DIR}/../../config.transform.yaml"
 ORG_GH_TOKEN="${ORG_GH_TOKEN:-}" # May be unset
 
 if [[ -n "${TF_IN_AUTOMATION:-}" ]]; then

@@ -16,8 +16,6 @@ FROM mcr.microsoft.com/vscode/devcontainers/python:3.10
 
 COPY .devcontainer/library-scripts/*.sh /tmp/library-scripts/
 
-COPY config.transform.yaml /tmp/config.transform.yaml
-
 # [Option] Install zsh
 ARG INSTALL_ZSH="true"
 # [Option] Upgrade OS packages to their latest versions
@@ -70,6 +68,9 @@ RUN npm install -g pajv@${PAJV_VERSION}
 ARG PRECOMMIT_VERSION="2.21.0"
 RUN python3 -m pip install pre-commit=="${PRECOMMIT_VERSION}" --no-cache-dir
 
+# Data transform pipeline config
+COPY config.transform.yaml /tmp/config.transform.yaml
+
 # Install Python dependencies for data transform pipeline
 ARG NUMPY_VERSION="1.24.2"
 ARG DATABRICKS_CLI_VERSION="0.17.4"
@@ -88,3 +89,8 @@ RUN mkdir -p /tmp/docker-downloads \
 
 ENV SPARK_HOME=/opt/spark
 ENV PATH=$PATH:$SPARK_HOME/bin
+
+# Check out data pipeline repositories
+ARG TF_IN_AUTOMATION
+ARG ORG_GH_TOKEN
+RUN bash /tmp/library-scripts/pipeline_repo_checkout.sh
