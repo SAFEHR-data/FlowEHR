@@ -16,9 +16,11 @@ locals {
   activities_file = "activities.json"
   artifacts_dir   = "artifacts"
 
+  all_activities_files = fileset(path.module, "../../transform/pipelines/**/${local.activities_file}")
+
   # Example value: [ "../../transform/pipelines/hello-world" ]
   pipeline_dirs = toset([
-    for activity_file in fileset(path.module, "../../transform/pipelines/**/${local.activities_file}") : dirname(activity_file)
+    for activity_file in all_activities_files : dirname(activity_file)
   ])
 
   # Example value: [ { "artifact_path" = "path/to/entrypoint.py", "pipeline" = "hello-world" } ]
