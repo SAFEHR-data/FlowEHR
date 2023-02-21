@@ -44,12 +44,17 @@ on:
         required: true
       FLOWEHR_GITHUB_TOKEN:
         required: true
+<<<<<<< HEAD
       GH_APP_CERT:
         required: false
 
 
 env:
   DEVCONTAINER_NAME: flowehr/devcontainer
+=======
+      LOCAL_MODE:
+        required: true
+>>>>>>> local_mode
 
 jobs:
   make_core:
@@ -256,6 +261,7 @@ jobs:
             ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
             ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
             ENVIRONMENT=${{ inputs.environment }}
+<<<<<<< HEAD
             CI_CONTAINER_REGISTRY=${{ vars.CI_CONTAINER_REGISTRY }}
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
@@ -275,3 +281,8 @@ jobs:
             -c tfstate \
             -d ${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }} \
             --account-name ${{ vars.CI_STORAGE_ACCOUNT }}
+=======
+            DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
+            ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
+            LOCAL_MODE=${{ secrets.LOCAL_MODE }}
+>>>>>>> local_mode
