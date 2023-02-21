@@ -1,0 +1,77 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "https://github.com/UCLH-Foundry/FlowEHR/serve/schema/config_schema.json",
+    "title": "FlowEHR Apps configuration",
+    "description": "Configuration for apps hosted on the FlowEHR platform.",
+    "type": "object",
+    "properties": {
+        "apps": {
+            "description": "List of app configurations. Adding a new configuration will deploy a new app on next 'make apps'.",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the app",
+                        "type": "string",
+                        "pattern": "^[a-zA-Z 0-9\\_-]*$"
+                    },
+                    "name": {
+                        "description": "Display name for the app",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "Short description for the app",
+                        "type": "string"
+                    },
+                    "owner": {
+                        "description": "AD email for the app owner",
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "contributors": {
+                        "description": "List of contributors to assign to the GH repo",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "email": {
+                                    "description": "AD email for the contributor",
+                                    "type": "string",
+                                    "format": "email"
+                                },
+                                "gh_username": {
+                                    "description": "GitHub username for the contributor",
+                                    "type": "string",
+                                    "pattern": "^[a-zA-Z 0-9\\_-]*$"
+                                }
+                            }
+                        }
+                    },
+                    "managed_repo": {
+                        "description": "Configuration for a repo created & managed by the FlowEHR platform",
+                        "type": "object",
+                        "properties": {
+                            "template": {
+                                "description": "GH template repo to use for creating the repository",
+                                "type": "string",
+                                "pattern": "^[a-zA-Z 0-9\\_-]*$"
+                            },
+                            "branch_approvers": {
+                                "description": "List of approver GH usernames for branch protection policies",
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "pattern": "^[a-zA-Z 0-9\\_-]*$"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "required": [
+      "apps"
+    ]
+}

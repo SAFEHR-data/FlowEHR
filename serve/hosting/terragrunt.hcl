@@ -30,4 +30,6 @@ inputs = {
   core_kv_id       = dependency.core.outputs.core_kv_id
 
   serve_app_service_plan_name = dependency.serve.outputs.app_service_plan_name
+  serve_cosmos_account_name   = dependency.serve.outputs.cosmos_account_name
+  sql_feature_store_id        = dependency.serve.outputs.sql_feature_store_id
 }
