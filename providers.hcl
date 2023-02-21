@@ -59,7 +59,17 @@ random = {
   version = "3.4.3"
 }  
 EOF
+<<<<<<< HEAD:providers.hcl
 >>>>>>> sql store, spn + secret scope:infrastructure/terragrunt.hcl
+=======
+
+  required_provider_databricks = <<EOF
+ databricks = {
+      source = "databricks/databricks"
+      version = "1.9.1"
+    }
+EOF
+>>>>>>> tidied up databricks provider ref + aad provider refs:infrastructure/terragrunt.hcl
 }
 EOF
 
@@ -78,8 +88,6 @@ databricks = {
 =======
   required_providers {
     ${local.required_provider_azure}
-    ${local.required_provider_azuread}
-    ${local.required_provider_random}
   }
 >>>>>>> deployer IP, sql store, private endpoints, dns zone:infrastructure/terragrunt.hcl
 }

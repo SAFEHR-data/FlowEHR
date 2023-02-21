@@ -41,11 +41,16 @@ terraform {
 =======
     ${include.root.locals.required_provider_azure}
     ${include.root.locals.required_provider_azuread}
+<<<<<<< HEAD
     databricks = {
       source = "databricks/databricks"
       version = "1.9.1"
     }
 >>>>>>> sql store, spn + secret scope
+=======
+    ${include.root.locals.required_provider_random}
+    ${include.root.locals.required_provider_databricks}
+>>>>>>> tidied up databricks provider ref + aad provider refs
   }
 }
 EOF
