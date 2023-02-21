@@ -60,7 +60,7 @@ resource "azurerm_mssql_database" "feature_database" {
   tags                 = var.tags
 }
 
-# AAD App + SPN for Databricks -> SQL Access
+# AAD App + SPN for Databricks -> SQL Access.
 resource "azuread_application" "flowehr_databricks_sql" {
   display_name = "FlowEHR-Databricks-SQL-${var.naming_suffix}"
   owners       = [data.azurerm_client_config.current.object_id]
