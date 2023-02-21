@@ -70,6 +70,17 @@ RUN npm install -g pajv@${PAJV_VERSION}
 ARG PRECOMMIT_VERSION="2.21.0"
 RUN python3 -m pip install pre-commit=="${PRECOMMIT_VERSION}" --no-cache-dir
 
+# Install ODBC 18 driver for MS SQL 
+# https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server
+RUN sudo su \
+    && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    && exit
+
+RUN sudo apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql18 \
+    && echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc \
+    && sudo apt-get update && sudo apt-get install -y unixodbc unixodbc-dev
+
 # Install Python dependencies for data transform pipeline
 ARG SPARK_VERSION="3.3.1"
 ARG NUMPY_VERSION="1.24.2"
@@ -90,13 +101,4 @@ RUN mkdir -p /tmp/docker-downloads \
 ENV SPARK_HOME=/opt/spark
 ENV PATH=$PATH:$SPARK_HOME/bin
 
-# Install ODBC 18 driver for MS SQL 
-# https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server
-RUN sudo su \
-    && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/mssql-release.list \
-    && exit
 
-RUN sudo apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql18 \
-    && echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc \
-    && sudo apt-get update && sudo apt-get install -y unixodbc unixodbc-dev
