@@ -67,6 +67,7 @@ resource "azuread_application" "flowehr_databricks_sql" {
 }
 resource "azuread_service_principal" "flowehr_databricks_sql" {
   application_id = azuread_application.flowehr_databricks_sql.application_id
+  owners         = [data.azurerm_client_config.current.object_id]
 }
 resource "azuread_service_principal_password" "flowehr_databricks_sql" {
   service_principal_id = azuread_service_principal.flowehr_databricks_sql.object_id
