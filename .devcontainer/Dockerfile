@@ -66,6 +66,9 @@ ARG PRECOMMIT_VERSION="2.21.0"
 RUN python3 -m pip install pre-commit=="${PRECOMMIT_VERSION}" --no-cache-dir
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dc fix ordering of installs
 # Install ODBC 18 driver for MS SQL 
 # https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server
 RUN sudo su \
@@ -73,6 +76,7 @@ RUN sudo su \
     && curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/mssql-release.list \
     && exit
 
+<<<<<<< HEAD
 RUN sudo apt-get update \
     && ACCEPT_EULA=Y apt-get install -y msodbcsql18 --no-install-recommends \
     && echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc \
@@ -90,6 +94,12 @@ RUN mkdir -p /tmp/actions-runner \
     && tar xzf runner.tar.gz -C /tmp/actions-runner \
     && rm runner.tar.gz
 =======
+=======
+RUN sudo apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql18 \
+    && echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc \
+    && sudo apt-get update && sudo apt-get install -y unixodbc unixodbc-dev
+
+>>>>>>> dc fix ordering of installs
 # Install Python dependencies for data transform pipeline
 ARG SPARK_VERSION="3.3.1"
 RUN python3 -m pip install pyspark==${SPARK_VERSION} pyodbc build numpy databricks-cli --no-cache-dir
@@ -105,14 +115,11 @@ RUN mkdir -p /tmp/docker-downloads \
 ENV SPARK_HOME=/opt/spark
 ENV PATH=$PATH:$SPARK_HOME/bin
 
-# Install ODBC 18 driver for MS SQL 
-# https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server
-RUN sudo su \
-    && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/mssql-release.list \
-    && exit
 
+<<<<<<< HEAD
 RUN sudo apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql18 \
     && echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc \
     && sudo apt-get update && sudo apt-get install -y unixodbc unixodbc-dev
 >>>>>>> MS ODBC driver 18 install
+=======
+>>>>>>> dc fix ordering of installs
