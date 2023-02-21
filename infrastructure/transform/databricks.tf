@@ -159,5 +159,16 @@ resource "azurerm_data_factory_linked_service_key_vault" "msi_linked" {
   data_factory_id = azurerm_data_factory.adf.id
   description     = "Key Vault linked service via MSI"
   key_vault_id    = var.core_kv_id
+<<<<<<< HEAD:infrastructure/transform/databricks.tf
 >>>>>>> sql store, spn + secret scope:infrastructure/transform/main.tf
+=======
+}
+
+resource "azurerm_data_factory_trigger_schedule" "trigger" {
+  name            = "databricks-pipeline-trigger-${var.naming_suffix}"
+  data_factory_id = azurerm_data_factory.adf.id
+  pipeline_name   = azurerm_data_factory_pipeline.pipeline.name
+  interval        = 15
+  frequency       = "Minute"
+>>>>>>> removed dupes:infrastructure/transform/main.tf
 }
