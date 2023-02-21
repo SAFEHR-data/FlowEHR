@@ -63,6 +63,13 @@ random = {
   version = "3.4.3"
 }  
 EOF
+
+  required_provider_databricks = <<EOF
+ databricks = {
+      source = "databricks/databricks"
+      version = "1.9.1"
+    }
+EOF
 }
 
 generate "terraform" {
@@ -74,8 +81,6 @@ terraform {
 
   required_providers {
     ${local.required_provider_azure}
-    ${local.required_provider_azuread}
-    ${local.required_provider_random}
   }
 }
 EOF
