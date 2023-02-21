@@ -12,6 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+#TODO remove
+
 resource "random_password" "sql_admin_password" {
   length  = 16
   special = true
