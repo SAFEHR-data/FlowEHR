@@ -50,6 +50,10 @@ variable "serve_cosmos_account_name" {
   type = string
 }
 
+variable "serve_acr_name" {
+  type = string
+}
+
 variable "sql_feature_store_id" {
   type = string
 }

@@ -19,8 +19,13 @@ resource "azurerm_linux_web_app" "app" {
   service_plan_id     = var.app_service_plan_id
 
   site_config {
+    linux_fx_version                        = "DOCKER|${var.acr_name}/${var.app_id}:latest"
     container_registry_use_managed_identity = true
     remote_debugging_enabled                = var.local_mode
+  }
+
+  app_settings = {
+    DOCKER_REGISTRY_SERVER_URL = "https://${var.acr_name}.azurecr.io"
   }
 
   identity {
@@ -32,11 +37,16 @@ resource "azurerm_linux_web_app" "app" {
   }
 }
 
+resource "azurerm_role_assignment" "webapp_acr" {
+  role_definition_name = "AcrPull"
+  scope                = data.azurerm_container_registry.serve.id
+  principal_id         = azurerm_linux_web_app.app.identity[0].principal_id
+}
+
 resource "azurerm_cosmosdb_sql_database" "app" {
   name                = "${var.app_id}-state"
   resource_group_name = var.resource_group_name
   account_name        = var.cosmos_account_name
-  throughput          = 400
 }
 
 resource "azurerm_cosmosdb_sql_container" "app" {

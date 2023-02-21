@@ -20,6 +20,7 @@ module "platform" {
   resource_group_name  = var.core_rg_name
   location             = var.core_rg_location
   app_service_plan     = var.serve_app_service_plan_name
+  acr_name             = vr.serve_acr_name
   cosmos_account_name  = var.serve_cosmos_account_name
   sql_feature_store_id = var.sql_feature_store_id
 }
