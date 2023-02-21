@@ -61,6 +61,4 @@ inputs = {
   core_kv_id            = dependency.core.outputs.core_kv_id
   core_kv_uri           = dependency.core.outputs.core_kv_uri
   subnet_address_spaces = dependency.core.outputs.subnet_address_spaces
-  local_mode            = dependency.core.outputs.local_mode
-  deployer_ip_address   = dependency.core.outputs.deployer_ip_address
 }

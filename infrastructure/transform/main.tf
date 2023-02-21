@@ -149,11 +149,3 @@ resource "azurerm_data_factory_linked_service_key_vault" "msi_linked" {
   description     = "Key Vault linked service via MSI"
   key_vault_id    = var.core_kv_id
 }
-
-resource "azurerm_data_factory_trigger_schedule" "trigger" {
-  name            = "databricks-pipeline-trigger-${var.naming_suffix}"
-  data_factory_id = azurerm_data_factory.adf.id
-  pipeline_name   = azurerm_data_factory_pipeline.pipeline.name
-  interval        = 15
-  frequency       = "Minute"
-}

@@ -14,16 +14,15 @@
 
 locals {
   sql_server_features_admin_username = "adminuser"
-  storage_account_name               = "dbfs${var.truncated_naming_suffix}"
-  adb_linked_service_name            = "ADBLinkedServiceViaMSI"
   activities_file                    = "activities.json"
   artifacts_dir                      = "artifacts"
+  adb_linked_service_name            = "ADBLinkedServiceViaMSI"
 
   all_activities_files = fileset(path.module, "../../transform/pipelines/**/${local.activities_file}")
 
   # Example value: [ "../../transform/pipelines/hello-world" ]
   pipeline_dirs = toset([
-    for activity_file in all_activities_files : dirname(activity_file)
+    for activity_file in local.all_activities_files : dirname(activity_file)
   ])
 
   # Example value: [ { "artifact_path" = "path/to/entrypoint.py", "pipeline" = "hello-world" } ]
@@ -35,5 +34,7 @@ locals {
       }
     ]
   ])
+  storage_account_name = "dbfs${var.truncated_naming_suffix}"
+
   spark_version = yamldecode(file("../../config.transform.yaml")).spark_version
 }
