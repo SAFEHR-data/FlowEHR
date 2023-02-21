@@ -81,7 +81,7 @@ jobs:
             serve:
               - 'infrastructure/serve/**'
             devcontainer:
-              - '.devcontainer'
+              - '.devcontainer/**'
 
       - id: set_make_command
         run: |
