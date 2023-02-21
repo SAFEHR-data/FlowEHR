@@ -56,6 +56,7 @@ bootstrap: az-login ## Boostrap Terraform backend
 	$(call terragrunt,apply,bootstrap/local)
 
 bootstrap-destroy: az-login ## Destroy boostrap rg
+<<<<<<< HEAD
 	$(call terragrunt,destroy,bootstrap/local)
 
 infrastructure: az-login transform-artifacts ## Deploy all infrastructure
@@ -125,6 +126,53 @@ destroy-non-core: az-login ## Destroy non-core
 		--terragrunt-exclude-dir ${MAKEFILE_DIR}/bootstrap/ci \
 		--terragrunt-exclude-dir ${MAKEFILE_DIR}/bootstrap/local \
 		--terragrunt-exclude-dir ${MAKEFILE_DIR}/apps
+=======
+	$(call target_title, "Destroy Bootstrap Env") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& . ${MAKEFILE_DIR}/infrastructure/bootstrap.sh -d
+
+deploy: bootstrap ## Deploy all infrastructure
+	$(call target_title, "Deploy All") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& cd ${MAKEFILE_DIR}/infrastructure \
+	&& terragrunt run-all apply --terragrunt-non-interactive
+
+deploy-core: bootstrap ## Deploy core infrastructure
+	$(call target_title, "Deploy Core Infrastructure") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& cd ${MAKEFILE_DIR}/infrastructure/core \
+	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
+
+deploy-transform-infrastructure: bootstrap ## Deploy transform infrastructure
+	$(call target_title, "Deploy Transform Infrastructure") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& cd ${MAKEFILE_DIR}/infrastructure/transform \
+	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
+
+PIPELINE_DIR = ${MAKEFILE_DIR}/transform/pipelines
+build-transform-artifacts:
+	${MAKEFILE_DIR}/scripts/build_artifacts.sh
+
+deploy-transform: build-transform-artifacts deploy-transform-infrastructure ## Deploy transform after building wheel file
+	
+deploy-serve: bootstrap ## Deploy serve infrastructure
+	$(call target_title, "Deploy Serve Infrastructure") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& cd ${MAKEFILE_DIR}/infrastructure/serve \
+	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
+
+destroy: az-login ## Destroy all infrastructure
+	$(call target_title, "Destroy All") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& cd ${MAKEFILE_DIR}/infrastructure \
+	&& terragrunt run-all destroy --terragrunt-non-interactive
+
+test: deploy destroy bootstrap-destroy  ## Test by deploy->destroy
+
+test-transform: deploy-transform destroy bootstrap-destroy  ## Test transform deploy->destroy
+
+test-serve: deploy-serve destroy bootstrap-destroy  ## Test transform deploy->destroy
+>>>>>>> rolled back a bad make target
 
 destroy-no-terraform: az-login ## Destroy all resource groups associated with this deployment
 	$(call target_title, "Destroy no terraform") \
