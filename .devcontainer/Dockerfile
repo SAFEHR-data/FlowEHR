@@ -95,10 +95,7 @@ RUN mkdir -p /tmp/docker-downloads \
     && wget https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz -O /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
     && tar -xvzf /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
     && mv spark-${SPARK_VERSION}-bin-hadoop3 /opt/spark \
-    && rm -rf /tmp/docker-downloads \
-    && python3 -m pip install pyspark==${SPARK_VERSION} --no-cache-dir
+    && rm -rf /tmp/docker-downloads
 
 ENV SPARK_HOME=/opt/spark
 ENV PATH=$PATH:$SPARK_HOME/bin
-
-
