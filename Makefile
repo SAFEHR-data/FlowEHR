@@ -131,7 +131,7 @@ destroy-non-core: az-login ## Destroy non-core
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& . ${MAKEFILE_DIR}/infrastructure/bootstrap.sh -d
 
-deploy: bootstrap ## Deploy all infrastructure
+deploy: build-transform-artifacts bootstrap ## Deploy all infrastructure
 	$(call target_title, "Deploy All") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/infrastructure \

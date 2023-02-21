@@ -113,7 +113,7 @@ inputs = {
   naming_suffix = get_env("NAMING_SUFFIX")
   truncated_naming_suffix = get_env("TRUNCATED_NAMING_SUFFIX")
   deployer_ip_address = get_env("DEPLOYER_IP_ADDRESS", "") // deployer's IP address is added to resource firewall exceptions IF in local_mode
-
+  local_mode = get_env("LOCAL_MODE", false)
   tags = {
     environment = get_env("ENVIRONMENT")
   }

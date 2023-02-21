@@ -163,6 +163,7 @@ resource "azurerm_data_factory_linked_service_key_vault" "msi_linked" {
 >>>>>>> sql store, spn + secret scope:infrastructure/transform/main.tf
 =======
 }
+<<<<<<< HEAD:infrastructure/transform/databricks.tf
 
 resource "azurerm_data_factory_trigger_schedule" "trigger" {
   name            = "databricks-pipeline-trigger-${var.naming_suffix}"
@@ -172,3 +173,5 @@ resource "azurerm_data_factory_trigger_schedule" "trigger" {
   frequency       = "Minute"
 >>>>>>> removed dupes:infrastructure/transform/main.tf
 }
+=======
+>>>>>>> merge fixes:infrastructure/transform/main.tf

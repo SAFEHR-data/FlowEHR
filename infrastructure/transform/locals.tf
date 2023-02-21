@@ -16,10 +16,14 @@ locals {
 <<<<<<< HEAD
 <<<<<<< HEAD
   sql_server_features_admin_username = "adminuser"
+<<<<<<< HEAD
   sql_owner_app_name                 = "flowehr-sql-owner-${lower(var.naming_suffix)}"
   databricks_app_name                = "flowehr-databricks-datawriter-${lower(var.naming_suffix)}"
   pipeline_file                      = "pipeline.json"
   trigger_file                       = "trigger.json"
+=======
+  activities_file                    = "activities.json"
+>>>>>>> merge fixes
   artifacts_dir                      = "artifacts"
   adb_linked_service_name            = "ADBLinkedServiceViaMSI"
 
@@ -27,7 +31,11 @@ locals {
 
   # Example value: [ "../../transform/pipelines/hello-world" ]
   pipeline_dirs = toset([
+<<<<<<< HEAD
     for pipeline_file in local.all_pipeline_files : dirname(pipeline_file)
+=======
+    for activity_file in local.all_activities_files : dirname(activity_file)
+>>>>>>> merge fixes
   ])
 
   pipelines = [
@@ -46,6 +54,7 @@ locals {
       }
     ]
   ])
+<<<<<<< HEAD
 
   triggers = flatten([
     for pipeline_dir in local.pipeline_dirs : [
@@ -98,4 +107,9 @@ locals {
   storage_account_name               = "dbfs${var.truncated_naming_suffix}"
   sql_server_features_admin_username = "adminuser"
 >>>>>>> deployer IP, sql store, private endpoints, dns zone
+=======
+  storage_account_name = "dbfs${var.truncated_naming_suffix}"
+
+  spark_version = yamldecode(file("../../config.transform.yaml")).spark_version
+>>>>>>> merge fixes
 }
