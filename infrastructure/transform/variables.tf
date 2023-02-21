@@ -59,7 +59,3 @@ variable "core_kv_id" {
 variable "core_kv_uri" {
   type = string
 }
-
-variable "spark_version" {
-  type = string
-}

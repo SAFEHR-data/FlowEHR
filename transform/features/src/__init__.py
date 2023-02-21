@@ -12,6 +12,5 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-locals {
-  subnet_address_spaces = cidrsubnets(var.core_address_space, 3, 3, 3, 1)
-}
+__version__ = "0.0.1"
+__author__ = "UCLH"

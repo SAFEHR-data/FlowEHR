@@ -11,7 +11,3 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-
-locals {
-  subnet_address_spaces = cidrsubnets(var.core_address_space, 3, 3, 3, 1)
-}
