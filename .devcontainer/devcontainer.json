@@ -2,11 +2,11 @@
 	"name": "FlowEHR",
 	"build": {
 		"dockerfile": "Dockerfile",
-		"context": "..",
-		"args": {
-			"TF_IN_AUTOMATION": "${localEnv:TF_IN_AUTOMATION}",
-			"ORG_GH_TOKEN": "${localEnv:ORG_GH_TOKEN}"
-		}
+		"context": ".."
+	},
+	"remoteEnv": {
+		"TF_IN_AUTOMATION": "${localEnv:TF_IN_AUTOMATION}",
+		"ORG_GH_TOKEN": "${localEnv:ORG_GH_TOKEN}"
 	},
 	"mounts": [ "source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind" ],
 	"overrideCommand": false,
