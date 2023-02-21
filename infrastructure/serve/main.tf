@@ -51,6 +51,3 @@ resource "azurerm_container_registry" "serve" {
   admin_enabled                 = true
   public_network_access_enabled = true
 }
-
-# networking?
-# admin creds in keyvault? or just use a data.azurerm_container_registry ?

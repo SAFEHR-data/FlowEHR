@@ -12,13 +12,13 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-
 resource "azurerm_cosmosdb_account" "serve" {
   name                = "cosmos-serve-${var.naming_suffix}"
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
   offer_type          = "Standard"
   kind                = "GlobalDocumentDB"
+  # TODO: once https://github.com/UCLH-Foundry/FlowEHR/pull/86 is merged 
   # public_network_access_enabled = var.local_mode
   # local_authentication_disabled = !var.local_mode
   tags = var.tags
