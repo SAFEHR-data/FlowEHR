@@ -13,9 +13,10 @@
 #  limitations under the License.
 
 locals {
-  activities_file         = "activities.json"
-  artifacts_dir           = "artifacts"
-  adb_linked_service_name = "ADBLinkedServiceViaMSI"
+  sql_server_features_admin_username = "adminuser"
+  activities_file                    = "activities.json"
+  artifacts_dir                      = "artifacts"
+  adb_linked_service_name            = "ADBLinkedServiceViaMSI"
 
   all_activities_files = fileset(path.module, "../../transform/pipelines/**/${local.activities_file}")
 

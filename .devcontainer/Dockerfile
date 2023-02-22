@@ -70,10 +70,22 @@ RUN npm install -g pajv@${PAJV_VERSION}
 ARG PRECOMMIT_VERSION="2.21.0"
 RUN python3 -m pip install pre-commit=="${PRECOMMIT_VERSION}" --no-cache-dir
 
+# Install ODBC 18 driver for MS SQL 
+# https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server
+RUN sudo su \
+    && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    && exit
+
+RUN sudo apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql18 \
+    && echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc \
+    && sudo apt-get update && sudo apt-get install -y unixodbc unixodbc-dev
+
 # Install Python dependencies for data transform pipeline
+ARG SPARK_VERSION="3.3.1"
 ARG NUMPY_VERSION="1.24.2"
 ARG DATABRICKS_CLI_VERSION="0.17.4"
-RUN python3 -m pip install build numpy=="${NUMPY_VERSION}" databricks-cli=="${DATABRICKS_CLI_VERSION}" --no-cache-dir
+RUN python3 -m pip install pyspark==${SPARK_VERSION} pyodbc build numpy=="${NUMPY_VERSION}" databricks-cli=="${DATABRICKS_CLI_VERSION}" --no-cache-dir
 
 # Get the local Spark installed to be able to run unit tests
 # Borrowed from https://github.com/beandrad/pyspark-sample/blob/main/.devcontainer/Dockerfile#L36
@@ -83,8 +95,7 @@ RUN mkdir -p /tmp/docker-downloads \
     && wget https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz -O /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
     && tar -xvzf /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
     && mv spark-${SPARK_VERSION}-bin-hadoop3 /opt/spark \
-    && rm -rf /tmp/docker-downloads \
-    && python3 -m pip install pyspark==${SPARK_VERSION} --no-cache-dir
+    && rm -rf /tmp/docker-downloads
 
 ENV SPARK_HOME=/opt/spark
 ENV PATH=$PATH:$SPARK_HOME/bin
