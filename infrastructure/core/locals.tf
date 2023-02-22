@@ -13,5 +13,5 @@
 #  limitations under the License.
 
 locals {
-  subnet_address_spaces = cidrsubnets(var.core_address_space, 3, 3, 3, 1)
+  subnet_address_spaces = cidrsubnets(var.core_address_space, 2, 2, 2, 2)
 }
