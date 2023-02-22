@@ -49,13 +49,26 @@ variable "local_mode" {
 }
 
 variable "devcontainer_acr_name" {
-  type = string
+  type        = string
   description = "Name of the azure container registry i.e. <acr-name>.azurecr.io"
-  default = ""  # Can be undefined for local deployment
 }
 
 variable "devcontainer_image_name" {
-  type = string
+  type        = string
   description = "Name of the azure container registry i.e. aregistry.azurecr.io/<image-name>:tag"
-  default = ""  # Can be undefined for local deployment
+}
+
+variable "github_runner_name" {
+  type        = string
+  description = "Name of the GitHub runner that will be created"
+}
+
+variable "github_runner_token" {
+  type        = string
+  description = "GitHub token with permissions to register a runner on this repository"
+}
+
+variable "github_repository" {
+  type        = string
+  description = "Github repository in which to create the build agent. e.g. UCLH-Foundry/FlowEHR"
 }

@@ -137,8 +137,23 @@ jobs:
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}
     secrets: inherit
 
-  run_test:
+  deploy_core:  # Deploy the core infrastructure including a build agent inside the vnet
     needs: [pr_comment]
+    if: |
+      (needs.pr_comment.outputs.command == 'test') &&
+      (needs.pr_comment.outputs.makeCommand != 'none')
+    uses: ./.github/workflows/devcontainer_make_command.yml
+    name: Make deploy-core
+    with:
+      suffix_override: ${{ needs.pr_comment.outputs.prRefId }}
+      environment: Infra-Test
+      command: deploy-core
+      sha: ${{ needs.pr_comment.outputs.prHeadSha }}
+      created_runner_name: devcontainer-${{ needs.pr_comment.outputs.prRefId }}
+    secrets: inherit
+
+  run_test:  # Run test on the created build agent
+    needs: [deploy_core]
     if: |
       (needs.pr_comment.outputs.command == 'test') &&
       (needs.pr_comment.outputs.makeCommand != 'none')
@@ -149,6 +164,7 @@ jobs:
       environment: Infra-Test
       command: ${{ needs.pr_comment.outputs.makeCommand }}
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}
+      runs_on: devcontainer-${{ needs.pr_comment.outputs.prRefId }}
     secrets: inherit
 
   summary:

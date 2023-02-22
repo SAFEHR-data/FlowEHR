@@ -25,10 +25,21 @@ permissions:
   pull-requests: read
 
 jobs:
+  deploy_core:
+    uses: ./.github/workflows/devcontainer_make_command.yml
+    name: Make deploy-core
+    with:
+      command: deploy-core
+      environment: Infra-Test
+      created_runner_name: devcontainer-Infra-Test
+    secrets: inherit
+
   deploy:
     uses: ./.github/workflows/devcontainer_make_command.yml
+    needs: [deploy_core]
     name: Make Deploy
     with:
       command: deploy
       environment: Infra-Test
+      runs_on: devcontainer-Infra-Test
     secrets: inherit

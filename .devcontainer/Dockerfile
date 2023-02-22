@@ -33,7 +33,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # [Option] Install Docker CLI
-ARG INSTALL_DOCKER="true"
+ARG INSTALL_DOCKER="false"
 
 RUN if [ "${INSTALL_DOCKER}" = "true" ]; then \
         bash /tmp/library-scripts/docker-debian.sh "true" "/var/run/docker-host.sock" "/var/run/docker.sock" "${USERNAME}"; \
@@ -96,6 +96,12 @@ RUN mkdir -p /tmp/docker-downloads \
     && tar -xvzf /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
     && mv spark-${SPARK_VERSION}-bin-hadoop3 /opt/spark \
     && rm -rf /tmp/docker-downloads
+
+# Install prerequsites for using this container as a GitHub runner. Assuming an x86 runner
+RUN mkdir -p /tmp/actions-runner \
+    && curl -o runner.tar.gz -L https://github.com/actions/runner/releases/download/v2.302.1/actions-runner-linux-x64-2.302.1.tar.gz \
+    && tar xzf runner.tar.gz -C /tmp/actions-runner \
+    && rm runner.tar.gz
 
 ENV SPARK_HOME=/opt/spark
 ENV PATH=$PATH:$SPARK_HOME/bin

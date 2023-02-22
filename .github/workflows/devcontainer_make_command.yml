@@ -25,6 +25,11 @@ on:
         type: string
         required: true
         description: The GitHub environment in which to run
+      runs_on:
+        type: string
+        required: false
+        default: ubuntu-latest
+        description: Name of the GitHub runner this workflow will execute on
       suffix_override:
         type: string
         required: false
@@ -33,6 +38,10 @@ on:
         type: string
         required: false
         description: Commit SHA to override the default GitHub checkout
+      created_runner_name:
+        type: string
+        required: false
+        description: Name of the GitHub runner to create. Must have command == "deploy-core"
     secrets:
       AZURE_CREDENTIALS:
         required: true
@@ -44,12 +53,10 @@ on:
         required: true
       ORG_GH_TOKEN:
         required: true
-      LOCAL_MODE:
-        required: true
 
 jobs:
   make_command:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs_on }}
     environment: ${{ inputs.environment }}
 
     steps:
@@ -97,4 +104,7 @@ jobs:
             DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
             DEVCONTAINER_IMAGE_IMAGE=flowehr/devcontainer
             ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
-            LOCAL_MODE=${{ secrets.LOCAL_MODE }}
+            LOCAL_MODE=false
+            GITHUB_RUNNER_NAME=${{ inputs.created_runner_name }}
+            GITHUB_RUNNER_TOKEN=${{ secrets.GITHUB_TOKEN }}
+            GITHUB_REPOSITORY=${{ github.repository }}

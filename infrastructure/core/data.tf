@@ -14,14 +14,12 @@
 
 data "azurerm_client_config" "current" {}
 
-
 # az acr list --query "[? name == 'acrsvce9c2'].[ resourceGroup]"
 data "external" "devcontainer_acr" {
   program = ["az", "az", "acr", "list", "--query", "\"[? name == '${var.}']\""]
 }
 
-
-data "azurerm_container_registry" "gh_actions" {
+data "azurerm_container_registry" "devcontainer" {
   name                = var.gh_actions_acr_name
   resource_group_name = var.gh_actions_resource_group_name
 }

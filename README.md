@@ -100,7 +100,6 @@ be created in a private repository created from this template repository.
     - `ENVIRONMENT`: Name of the environment e.g. `dev`, also used to name resources
     - `DEVCONTAINER_ACR_NAME`: Name of the Azure Container Registry to use for the devcontainer build. This may or may not exist. e.g. `flowehrmgmtacr`
 
-
 3. Run `Deploy Infra-Test`
 
     Trigger a deployment using a workflow dispatch trigger on the `Actions` tab.
