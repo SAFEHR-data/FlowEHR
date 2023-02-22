@@ -72,6 +72,12 @@ resource "databricks_cluster" "fixed_single_node" {
   ]
 }
 
+# databricks secret scope, in-built. Not able to use key vault backed scope due to limitation in databricks:
+# https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secret-scopes#--create-an-azure-key-vault-backed-secret-scope-using-the-databricks-cli 
+resource "databricks_secret_scope" "secrets" {
+  name = "flowehr-secrets"
+}
+
 resource "azurerm_data_factory" "adf" {
   name                = "adf-${var.naming_suffix}"
   location            = var.core_rg_location
