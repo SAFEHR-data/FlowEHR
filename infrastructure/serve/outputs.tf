@@ -12,14 +12,14 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-data "azurerm_virtual_network" "core" {
-  name                = var.core_vnet_name
-  resource_group_name = var.core_rg_name
+output "cosmos_account_name" {
+  value = azurerm_cosmosdb_account.serve.name
 }
 
-data "azurerm_private_dns_zone" "blobcore" {
-  name                = "privatelink.blob.core.windows.net"
-  resource_group_name = var.core_rg_name
+output "app_service_plan_name" {
+  value = azurerm_service_plan.serve.name
 }
 
-data "azurerm_client_config" "current" {}
+output "acr_name" {
+  value = azurerm_container_registry.serve.name
+}

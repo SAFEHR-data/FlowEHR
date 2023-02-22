@@ -48,7 +48,7 @@ bootstrap-destroy: az-login ## Destroy boostrap rg
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& . ${MAKEFILE_DIR}/scripts/bootstrap.sh -d
 
-deploy: bootstrap ## Deploy all infrastructure
+deploy: build-transform-artifacts bootstrap ## Deploy all infrastructure
 	$(call target_title, "Deploy All") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/infrastructure \
@@ -60,12 +60,18 @@ deploy-core: bootstrap ## Deploy core infrastructure
 	&& cd ${MAKEFILE_DIR}/infrastructure/core \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
 
-deploy-transform: bootstrap ## Deploy transform infrastructure
+deploy-transform-infrastructure: bootstrap ## Deploy transform infrastructure
 	$(call target_title, "Deploy Transform Infrastructure") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/infrastructure/transform \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
 
+PIPELINE_DIR = ${MAKEFILE_DIR}/transform/pipelines
+build-transform-artifacts:
+	${MAKEFILE_DIR}/scripts/build_artifacts.sh
+
+deploy-transform: build-transform-artifacts deploy-transform-infrastructure ## Deploy transform after building wheel file
+	
 deploy-serve: bootstrap ## Deploy serve infrastructure
 	$(call target_title, "Deploy Serve Infrastructure") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \

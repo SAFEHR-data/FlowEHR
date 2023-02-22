@@ -92,3 +92,20 @@ export TRUNCATED_NAMING_SUFFIX
 export MGMT_RG="rg-mgmt-${NAMING_SUFFIX}"
 export MGMT_STORAGE="strgm${TRUNCATED_NAMING_SUFFIX}"
 export STATE_CONTAINER="tfstate"
+
+# Get IP address for local deployments
+if [[ "${LOCAL_MODE}" == "true" ]];
+then
+    echo "Local Mode: TRUE"
+    if [[ -z "${DEPLOYER_IP_ADDRESS+x}" ]];
+    then
+        echo "No IP address assigned in config, getting client IP and setting in ENV"
+        this_ip="$(curl -s 'https://api64.ipify.org')"
+        export DEPLOYER_IP_ADDRESS="${this_ip}"
+    else
+        echo "Have IP address from config.yaml"
+    fi
+    echo "IP Address: ${DEPLOYER_IP_ADDRESS}"
+else
+    echo "Local Mode: FALSE"
+fi

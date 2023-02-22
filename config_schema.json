@@ -29,25 +29,14 @@
             "description": "Azure Container Registry name. If this does not exist then make bootstrap will create it",
             "type": "string",
             "pattern": "[0-9a-z]{5,50}"
-        },
-        "transform": {
-            "description": "Configuration for Data Transformation",
-            "type": "object",
-            "properties": {
-                "spark_version": {
-                    "description": "Full version string to use as Spark Version, e.g. 3.1.0",
-                    "type": "string",
-                    "pattern": "^[0-9]+(.[0-9])+$",
-                    "maxLength": 5,
-                    "default": "3.3.1"
-                }
-            }
         }
     },
     "required": [
       "location",
       "suffix",
       "environment",
-      "arm_subscription_id"
+      "arm_subscription_id",
+      "local_mode",
+      "devcontainer_acr_name"
     ]
 }

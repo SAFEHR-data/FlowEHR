@@ -15,22 +15,19 @@
 
 set -o errexit
 set -o pipefail
+set -o nounset
+# Uncomment this line to see each command for debugging (careful: this will show secrets!)
+# set -o xtrace
 
-for ext in ".tf" ".yml" ".sh" "Dockerfile" ".py" ".hcl" ".js"
-do
-    # shellcheck disable=SC2044
-    for path in $(find . -type f -name "*$ext")
-    do
-        if git check-ignore -q "$path" ; then  # Ignore any .gitignored files
-            continue
-        fi
-        if [[ "$path" == *".lock.hcl"* ]]; then # Ignore any lock files
-            continue
-        fi
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+PIPELINE_DIR="${SCRIPT_DIR}/../transform/pipelines"
+shopt -s globstar nullglob
 
-        if ! grep -q "Copyright" "$path"; then
-            echo -e "\n\e[31m»»» ⚠️  No copyright/license header in $path"
-            exit 1
-        fi
-    done || exit 1
+# Walk through files in /transform/pipelines
+# For each directory where activities.json has been found
+for activity_json_file in "${PIPELINE_DIR}"/**/activities.json; do 
+    pipeline_dir=$(dirname "${activity_json_file}")
+    pushd "${pipeline_dir}"
+    make artifacts
+    popd
 done

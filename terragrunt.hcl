@@ -54,6 +54,27 @@ azurerm = {
   version = ">= 3.32"
 }
 EOF
+
+  required_provider_azuread = <<EOF
+azuread = {
+  source  = "hashicorp/azuread"
+  version = "2.33.0" # pinned due to https://github.com/hashicorp/terraform-provider-azuread/issues/1017
+}
+EOF
+
+  required_provider_random = <<EOF
+random = {
+  source = "hashicorp/random"
+  version = "3.4.3"
+}  
+EOF
+
+  required_provider_databricks = <<EOF
+ databricks = {
+      source = "databricks/databricks"
+      version = "1.9.1"
+    }
+EOF
 }
 
 generate "terraform" {
@@ -95,7 +116,8 @@ inputs = {
   location = get_env("LOCATION")
   naming_suffix = get_env("NAMING_SUFFIX")
   truncated_naming_suffix = get_env("TRUNCATED_NAMING_SUFFIX")
-
+  deployer_ip_address = get_env("DEPLOYER_IP_ADDRESS", "") // deployer's IP address is added to resource firewall exceptions IF in local_mode
+  local_mode = get_env("LOCAL_MODE", false)
   tags = {
     environment = get_env("ENVIRONMENT")
   }

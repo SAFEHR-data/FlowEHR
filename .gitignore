@@ -1,5 +1,6 @@
 # Local .terraform directories
 **/.terraform/*
+.terraform.lock.hcl
 
 # .tfstate files
 *.tfstate
@@ -47,8 +48,9 @@ apps.yaml
 
 # Python artifacts
 **/__pycache__/**
-**/*egg-info/**
-transform/pipeline/dist/**
 
 # vs code settings
 .vscode/
+
+# Checked out pipeline repos
+transform/pipelines/**

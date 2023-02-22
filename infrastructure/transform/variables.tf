@@ -60,6 +60,10 @@ variable "core_kv_uri" {
   type = string
 }
 
-variable "spark_version" {
+variable "deployer_ip_address" {
   type = string
+}
+
+variable "local_mode" {
+  type = bool
 }

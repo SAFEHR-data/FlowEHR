@@ -37,3 +37,13 @@ variable "core_address_space" {
   default     = "10.0.0.0/24"
 }
 
+variable "deployer_ip_address" {
+  type    = string
+  default = ""
+}
+
+variable "local_mode" {
+  type        = bool
+  description = "Dev mode will enable more debugging, and set the deployer's IP address as an exception in resource firewalls"
+  default     = false
+}

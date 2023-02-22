@@ -42,6 +42,10 @@ on:
         required: true
       LOCATION:
         required: true
+      ORG_GH_TOKEN:
+        required: true
+      LOCAL_MODE:
+        required: true
 
 jobs:
   make_command:
@@ -91,3 +95,5 @@ jobs:
             LOCATION=${{ secrets.LOCATION }}
             ENVIRONMENT=${{ inputs.environment }}
             DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
+            ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
+            LOCAL_MODE=${{ secrets.LOCAL_MODE }}
