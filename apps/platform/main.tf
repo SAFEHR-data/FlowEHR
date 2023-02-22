@@ -74,7 +74,7 @@ resource "azurerm_app_service_connection" "cosmos" {
 resource "azurerm_app_service_connection" "sql" {
   name               = "sql-serviceconnector"
   app_service_id     = azurerm_linux_web_app.app.id
-  target_resource_id = var.sql_feature_store_id
+  target_resource_id = var.transform_sql_feature_store_id
 
   authentication {
     type = "systemAssignedIdentity"

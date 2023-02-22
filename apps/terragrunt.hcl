@@ -32,5 +32,5 @@ inputs = {
   serve_app_service_plan_name = dependency.serve.outputs.app_service_plan_name
   serve_acr_name              = dependency.serve.outputs.acr_name
   serve_cosmos_account_name   = dependency.serve.outputs.cosmos_account_name
-  sql_feature_store_id        = dependency.serve.outputs.sql_feature_store_id
+  transform_sql_feature_store_id        = dependency.serve.outputs.transform_sql_feature_store_id
 }

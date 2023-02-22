@@ -12,30 +12,48 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+variable "naming_suffix" {
+  type        = string
+  description = "Suffix used to name resources"
+}
+
+variable "truncated_naming_suffix" {
+  type        = string
+  description = "Truncated (max 20 chars, no hyphens etc.) suffix for e.g storage accounts"
+}
+
+variable "tags" {
+  type = map(any)
+}
+
 variable "local_mode" {
   type = bool
 }
 
-variable "app_id" {
+variable "core_rg_name" {
   type = string
 }
 
-variable "resource_group_name" {
+variable "core_rg_location" {
   type = string
 }
 
-variable "location" {
+variable "core_kv_id" {
   type = string
 }
 
-variable "app_service_plan" {
+variable "transform_sql_feature_store_id" {
   type = string
 }
 
-variable "cosmos_account_name" {
+variable "serve_app_service_plan_name" {
   type = string
 }
 
-variable "sql_feature_store_id" {
+variable "serve_cosmos_account_name" {
+  type = string
+}
+
+variable "serve_acr_name" {
   type = string
 }
