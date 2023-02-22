@@ -66,9 +66,16 @@ EOF
 
   required_provider_databricks = <<EOF
  databricks = {
-      source = "databricks/databricks"
-      version = "1.9.1"
-    }
+    source = "databricks/databricks"
+    version = "1.9.1"
+  }
+EOF
+
+  required_provider_external = <<EOF
+  external = {
+    source = "hashicorp/external"
+    version = "2.2.3"
+  }
 EOF
 }
 
@@ -113,6 +120,8 @@ inputs = {
   truncated_naming_suffix = get_env("TRUNCATED_NAMING_SUFFIX")
   deployer_ip_address = get_env("DEPLOYER_IP_ADDRESS", "") // deployer's IP address is added to resource firewall exceptions IF in local_mode
   local_mode = get_env("LOCAL_MODE", false)
+  devcontainer_acr_name = get_env("DEVCONTAINER_ACR_NAME", "")
+  devcontainer_image_name = get_env("DEVCONTAINER_IMAGE_IMAGE", "")
   tags = {
     environment = get_env("ENVIRONMENT")
   }

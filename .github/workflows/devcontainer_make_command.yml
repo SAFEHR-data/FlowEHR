@@ -95,5 +95,6 @@ jobs:
             LOCATION=${{ secrets.LOCATION }}
             ENVIRONMENT=${{ inputs.environment }}
             DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
+            DEVCONTAINER_IMAGE_IMAGE=flowehr/devcontainer
             ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
             LOCAL_MODE=${{ secrets.LOCAL_MODE }}

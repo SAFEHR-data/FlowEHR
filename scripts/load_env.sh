@@ -74,8 +74,6 @@ else
 
 fi
 
-
-
 NAMING_SUFFIX=$("${script_dir}/name_suffix.py")
 echo "Naming resources with suffixed with: ${NAMING_SUFFIX}"
 export NAMING_SUFFIX

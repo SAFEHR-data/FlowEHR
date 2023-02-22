@@ -15,3 +15,18 @@
 include "root" {
   path = find_in_parent_folders()
 }
+
+generate "terraform" {
+  path      = "terraform.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+terraform {
+  required_version = "${include.root.locals.terraform_version}"
+
+  required_providers {
+    ${include.root.locals.required_provider_azure}
+    ${include.root.locals.required_provider_external}
+  }
+}
+EOF
+}

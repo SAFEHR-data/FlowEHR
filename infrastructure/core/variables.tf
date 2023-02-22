@@ -47,3 +47,15 @@ variable "local_mode" {
   description = "Dev mode will enable more debugging, and set the deployer's IP address as an exception in resource firewalls"
   default     = false
 }
+
+variable "devcontainer_acr_name" {
+  type = string
+  description = "Name of the azure container registry i.e. <acr-name>.azurecr.io"
+  default = ""  # Can be undefined for local deployment
+}
+
+variable "devcontainer_image_name" {
+  type = string
+  description = "Name of the azure container registry i.e. aregistry.azurecr.io/<image-name>:tag"
+  default = ""  # Can be undefined for local deployment
+}
