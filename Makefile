@@ -72,17 +72,23 @@ deploy-serve: bootstrap ## Deploy serve infrastructure
 	&& cd ${MAKEFILE_DIR}/infrastructure/serve \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
 
-destroy: az-login ## Destroy all infrastructure
-	$(call target_title, "Destroy All") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
-	&& cd ${MAKEFILE_DIR}/infrastructure \
-	&& terragrunt run-all destroy --terragrunt-non-interactive
-
 test: deploy destroy bootstrap-destroy  ## Test by deploy->destroy
 
 test-transform: deploy-transform destroy bootstrap-destroy  ## Test transform deploy->destroy
 
 test-serve: deploy-serve destroy bootstrap-destroy  ## Test transform deploy->destroy
+
+apps: bootstrap ## Deploy FlowEHR apps
+	$(call target_title, "Deploy FlowEHR apps") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh --apps \
+	&& cd ${MAKEFILE_DIR}/serve/hosting \
+	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
+
+destroy: az-login ## Destroy all infrastructure
+	$(call target_title, "Destroy All") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& cd ${MAKEFILE_DIR}/infrastructure \
+	&& terragrunt run-all destroy --terragrunt-non-interactive
 
 destroy-no-terraform: az-login ## Destroy all resource groups associated with this deployment
 	$(call target_title, "Destroy no terraform") \
