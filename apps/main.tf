@@ -13,14 +13,18 @@
 #  limitations under the License.
 
 module "platform" {
-  for_each                       = toset(["app1", "app2"])
-  source                         = "./platform"
-  app_id                         = each.key
-  local_mode                     = var.local_mode
-  resource_group_name            = var.core_rg_name
-  location                       = var.core_rg_location
-  app_service_plan               = var.serve_app_service_plan_name
-  acr_name                       = vr.serve_acr_name
-  cosmos_account_name            = var.serve_cosmos_account_name
-  transform_sql_feature_store_id = var.transform_sql_feature_store_id
+  for_each              = local.apps
+  source                = "./platform"
+  app_id                = each.key
+  naming_suffix         = var.naming_suffix
+  local_mode            = var.local_mode
+  webapps_subnet_id     = var.serve_webapps_subnet_id
+  resource_group_name   = var.core_rg_name
+  location              = var.core_rg_location
+  log_analytics_name    = var.core_log_analytics_name
+  app_service_plan_name = var.serve_app_service_plan_name
+  acr_name              = var.serve_acr_name
+  cosmos_account_name   = var.serve_cosmos_account_name
+  feature_store_id      = var.transform_sql_feature_store_id
+  app_config            = each.value
 }

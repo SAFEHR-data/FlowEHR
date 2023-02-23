@@ -11,3 +11,5 @@ apps:
       template: FlowEHR-Dash-Seedling
       branch_approvers:
         - __CHANGE_ME__
+    app_settings:
+      WEBSITES_PORT: 8050

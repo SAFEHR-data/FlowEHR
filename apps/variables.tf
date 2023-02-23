@@ -38,6 +38,10 @@ variable "core_rg_location" {
   type = string
 }
 
+variable "core_log_analytics_name" {
+  type = string
+}
+
 variable "core_kv_id" {
   type = string
 }
@@ -55,5 +59,9 @@ variable "serve_cosmos_account_name" {
 }
 
 variable "serve_acr_name" {
+  type = string
+}
+
+variable "serve_webapps_subnet_id" {
   type = string
 }

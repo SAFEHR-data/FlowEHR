@@ -66,19 +66,6 @@ script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 echo "Loading core configuration..."
 export_config_from_yaml "${script_dir}/../config.yaml" "${script_dir}/../config_schema.json"
 
-# If apps flag is passed, also export apps config
-while [ $# -gt 0 ] ; do
-  case $1 in
-    -a | --apps)
-      echo "Loading configuration for FlowEHR apps..."
-      export_config_from_yaml "${script_dir}/../serve/apps.yaml" "${script_dir}/../serve/apps_schema.json";;
-    *) # unknown
-        echo "Unknown flag $1"
-        exit 1
-  esac
-  shift
-done
-
 # Export naming suffixes
 NAMING_SUFFIX=$("${script_dir}/name_suffix.py")
 echo "Naming resources with suffixed with: ${NAMING_SUFFIX}"

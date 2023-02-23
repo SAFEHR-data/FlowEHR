@@ -20,17 +20,24 @@ dependency "core" {
   config_path = "${get_repo_root()}/infrastructure/core"
 }
 
+dependency "transform" {
+  config_path = "${get_repo_root()}/infrastructure/transform"
+}
+
 dependency "serve" {
   config_path = "${get_repo_root()}/infrastructure/serve"
 }
 
 inputs = {
-  core_rg_name     = dependency.core.outputs.core_rg_name
-  core_rg_location = dependency.core.outputs.core_rg_location
-  core_kv_id       = dependency.core.outputs.core_kv_id
+  core_rg_name            = dependency.core.outputs.core_rg_name
+  core_rg_location        = dependency.core.outputs.core_rg_location
+  core_kv_id              = dependency.core.outputs.core_kv_id
+  core_log_analytics_name = dependency.core.outputs.core_log_analytics_name
+
+  transform_sql_feature_store_id = dependency.transform.outputs.feature_store_id
 
   serve_app_service_plan_name = dependency.serve.outputs.app_service_plan_name
   serve_acr_name              = dependency.serve.outputs.acr_name
   serve_cosmos_account_name   = dependency.serve.outputs.cosmos_account_name
-  transform_sql_feature_store_id        = dependency.serve.outputs.transform_sql_feature_store_id
+  serve_webapps_subnet_id     = dependency.serve.outputs.webapps_subnet_id
 }

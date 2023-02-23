@@ -20,6 +20,10 @@ variable "app_id" {
   type = string
 }
 
+variable "naming_suffix" {
+  type = string
+}
+
 variable "resource_group_name" {
   type = string
 }
@@ -28,7 +32,19 @@ variable "location" {
   type = string
 }
 
-variable "app_service_plan" {
+variable "webapps_subnet_id" {
+  type = string
+}
+
+variable "log_analytics_name" {
+  type = string
+}
+
+variable "acr_name" {
+  type = string
+}
+
+variable "app_service_plan_name" {
   type = string
 }
 
@@ -36,6 +52,26 @@ variable "cosmos_account_name" {
   type = string
 }
 
-variable "transform_sql_feature_store_id" {
+variable "feature_store_id" {
   type = string
+}
+
+variable "app_config" {
+  type = object({
+    name        = string
+    description = string
+    owner       = string
+
+    contributors = list(object({
+      email       = string
+      gh_username = string
+    }))
+
+    managed_repo = object({
+      template         = string,
+      branch_approvers = list(string)
+    })
+
+    env = optional(map(string))
+  })
 }

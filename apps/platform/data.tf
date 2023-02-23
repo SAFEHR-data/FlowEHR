@@ -12,12 +12,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-data "azurerm_app_service_plan" "serve" {
+data "azurerm_log_analytics_workspace" "core" {
+  name                = var.log_analytics_name
+  resource_group_name = var.resource_group_name
+}
+
+data "azurerm_service_plan" "serve" {
   name                = var.app_service_plan_name
-  resource_group_name = var.core_rg_name
+  resource_group_name = var.resource_group_name
 }
 
 data "azurerm_container_registry" "serve" {
   name                = var.acr_name
-  resource_group_name = var.core_rg_name
+  resource_group_name = var.resource_group_name
 }

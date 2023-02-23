@@ -66,6 +66,10 @@
                                 }
                             }
                         }
+                    },
+                    "app_settings": {
+                        "description": "Map of app settings to pass to the webapp container",
+                        "type": "object"
                     }
                 }
             }

@@ -84,7 +84,7 @@ test-serve: deploy-serve destroy bootstrap-destroy  ## Test transform deploy->de
 
 apps: bootstrap ## Deploy FlowEHR apps
 	$(call target_title, "Deploy FlowEHR apps") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh --apps \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/apps \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
 
