@@ -16,7 +16,7 @@ include "root" {
   path = find_in_parent_folders()
 }
 
-inputs {
+inputs = {
    # Additional variables are required for the build agent deployment
   devcontainer_acr_name = get_env("DEVCONTAINER_ACR_NAME", "")
   devcontainer_image_name = get_env("DEVCONTAINER_IMAGE_IMAGE", "")
