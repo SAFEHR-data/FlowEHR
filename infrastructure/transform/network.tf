@@ -122,3 +122,19 @@ resource "azurerm_private_endpoint" "databricks_filesystem" {
     private_dns_zone_ids = [data.azurerm_private_dns_zone.blobcore.id]
   }
 }
+
+resource "azurerm_virtual_network_peering" "data_source_to_flowehr" {
+  for_each                  = local.peerings
+  name                      = "peer-${each.key}-to-${var.naming_suffix}"
+  resource_group_name       = var.core_rg_name
+  virtual_network_name      = each.value.virtual_network_name
+  remote_virtual_network_id = data.azurerm_virtual_network.core.id
+}
+
+resource "azurerm_virtual_network_peering" "flowehr_to_data_source" {
+  for_each                  = local.peered_vnet_ids
+  name                      = "peer-${var.naming_suffix}-to-${each.key}"
+  resource_group_name       = var.core_rg_name
+  virtual_network_name      = data.azurerm_virtual_network.core.id
+  remote_virtual_network_id = each.value
+}

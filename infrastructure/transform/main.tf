@@ -149,3 +149,10 @@ resource "azurerm_data_factory_linked_service_key_vault" "msi_linked" {
   description     = "Key Vault linked service via MSI"
   key_vault_id    = var.core_kv_id
 }
+
+resource "databricks_secret" "data_source_connetions" {
+  for_each     = var.data_source_connections
+  key          = "flowehr-dbks-${each.value.name}"
+  string_value = each.value.connection_string
+  scope        = databricks_secret_scope.secrets.id
+}

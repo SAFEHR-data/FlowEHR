@@ -103,6 +103,7 @@ resource "databricks_secret" "flowehr_databricks_sql_spn_app_id" {
   string_value = azuread_service_principal.flowehr_databricks_sql.application_id
   scope        = databricks_secret_scope.secrets.id
 }
+
 resource "databricks_secret" "flowehr_databricks_sql_spn_app_secret" {
   key          = "flowehr-dbks-sql-spn-app-secret"
   string_value = azuread_service_principal_password.flowehr_databricks_sql.value

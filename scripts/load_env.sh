@@ -72,9 +72,11 @@ else
       echo "Local Mode: FALSE"
   fi
 
+  # Export the data source connections as json
+  DATA_SOURCE_CONNECTIONS="$(yq -o=json eval '.data_source_connections' config.yaml)"
+  export DATA_SOURCE_CONNECTIONS="$DATA_SOURCE_CONNECTIONS"
+
 fi
-
-
 
 NAMING_SUFFIX=$("${script_dir}/name_suffix.py")
 echo "Naming resources with suffixed with: ${NAMING_SUFFIX}"

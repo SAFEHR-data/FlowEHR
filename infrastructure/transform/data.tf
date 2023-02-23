@@ -23,3 +23,9 @@ data "azurerm_private_dns_zone" "blobcore" {
 }
 
 data "azurerm_client_config" "current" {}
+
+data "azurerm_virtual_network" "peered_data_source_networks" {
+  for_each            = local.peerings
+  name                = each.value.virtual_network_name
+  resource_group_name = each.value.resource_group_name
+}

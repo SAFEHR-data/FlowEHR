@@ -37,4 +37,15 @@ locals {
   storage_account_name = "dbfs${var.truncated_naming_suffix}"
 
   spark_version = yamldecode(file("../../config.transform.yaml")).spark_version
+
+  peerings = {for idx, item in var.data_source_connections : 
+     format("%s-%s", item.peering.virtual_network_name, item.peering.resource_group_name) => {
+         virtual_network_name = item.peering.virtual_network_name
+         resource_group_name = item.peering.resource_group_name
+     }
+   }
+
+   peered_vnet_ids = {for idx, item in data.azurerm_virtual_network.peered_data_source_networks : 
+     format("%s-%s", item.name, item.resource_group_name) => item.id
+   }
 }
