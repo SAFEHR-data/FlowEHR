@@ -52,7 +52,11 @@ variable "cosmos_account_name" {
   type = string
 }
 
-variable "feature_store_id" {
+variable "feature_store_db_name" {
+  type = string
+}
+
+variable "feature_store_server_name" {
   type = string
 }
 

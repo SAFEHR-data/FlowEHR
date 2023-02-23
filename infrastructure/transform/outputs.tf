@@ -12,6 +12,10 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-output "feature_store_id" {
-  value = azurerm_mssql_database.feature_database.id
+output "feature_store_server_name" {
+  value = azurerm_mssql_server.sql_server_features.name
+}
+
+output "feature_store_db_name" {
+  value = azurerm_mssql_database.feature_database.name
 }

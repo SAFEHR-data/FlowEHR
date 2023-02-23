@@ -26,3 +26,13 @@ data "azurerm_container_registry" "serve" {
   name                = var.acr_name
   resource_group_name = var.resource_group_name
 }
+
+data "azurerm_cosmosdb_account" "state_store" {
+  name                = var.cosmos_account_name
+  resource_group_name = var.resource_group_name
+}
+
+data "azurerm_mssql_server" "feature_store" {
+  name                = var.feature_store_server_name
+  resource_group_name = var.resource_group_name
+}

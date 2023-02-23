@@ -13,5 +13,6 @@
 #  limitations under the License.
 
 locals {
-  app_id_truncated = substr(replace(replace(replace(var.app_id, "-", ""), "_", ""), " ", ""), 0, 10)
+  app_id_truncated   = substr(replace(replace(var.app_id, "_", "-"), " ", ""), 0, 20)
+  feature_store_odbc = "Driver={ODBC Driver 18 for SQL Server};Server=tcp:${data.azurerm_mssql_server.feature_store.fully_qualified_domain_name},1433;Database=${var.feature_store_db_name};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
 }

@@ -46,7 +46,11 @@ variable "core_kv_id" {
   type = string
 }
 
-variable "transform_sql_feature_store_id" {
+variable "transform_feature_store_db_name" {
+  type = string
+}
+
+variable "transform_feature_store_server_name" {
   type = string
 }
 

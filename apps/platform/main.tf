@@ -42,6 +42,9 @@ resource "azurerm_linux_web_app" "app" {
     APPINSIGHTS_INSTRUMENTATIONKEY             = azurerm_application_insights.app.instrumentation_key
     APPLICATIONINSIGHTS_CONNECTION_STRING      = azurerm_application_insights.app.connection_string
     ApplicationInsightsAgent_EXTENSION_VERSION = "~3"
+    DOCKER_ENABLE_CI                           = true
+    COSMOS_STATE_STORE_ENDPOINT                = data.azurerm_cosmosdb_account.state_store.endpoint
+    FEATURE_STORE_CONNECTION_STRING            = local.feature_store_odbc
   })
 
   identity {
@@ -76,14 +79,14 @@ resource "azurerm_role_assignment" "webapp_acr" {
 
 # Create a web hook that triggers automated deployment of the Docker image
 resource "azurerm_container_registry_webhook" "webhook" {
-  name                = "WH${local.app_id_truncated}"
+  name                = "acrwh${replace(local.app_id_truncated, "-", "")}"
   resource_group_name = var.resource_group_name
   location            = var.location
   registry_name       = data.azurerm_container_registry.serve.name
 
-  service_uri = "https://${azurerm_linux_web_app.app.site_credential[0].name}:${azurerm_linux_web_app.app.site_credential[0].password}@${lower(azurerm_linux_web_app.app.name)}.scm.azurewebsites.net/docker/hook"
+  service_uri = "https://${azurerm_linux_web_app.app.site_credential[0].name}:${azurerm_linux_web_app.app.site_credential[0].password}@${lower(azurerm_linux_web_app.app.name)}.scm.azurewebsites.net/api/registry/webhook"
   status      = "enabled"
-  scope       = var.app_id
+  scope       = "${var.app_id}:latest"
   actions     = ["push"]
 
   custom_headers = {
@@ -103,24 +106,4 @@ resource "azurerm_cosmosdb_sql_container" "app" {
   account_name        = var.cosmos_account_name
   database_name       = azurerm_cosmosdb_sql_database.app.name
   partition_key_path  = "/id"
-}
-
-resource "azurerm_app_service_connection" "cosmos" {
-  name               = "cosmos_state_store"
-  app_service_id     = azurerm_linux_web_app.app.id
-  target_resource_id = azurerm_cosmosdb_sql_database.app.id
-
-  authentication {
-    type = "systemAssignedIdentity"
-  }
-}
-
-resource "azurerm_app_service_connection" "sql" {
-  name               = "sql_feature_store"
-  app_service_id     = azurerm_linux_web_app.app.id
-  target_resource_id = var.feature_store_id
-
-  authentication {
-    type = "systemAssignedIdentity"
-  }
 }

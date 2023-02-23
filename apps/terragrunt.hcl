@@ -34,7 +34,8 @@ inputs = {
   core_kv_id              = dependency.core.outputs.core_kv_id
   core_log_analytics_name = dependency.core.outputs.core_log_analytics_name
 
-  transform_sql_feature_store_id = dependency.transform.outputs.feature_store_id
+  transform_feature_store_server_name = dependency.transform.outputs.feature_store_server_name
+  transform_feature_store_db_name     = dependency.transform.outputs.feature_store_db_name
 
   serve_app_service_plan_name = dependency.serve.outputs.app_service_plan_name
   serve_acr_name              = dependency.serve.outputs.acr_name
