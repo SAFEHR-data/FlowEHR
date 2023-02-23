@@ -59,5 +59,5 @@ inputs = {
   core_kv_id              = dependency.core.outputs.core_kv_id
   core_kv_uri             = dependency.core.outputs.core_kv_uri
   subnet_address_spaces   = dependency.core.outputs.subnet_address_spaces
-  data_source_connections = jsondecode(get_env("DATA_SOURCE_CONNECTIONS", "[]"))
+  data_source_connections = get_env("DATA_SOURCE_CONNECTIONS", "[]")
 }

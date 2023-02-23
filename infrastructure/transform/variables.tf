@@ -71,10 +71,10 @@ variable "local_mode" {
 variable "data_source_connections" {
   type = list(object({
     name              = string
-    connection_string = number
-    peering           = object({
+    connection_string = string
+    peering = object({
       virtual_network_name = string
-      resource_group_name = string
+      resource_group_name  = string
     })
   }))
 }

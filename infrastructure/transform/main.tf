@@ -151,8 +151,10 @@ resource "azurerm_data_factory_linked_service_key_vault" "msi_linked" {
 }
 
 resource "databricks_secret" "data_source_connetions" {
-  for_each     = var.data_source_connections
-  key          = "flowehr-dbks-${each.value.name}"
-  string_value = each.value.connection_string
+  for_each = { for connection in var.data_source_connections :
+    connection.name => connection.connection_string
+  }
+  key          = "flowehr-dbks-${each.key}"
+  string_value = each.value
   scope        = databricks_secret_scope.secrets.id
 }
