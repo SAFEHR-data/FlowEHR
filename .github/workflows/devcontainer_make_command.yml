@@ -79,17 +79,32 @@ jobs:
         run: |
           az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
 
-      - name: Build and run dev container task
+      - name: Bootstrap
         uses: devcontainers/ci@v0.2
         with:
           imageName: "${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer"
           cacheFrom: "${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer"
           imageTag: ${{ inputs.environment }}
+          runCmd: make bootstrap
+          push: always
+          env: |
+            DOCKER_BUILDKIT=1
+            ARM_CLIENT_ID=${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
+            ARM_CLIENT_SECRET=${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
+            ARM_TENANT_ID=${{ fromJSON(secrets.AZURE_CREDENTIALS).tenantId }}
+            ARM_SUBSCRIPTION_ID=${{ fromJSON(secrets.AZURE_CREDENTIALS).subscriptionId }}
+            SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
+            LOCATION=${{ secrets.LOCATION }}
+            ENVIRONMENT=${{ inputs.environment }}
+            DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
+
+      - name: Build and run dev container task
+        uses: devcontainers/ci@v0.2
+        with:
+          cacheFrom: "${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer"
+          imageTag: ${{ inputs.environment }}
           runCmd: make ${{ inputs.command }}
-          # Only push the devcontainer if this workflow is triggered from a push to main
-          # and if the ACR login has succeeded
-          refFilterForPush: refs/heads/main
-          push: ${{ steps.acr_login.outcome == 'success' && 'filter' || 'never'  }}
+          push: never  # Pushed in bootstrap
           env: |
             DOCKER_BUILDKIT=1
             TF_INPUT=0
