@@ -24,7 +24,7 @@ PIPELINE_DIR="${SCRIPT_DIR}/../transform/pipelines"
 CONFIG_PATH="${SCRIPT_DIR}/../config.transform.yaml"
 ORG_GH_TOKEN="${ORG_GH_TOKEN:-}" # May be unset
 
-printenv
+printenv | sort
 
 if [[ -n "${ORG_GH_TOKEN}" ]]; then
   echo "${ORG_GH_TOKEN}" | gh auth login --with-token
