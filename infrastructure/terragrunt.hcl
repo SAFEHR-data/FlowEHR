@@ -88,6 +88,7 @@ terraform {
 
   required_providers {
     ${local.required_provider_azure}
+    ${local.required_provider_external}
   }
 }
 EOF
@@ -120,11 +121,6 @@ inputs = {
   truncated_naming_suffix = get_env("TRUNCATED_NAMING_SUFFIX")
   deployer_ip_address = get_env("DEPLOYER_IP_ADDRESS", "") # deployer's IP address is added to resource firewall exceptions IF in local_mode
   local_mode = get_env("LOCAL_MODE", false)
-  devcontainer_acr_name = get_env("DEVCONTAINER_ACR_NAME", "") # Required for the build agent deployment
-  devcontainer_image_name = get_env("DEVCONTAINER_IMAGE_IMAGE", "")
-  github_runner_name = get_env("GITHUB_RUNNER_NAME", "")
-  github_runner_token = get_env("GITHUB_RUNNER_TOKEN", "")
-  github_repository = get_env("GITHUB_REPOSITORY", "")
   tags = {
     environment = get_env("ENVIRONMENT")
   }

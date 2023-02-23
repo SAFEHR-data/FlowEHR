@@ -103,6 +103,7 @@ jobs:
             ENVIRONMENT=${{ inputs.environment }}
             DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
             DEVCONTAINER_IMAGE_IMAGE=flowehr/devcontainer
+            DEVCONTAINER_TAG=${{ inputs.environment }}
             ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
             LOCAL_MODE=false
             GITHUB_RUNNER_NAME=${{ inputs.created_runner_name }}

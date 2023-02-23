@@ -23,7 +23,7 @@ resource "azurerm_subnet" "databricks_host" {
   name                 = "subnet-dbks-host-${var.naming_suffix}"
   resource_group_name  = var.core_rg_name
   virtual_network_name = data.azurerm_virtual_network.core.name
-  address_prefixes     = [var.subnet_address_spaces[1]]
+  address_prefixes     = [var.subnet_address_spaces[2]]
 
   delegation {
     name = "dbks-host-vnet-integration"
@@ -43,7 +43,7 @@ resource "azurerm_subnet" "databricks_container" {
   name                 = "subnet-dbks-container-${var.naming_suffix}"
   resource_group_name  = var.core_rg_name
   virtual_network_name = data.azurerm_virtual_network.core.name
-  address_prefixes     = [var.subnet_address_spaces[2]]
+  address_prefixes     = [var.subnet_address_spaces[3]]
 
   delegation {
     name = "dbks-container-vnet-integration"

@@ -16,17 +16,12 @@ include "root" {
   path = find_in_parent_folders()
 }
 
-generate "terraform" {
-  path      = "terraform.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-terraform {
-  required_version = "${include.root.locals.terraform_version}"
-
-  required_providers {
-    ${include.root.locals.required_provider_azure}
-    ${include.root.locals.required_provider_external}
-  }
-}
-EOF
+inputs {
+   # Additional variables are required for the build agent deployment
+  devcontainer_acr_name = get_env("DEVCONTAINER_ACR_NAME", "")
+  devcontainer_image_name = get_env("DEVCONTAINER_IMAGE_IMAGE", "")
+  devcontainer_tag = get_env("DEVCONTAINER_TAG", "")
+  github_runner_name = get_env("GITHUB_RUNNER_NAME", "")
+  github_runner_token = get_env("GITHUB_RUNNER_TOKEN", "")
+  github_repository = get_env("GITHUB_REPOSITORY", "")
 }

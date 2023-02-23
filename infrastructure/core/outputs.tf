@@ -25,7 +25,7 @@ output "core_vnet_name" {
 }
 
 output "core_subnet_id" {
-  value = azurerm_subnet.core.id
+  value = azurerm_subnet.core_shared.id
 }
 
 output "core_kv_id" {

@@ -13,26 +13,30 @@
 #  limitations under the License.
 
 resource "azurerm_container_group" "build_agent" {
-  count               = var.local_mode == true ? 1 : 0
+  count               = var.local_mode == true ? 0 : 1
   name                = "cg-build-agent-${var.naming_suffix}"
   resource_group_name = azurerm_resource_group.core.name
   location            = azurerm_resource_group.core.location
-  network_profile_id  = azurerm_network_profile.build_agent.id
+  subnet_ids          = [azurerm_subnet.core_containers.id]
   ip_address_type     = "Private"
   os_type             = "Linux"
   restart_policy      = "Never"
 
   container {
     name   = "devcontainer"
-    image  = "${data.azurerm_container_registry.devcontainer.login_server}/${var.devcontainer_image_name}"
+    image  = "${data.azurerm_container_registry.devcontainer[0].login_server}/${var.devcontainer_image_name}:${var.devcontainer_tag}"
     cpu    = "1"
     memory = "4"
     # commands = ["/bin/sleep", "infinity"] # Keep container runniner for debuging
-    commands = ["/tmp/library-scripts/actionsstart-gh-runner.sh"]
+    commands = ["/tmp/library-scripts/start-gh-runner.sh"]
+
+    environment_variables = {
+      GITHUB_REPOSITORY  = var.github_repository
+      GITHUB_RUNNER_NAME = var.github_runner_name
+    }
+
     secure_environment_variables = {
       GITHUB_RUNNER_TOKEN = var.github_runner_token
-      GITHUB_RUNNER_NAME  = var.github_runner_name
-      GITHUB_REPOSITORY   = var.github_repository
     }
 
     # Needs to be defined but is unused
@@ -43,26 +47,8 @@ resource "azurerm_container_group" "build_agent" {
   }
 
   image_registry_credential {
-    username = data.azurerm_container_registry.devcontainer.admin_username
-    password = data.azurerm_container_registry.devcontainer.admin_password
-    server   = data.azurerm_container_registry.devcontainer.login_server
-  }
-}
-
-resource "azurerm_network_profile" "build_agent" {
-  count               = var.local_mode == true ? 1 : 0
-  name                = "network-profile-build-agent-${var.naming_suffix}"
-  resource_group_name = azurerm_resource_group.core.name
-  location            = azurerm_resource_group.core.location
-
-  container_network_interface {
-    name = "network-interface-build-agent-${var.naming_suffix}"
-
-    ip_configuration {
-      name = "ipconfig-build-agent-${var.naming_suffix}"
-
-      # TODO: create delegated subnet 
-      subnet_id = data.azurerm_subnet.core.id
-    }
+    username = data.azurerm_container_registry.devcontainer[0].admin_username
+    password = data.azurerm_container_registry.devcontainer[0].admin_password
+    server   = data.azurerm_container_registry.devcontainer[0].login_server
   }
 }

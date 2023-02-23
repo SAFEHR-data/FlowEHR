@@ -45,12 +45,16 @@ variable "deployer_ip_address" {
 variable "local_mode" {
   type        = bool
   description = "Dev mode will enable more debugging, and set the deployer's IP address as an exception in resource firewalls"
-  default     = false
 }
 
 variable "devcontainer_acr_name" {
   type        = string
   description = "Name of the azure container registry i.e. <acr-name>.azurecr.io"
+}
+
+variable "devcontainer_tag" {
+  type        = string
+  description = ""
 }
 
 variable "devcontainer_image_name" {

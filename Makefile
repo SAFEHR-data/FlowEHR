@@ -96,4 +96,4 @@ destroy-no-terraform: az-login ## Destroy all resource groups associated with th
 	&& . ${MAKEFILE_DIR}/scripts/destroy_no_terraform.sh
 
 clean: ## Remove all local terraform state
-	find ${MAKEFILE_DIR} -type d -name ".terraform" -exec rm -rf "{}" \;
+	find ${MAKEFILE_DIR} -type d -name ".terraform" -exec rm -rf "{}" \; || true

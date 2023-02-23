@@ -18,7 +18,7 @@ resource "azurerm_subnet" "serve_webapps" {
   virtual_network_name                          = data.azurerm_virtual_network.core.name
   private_endpoint_network_policies_enabled     = false
   private_link_service_network_policies_enabled = true
-  address_prefixes                              = [var.subnet_address_spaces[3]]
+  address_prefixes                              = [var.subnet_address_spaces[4]]
 
   delegation {
     name = "web-app-vnet-integration"

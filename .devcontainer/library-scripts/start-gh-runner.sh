@@ -25,12 +25,19 @@ REGISTRATION_TOKEN=$(curl \
   -H "Accept: application/vnd.github+json" \
   -H "Authorization: Bearer ${GITHUB_RUNNER_TOKEN}" \
   -H "X-GitHub-Api-Version: 2022-11-28" \
-  https://api.github.com/repos/UCLH-Foundry/PIXLated-FlowEHR/actions/runners/registration-token | awk '/token/ { gsub(/[",]/,""); print $2}')
+  "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners/registration-token" | awk '/token/ { gsub(/[",]/,""); print $2}')
+
+if [ "${REGISTRATION_TOKEN}" != "" ]; then
+  echo "Created registration token"
+else
+  echo "Failed to obtain a registration token. Check the scope of \$GITHUB_RUNNER_TOKEN"
+  exit 1
+fi
 
 # See https://docs.github.com/en/actions/hosting-your-own-runners/about-self-hosted-runners
 # The GH_RUNNER_NAME must be unique within the repositry.
 /tmp/actions-runner/config.sh --ephemeral \
-    --url "https://github.com/UCLH-Foundry/FlowEHR" \
+    --url "https://github.com/${GITHUB_REPOSITORY}" \
     --token "${REGISTRATION_TOKEN}" \
     --name "${GITHUB_RUNNER_NAME}" \
     --labels "${GITHUB_RUNNER_NAME}" \

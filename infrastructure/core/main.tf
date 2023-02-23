@@ -26,12 +26,28 @@ resource "azurerm_virtual_network" "core" {
   tags                = var.tags
 }
 
-resource "azurerm_subnet" "core" {
-  name                 = "subnet-core-${var.naming_suffix}"
+resource "azurerm_subnet" "core_shared" {
+  name                 = "subnet-core-shared-${var.naming_suffix}"
   resource_group_name  = azurerm_resource_group.core.name
   virtual_network_name = azurerm_virtual_network.core.name
   address_prefixes     = [local.subnet_address_spaces[0]]
   service_endpoints    = ["Microsoft.KeyVault", "Microsoft.Storage"]
+}
+
+resource "azurerm_subnet" "core_containers" {
+  name                 = "subnet-core-containers-${var.naming_suffix}"
+  resource_group_name  = azurerm_resource_group.core.name
+  virtual_network_name = azurerm_virtual_network.core.name
+  address_prefixes     = [local.subnet_address_spaces[1]]
+
+  delegation {
+    name = "delegation-core-containers-${var.naming_suffix}"
+
+    service_delegation {
+      name    = "Microsoft.ContainerInstance/containerGroups"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
+    }
+  }
 }
 
 resource "azurerm_storage_account" "core" {
@@ -44,7 +60,7 @@ resource "azurerm_storage_account" "core" {
 
   network_rules {
     default_action             = "Deny"
-    virtual_network_subnet_ids = [azurerm_subnet.core.id]
+    virtual_network_subnet_ids = [azurerm_subnet.core_shared.id]
   }
 }
 
@@ -76,7 +92,7 @@ resource "azurerm_key_vault" "core" {
   network_acls {
     bypass                     = "AzureServices"
     default_action             = "Deny"
-    virtual_network_subnet_ids = [azurerm_subnet.core.id]
+    virtual_network_subnet_ids = [azurerm_subnet.core_shared.id]
     ip_rules                   = var.local_mode == true ? [var.deployer_ip_address] : []
   }
 }
