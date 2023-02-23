@@ -36,6 +36,7 @@
       "suffix",
       "environment",
       "arm_subscription_id",
+      "local_mode",
       "devcontainer_acr_name"
     ]
 }

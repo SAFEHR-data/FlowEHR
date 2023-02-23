@@ -72,6 +72,12 @@ resource "databricks_cluster" "fixed_single_node" {
   ]
 }
 
+# databricks secret scope, in-built. Not able to use key vault backed scope due to limitation in databricks:
+# https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secret-scopes#--create-an-azure-key-vault-backed-secret-scope-using-the-databricks-cli 
+resource "databricks_secret_scope" "secrets" {
+  name = "flowehr-secrets"
+}
+
 resource "azurerm_data_factory" "adf" {
   name                = "adf-${var.naming_suffix}"
   location            = var.core_rg_location
@@ -142,51 +148,4 @@ resource "azurerm_data_factory_linked_service_key_vault" "msi_linked" {
   data_factory_id = azurerm_data_factory.adf.id
   description     = "Key Vault linked service via MSI"
   key_vault_id    = var.core_kv_id
-}
-
-resource "azurerm_data_factory_pipeline" "pipeline" {
-  name            = "databricks-pipeline-${var.naming_suffix}"
-  data_factory_id = azurerm_data_factory.adf.id
-  activities_json = jsonencode(
-    [
-      {
-        "name" : "DatabricksPythonActivity",
-        "type" : "DatabricksSparkPython",
-        "typeProperties" : {
-          "pythonFile" : "${local.python_file_dbfs_path}/${local.python_file_name}",
-          "libraries" : [
-            {
-              "whl" : "${local.whl_file_dbfs_path}/${local.whl_file_name}"
-            }
-          ]
-        },
-        "linkedServiceName" : {
-          "referenceName" : "${local.adb_linked_service_name}",
-          "type" : "LinkedServiceReference"
-        }
-      }
-    ]
-  )
-
-  depends_on = [
-    azurerm_data_factory_linked_service_azure_databricks.msi_linked
-  ]
-}
-
-resource "databricks_dbfs_file" "dbfs_whl_file_upload" {
-  source = "${local.whl_file_local_path}/${local.whl_file_name}"
-  path   = "/${local.whl_file_name}"
-}
-
-resource "databricks_dbfs_file" "dbfs_pythong_file_upload" {
-  source = "${local.python_file_local_path}/${local.python_file_name}"
-  path   = "/${local.python_file_name}"
-}
-
-resource "azurerm_data_factory_trigger_schedule" "trigger" {
-  name            = "databricks-pipeline-trigger-${var.naming_suffix}"
-  data_factory_id = azurerm_data_factory.adf.id
-  pipeline_name   = azurerm_data_factory_pipeline.pipeline.name
-  interval        = 15
-  frequency       = "Minute"
 }

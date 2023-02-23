@@ -77,6 +77,7 @@ resource "azurerm_key_vault" "core" {
     bypass                     = "AzureServices"
     default_action             = "Deny"
     virtual_network_subnet_ids = [azurerm_subnet.core.id]
+    ip_rules                   = var.local_mode == true ? [var.deployer_ip_address] : []
   }
 }
 

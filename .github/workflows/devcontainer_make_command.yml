@@ -44,6 +44,8 @@ on:
         required: true
       ORG_GH_TOKEN:
         required: true
+      LOCAL_MODE:
+        required: true
 
 jobs:
   make_command:
@@ -72,6 +74,8 @@ jobs:
 
       - name: Build and run dev container task
         uses: devcontainers/ci@v0.2
+        env:
+          ORG_GH_TOKEN: "${{ secrets.ORG_GH_TOKEN }}"
         with:
           imageName: "${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer"
           cacheFrom: "${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer"
@@ -94,3 +98,4 @@ jobs:
             ENVIRONMENT=${{ inputs.environment }}
             DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
             ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
+            LOCAL_MODE=${{ secrets.LOCAL_MODE }}
