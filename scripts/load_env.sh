@@ -74,8 +74,7 @@ else
 
   # Export the data source connections as json
   DATA_SOURCE_CONNECTIONS="$(yq -o=json eval '.data_source_connections' config.yaml)"
-  export DATA_SOURCE_CONNECTIONS="$DATA_SOURCE_CONNECTIONS"
-
+  export DATA_SOURCE_CONNECTIONS
 fi
 
 NAMING_SUFFIX=$("${script_dir}/name_suffix.py")
@@ -86,7 +85,7 @@ TRUNCATED_NAMING_SUFFIX=$("${script_dir}/name_suffix.py" --truncated)
 echo "Naming resources that have naming restrictions with: ${TRUNCATED_NAMING_SUFFIX}"
 export TRUNCATED_NAMING_SUFFIX 
 
-CORE_ADDRESS_SPACE=$("PYTHONHASHSEED=0 ${script_dir}/core_address_space.py")
+CORE_ADDRESS_SPACE=$(PYTHONHASHSEED=0 "${script_dir}/core_address_space.py")
 echo "Using core address space: $CORE_ADDRESS_SPACE"
 export CORE_ADDRESS_SPACE
 
