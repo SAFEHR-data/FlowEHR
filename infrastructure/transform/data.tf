@@ -23,3 +23,6 @@ data "azurerm_private_dns_zone" "blobcore" {
 }
 
 data "azurerm_client_config" "current" {}
+
+# get the MSGraph app
+data "azuread_application_published_app_ids" "well_known" {}
