@@ -51,10 +51,6 @@ resource "azurerm_linux_web_app" "app" {
     type = "SystemAssigned"
   }
 
-  auth_settings {
-    enabled = true
-  }
-
   logs {
     application_logs {
       file_system_level = "Information"
