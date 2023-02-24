@@ -150,7 +150,7 @@ resource "azurerm_data_factory_linked_service_key_vault" "msi_linked" {
   key_vault_id    = var.core_kv_id
 }
 
-resource "databricks_secret" "data_source_connetions" {
+resource "databricks_secret" "data_source_connections" {
   for_each = { for connection in var.data_source_connections :
     connection.name => connection.connection_string
   }
