@@ -86,6 +86,10 @@ TRUNCATED_NAMING_SUFFIX=$("${script_dir}/name_suffix.py" --truncated)
 echo "Naming resources that have naming restrictions with: ${TRUNCATED_NAMING_SUFFIX}"
 export TRUNCATED_NAMING_SUFFIX 
 
+CORE_ADDRESS_SPACE=$("PYTHONHASHSEED=0 ${script_dir}/core_address_space.py")
+echo "Using core address space: $CORE_ADDRESS_SPACE"
+export CORE_ADDRESS_SPACE
+
 export MGMT_RG="rg-mgmt-${NAMING_SUFFIX}"
 export MGMT_STORAGE="strgm${TRUNCATED_NAMING_SUFFIX}"
 export STATE_CONTAINER="tfstate"

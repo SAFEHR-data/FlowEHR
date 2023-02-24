@@ -28,7 +28,7 @@ on:
       suffix_override:
         type: string
         required: false
-        description: An override for the naming suffix
+        description: An override for the naming suffix. If defined the core address space is random
       sha:
         type: string
         required: false
@@ -103,3 +103,4 @@ jobs:
             ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
             LOCAL_MODE=${{ secrets.LOCAL_MODE }}
             DATA_SOURCE_CONNECTIONS=${{ secrets.DATA_SOURCE_CONNECTIONS }}
+            USE_RANDOM_ADDRESS_SPACE=${{ (inputs.suffix_override != '' && "1") || "0" }}
