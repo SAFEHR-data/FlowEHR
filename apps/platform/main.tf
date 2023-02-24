@@ -66,8 +66,6 @@ resource "azurerm_linux_web_app" "app" {
         retention_in_mb   = 35
       }
     }
-
-    failed_request_tracing = true
   }
 }
 
@@ -106,4 +104,23 @@ resource "azurerm_cosmosdb_sql_container" "app" {
   account_name        = var.cosmos_account_name
   database_name       = azurerm_cosmosdb_sql_database.app.name
   partition_key_path  = "/id"
+}
+
+resource "azurerm_cosmosdb_sql_role_definition" "webapp" {
+  name                = "${local.app_id_truncated}-cosmos-access"
+  resource_group_name = var.resource_group_name
+  account_name        = var.cosmos_account_name
+  assignable_scopes   = ["${data.azurerm_cosmosdb_account.state_store.id}/dbs/${azurerm_cosmosdb_sql_database.app.name}"]
+
+  permissions {
+    data_actions = ["Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/*"]
+  }
+}
+
+resource "azurerm_cosmosdb_sql_role_assignment" "webapp" {
+  resource_group_name = var.resource_group_name
+  account_name        = var.cosmos_account_name
+  role_definition_id  = azurerm_cosmosdb_sql_role_definition.webapp.id
+  principal_id        = azurerm_linux_web_app.app.identity[0].principal_id
+  scope               = "${data.azurerm_cosmosdb_account.state_store.id}/dbs/${azurerm_cosmosdb_sql_database.app.name}"
 }

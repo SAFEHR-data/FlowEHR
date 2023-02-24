@@ -1,15 +1,14 @@
 ---
-apps:
-  - id: dash_seedling
-    name: Dash Seedling
-    description: Hello world app for Dash
-    owner: __CHANGE_ME__
-    contributors:
-      - email: __CHANGE_ME__
-        gh_username: __CHANGE_ME__
-    managed_repo:
-      template: FlowEHR-Dash-Seedling
-      branch_approvers:
-        - __CHANGE_ME__
-    app_settings:
-      WEBSITES_PORT: 8050
+dash_seedling:
+  name: Dash Seedling
+  description: Hello world app for Dash
+  owner: me@mycompany.com
+  contributors:
+    - email: contributor@mycompany.com
+      gh_username: octocat
+  managed_repo:
+    template: FlowEHR-Dash-Seedling
+    branch_approvers:
+      - importantperson@mycompany.com
+  env:
+    WEBSITES_PORT: 8000

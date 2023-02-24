@@ -47,3 +47,7 @@ variable "core_subnet_id" {
 variable "subnet_address_spaces" {
   type = list(string)
 }
+
+variable "local_mode" {
+  type = bool
+}
