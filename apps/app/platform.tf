@@ -124,3 +124,5 @@ resource "azurerm_cosmosdb_sql_role_assignment" "webapp" {
   principal_id        = azurerm_linux_web_app.app.identity[0].principal_id
   scope               = "${data.azurerm_cosmosdb_account.state_store.id}/dbs/${azurerm_cosmosdb_sql_database.app.name}"
 }
+
+// TODO: once Feature Store SQL SPN stuff is in, add connection from App Service here

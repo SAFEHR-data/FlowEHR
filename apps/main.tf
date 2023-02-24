@@ -12,9 +12,9 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-module "platform" {
+module "app" {
   for_each                  = local.apps
-  source                    = "./platform"
+  source                    = "./app"
   app_id                    = each.key
   naming_suffix             = var.naming_suffix
   local_mode                = var.local_mode
