@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 resource "azurerm_application_insights" "app" {
-  name                       = "ai-${local.app_id_truncated}-${var.naming_suffix}"
+  name                       = "ai-${replace(var.app_id, "_", "-")}-${var.naming_suffix}"
   resource_group_name        = var.resource_group_name
   location                   = var.location
   workspace_id               = data.azurerm_log_analytics_workspace.core.id
@@ -22,7 +22,7 @@ resource "azurerm_application_insights" "app" {
 }
 
 resource "azurerm_linux_web_app" "app" {
-  name                      = "webapp-${local.app_id_truncated}-${var.naming_suffix}"
+  name                      = "webapp-${replace(var.app_id, "_", "-")}-${var.naming_suffix}"
   resource_group_name       = var.resource_group_name
   location                  = var.location
   service_plan_id           = data.azurerm_service_plan.serve.id
@@ -73,7 +73,7 @@ resource "azurerm_role_assignment" "webapp_acr" {
 
 # Create a web hook that triggers automated deployment of the Docker image
 resource "azurerm_container_registry_webhook" "webhook" {
-  name                = "acrwh${replace(local.app_id_truncated, "-", "")}"
+  name                = "acrwh${replace(var.app_id, "_", "-")}"
   resource_group_name = var.resource_group_name
   location            = var.location
   registry_name       = data.azurerm_container_registry.serve.name
@@ -89,13 +89,13 @@ resource "azurerm_container_registry_webhook" "webhook" {
 }
 
 resource "azurerm_cosmosdb_sql_database" "app" {
-  name                = "${local.app_id}-state"
+  name                = "${var.app_id}-state"
   resource_group_name = var.resource_group_name
   account_name        = var.cosmos_account_name
 }
 
 resource "azurerm_cosmosdb_sql_role_definition" "webapp" {
-  name                = "${local.app_id_truncated}-cosmos-access"
+  name                = "${var.app_id}-AccessCosmosSingleDB"
   resource_group_name = var.resource_group_name
   account_name        = var.cosmos_account_name
   assignable_scopes   = ["${data.azurerm_cosmosdb_account.state_store.id}/dbs/${azurerm_cosmosdb_sql_database.app.name}"]

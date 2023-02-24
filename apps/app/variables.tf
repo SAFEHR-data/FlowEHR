@@ -25,8 +25,8 @@ variable "app_id" {
   }
 
   validation {
-    condition     = can(regex("\\s", var.app_id))
-    error_message = "app_id cannot contain spaces"
+    condition     = can(regex("^[a-zA-Z0-9\\_-]*$", var.app_id))
+    error_message = "app_id cannot contain spaces or special characters except '-' and '_'"
   }
 }
 
