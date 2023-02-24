@@ -9,6 +9,6 @@ dash_seedling: # unique ID for the app
   managed_repo: # details for created repo
     template: Dash-Seedling
     branch_approvers:
-      - importantperson@mycompany.com
+      - important_persons_gh_username
   env: # any env vars to pass to the app container
     WEBSITES_PORT: 8000

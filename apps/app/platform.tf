@@ -73,7 +73,7 @@ resource "azurerm_role_assignment" "webapp_acr" {
 
 # Create a web hook that triggers automated deployment of the Docker image
 resource "azurerm_container_registry_webhook" "webhook" {
-  name                = "acrwh${replace(var.app_id, "_", "-")}"
+  name                = "acrwh${replace(replace(var.app_id, "_", ""), "-", "")}"
   resource_group_name = var.resource_group_name
   location            = var.location
   registry_name       = data.azurerm_container_registry.serve.name
