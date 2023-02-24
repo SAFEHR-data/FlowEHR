@@ -40,7 +40,7 @@ else
   fi
 
   # Get leaf keys yq query
-  GET_LEAF_KEYS=".. | select(. == \"*\") | {(path | .[-1]): .}"
+  GET_LEAF_KEYS="del(.data_source_connections) | .. | select(. == \"*\") | {(path | .[-1]): .}"
   # Map keys to uppercase yq query
   UPCASE_KEYS="with_entries(.key |= upcase)"
   # Suffix keys with TF_VAR_ yq query

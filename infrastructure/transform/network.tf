@@ -138,3 +138,11 @@ resource "azurerm_virtual_network_peering" "flowehr_to_data_source" {
   virtual_network_name      = data.azurerm_virtual_network.core.name
   remote_virtual_network_id = each.value
 }
+
+resource "azurerm_private_dns_zone_virtual_network_link" "data_sources" {
+  for_each              = { for idx, item in local.data_source_dns_zones : idx => item }
+  name                  = "vnl-${each.key}-flwr-${var.naming_suffix}"
+  private_dns_zone_name = each.value.dns_zone_name
+  virtual_network_id    = data.azurerm_virtual_network.core.id
+  resource_group_name   = each.value.resource_group_name
+}

@@ -107,7 +107,10 @@ be created in a private repository created from this template repository.
         "name": "xxx",
         "peering": {
             "virtual_network_name": "xxx",
-            "resource_group_name": "xxx"
+            "resource_group_name": "xxx",
+            "dns_zones": [
+                "privatelink.xxx.xxx.azure.com"
+            ]
         },
         "connection_string": "postgresql://<hostname>:5432/<database-name>?user=<username>&password=<***>"
     }

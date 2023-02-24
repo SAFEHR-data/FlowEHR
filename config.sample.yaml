@@ -12,4 +12,6 @@ data_source_connections:
     peering: # Optional
       virtual_network_name: __CHANGE_ME__
       resource_group_name: __CHANGE_ME__
+      dns_zones:
+        - __CHANGE_ME__
     connection_string: postgresql://<hostname>:5432/<database-name>?user=<username>&password=<***>

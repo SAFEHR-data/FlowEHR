@@ -52,4 +52,17 @@ locals {
   peered_vnet_ids = { for idx, item in data.azurerm_virtual_network.peered_data_source_networks :
     format("%s-%s", item.name, item.resource_group_name) => item.id
   }
+
+  data_source_dns_zones = distinct(flatten([
+    for idx, item in local.data_source_connections_with_peerings : [
+      for idx, zone in item.peering.dns_zones : {
+        name                = format("%s-%s", item.name, zone)
+        dns_zone_name       = zone
+        resource_group_name = item.peering.resource_group_name
+      }
+    ]
+    ]
+    )
+  )
+
 }

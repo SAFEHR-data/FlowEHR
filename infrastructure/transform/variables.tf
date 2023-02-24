@@ -76,6 +76,7 @@ variable "data_source_connections" {
       object({
         virtual_network_name = string
         resource_group_name  = string
+        dns_zones            = list(string)
       })
     )
   }))
