@@ -48,21 +48,13 @@ For the full reference of possible configuration values, see the [config schema 
     make all
     ```
 
-    Alternatively, you can deploy just infrastructure, or individual infrastructure modules separately with their corresponding make command:
+    Alternatively, you can deploy just infrastructure:
 
     ```bash
     make infrastructure
     ```
 
-    ```bash
-    make infrastructure-transform
-    ```
-
-    ```bash
-    make infrastructure-serve
-    ```
-
-    To see all options:
+    You can also deploy individual infrastructure modules, as well as destroy and other operations. To see all options:
 
     ```bash
     make help
