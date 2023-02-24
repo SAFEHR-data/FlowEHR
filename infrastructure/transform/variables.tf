@@ -72,9 +72,11 @@ variable "data_source_connections" {
   type = list(object({
     name              = string
     connection_string = string
-    peering = object({
-      virtual_network_name = string
-      resource_group_name  = string
-    })
+    peering = optional(
+      object({
+        virtual_network_name = string
+        resource_group_name  = string
+      })
+    )
   }))
 }

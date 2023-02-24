@@ -38,7 +38,11 @@ locals {
 
   spark_version = yamldecode(file("../../config.transform.yaml")).spark_version
 
-  peerings = { for idx, item in var.data_source_connections :
+  data_source_connections_with_peerings = [
+    for idx, item in var.data_source_connections : item if item.peering != null
+  ]
+
+  peerings = { for idx, item in local.data_source_connections_with_peerings :
     format("%s-%s", item.peering.virtual_network_name, item.peering.resource_group_name) => {
       virtual_network_name = item.peering.virtual_network_name
       resource_group_name  = item.peering.resource_group_name
