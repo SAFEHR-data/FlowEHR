@@ -89,17 +89,9 @@ resource "azurerm_container_registry_webhook" "webhook" {
 }
 
 resource "azurerm_cosmosdb_sql_database" "app" {
-  name                = "${local.app_id_truncated}-state"
+  name                = "${local.app_id}-state"
   resource_group_name = var.resource_group_name
   account_name        = var.cosmos_account_name
-}
-
-resource "azurerm_cosmosdb_sql_container" "app" {
-  name                = "main"
-  resource_group_name = var.resource_group_name
-  account_name        = var.cosmos_account_name
-  database_name       = azurerm_cosmosdb_sql_database.app.name
-  partition_key_path  = "/id"
 }
 
 resource "azurerm_cosmosdb_sql_role_definition" "webapp" {
