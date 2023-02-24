@@ -27,6 +27,7 @@ resource "azurerm_linux_web_app" "app" {
   location                  = var.location
   service_plan_id           = data.azurerm_service_plan.serve.id
   virtual_network_subnet_id = var.webapps_subnet_id
+  https_only                = true
 
   site_config {
     container_registry_use_managed_identity = true
