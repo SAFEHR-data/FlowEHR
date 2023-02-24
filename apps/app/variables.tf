@@ -18,6 +18,16 @@ variable "local_mode" {
 
 variable "app_id" {
   type = string
+
+  validation {
+    condition     = length(var.app_id) < 15
+    error_message = "app_id must be less than 15 chars"
+  }
+
+  validation {
+    condition     = can(regex("\\s", var.app_id))
+    error_message = "app_id cannot contain spaces"
+  }
 }
 
 variable "naming_suffix" {

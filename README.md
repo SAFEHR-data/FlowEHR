@@ -42,16 +42,24 @@ For the full reference of possible configuration values, see the [config schema 
 
 2. Run `make all`
 
-    To bootstrap Terraform, and deploy all infrastructure, run
+    To bootstrap Terraform, and deploy all infrastructure and apps, run
 
     ```bash
     make all
     ```
 
-    Alternatively, you can deploy individual modules separately with their corresponding make command:
+    Alternatively, you can deploy just infrastructure, or individual infrastructure modules separately with their corresponding make command:
 
     ```bash
-    make deploy-core
+    make infrastructure
+    ```
+
+    ```bash
+    make infrastructure-transform
+    ```
+
+    ```bash
+    make infrastructure-serve
     ```
 
     To see all options:
