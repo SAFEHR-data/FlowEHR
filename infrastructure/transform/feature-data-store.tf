@@ -20,12 +20,14 @@ resource "random_password" "sql_admin_password" {
 # AAD App + secret to set as AAD Admin of SQL Server
 resource "azuread_application" "flowehr_sql_owner" {
   display_name = local.sql_owner_app_name
+  owners       = [data.azurerm_client_config.current.object_id]
 }
 resource "azuread_application_password" "flowehr_sql_owner" {
   application_object_id = azuread_application.flowehr_sql_owner.object_id
 }
 resource "azuread_service_principal" "flowehr_sql_owner" {
   application_id = azuread_application.flowehr_sql_owner.application_id
+  owners         = [data.azurerm_client_config.current.object_id]
 }
 
 # Azure SQL logical server, public access disabled - will use private endpoints for access
@@ -118,14 +120,17 @@ resource "null_resource" "create_sql_user" {
 # AAD App + SPN for Databricks -> SQL Access
 resource "azuread_application" "flowehr_databricks_sql" {
   display_name = local.databricks_app_name
+  owners       = [data.azurerm_client_config.current.object_id]
 }
 resource "azuread_application_password" "flowehr_databricks_sql" {
   application_object_id = azuread_application.flowehr_databricks_sql.object_id
 }
 resource "azuread_service_principal" "flowehr_databricks_sql" {
   application_id = azuread_application.flowehr_databricks_sql.application_id
+  owners         = [data.azurerm_client_config.current.object_id]
 }
 
+/* TODO - enable when build agent can communicate with KV
 # Push secrets to KV
 resource "azurerm_key_vault_secret" "sql_server_owner_app_id" {
   name         = "sql-owner-app-id"
@@ -157,6 +162,7 @@ resource "azurerm_key_vault_secret" "flowehr_databricks_sql_spn_app_secret" {
   value        = azuread_application_password.flowehr_databricks_sql.value
   key_vault_id = var.core_kv_id
 }
+*/
 
 # Push SPN details to databricks secret scope
 resource "databricks_secret" "flowehr_databricks_sql_spn_app_id" {
@@ -179,6 +185,7 @@ resource "databricks_secret" "flowehr_databricks_sql_database" {
   string_value = azurerm_mssql_database.feature_database.name
   scope        = databricks_secret_scope.secrets.id
 }
+
 # Private DNS + endpoint for SQL Server
 resource "azurerm_private_dns_zone" "sql" {
   name                = "privatelink.database.windows.net"

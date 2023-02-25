@@ -13,13 +13,11 @@
 #  limitations under the License.
 
 variable "naming_suffix" {
-  type        = string
-  description = "Suffix used to name resources"
+  type = string
 }
 
 variable "truncated_naming_suffix" {
-  type        = string
-  description = "Truncated (max 20 chars, no hyphens etc.) suffix for e.g storage accounts"
+  type = string
 }
 
 variable "tags" {
@@ -36,4 +34,16 @@ variable "core_rg_location" {
 
 variable "core_kv_id" {
   type = string
+}
+
+variable "core_vnet_name" {
+  type = string
+}
+
+variable "core_subnet_id" {
+  type = string
+}
+
+variable "subnet_address_spaces" {
+  type = list(string)
 }

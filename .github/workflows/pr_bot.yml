@@ -80,6 +80,8 @@ jobs:
               - 'infrastructure/transform/**'
             serve:
               - 'infrastructure/serve/**'
+            devcontainer:
+              - '.devcontainer/**'
 
       - id: set_make_command
         run: |
@@ -90,10 +92,22 @@ jobs:
               make_command="test-transform"
           elif [ ${{ steps.changes.outputs.serve }} = "true" ]; then
               make_command="test-serve"
+          elif [ ${{ steps.changes.outputs.devcontainer }} = "true" ]; then
+              make_command="test"
           else
               make_command="none"
           fi
           echo "makeCommand=${make_command}" >> $GITHUB_OUTPUT
+
+      - name: Report check status start
+        if: ${{ steps.check_command.outputs.command == 'test' }}
+        uses: LouisBrunner/checks-action@v1.5.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sha: ${{ steps.check_command.outputs.prHeadSha }}
+          name: "Deploy PR"
+          status: "in_progress"
+          details_url: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
       # If we don't run the actual deploy (see the run_test job below) we won't receive
       # a check-run status, and will have to send it "manually"
@@ -109,16 +123,6 @@ jobs:
           name: "Deploy PR"
           status: "completed"
           conclusion: "success"
-
-      - name: Report check status start
-        if: ${{ steps.check_command.outputs.command == 'test' }}
-        uses: LouisBrunner/checks-action@v1.5.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          sha: ${{ steps.check_command.outputs.prHeadSha }}
-          name: "Deploy PR"
-          status: "in_progress"
-          details_url: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
   destroy_pr_env:  # Remove the resource group(s)
     needs: [pr_comment]

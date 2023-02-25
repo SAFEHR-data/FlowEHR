@@ -18,6 +18,7 @@ repos:
     hooks:
       - id: flake8
         args: ["--max-line-length", "88"]
+      - id: end-of-file-fixer
 
   - repo: https://github.com/psf/black
     rev: 22.12.0
