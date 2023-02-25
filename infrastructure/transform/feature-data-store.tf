@@ -58,17 +58,20 @@ resource "azurerm_mssql_database" "feature_database" {
   tags                 = var.tags
 }
 
-# AAD App + SPN for Databricks -> SQL Access
+# AAD App + SPN for Databricks -> SQL Access.
 resource "azuread_application" "flowehr_databricks_sql" {
   display_name = "FlowEHR-Databricks-SQL-${var.naming_suffix}"
+  owners       = [data.azurerm_client_config.current.object_id]
 }
 resource "azuread_service_principal" "flowehr_databricks_sql" {
   application_id = azuread_application.flowehr_databricks_sql.application_id
+  owners         = [data.azurerm_client_config.current.object_id]
 }
 resource "azuread_service_principal_password" "flowehr_databricks_sql" {
   service_principal_id = azuread_service_principal.flowehr_databricks_sql.object_id
 }
 
+/* TODO - enable when build agent can communicate with KV
 # Push secrets to KV
 resource "azurerm_key_vault_secret" "sql_server_features_admin_username" {
   name         = "sql-features-admin-username"
@@ -90,6 +93,7 @@ resource "azurerm_key_vault_secret" "flowehr_databricks_sql_spn_app_secret" {
   value        = azuread_service_principal_password.flowehr_databricks_sql.value
   key_vault_id = var.core_kv_id
 }
+*/
 
 # Push SPN details to databricks secret scope
 resource "databricks_secret" "flowehr_databricks_sql_spn_app_id" {

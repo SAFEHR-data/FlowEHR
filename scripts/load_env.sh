@@ -71,8 +71,6 @@ else
   else
       echo "Local Mode: FALSE"
   fi
-
-
 fi
 
 NAMING_SUFFIX=$("${script_dir}/name_suffix.py")
