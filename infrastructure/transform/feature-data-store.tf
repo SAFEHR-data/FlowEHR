@@ -52,23 +52,23 @@ resource "azurerm_mssql_server" "sql_server_features" {
 
 # Assign the SQL Identity User.Read.All / GroupMember.Read.All / Application.Read.All
 # Doc here: https://learn.microsoft.com/en-us/azure/azure-sql/database/authentication-azure-ad-user-assigned-managed-identity
-# resource "azuread_service_principal" "msgraph" {
-#   application_id = data.azuread_application_published_app_ids.well_known.result.MicrosoftGraph
-#   use_existing   = true
-# }
+resource "azuread_service_principal" "msgraph" {
+  application_id = data.azuread_application_published_app_ids.well_known.result.MicrosoftGraph
+  use_existing   = true
+}
 
 resource "azuread_app_role_assignment" "sql_user_read_all" {
-  app_role_id         = "dc5007c0-2d7d-4c42-879c-2dab87571379" #azuread_service_principal.msgraph.app_role_ids["User.Read.All"]
+  app_role_id         = azuread_service_principal.msgraph.app_role_ids["User.Read.All"]
   principal_object_id = azurerm_mssql_server.sql_server_features.identity[0].principal_id
   resource_object_id  = azuread_service_principal.msgraph.object_id
 }
 resource "azuread_app_role_assignment" "sql_groupmember_read_all" {
-  app_role_id         = "98830695-27a2-44f7-8c18-0c3ebc9698f6" #azuread_service_principal.msgraph.app_role_ids["GroupMember.Read.All"]
+  app_role_id         = azuread_service_principal.msgraph.app_role_ids["GroupMember.Read.All"]
   principal_object_id = azurerm_mssql_server.sql_server_features.identity[0].principal_id
   resource_object_id  = azuread_service_principal.msgraph.object_id
 }
 resource "azuread_app_role_assignment" "sql_application_read_all" {
-  app_role_id         = "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30" #azuread_service_principal.msgraph.app_role_ids["Application.Read.All"]
+  app_role_id         = azuread_service_principal.msgraph.app_role_ids["Application.Read.All"]
   principal_object_id = azurerm_mssql_server.sql_server_features.identity[0].principal_id
   resource_object_id  = azuread_service_principal.msgraph.object_id
 }
