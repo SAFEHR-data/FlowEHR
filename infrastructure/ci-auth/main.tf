@@ -19,7 +19,7 @@ resource "azuread_service_principal" "msgraph" {
 }
 
 resource "azuread_application" "ci_app" {
-  display_name = var.ci_app_name
+  display_name = "sp-flowehr-cicd-${lower(var.naming_suffix)}"
   owners       = [data.azurerm_client_config.current.object_id]
   required_resource_access {
     resource_app_id = data.azuread_application_published_app_ids.well_known.result.MicrosoftGraph

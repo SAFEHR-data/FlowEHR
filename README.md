@@ -65,25 +65,31 @@ For the full reference of possible configuration values, see the [config schema 
 CI deployment workflows are run in [Github environments](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment). These should
 be created in a private repository created from this template repository.
 
-1. Create a service principal
+This step will create an AAP Application and Service Principal in the specified tenancy, and grant that service principal permissions in Azure and AAD needed for deployment. These are detailed below. 
 
-    CI deployments require a service principal with access to deploy resources
-    in the subscription. One will be required for each subscription into which the
-    environment deploys. Create one with:
+> _NOTE_: The user following the steps below will need to be an `Owner` of the target Azure Subscription as well as a `Global Administrator` in AAD.
+
+1. Open this repo in the dev container, and create the `config.yaml` file as outlined above.
+
+2. Create the service principal with required AAD permissions: 
 
     ```bash
-    subscription_id=<e.g 00000000-0000-0000-0000-00000000>
-    az ad sp create-for-rbac --name "sp-flowehr-cicd" --role Owner --scopes "/subscriptions/${subscription_id}"
+    make ci-auth
     ```
 
-    The output will be used in the next step.
+    _NOTE_: CI deployments require a service principal with access to deploy resources
+    in the subscription, and the following permissions within the associated AAD tenancy:
+    - `Application.ReadWrite.All`: Required to query the directory for the MSGraph app, and create applications used to administer the SQL Server.   
+    - `AppRoleAssignment.ReadWrite.All`: Required to assign the following permissions to the System Managed Identity for SQL Server. 
+
+    - Copy the block of JSON from the terminal for the next step.
 
 
 2. Create and populate a GitHub environment
 
     Add an environment called `Infra-Test` with the following secrets:
 
-    - `AZURE_CREDENTIALS`: json containing the credentials of the service principal in the format:
+    - `AZURE_CREDENTIALS`: json containing the credentials of the service principal in the format. This should have been output for you in the correct format in the previous step:
 
         ```json
         {
@@ -104,3 +110,15 @@ be created in a private repository created from this template repository.
 3. Run `Deploy Infra-Test`
 
     Trigger a deployment using a workflow dispatch trigger on the `Actions` tab.
+
+## Identities
+
+This table summarises the various authentication identities involved in the deployment and operation of FlowEHR:
+
+| Name | Type | Access Needed | Purpose |
+|--|--|--|--|
+| Local Developer | User context of developer running `az login` | Azure: `Owner`. <br/> AAD: Either `Global Administrator` or `Priviliged Role Administrator`. | To automate the deployment of resources and identities during development |
+| `sp-flowehr-cicd-<naming-suffix>` | App / Service Principal | Azure: `Owner`. <br/>AAD: `Application.ReadWrite.All` / `AppRoleAssignment.ReadWrite.All` | Context for GitHub runner for CICD. Needs to query apps, create new apps (detailed below), and assign roles to identities |
+| `flowehr-sql-owner-<naming-suffix>` | App / Service Principal | AAD Administrator of SQL Feature Data Store | Used to connect to SQL as a Service Principal, and create logins + users during deployment |
+| `flowehr-databricks-sql-<naming-suffix>` | App / Service Principal | No access to resources or AAD. Added as a `db_owner` of the Feature Data Store database. Credentials stored in databricks secrets to be used in saving features to SQL |
+| `sql-server-features-<naming-suffix>` | System Managed Identity | AAD: `User.Read.All` / `GroupMember.Read.All` / `Application.Read.All` | For SQL to accept AAD connections |

@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-variable "ci_app_name" {
-  type    = string
-  default = "sp-flowehr-cicd"
+variable "naming_suffix" {
+  type        = string
+  description = "Suffix used to name resources"
 }
