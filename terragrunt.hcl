@@ -13,7 +13,6 @@
 #  limitations under the License.
 
 terraform {
-  # Pass arguments to terraform commands
   extra_arguments "auto_approve" {
     commands  = ["apply"]
     arguments = ["-auto-approve"]
