@@ -52,11 +52,12 @@ EOF
 }
 
 inputs = {
-  core_rg_name          = dependency.core.outputs.core_rg_name
-  core_rg_location      = dependency.core.outputs.core_rg_location
-  core_vnet_name        = dependency.core.outputs.core_vnet_name
-  core_subnet_id        = dependency.core.outputs.core_subnet_id
-  core_kv_id            = dependency.core.outputs.core_kv_id
-  core_kv_uri           = dependency.core.outputs.core_kv_uri
-  subnet_address_spaces = dependency.core.outputs.subnet_address_spaces
+  core_rg_name            = dependency.core.outputs.core_rg_name
+  core_rg_location        = dependency.core.outputs.core_rg_location
+  core_vnet_name          = dependency.core.outputs.core_vnet_name
+  core_subnet_id          = dependency.core.outputs.core_subnet_id
+  core_kv_id              = dependency.core.outputs.core_kv_id
+  core_kv_uri             = dependency.core.outputs.core_kv_uri
+  subnet_address_spaces   = dependency.core.outputs.subnet_address_spaces
+  data_source_connections = get_env("DATA_SOURCE_CONNECTIONS", "[]")
 }
