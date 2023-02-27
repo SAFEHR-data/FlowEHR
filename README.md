@@ -65,7 +65,7 @@ For the full reference of possible configuration values, see the [config schema 
 CI deployment workflows are run in [Github environments](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment). These should
 be created in a private repository created from this template repository.
 
-This step will create an AAP Application and Service Principal in the specified tenancy, and grant that service principal permissions in Azure and AAD needed for deployment. These are detailed below. 
+This step will create an AAD Application and Service Principal in the specified tenancy, and grant that service principal permissions in Azure and AAD needed for deployment. These are detailed below. 
 
 > _NOTE_: The user following the steps below will need to be an `Owner` of the target Azure Subscription as well as a `Global Administrator` in AAD.
 
@@ -89,7 +89,7 @@ This step will create an AAP Application and Service Principal in the specified 
 
     Add an environment called `Infra-Test` with the following secrets:
 
-    - `AZURE_CREDENTIALS`: json containing the credentials of the service principal in the format. This should have been output for you in the correct format in the previous step:
+    - `AZURE_CREDENTIALS`: json containing the credentials of the service principal (outputted from the previous step) in the following format:
 
         ```json
         {
