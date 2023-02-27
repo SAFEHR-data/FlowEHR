@@ -15,6 +15,7 @@
 import pandas
 from sqlalchemy import create_engine
 import os
+import pyodbc
 
 server = os.environ.get("SERVER")
 database = os.environ.get("DATABASE")
@@ -29,11 +30,22 @@ def create_con_str(db: str) -> str:
     return f"DRIVER={driver};SERVER={server};DATABASE={db};ENCRYPT=yes;Authentication=ActiveDirectoryServicePrincipal;UID={client_id};PWD={client_secret}"  # noqa: E501
 
 
-engine = create_engine(
-    "mssql+pyodbc:///?odbc_connect={}".format(create_con_str(database))
-)
+con_str = create_con_str(database)
+engine = create_engine("mssql+pyodbc:///?odbc_connect={}".format(con_str))
 
 df = pandas.read_csv(path_to_csv)
+
+# drop table if exists
+cnxn = pyodbc.connect(con_str)
+cursor = cnxn.cursor()
+
+query = f"""
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{table_name}]') AND type in (N'U'))
+DROP TABLE [dbo].[{table_name}]
+"""  # noqa: E501
+
+cursor.execute(query)
+cnxn.commit()
 
 # save file to SQL
 df.to_sql(table_name, schema="dbo", con=engine)
