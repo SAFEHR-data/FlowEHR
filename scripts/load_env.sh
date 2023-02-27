@@ -55,26 +55,26 @@ else
   # shellcheck disable=SC2046
   export $(yq e "$GET_LEAF_KEYS|$TF_KEYS| $FORMAT_FOR_ENV_EXPORT" config.yaml)
 
-  # Get IP address for local deployments
-  if [[ "${LOCAL_MODE}" == "true" ]];
-  then
-      echo "Local Mode: TRUE"
-      if [[ -z "${DEPLOYER_IP_ADDRESS+x}" ]];
-      then
-          echo "No IP address assigned in config, getting client IP and setting in ENV"
-          this_ip="$(curl -s 'https://api64.ipify.org')"
-          export DEPLOYER_IP_ADDRESS="${this_ip}"
-      else
-          echo "Have IP address from config.yaml"
-      fi
-      echo "IP Address: ${DEPLOYER_IP_ADDRESS}"
-  else
-      echo "Local Mode: FALSE"
-  fi
-
   # Export the data source connections as json
   DATA_SOURCE_CONNECTIONS="$(yq -o=json eval '.data_source_connections' config.yaml)"
   export DATA_SOURCE_CONNECTIONS
+fi
+
+# Get IP address for "local" deployments
+if [[ "${LOCAL_MODE}" == "true" ]];
+then
+    echo "Local Mode: TRUE"
+    if [[ -z "${DEPLOYER_IP_ADDRESS+x}" ]];
+    then
+        echo "No IP address assigned in config, getting client IP and setting in ENV"
+        this_ip="$(curl -s 'https://api64.ipify.org')"
+        export DEPLOYER_IP_ADDRESS="${this_ip}"
+    else
+        echo "Have IP address from config.yaml"
+    fi
+    echo "IP Address: ${DEPLOYER_IP_ADDRESS}"
+else
+    echo "Local Mode: FALSE"
 fi
 
 NAMING_SUFFIX=$("${script_dir}/name_suffix.py")
