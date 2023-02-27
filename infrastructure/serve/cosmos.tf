@@ -18,10 +18,10 @@ resource "azurerm_cosmosdb_account" "serve" {
   resource_group_name = var.core_rg_name
   offer_type          = "Standard"
   kind                = "GlobalDocumentDB"
-  # TODO: once https://github.com/UCLH-Foundry/FlowEHR/pull/86 is merged 
-  # public_network_access_enabled = var.local_mode
-  # local_authentication_disabled = !var.local_mode
-  tags = var.tags
+  tags                = var.tags
+
+  public_network_access_enabled = var.local_mode
+  local_authentication_disabled = !var.local_mode
 
   capabilities {
     name = "EnableServerless"

@@ -41,6 +41,7 @@ terraform.tf
 .env
 *.env
 config.yaml
+apps.yaml
 
 # Mac specific metadata
 .DS_store

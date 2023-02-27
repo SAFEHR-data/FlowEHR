@@ -42,19 +42,19 @@ For the full reference of possible configuration values, see the [config schema 
 
 2. Run `make all`
 
-    To bootstrap Terraform, and deploy all infrastructure, run
+    To bootstrap Terraform, and deploy all infrastructure and apps, run
 
     ```bash
     make all
     ```
 
-    Alternatively, you can deploy individual modules separately with their corresponding make command:
+    Alternatively, you can deploy just infrastructure:
 
     ```bash
-    make deploy-core
+    make infrastructure
     ```
 
-    To see all options:
+    You can also deploy individual infrastructure modules, as well as destroy and other operations. To see all options:
 
     ```bash
     make help
@@ -104,3 +104,11 @@ be created in a private repository created from this template repository.
 3. Run `Deploy Infra-Test`
 
     Trigger a deployment using a workflow dispatch trigger on the `Actions` tab.
+
+## Common issues
+
+### Inconsistent dependency lock file
+
+When deploying locally, you might encounter an error message from Terraform saying you have inconsistent lock files. This is likely due to an update to some of the provider configurations and lock files upstream, that when pulled down to your machine, might not match the cached providers you have locally from a previous deployment.
+
+The easiest fix is to run `make tf-init`, which will re-initialise these caches in all of the Terraform modules to match the lock files.
