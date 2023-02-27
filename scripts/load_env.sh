@@ -63,7 +63,12 @@ export_config_from_yaml () {
 fi
 }
 
-script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+# Export core config
+echo "Loading core configuration..."
+export_config_from_yaml "${SCRIPT_DIR}/../config.yaml" "${SCRIPT_DIR}/../config_schema.json"
+
 # Get IP address for "local" deployments
 if [[ "${LOCAL_MODE}" == "true" ]];
 then
@@ -81,20 +86,16 @@ else
     echo "Local Mode: FALSE"
 fi
 
-# Export core config
-echo "Loading core configuration..."
-export_config_from_yaml "${script_dir}/../config.yaml" "${script_dir}/../config_schema.json"
-
 # Export naming suffixes
-NAMING_SUFFIX=$("${script_dir}/name_suffix.py")
+NAMING_SUFFIX=$("${SCRIPT_DIR}/name_suffix.py")
 echo "Naming resources with suffixed with: ${NAMING_SUFFIX}"
 export NAMING_SUFFIX
 
-TRUNCATED_NAMING_SUFFIX=$("${script_dir}/name_suffix.py" --truncated)
+TRUNCATED_NAMING_SUFFIX=$("${SCRIPT_DIR}/name_suffix.py" --truncated)
 echo "Naming resources that have naming restrictions with: ${TRUNCATED_NAMING_SUFFIX}"
 export TRUNCATED_NAMING_SUFFIX 
 
-CORE_ADDRESS_SPACE=$(PYTHONHASHSEED=0 "${script_dir}/core_address_space.py")
+CORE_ADDRESS_SPACE=$(PYTHONHASHSEED=0 "${SCRIPT_DIR}/core_address_space.py")
 echo "Using core address space: $CORE_ADDRESS_SPACE"
 export CORE_ADDRESS_SPACE
 
