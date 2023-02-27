@@ -73,20 +73,14 @@ jobs:
       - name: Set devcontainer attributes
         id: dc
         run: |
-          md5=$(tar cf - .devcontainer | md5sum | awk '{print $1}')
-          echo "tag=${md5}" >> $GITHUB_OUTPUT
+          echo "tag=${{ inputs.environment }}" >> $GITHUB_OUTPUT
           echo "image=${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer" >> $GITHUB_OUTPUT
-
-      - name: Pull devcontainer
-        id: devcontainer_pull
-        continue-on-error: true  # Devcontainer may have changed thus this tag not exist
-        run: |
-          docker pull ${{ steps.dc.outputs.image }}:${{ steps.dc.outputs.tag }}
 
       - name: Bootstrap
         uses: devcontainers/ci@v0.2
         with:
           imageName: ${{ steps.dc.outputs.image }}
+          cacheFrom: ${{ steps.dc.outputs.image }}
           imageTag: ${{ steps.dc.outputs.tag }}
           runCmd: make bootstrap
           # Push is manual otherwise the post step command doesn't execute before core deploy
@@ -104,7 +98,6 @@ jobs:
             DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
 
       - name: Push devcontainer
-        if: steps.devcontainer_pull.outcome != 'success'
         run: |
           docker push ${{ steps.dc.outputs.image }}:${{ steps.dc.outputs.tag }}
 
