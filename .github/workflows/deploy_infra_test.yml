@@ -16,9 +16,7 @@ name: Deploy Infra-Test
 
 on:
   push:
-    branches: [main]
-    paths:
-      - 'infrastructure/**'
+    # TODO rm
   workflow_dispatch:
 
 permissions:
