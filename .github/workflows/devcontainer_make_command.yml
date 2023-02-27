@@ -110,7 +110,7 @@ jobs:
           cacheFrom: "${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer"
           imageTag: ${{ inputs.environment }}
           runCmd: make ${{ inputs.command }}
-          push: never  # Pushed in bootstrap
+          push: never
           env: |
             DOCKER_BUILDKIT=1
             TF_INPUT=0
