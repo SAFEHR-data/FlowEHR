@@ -78,10 +78,6 @@ be created in a private repository created from this template repository.
 
     The output will be used in the next step.
 
-1. Assing a `Application.ReadWrite.OwnedBy` role to the Service Principal you've just created. 
-
-To do that, look for "sp-flowehr-cicd" Service principal in Azure Active Directory and follow Permissions -> Add a permission -> Graph -> Application -> select `Application.ReadWrite.OwnedBy` -> Save -> Grant Admin consent.
-
 1. Create and populate a GitHub environment
 
     Add an environment called `Infra-Test` with the following secrets:
