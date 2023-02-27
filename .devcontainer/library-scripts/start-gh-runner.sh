@@ -22,10 +22,12 @@ echo "Registering GH runner.."
 # See: https://docs.github.com/en/rest/actions/self-hosted-runners#create-a-registration-token-for-a-repository
 REGISTRATION_TOKEN=$(curl \
   -X POST \
+  --fail \
   -H "Accept: application/vnd.github+json" \
   -H "Authorization: Bearer ${GITHUB_RUNNER_TOKEN}" \
   -H "X-GitHub-Api-Version: 2022-11-28" \
-  "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners/registration-token" | awk '/token/ { gsub(/[",]/,""); print $2}')
+  "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners/registration-token" \
+  | awk '/token/ { gsub(/[",]/,""); print $2}')
 
 if [ "${REGISTRATION_TOKEN}" != "" ]; then
   echo "Created registration token"

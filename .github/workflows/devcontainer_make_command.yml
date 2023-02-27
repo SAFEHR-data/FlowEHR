@@ -125,7 +125,7 @@ jobs:
             ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
             LOCAL_MODE=false
             GITHUB_RUNNER_NAME=devcontainer-${{ inputs.suffix }}
-            GITHUB_RUNNER_TOKEN=${{ secrets.GITHUB_TOKEN }}
+            GITHUB_RUNNER_TOKEN=${{ secrets.GH_RUNNER_CREATE_TOKEN }}
             GITHUB_REPOSITORY=${{ github.repository }}
 
   make:
