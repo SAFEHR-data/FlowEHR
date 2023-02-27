@@ -34,6 +34,11 @@ else
   exit 1
 fi
 
+if [ "$EUID" -eq 0 ]; then
+  echo "Executing as non root user"
+  su - "${NON_ROOT_USERNAME}"
+fi
+
 # See https://docs.github.com/en/actions/hosting-your-own-runners/about-self-hosted-runners
 # The GH_RUNNER_NAME must be unique within the repositry.
 /tmp/actions-runner/config.sh --ephemeral \
