@@ -75,7 +75,7 @@ jobs:
 
       - name: ACR Login
         id: acr_login
-        continue-on-error: true
+        continue-on-error: true  # ACR may not exist yet
         run: |
           az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
 
@@ -86,7 +86,8 @@ jobs:
           cacheFrom: "${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer"
           imageTag: ${{ inputs.environment }}
           runCmd: make bootstrap
-          push: always
+          # Push is manual otherwise the post step command doesn't execute before core deploy
+          push: never
           env: |
             DOCKER_BUILDKIT=1
             TF_IN_AUTOMATION=1
@@ -98,6 +99,10 @@ jobs:
             LOCATION=${{ secrets.LOCATION }}
             ENVIRONMENT=${{ inputs.environment }}
             DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
+
+      - name: Push devcontainer
+        run: |
+          docker push ${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer:${{ inputs.environment }}
 
       - name: Build and run dev container task
         uses: devcontainers/ci@v0.2
