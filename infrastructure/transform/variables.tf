@@ -67,3 +67,17 @@ variable "deployer_ip_address" {
 variable "local_mode" {
   type = bool
 }
+
+variable "data_source_connections" {
+  type = list(object({
+    name              = string
+    connection_string = string
+    peering = optional(
+      object({
+        virtual_network_name = string
+        resource_group_name  = string
+        dns_zones            = list(string)
+      })
+    )
+  }))
+}

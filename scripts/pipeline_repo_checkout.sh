@@ -24,23 +24,15 @@ PIPELINE_DIR="${SCRIPT_DIR}/../transform/pipelines"
 CONFIG_PATH="${SCRIPT_DIR}/../config.transform.yaml"
 ORG_GH_TOKEN="${ORG_GH_TOKEN:-}" # May be unset
 
-if [[ -n "${TF_IN_AUTOMATION:-}" ]]; then
-  if [[ -n "${ORG_GH_TOKEN}" ]]; then
-    echo "${ORG_GH_TOKEN}" | gh auth login --with-token
-    REPO_CHECKOUT_COMMAND="gh repo clone"
-  else
-    echo "ORG_GH_TOKEN secret must be set in order to check out the repositories"
-    exit 1
-  fi
+if [[ -n "${ORG_GH_TOKEN}" ]]; then
+  REPO_CHECKOUT_COMMAND="GH_TOKEN=${ORG_GH_TOKEN} git -c credential.helper= -c credential.helper='!gh auth git-credential' clone"
 else
-  # Using `git clone` for local flow instead of `gh` to avoid interactive prompt of `gh auth login`
   REPO_CHECKOUT_COMMAND="git clone"
 fi
 
 pushd "${PIPELINE_DIR}" > /dev/null
 
 while IFS=$'\n' read -r repo _; do
-  echo "Repo:  $repo"
   # Name for the directory to check out to,
   # e.g. git@github.com:UCLH-Foundry/Data-Pipeline.git becomes Data-Pipeline 
   # If the directory with checked out repo already exists, remove it

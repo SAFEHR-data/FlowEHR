@@ -26,3 +26,9 @@ data "azurerm_client_config" "current" {}
 
 # get the MSGraph app
 data "azuread_application_published_app_ids" "well_known" {}
+
+data "azurerm_virtual_network" "peered_data_source_networks" {
+  for_each            = local.peerings
+  name                = each.value.virtual_network_name
+  resource_group_name = each.value.resource_group_name
+}
