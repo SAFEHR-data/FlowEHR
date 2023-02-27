@@ -14,13 +14,14 @@
 
 import pandas
 from sqlalchemy import create_engine
+import os
 
-server = "${SERVER}"
-database = "${DATABASE}"
-client_id = "${CLIENT_ID}"
-client_secret = "${CLIENT_SECRET}"
-path_to_csv = "${PATH_TO_CSV}"
-table_name = "${TABLE_NAME}"
+server = os.environ.get("SERVER")
+database = os.environ.get("DATABASE")
+client_id = os.environ.get("CLIENT_ID")
+client_secret = os.environ.get("CLIENT_SECRET")
+path_to_csv = os.environ.get("PATH_TO_CSV")
+table_name = os.environ.get("TABLE_NAME")
 
 
 def create_con_str(db: str) -> str:

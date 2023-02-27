@@ -13,12 +13,13 @@
 #  limitations under the License.
 
 import pyodbc
+import os
 
-server = "${SERVER}"
-database = "${DATABASE}"
-client_id = "${CLIENT_ID}"
-client_secret = "${CLIENT_SECRET}"
-login_to_create = "${LOGIN_TO_CREATE}"
+server = os.environ.get("SERVER")
+database = os.environ.get("DATABASE")
+client_id = os.environ.get("CLIENT_ID")
+client_secret = os.environ.get("CLIENT_SECRET")
+login_to_create = os.environ.get("LOGIN_TO_CREATE")
 
 
 def create_con_str(db: str) -> str:

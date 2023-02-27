@@ -120,8 +120,10 @@ resource "null_resource" "create_sql_user" {
   # load a csv file into a new SQL table
   provisioner "local-exec" {
     command = <<EOF
-      python ../../scripts/sql/create_sql_user.py
-      python ../../scripts/sql/load_csv_data.py  
+      pushd ../../scripts/sql
+      python create_sql_user.py
+      python load_csv_data.py
+      popd
     EOF
     environment = {
       SERVER          = azurerm_mssql_server.sql_server_features.fully_qualified_domain_name
@@ -129,7 +131,7 @@ resource "null_resource" "create_sql_user" {
       CLIENT_ID       = azuread_application.flowehr_sql_owner.application_id
       CLIENT_SECRET   = azuread_application_password.flowehr_sql_owner.value
       LOGIN_TO_CREATE = local.databricks_app_name
-      PATH_TO_CSV     = "../../scripts/sql/nhsd-diabetes.csv"
+      PATH_TO_CSV     = "nhsd-diabetes.csv"
       TABLE_NAME      = "diabetes"
     }
   }
