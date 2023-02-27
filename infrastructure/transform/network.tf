@@ -125,7 +125,7 @@ resource "azurerm_private_endpoint" "databricks_filesystem" {
 
 resource "azurerm_virtual_network_peering" "data_source_to_flowehr" {
   for_each                  = local.peerings
-  name                      = "peer-${each.key}-to-${var.naming_suffix}"
+  name                      = "peer-${substr(each.key, 0, 30)}-to-${var.naming_suffix}"
   resource_group_name       = each.value.resource_group_name
   virtual_network_name      = each.value.virtual_network_name
   remote_virtual_network_id = data.azurerm_virtual_network.core.id
@@ -133,7 +133,7 @@ resource "azurerm_virtual_network_peering" "data_source_to_flowehr" {
 
 resource "azurerm_virtual_network_peering" "flowehr_to_data_source" {
   for_each                  = local.peered_vnet_ids
-  name                      = "peer-${var.naming_suffix}-to-${each.key}"
+  name                      = "peer-${var.naming_suffix}-to-${substr(each.key, 0, 30)}"
   resource_group_name       = var.core_rg_name
   virtual_network_name      = data.azurerm_virtual_network.core.name
   remote_virtual_network_id = each.value
