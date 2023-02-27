@@ -86,9 +86,9 @@ infrastructure-serve: bootstrap ## Deploy serve infrastructure
 
 test: deploy destroy bootstrap-destroy  ## Test by deploy->destroy
 
-test-transform: deploy-transform destroy bootstrap-destroy  ## Test transform deploy->destroy
+test-transform: infrastructure-transform destroy bootstrap-destroy  ## Test transform deploy->destroy
 
-test-serve: deploy-serve destroy bootstrap-destroy  ## Test transform deploy->destroy
+test-serve: infrastructure-serve destroy bootstrap-destroy  ## Test transform deploy->destroy
 
 apps: bootstrap ## Deploy FlowEHR apps
 	$(call target_title, "Deploy FlowEHR apps") \
