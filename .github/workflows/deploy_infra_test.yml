@@ -27,8 +27,8 @@ permissions:
 jobs:
   deploy:
     uses: ./.github/workflows/devcontainer_make_command.yml
-    name: Make Deploy
+    name: Make Infrastructure
     with:
-      command: deploy
+      command: infrastructure
       environment: Infra-Test
     secrets: inherit

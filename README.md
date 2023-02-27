@@ -42,19 +42,19 @@ For the full reference of possible configuration values, see the [config schema 
 
 2. Run `make all`
 
-    To bootstrap Terraform, and deploy all infrastructure, run
+    To bootstrap Terraform, and deploy all infrastructure and apps, run
 
     ```bash
     make all
     ```
 
-    Alternatively, you can deploy individual modules separately with their corresponding make command:
+    Alternatively, you can deploy just infrastructure:
 
     ```bash
-    make deploy-core
+    make infrastructure
     ```
 
-    To see all options:
+    You can also deploy individual infrastructure modules, as well as destroy and other operations. To see all options:
 
     ```bash
     make help
@@ -122,3 +122,11 @@ This table summarises the various authentication identities involved in the depl
 | `flowehr-sql-owner-<naming-suffix>` | App / Service Principal | AAD Administrator of SQL Feature Data Store | Used to connect to SQL as a Service Principal, and create logins + users during deployment |
 | `flowehr-databricks-sql-<naming-suffix>` | App / Service Principal | No access to resources or AAD. Added as a `db_owner` of the Feature Data Store database. Credentials stored in databricks secrets to be used in saving features to SQL |
 | `sql-server-features-<naming-suffix>` | System Managed Identity | AAD: `User.Read.All` / `GroupMember.Read.All` / `Application.Read.All` | For SQL to accept AAD connections |
+
+## Common issues
+
+### Inconsistent dependency lock file
+
+When deploying locally, you might encounter an error message from Terraform saying you have inconsistent lock files. This is likely due to an update to some of the provider configurations and lock files upstream, that when pulled down to your machine, might not match the cached providers you have locally from a previous deployment.
+
+The easiest fix is to run `make tf-init`, which will re-initialise these caches in all of the Terraform modules to match the lock files.

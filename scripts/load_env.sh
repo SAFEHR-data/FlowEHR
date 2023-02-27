@@ -17,45 +17,68 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-env_file_path="${script_dir}/../config.yaml"
+# Export environment variables from a yaml config file ($1) and validate against a schema $2
+export_config_from_yaml () {
+  config_file_path=$1
+  schema_file_path=$2
 
-if [ ! -f "$env_file_path" ]; then
-  if [ -z "${TF_IN_AUTOMATION:-}" ]; then
-      echo -e "\e[31m»»» 💥 Unable to find config.yaml file. Please create and try again.\e[0m"
+  if [ ! -f "$config_file_path" ]; then
+    if [ -z "${TF_IN_AUTOMATION:-}" ]; then
+        echo -e "\e[31m»»» 💥 Unable to find config file at path $config_file_path. Please create and try again.\e[0m"
+        exit 1
+    fi
+  else
+    # Validate no duplicate keys in config
+    has_dupes=$(yq e '.. | select(. == "*") | {(path | .[-1]): .}| keys' "$config_file_path" | sort| uniq -d)
+    if [ -n "${has_dupes:-}" ]; then
+      echo -e "\e[31m»»» 💥 There are duplicate keys in your config, please fix and try again!\e[0m"
       exit 1
+    fi
+
+    # Validate config schema
+    if [[ $(pajv validate -s "$schema_file_path" -d "$config_file_path") != *valid* ]]; then
+      echo -e "\e[31m»»» ⚠️ Your config is invalid 😥 Please fix the errors and retry."
+      exit 1
+    fi
+
+    # Get leaf keys yq query
+    GET_LEAF_KEYS=".. | select(. == \"*\") | {(path | .[-1]): .}"
+    # Map keys to uppercase yq query
+    UPCASE_KEYS="with_entries(.key |= upcase)"
+    # Suffix keys with TF_VAR_ yq query
+    TF_KEYS="with_entries(.key |= \"TF_VAR_\" + .)"
+    # Yq query to format the output to be in form: key=value
+    FORMAT_FOR_ENV_EXPORT="to_entries| map(.key + \"=\" +  .value)|join(\" \")"
+
+    # Export as UPPERCASE keys env vars
+    # shellcheck disable=SC2046
+    export $(yq e "$GET_LEAF_KEYS|$UPCASE_KEYS| $FORMAT_FOR_ENV_EXPORT" "$config_file_path")
+    # Export as Terraform keys env vars
+    # shellcheck disable=SC2046
+    export $(yq e "$GET_LEAF_KEYS|$TF_KEYS| $FORMAT_FOR_ENV_EXPORT" "$config_file_path")
+
   fi
-else
-  # Validate no duplicate keys in config
-  has_dupes=$(yq e '.. | select(. == "*") | {(path | .[-1]): .}| keys' config.yaml | sort| uniq -d)
-  if [ -n "${has_dupes:-}" ]; then
-    echo -e "\e[31m»»» 💥 There are duplicate keys in your config, please fix and try again!\e[0m"
-    exit 1
-  fi
+}
 
-  # Validate config schema
-  if [[ $(pajv validate -s config_schema.json -d config.yaml) != *valid* ]]; then
-    echo -e "\e[31m»»» ⚠️ Your config.yaml is invalid 😥 Please fix the errors and retry."
-    exit 1
-  fi
+script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-  # Get leaf keys yq query
-  GET_LEAF_KEYS=".. | select(. == \"*\") | {(path | .[-1]): .}"
-  # Map keys to uppercase yq query
-  UPCASE_KEYS="with_entries(.key |= upcase)"
-  # Suffix keys with TF_VAR_ yq query
-  TF_KEYS="with_entries(.key |= \"TF_VAR_\" + .)"
-  # Yq query to format the output to be in form: key=value
-  FORMAT_FOR_ENV_EXPORT="to_entries| map(.key + \"=\" +  .value)|join(\" \")"
+# Export core config
+echo "Loading core configuration..."
+export_config_from_yaml "${script_dir}/../config.yaml" "${script_dir}/../config_schema.json"
 
-  # Export as UPPERCASE keys env vars
-  # shellcheck disable=SC2046
-  export $(yq e "$GET_LEAF_KEYS|$UPCASE_KEYS| $FORMAT_FOR_ENV_EXPORT" config.yaml)
-  # Export as Terraform keys env vars
-  # shellcheck disable=SC2046
-  export $(yq e "$GET_LEAF_KEYS|$TF_KEYS| $FORMAT_FOR_ENV_EXPORT" config.yaml)
+# Export naming suffixes
+NAMING_SUFFIX=$("${script_dir}/name_suffix.py")
+echo "Naming resources with suffixed with: ${NAMING_SUFFIX}"
+export NAMING_SUFFIX
 
-fi
+TRUNCATED_NAMING_SUFFIX=$("${script_dir}/name_suffix.py" --truncated)
+echo "Naming resources that have naming restrictions with: ${TRUNCATED_NAMING_SUFFIX}"
+export TRUNCATED_NAMING_SUFFIX 
+
+# Export Terraform state vars
+export MGMT_RG="rg-mgmt-${NAMING_SUFFIX}"
+export MGMT_STORAGE="strgm${TRUNCATED_NAMING_SUFFIX}"
+export STATE_CONTAINER="tfstate"
 
 # Get IP address for local deployments
 if [[ "${LOCAL_MODE}" == "true" ]];
@@ -73,15 +96,3 @@ then
 else
     echo "Local Mode: FALSE"
 fi
-
-NAMING_SUFFIX=$("${script_dir}/name_suffix.py")
-echo "Naming resources with suffixed with: ${NAMING_SUFFIX}"
-export NAMING_SUFFIX
-
-TRUNCATED_NAMING_SUFFIX=$("${script_dir}/name_suffix.py" --truncated)
-echo "Naming resources that have naming restrictions with: ${TRUNCATED_NAMING_SUFFIX}"
-export TRUNCATED_NAMING_SUFFIX 
-
-export MGMT_RG="rg-mgmt-${NAMING_SUFFIX}"
-export MGMT_STORAGE="strgm${TRUNCATED_NAMING_SUFFIX}"
-export STATE_CONTAINER="tfstate"

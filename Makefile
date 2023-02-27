@@ -20,7 +20,7 @@ LINTER_REGEX_INCLUDE?=all # regex to specify which files to include in local lin
 
 target_title = @echo -e "\n\e[34m»»» 🌺 \e[96m$(1)\e[0m..."
 
-all: bootstrap deploy
+all: bootstrap infrastructure apps
 
 help: ## Show this help
 	@echo
@@ -49,41 +49,51 @@ ci-auth: ## Deploy an AAD app with permissions to use for CI builds
 bootstrap: az-login ## Boostrap Terraform backend
 	$(call target_title, "Bootstrap") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
-	&& . ${MAKEFILE_DIR}/infrastructure/bootstrap.sh
+	&& . ${MAKEFILE_DIR}/scripts/bootstrap.sh
 
 bootstrap-destroy: az-login ## Destroy boostrap rg
 	$(call target_title, "Destroy Bootstrap Env") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
-	&& . ${MAKEFILE_DIR}/infrastructure/bootstrap.sh -d
+	&& . ${MAKEFILE_DIR}/scripts/bootstrap.sh -d
 
-deploy: build-transform-artifacts bootstrap ## Deploy all infrastructure
-	$(call target_title, "Deploy All") \
+infrastructure: transform-artifacts bootstrap ## Deploy all infrastructure
+	$(call target_title, "Deploy All Infrastructure") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/infrastructure \
 	&& terragrunt run-all apply --terragrunt-non-interactive
 
-deploy-core: bootstrap ## Deploy core infrastructure
+infrastructure-core: bootstrap ## Deploy core infrastructure
 	$(call target_title, "Deploy Core Infrastructure") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/infrastructure/core \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
 
-deploy-transform-infrastructure: bootstrap ## Deploy transform infrastructure
+infrastructure-transform: bootstrap transform-artifacts ## Deploy transform infrastructure
 	$(call target_title, "Deploy Transform Infrastructure") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/infrastructure/transform \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
 
 PIPELINE_DIR = ${MAKEFILE_DIR}/transform/pipelines
-build-transform-artifacts:
+transform-artifacts: ## Build transform artifacts
 	${MAKEFILE_DIR}/scripts/build_artifacts.sh
 
-deploy-transform: build-transform-artifacts deploy-transform-infrastructure ## Deploy transform after building wheel file
-	
-deploy-serve: bootstrap ## Deploy serve infrastructure
+infrastructure-serve: bootstrap ## Deploy serve infrastructure
 	$(call target_title, "Deploy Serve Infrastructure") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/infrastructure/serve \
+	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
+
+test: deploy destroy bootstrap-destroy  ## Test by deploy->destroy
+
+test-transform: deploy-transform destroy bootstrap-destroy  ## Test transform deploy->destroy
+
+test-serve: deploy-serve destroy bootstrap-destroy  ## Test transform deploy->destroy
+
+apps: bootstrap ## Deploy FlowEHR apps
+	$(call target_title, "Deploy FlowEHR apps") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& cd ${MAKEFILE_DIR}/apps \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
 
 destroy: az-login ## Destroy all infrastructure
@@ -92,12 +102,6 @@ destroy: az-login ## Destroy all infrastructure
 	&& cd ${MAKEFILE_DIR}/infrastructure \
 	&& terragrunt run-all destroy --terragrunt-non-interactive
 
-test: deploy destroy bootstrap-destroy  ## Test by deploy->destroy
-
-test-transform: deploy-transform destroy bootstrap-destroy  ## Test transform deploy->destroy
-
-test-serve: deploy-serve destroy bootstrap-destroy  ## Test transform deploy->destroy
-
 destroy-no-terraform: az-login ## Destroy all resource groups associated with this deployment
 	$(call target_title, "Destroy no terraform") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
@@ -105,3 +109,9 @@ destroy-no-terraform: az-login ## Destroy all resource groups associated with th
 
 clean: ## Remove all local terraform state
 	find ${MAKEFILE_DIR} -type d -name ".terraform" -exec rm -rf "{}" \;
+
+tf-init: az-login ## Init Terraform (use for updating lock files)
+	$(call target_title, "Terraform init") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& cd ${MAKEFILE_DIR} \
+	&& terragrunt run-all init

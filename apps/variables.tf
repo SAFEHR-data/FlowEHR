@@ -13,15 +13,21 @@
 #  limitations under the License.
 
 variable "naming_suffix" {
-  type = string
+  type        = string
+  description = "Suffix used to name resources"
 }
 
 variable "truncated_naming_suffix" {
-  type = string
+  type        = string
+  description = "Truncated (max 20 chars, no hyphens etc.) suffix for e.g storage accounts"
 }
 
 variable "tags" {
   type = map(any)
+}
+
+variable "local_mode" {
+  type = bool
 }
 
 variable "core_rg_name" {
@@ -32,22 +38,34 @@ variable "core_rg_location" {
   type = string
 }
 
+variable "core_log_analytics_name" {
+  type = string
+}
+
 variable "core_kv_id" {
   type = string
 }
 
-variable "core_vnet_name" {
+variable "transform_feature_store_db_name" {
   type = string
 }
 
-variable "core_subnet_id" {
+variable "transform_feature_store_server_name" {
   type = string
 }
 
-variable "subnet_address_spaces" {
-  type = list(string)
+variable "serve_app_service_plan_name" {
+  type = string
 }
 
-variable "local_mode" {
-  type = bool
+variable "serve_cosmos_account_name" {
+  type = string
+}
+
+variable "serve_acr_name" {
+  type = string
+}
+
+variable "serve_webapps_subnet_id" {
+  type = string
 }
