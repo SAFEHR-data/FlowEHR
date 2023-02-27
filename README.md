@@ -78,8 +78,7 @@ be created in a private repository created from this template repository.
 
     The output will be used in the next step.
 
-
-2. Create and populate a GitHub environment
+1. Create and populate a GitHub environment
 
     Add an environment called `Infra-Test` with the following secrets:
 
@@ -99,6 +98,7 @@ be created in a private repository created from this template repository.
     - `LOCATION`: Name of an Azure location e.g. `uksouth`. These can be listed with `az account list-locations -o table`
     - `ENVIRONMENT`: Name of the environment e.g. `dev`, also used to name resources
     - `DEVCONTAINER_ACR_NAME`: Name of the Azure Container Registry to use for the devcontainer build. This may or may not exist. e.g. `flowehrmgmtacr`
+    - `LOCAL_MODE`: Set to `false`
     - [Optional] `DATA_SOURCE_CONNECTIONS`: *single line* json containing connectivity information to data sources in the format:
 
     ```json
