@@ -12,8 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-# superficial change to trigger build.
-
 locals {
   sql_server_features_admin_username = "adminuser"
   activities_file                    = "activities.json"
