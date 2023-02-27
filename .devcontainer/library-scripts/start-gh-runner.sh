@@ -34,9 +34,12 @@ else
   exit 1
 fi
 
+sudo chmod -R a+rwX /tmp/actions-runner/
+cd /tmp/actions-runner/
+
 # See https://docs.github.com/en/actions/hosting-your-own-runners/about-self-hosted-runners
 # The GH_RUNNER_NAME must be unique within the repositry.
-sudo -u "${NON_ROOT_USERNAME}" /tmp/actions-runner/config.sh --ephemeral \
+sudo -u "${NON_ROOT_USERNAME}" ./config.sh --ephemeral \
     --url "https://github.com/${GITHUB_REPOSITORY}" \
     --token "${REGISTRATION_TOKEN}" \
     --name "${GITHUB_RUNNER_NAME}" \
@@ -44,4 +47,4 @@ sudo -u "${NON_ROOT_USERNAME}" /tmp/actions-runner/config.sh --ephemeral \
     --unattended \
     --disableupdate
 
-sudo -u "${NON_ROOT_USERNAME}" /tmp/actions-runner/run.sh
+sudo -u "${NON_ROOT_USERNAME}" ./run.sh
