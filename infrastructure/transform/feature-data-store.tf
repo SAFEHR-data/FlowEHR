@@ -88,7 +88,7 @@ resource "azurerm_mssql_server_transparent_data_encryption" "sql_server_features
 }
 
 # Azure SQL database, basic + small for dev
-# TODO: Rightsize for prod -> https://github.com/UCLH-Foundry/issues/63
+# TODO: Rightsize for prod -> https://github.com/UCLH-Foundry/FlowEHR/issues/63
 resource "azurerm_mssql_database" "feature_database" {
   name                 = "sql-db-features"
   server_id            = azurerm_mssql_server.sql_server_features.id
@@ -120,15 +120,17 @@ resource "null_resource" "create_sql_user" {
   # load a csv file into a new SQL table
   provisioner "local-exec" {
     command = <<EOF
-      python ../../scripts/sql/create_sql_user.py $sql_server $database $app_id $app_secret $app_name
-      python ../../scripts/sql/load_csv_data.py $sql_server $database $app_id $app_secret "../../scripts/sql/nhsd-diabetes.csv" "diabetes"
+      python ../../scripts/sql/create_sql_user.py
+      python ../../scripts/sql/load_csv_data.py  
     EOF
     environment = {
-      sql_server = azurerm_mssql_server.sql_server_features.fully_qualified_domain_name
-      database   = azurerm_mssql_database.feature_database.name
-      app_id     = azuread_application.flowehr_sql_owner.application_id
-      app_secret = azuread_application_password.flowehr_sql_owner.value
-      app_name   = local.databricks_app_name
+      SERVER          = azurerm_mssql_server.sql_server_features.fully_qualified_domain_name
+      DATABASE        = azurerm_mssql_database.feature_database.name
+      CLIENT_ID       = azuread_application.flowehr_sql_owner.application_id
+      CLIENT_SECRET   = azuread_application_password.flowehr_sql_owner.value
+      LOGIN_TO_CREATE = local.databricks_app_name
+      PATH_TO_CSV     = "../../scripts/sql/nhsd-diabetes.csv"
+      TABLE_NAME      = "diabetes"
     }
   }
 }

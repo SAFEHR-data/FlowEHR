@@ -12,16 +12,15 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import sys
 import pandas
 from sqlalchemy import create_engine
 
-server = sys.argv[1]
-database = sys.argv[2]
-client_id = sys.argv[3]
-client_secret = sys.argv[4]
-path_to_csv = sys.argv[5]
-table_name = sys.argv[6]
+server = "${SERVER}"
+database = "${DATABASE}"
+client_id = "${CLIENT_ID}"
+client_secret = "${CLIENT_SECRET}"
+path_to_csv = "${PATH_TO_CSV}"
+table_name = "${TABLE_NAME}"
 
 
 def create_con_str(db: str) -> str:
