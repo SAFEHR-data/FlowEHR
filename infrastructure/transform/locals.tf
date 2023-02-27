@@ -61,8 +61,6 @@ locals {
         resource_group_name = item.peering.resource_group_name
       }
     ]
-    ]
-    )
-  )
+  ]))
 
 }
