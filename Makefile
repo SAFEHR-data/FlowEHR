@@ -76,11 +76,11 @@ infrastructure-serve: bootstrap ## Deploy serve infrastructure
 	&& cd ${MAKEFILE_DIR}/infrastructure/serve \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
 
-test: deploy destroy bootstrap-destroy  ## Test by deploy->destroy
+test: infrastructure destroy bootstrap-destroy  ## Test by deploy->destroy
 
-test-transform: deploy-transform destroy bootstrap-destroy  ## Test transform deploy->destroy
+test-transform: infrastructure-transform destroy bootstrap-destroy  ## Test transform deploy->destroy
 
-test-serve: deploy-serve destroy bootstrap-destroy  ## Test transform deploy->destroy
+test-serve: infrastructure-serve destroy bootstrap-destroy  ## Test transform deploy->destroy
 
 apps: bootstrap ## Deploy FlowEHR apps
 	$(call target_title, "Deploy FlowEHR apps") \

@@ -28,7 +28,7 @@ on:
       suffix_override:
         type: string
         required: false
-        description: An override for the naming suffix
+        description: An override for the naming suffix. If defined the core address space is random
       sha:
         type: string
         required: false
@@ -46,6 +46,9 @@ on:
         required: true
       LOCAL_MODE:
         required: true
+      DATA_SOURCE_CONNECTIONS:
+        required: false
+        # default: "[]"
 
 jobs:
   make_command:
@@ -89,6 +92,7 @@ jobs:
             DOCKER_BUILDKIT=1
             TF_INPUT=0
             TF_IN_AUTOMATION=1
+            LOCAL_MODE=${{ secrets.LOCAL_MODE }}
             ARM_CLIENT_ID=${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
             ARM_CLIENT_SECRET=${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
             ARM_TENANT_ID=${{ fromJSON(secrets.AZURE_CREDENTIALS).tenantId }}
@@ -98,4 +102,5 @@ jobs:
             ENVIRONMENT=${{ inputs.environment }}
             DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
             ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
-            LOCAL_MODE=${{ secrets.LOCAL_MODE }}
+            DATA_SOURCE_CONNECTIONS=${{ (secrets.DATA_SOURCE_CONNECTIONS != '' && secrets.DATA_SOURCE_CONNECTIONS) || '[]' }}
+            USE_RANDOM_ADDRESS_SPACE=${{ (inputs.suffix_override != '' && '1') || '0' }}
