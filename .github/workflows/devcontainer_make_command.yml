@@ -25,11 +25,6 @@ on:
         type: string
         required: true
         description: The GitHub environment in which to run
-      runs_on:
-        type: string
-        required: false
-        default: ubuntu-latest
-        description: Name of the GitHub runner this workflow will execute on
       suffix_override:
         type: string
         required: false
@@ -38,10 +33,6 @@ on:
         type: string
         required: false
         description: Commit SHA to override the default GitHub checkout
-      created_runner_name:
-        type: string
-        required: false
-        description: Name of the GitHub runner to create. Must have command == "deploy-core"
     secrets:
       AZURE_CREDENTIALS:
         required: true
@@ -55,7 +46,7 @@ on:
         required: true
 
 jobs:
-  make_command:
+  make_core:
     runs-on: ${{ inputs.runs_on }}
     environment: ${{ inputs.environment }}
 
@@ -79,12 +70,24 @@ jobs:
         run: |
           az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
 
+      - name: Set devcontainer attributes
+        id: dev_container_attrs
+        run: |
+          md5=$(tar cf - .devcontainer | md5sum | awk '{print $1}')
+          echo "tag=${md5}" >> $GITHUB_OUTPUT
+          echo "image=${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer" >> $GITHUB_OUTPUT
+
+      - name: Pull devcontainer
+        id: devcontainer_pull
+        continue-on-error: true  # Devcontainer may have changed thus this tag not exist
+        run: |
+          docker pull ${{ steps.dev_container_attrs.outputs.image }}:${{ steps.dev_container_attrs.outputs.tag }}
+
       - name: Bootstrap
         uses: devcontainers/ci@v0.2
         with:
-          imageName: "${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer"
-          cacheFrom: "${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer"
-          imageTag: ${{ inputs.environment }}
+          imageName: ${{ steps.dev_container_attrs.outputs.image }}
+          imageTag: ${{ steps.dev_container_attrs.outputs.tag }}
           runCmd: make bootstrap
           # Push is manual otherwise the post step command doesn't execute before core deploy
           push: never
@@ -101,15 +104,16 @@ jobs:
             DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
 
       - name: Push devcontainer
+        if: steps.devcontainer_pull.outcome != 'success'
         run: |
-          docker push ${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer:${{ inputs.environment }}
+          docker push ${{ steps.dev_container_attrs.outputs.image }}:${{ steps.dev_container_attrs.outputs.tag }}
 
-      - name: Build and run dev container task
+      - name: Deploy core and build agent
         uses: devcontainers/ci@v0.2
         with:
-          cacheFrom: "${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer"
-          imageTag: ${{ inputs.environment }}
-          runCmd: make ${{ inputs.command }}
+          imageName: ${{ steps.dev_container_attrs.outputs.image }}
+          imageTag: ${{ steps.dev_container_attrs.outputs.tag }}
+          runCmd: make deploy-core
           push: never
           env: |
             DOCKER_BUILDKIT=1
@@ -127,6 +131,40 @@ jobs:
             DEVCONTAINER_TAG=${{ inputs.environment }}
             ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
             LOCAL_MODE=false
-            GITHUB_RUNNER_NAME=${{ inputs.created_runner_name }}
+            GITHUB_RUNNER_NAME=devcontainer-${{ inputs.suffix }}
             GITHUB_RUNNER_TOKEN=${{ secrets.GITHUB_TOKEN }}
             GITHUB_REPOSITORY=${{ github.repository }}
+
+  make:
+    if: ${{ inputs.command }} != 'deploy-core'
+    needs: [make_core]
+    runs-on: devcontainer-${{ inputs.suffix }}
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          # if the following values are missing (i.e. not triggered via comment workflow)
+          # then the default checkout will apply
+          ref: ${{ inputs.sha }}
+
+      - name: Deploy
+        env:
+          DOCKER_BUILDKIT: 1
+          TF_INPUT: 0
+          TF_IN_AUTOMATION: 1
+          ARM_CLIENT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
+          ARM_CLIENT_SECRET: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
+          ARM_TENANT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).tenantId }}
+          ARM_SUBSCRIPTION_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).subscriptionId }}
+          SUFFIX: ${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
+          LOCATION: ${{ secrets.LOCATION }}
+          ENVIRONMENT: ${{ inputs.environment }}
+          DEVCONTAINER_ACR_NAME: ${{ secrets.DEVCONTAINER_ACR_NAME }}
+          DEVCONTAINER_IMAGE_IMAGE: flowehr/devcontainer
+          DEVCONTAINER_TAG: ${{ steps.dev_container_attrs.outputs.tag }}
+          ORG_GH_TOKEN: ${{ secrets.ORG_GH_TOKEN }}
+          LOCAL_MODE: false
+        run: make ${{ inputs.command }}
