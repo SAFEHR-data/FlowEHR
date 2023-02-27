@@ -77,7 +77,8 @@ RUN sudo su \
     && curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/mssql-release.list \
     && exit
 
-RUN sudo apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql18 \
+RUN sudo apt-get update \
+    && ACCEPT_EULA=Y apt-get install -y msodbcsql18 --no-install-recommends \
     && echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc \
     && sudo apt-get update && sudo apt-get install -y unixodbc unixodbc-dev
 
@@ -85,21 +86,30 @@ RUN sudo apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql18 \
 ARG SPARK_VERSION="3.3.1"
 ARG NUMPY_VERSION="1.24.2"
 ARG DATABRICKS_CLI_VERSION="0.17.4"
-RUN python3 -m pip install pyspark==${SPARK_VERSION} pyodbc build numpy=="${NUMPY_VERSION}" databricks-cli=="${DATABRICKS_CLI_VERSION}" --no-cache-dir
+ARG PYODBC_VERSION="4.0.35"
+ARG PYTHON_BUILD_VERSION="0.10.0"
+RUN python3 -m pip install --no-cache-dir \
+    pyspark=="${SPARK_VERSION}" \
+    pyodbc=="${PYODBC_VERSION}" \
+    build=="${PYTHON_BUILD_VERSION}" \
+    numpy=="${NUMPY_VERSION}" \
+    databricks-cli=="${DATABRICKS_CLI_VERSION}"
 
 # Get the local Spark installed to be able to run unit tests
 # Borrowed from https://github.com/beandrad/pyspark-sample/blob/main/.devcontainer/Dockerfile#L36
 RUN mkdir -p /tmp/docker-downloads \
     && SPARK_VERSION=$(yq e .spark_version /tmp/config.transform.yaml) \
-    && sudo apt-get update && sudo apt-get -y install openjdk-11-jdk wget \
-    && wget https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz -O /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
+    && apt-get update \
+    && apt-get -y install openjdk-11-jdk wget --no-install-recommends \
+    && wget -q https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz -O /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
     && tar -xvzf /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
     && mv spark-${SPARK_VERSION}-bin-hadoop3 /opt/spark \
     && rm -rf /tmp/docker-downloads
 
 # Install prerequsites for using this container as a GitHub runner. Assuming an x86 runner
+ARG GH_RUNNER_VERSION="v2.302.1"
 RUN mkdir -p /tmp/actions-runner \
-    && curl -o runner.tar.gz -L https://github.com/actions/runner/releases/download/v2.302.1/actions-runner-linux-x64-2.302.1.tar.gz \
+    && curl -o runner.tar.gz -L https://github.com/actions/runner/releases/download/${GH_RUNNER_VERSION}/actions-runner-linux-x64-2.302.1.tar.gz \
     && tar xzf runner.tar.gz -C /tmp/actions-runner \
     && rm runner.tar.gz
 
