@@ -20,7 +20,6 @@ database = sys.argv[2]
 client_id = sys.argv[3]
 client_secret = sys.argv[4]
 login_to_create = sys.argv[5]
-permission_to_set = sys.argv[6]
 
 
 def create_con_str(db: str) -> str:
@@ -44,7 +43,6 @@ cnxn.commit()
 # connect to target feature database to create user + assign as dbo
 cnxn = pyodbc.connect(create_con_str(database))
 cursor = cnxn.cursor()
-
 
 query = f"""
 IF NOT EXISTS(SELECT principal_id FROM sys.database_principals WHERE name = '{login_to_create}') BEGIN
