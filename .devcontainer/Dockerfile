@@ -14,12 +14,9 @@
 # You can pick any Debian/Ubuntu-based image. 😊
 FROM mcr.microsoft.com/vscode/devcontainers/python:3.10
 
-COPY .devcontainer/library-scripts/*.sh /tmp/library-scripts/
-
-COPY config.transform.yaml /tmp/config.transform.yaml
-
 # [Option] Install zsh
 ARG INSTALL_ZSH="true"
+
 # [Option] Upgrade OS packages to their latest versions
 ARG UPGRADE_PACKAGES="false"
 
@@ -27,6 +24,7 @@ ARG UPGRADE_PACKAGES="false"
 ARG USERNAME=vscode
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
+COPY .devcontainer/library-scripts/common-debian.sh /tmp/library-scripts/
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && bash /tmp/library-scripts/common-debian.sh "${INSTALL_ZSH}" "${USERNAME}" "${USER_UID}" "${USER_GID}" "${UPGRADE_PACKAGES}" "true" "true" \ 
     && apt-get install -y graphviz --no-install-recommends \
@@ -34,6 +32,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 
 # [Option] Install Docker CLI
 ARG INSTALL_DOCKER="false"
+COPY .devcontainer/library-scripts/docker-debian.sh /tmp/library-scripts/
 RUN if [ "${INSTALL_DOCKER}" = "true" ]; then \
         bash /tmp/library-scripts/docker-debian.sh "true" "/var/run/docker-host.sock" "/var/run/docker.sock" "${USERNAME}"; \
     else \
@@ -94,9 +93,10 @@ RUN python3 -m pip install --no-cache-dir \
 
 # Get the local Spark installed to be able to run unit tests
 # Borrowed from https://github.com/beandrad/pyspark-sample/blob/main/.devcontainer/Dockerfile#L36
-#
+
 
 ## TODO: comment back in
+# COPY config.transform.yaml /tmp/config.transform.yaml
 # RUN mkdir -p /tmp/docker-downloads \
 #    && SPARK_VERSION=$(yq e .spark_version /tmp/config.transform.yaml) \
 #    && python3 -m pip install --no-cache-dir pyspark=="${SPARK_VERSION}" \
@@ -109,6 +109,7 @@ RUN python3 -m pip install --no-cache-dir \
 
 
 # Install prerequsites for using this container as a GitHub runner. Assuming an x86 runner
+COPY .devcontainer/library-scripts/start-gh-runner.sh /tmp/library-scripts/
 ARG GH_RUNNER_VERSION="v2.302.1"
 RUN mkdir -p /tmp/actions-runner \
     && curl -o runner.tar.gz -L https://github.com/actions/runner/releases/download/${GH_RUNNER_VERSION}/actions-runner-linux-x64-2.302.1.tar.gz \

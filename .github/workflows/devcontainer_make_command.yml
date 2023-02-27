@@ -71,7 +71,7 @@ jobs:
           az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
 
       - name: Set devcontainer attributes
-        id: dev_container_attrs
+        id: dc
         run: |
           md5=$(tar cf - .devcontainer | md5sum | awk '{print $1}')
           echo "tag=${md5}" >> $GITHUB_OUTPUT
@@ -81,13 +81,13 @@ jobs:
         id: devcontainer_pull
         continue-on-error: true  # Devcontainer may have changed thus this tag not exist
         run: |
-          docker pull ${{ steps.dev_container_attrs.outputs.image }}:${{ steps.dev_container_attrs.outputs.tag }}
+          docker pull ${{ steps.dc.outputs.image }}:${{ steps.dc.outputs.tag }}
 
       - name: Bootstrap
         uses: devcontainers/ci@v0.2
         with:
-          imageName: ${{ steps.dev_container_attrs.outputs.image }}
-          imageTag: ${{ steps.dev_container_attrs.outputs.tag }}
+          imageName: ${{ steps.dc.outputs.image }}
+          imageTag: ${{ steps.dc.outputs.tag }}
           runCmd: make bootstrap
           # Push is manual otherwise the post step command doesn't execute before core deploy
           push: never
@@ -106,13 +106,13 @@ jobs:
       - name: Push devcontainer
         if: steps.devcontainer_pull.outcome != 'success'
         run: |
-          docker push ${{ steps.dev_container_attrs.outputs.image }}:${{ steps.dev_container_attrs.outputs.tag }}
+          docker push ${{ steps.dc.outputs.image }}:${{ steps.dc.outputs.tag }}
 
       - name: Deploy core and build agent
         uses: devcontainers/ci@v0.2
         with:
-          imageName: ${{ steps.dev_container_attrs.outputs.image }}
-          imageTag: ${{ steps.dev_container_attrs.outputs.tag }}
+          imageName: ${{ steps.dc.outputs.image }}
+          imageTag: ${{ steps.dc.outputs.tag }}
           runCmd: make deploy-core
           push: never
           env: |
@@ -164,7 +164,7 @@ jobs:
           ENVIRONMENT: ${{ inputs.environment }}
           DEVCONTAINER_ACR_NAME: ${{ secrets.DEVCONTAINER_ACR_NAME }}
           DEVCONTAINER_IMAGE_IMAGE: flowehr/devcontainer
-          DEVCONTAINER_TAG: ${{ steps.dev_container_attrs.outputs.tag }}
+          DEVCONTAINER_TAG: ${{ steps.dc.outputs.tag }}
           ORG_GH_TOKEN: ${{ secrets.ORG_GH_TOKEN }}
           LOCAL_MODE: false
         run: make ${{ inputs.command }}
