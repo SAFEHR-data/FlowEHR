@@ -41,14 +41,14 @@ export_config_from_yaml () {
       exit 1
     fi
 
-  # Get leaf keys yq query
-  GET_LEAF_KEYS="del(.data_source_connections) | .. | select(. == \"*\") | {(path | .[-1]): .}"
-  # Map keys to uppercase yq query
-  UPCASE_KEYS="with_entries(.key |= upcase)"
-  # Suffix keys with TF_VAR_ yq query
-  TF_KEYS="with_entries(.key |= \"TF_VAR_\" + .)"
-  # Yq query to format the output to be in form: key=value
-  FORMAT_FOR_ENV_EXPORT="to_entries| map(.key + \"=\" +  .value)|join(\" \")"
+    # Get leaf keys yq query
+    GET_LEAF_KEYS="del(.data_source_connections) | .. | select(. == \"*\") | {(path | .[-1]): .}"
+    # Map keys to uppercase yq query
+    UPCASE_KEYS="with_entries(.key |= upcase)"
+    # Suffix keys with TF_VAR_ yq query
+    TF_KEYS="with_entries(.key |= \"TF_VAR_\" + .)"
+    # Yq query to format the output to be in form: key=value
+    FORMAT_FOR_ENV_EXPORT="to_entries| map(.key + \"=\" +  .value)|join(\" \")"
 
     # Export as UPPERCASE keys env vars
     # shellcheck disable=SC2046
@@ -57,9 +57,9 @@ export_config_from_yaml () {
     # shellcheck disable=SC2046
     export $(yq e "$GET_LEAF_KEYS|$TF_KEYS| $FORMAT_FOR_ENV_EXPORT" "$config_file_path")
 
-  # Export the data source connections as json
-  DATA_SOURCE_CONNECTIONS="$(yq -o=json eval '.data_source_connections' config.yaml)"
-  export DATA_SOURCE_CONNECTIONS
+    # Export the data source connections as json
+    DATA_SOURCE_CONNECTIONS="$(yq -o=json eval '.data_source_connections' config.yaml)"
+    export DATA_SOURCE_CONNECTIONS
 fi
 }
 
