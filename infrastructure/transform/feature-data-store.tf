@@ -111,16 +111,25 @@ resource "null_resource" "create_sql_user" {
     azuread_app_role_assignment.sql_application_read_all
   ]
 
-  triggers = [
-    azuread_application.flowehr_databricks_sql,
-    azurerm_mssql_database.feature_database
-  ]
+  triggers = {
+    app_name      = azuread_application.flowehr_databricks_sql.display_name
+    database_name = azurerm_mssql_database.feature_database.name
+  }
 
   # set the databricks 'user' app as dbo on the flowehr database
-  # push output to /dev/null to avoid leaking the connection string in errors
-  # connectivity will be tested as part of integration tests
+  # load a csv file into a new SQL table
   provisioner "local-exec" {
-    command = "python ../../scripts/sql/create_sql_user.py ${azurerm_mssql_server.sql_server_features.fully_qualified_domain_name} ${azurerm_mssql_database.feature_database.name} ${azuread_application.flowehr_sql_owner.application_id} ${azuread_application_password.flowehr_sql_owner.value} ${local.databricks_app_name} > /dev/null"
+    command = <<EOF
+      python ../../scripts/sql/create_sql_user.py $sql_server $database $app_id $app_secret $app_name
+      python ../../scripts/sql/load_csv_data.py $sql_server $database $app_id $app_secret "../../scripts/sql/nhsd-diabetes.csv" "diabetes"
+    EOF
+    environment = {
+      sql_server = azurerm_mssql_server.sql_server_features.fully_qualified_domain_name
+      database   = azurerm_mssql_database.feature_database.name
+      app_id     = azuread_application.flowehr_sql_owner.application_id
+      app_secret = azuread_application_password.flowehr_sql_owner.value
+      app_name   = local.databricks_app_name
+    }
   }
 }
 

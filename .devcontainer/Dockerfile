@@ -85,7 +85,7 @@ RUN sudo apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql18 \
 ARG SPARK_VERSION="3.3.1"
 ARG NUMPY_VERSION="1.24.2"
 ARG DATABRICKS_CLI_VERSION="0.17.4"
-RUN python3 -m pip install pyspark==${SPARK_VERSION} pyodbc build numpy=="${NUMPY_VERSION}" databricks-cli=="${DATABRICKS_CLI_VERSION}" --no-cache-dir
+RUN python3 -m pip install pyspark==${SPARK_VERSION} pyodbc sqlalchemy pandas build numpy=="${NUMPY_VERSION}" databricks-cli=="${DATABRICKS_CLI_VERSION}" --no-cache-dir
 
 # Get the local Spark installed to be able to run unit tests
 # Borrowed from https://github.com/beandrad/pyspark-sample/blob/main/.devcontainer/Dockerfile#L36

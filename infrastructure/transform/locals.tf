@@ -15,7 +15,7 @@
 locals {
   sql_server_features_admin_username = "adminuser"
   sql_owner_app_name                 = "flowehr-sql-owner-${lower(var.naming_suffix)}"
-  databricks_app_name                = "flowehr-databricks-sql-${lower(var.naming_suffix)}"
+  databricks_app_name                = "flowehr-databricks-datawriter-${lower(var.naming_suffix)}"
   activities_file                    = "activities.json"
   artifacts_dir                      = "artifacts"
   adb_linked_service_name            = "ADBLinkedServiceViaMSI"

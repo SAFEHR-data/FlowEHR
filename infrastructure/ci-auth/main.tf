@@ -21,7 +21,7 @@ resource "azuread_service_principal" "msgraph" {
 resource "azuread_application" "ci_app" {
   display_name = "sp-flowehr-cicd-${lower(var.naming_suffix)}"
   owners       = [data.azurerm_client_config.current.object_id]
-  
+
   required_resource_access {
     resource_app_id = data.azuread_application_published_app_ids.well_known.result.MicrosoftGraph
 
@@ -29,7 +29,7 @@ resource "azuread_application" "ci_app" {
       id   = azuread_service_principal.msgraph.app_role_ids["Application.ReadWrite.All"]
       type = "Role"
     }
-    
+
     resource_access {
       id   = azuread_service_principal.msgraph.app_role_ids["AppRoleAssignment.ReadWrite.All"]
       type = "Role"
