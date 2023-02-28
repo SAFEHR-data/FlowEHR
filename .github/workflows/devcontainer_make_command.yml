@@ -75,6 +75,7 @@ jobs:
         run: |
           echo "tag=${{ inputs.environment }}" >> $GITHUB_OUTPUT
           echo "image=${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer" >> $GITHUB_OUTPUT
+          echo "runner_name=${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}" >> $GITHUB_OUTPUT
 
       - name: Bootstrap
         uses: devcontainers/ci@v0.2
@@ -121,17 +122,17 @@ jobs:
             ENVIRONMENT=${{ inputs.environment }}
             DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
             DEVCONTAINER_IMAGE_IMAGE=flowehr/devcontainer
-            DEVCONTAINER_TAG=${{ inputs.environment }}
+            DEVCONTAINER_TAG=${{ steps.dc.outputs.tag }}
             ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
             LOCAL_MODE=false
-            GITHUB_RUNNER_NAME=devcontainer-${{ inputs.suffix }}
+            GITHUB_RUNNER_NAME=${{ steps.dc.outputs.runner_name }}
             GITHUB_RUNNER_TOKEN=${{ secrets.GH_RUNNER_CREATE_TOKEN }}
             GITHUB_REPOSITORY=${{ github.repository }}
 
   make:
     if: ${{ inputs.command }} != 'deploy-core'
     needs: [make_core]
-    runs-on: devcontainer-${{ inputs.suffix }}
+    runs-on: ${{ steps.dc.outputs.runner_name }}
     environment: ${{ inputs.environment }}
 
     steps:
@@ -144,20 +145,20 @@ jobs:
           ref: ${{ inputs.sha }}
 
       - name: Deploy
-        env:
-          DOCKER_BUILDKIT: 1
-          TF_INPUT: 0
-          TF_IN_AUTOMATION: 1
-          ARM_CLIENT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
-          ARM_CLIENT_SECRET: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
-          ARM_TENANT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).tenantId }}
-          ARM_SUBSCRIPTION_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).subscriptionId }}
-          SUFFIX: ${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
-          LOCATION: ${{ secrets.LOCATION }}
-          ENVIRONMENT: ${{ inputs.environment }}
-          DEVCONTAINER_ACR_NAME: ${{ secrets.DEVCONTAINER_ACR_NAME }}
-          DEVCONTAINER_IMAGE_IMAGE: flowehr/devcontainer
-          DEVCONTAINER_TAG: ${{ steps.dc.outputs.tag }}
-          ORG_GH_TOKEN: ${{ secrets.ORG_GH_TOKEN }}
-          LOCAL_MODE: false
-        run: make ${{ inputs.command }}
+        run: |
+          DOCKER_BUILDKIT=1 \
+          TF_INPUT=0 \
+          TF_IN_AUTOMATION=1 \
+          ARM_CLIENT_ID=${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }} \
+          ARM_CLIENT_SECRET=${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }} \
+          ARM_TENANT_ID=${{ fromJSON(secrets.AZURE_CREDENTIALS).tenantId }} \
+          ARM_SUBSCRIPTION_ID=${{ fromJSON(secrets.AZURE_CREDENTIALS).subscriptionId }} \
+          SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }} \
+          LOCATION=${{ secrets.LOCATION }} \
+          ENVIRONMENT=${{ inputs.environment }} \
+          DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }} \
+          DEVCONTAINER_IMAGE_IMAGE=flowehr/devcontainer \
+          DEVCONTAINER_TAG=${{ steps.dc.outputs.tag }} \
+          ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }} \
+          LOCAL_MODE=false \
+          make ${{ inputs.command }}

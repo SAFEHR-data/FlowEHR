@@ -118,4 +118,3 @@ RUN mkdir -p /tmp/actions-runner \
 
 ENV SPARK_HOME=/opt/spark
 ENV PATH=$PATH:$SPARK_HOME/bin
-ENV NON_ROOT_USERNAME=${USERNAME}

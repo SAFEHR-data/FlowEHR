@@ -23,12 +23,12 @@ resource "azurerm_container_group" "build_agent" {
   restart_policy      = "Never"
 
   container {
-    name     = "devcontainer"
-    image    = "${data.azurerm_container_registry.devcontainer[0].login_server}/${var.devcontainer_image_name}:${var.devcontainer_tag}"
-    cpu      = "1"
-    memory   = "4"
-    commands = ["/bin/sleep", "infinity"] # Keep container runniner for debuging
-    # commands = ["/bin/bash", "-c", "'/tmp/library-scripts/start-gh-runner.sh'"]
+    name   = "devcontainer"
+    image  = "${data.azurerm_container_registry.devcontainer[0].login_server}/${var.devcontainer_image_name}:${var.devcontainer_tag}"
+    cpu    = "1"
+    memory = "4"
+    # commands = ["/bin/sleep", "infinity"] # Keep container runniner for debuging
+    commands = ["/bin/bash", "-c", "'/tmp/library-scripts/start-gh-runner.sh'"]
 
     environment_variables = {
       GITHUB_REPOSITORY  = var.github_repository
@@ -50,5 +50,10 @@ resource "azurerm_container_group" "build_agent" {
     username = data.azurerm_container_registry.devcontainer[0].admin_username
     password = data.azurerm_container_registry.devcontainer[0].admin_password
     server   = data.azurerm_container_registry.devcontainer[0].login_server
+  }
+
+  # As terraform is deployed on this container it's essential to not recreate it
+  lifecycle {
+    ignore_changes = true
   }
 }
