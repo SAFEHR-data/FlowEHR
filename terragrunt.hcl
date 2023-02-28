@@ -83,13 +83,6 @@ EOF
       version = "3.2.1"
     }
 EOF
-
-  required_provider_null = <<EOF
-  null = {
-      source = "hashicorp/null"
-      version = "3.2.1"
-    }
-EOF
 }
 
 generate "terraform" {
