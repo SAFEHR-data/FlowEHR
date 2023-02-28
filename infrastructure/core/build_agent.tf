@@ -51,9 +51,4 @@ resource "azurerm_container_group" "build_agent" {
     password = data.azurerm_container_registry.devcontainer[0].admin_password
     server   = data.azurerm_container_registry.devcontainer[0].login_server
   }
-
-  # As terraform is deployed on this container it's essential to not recreate it
-  lifecycle {
-    ignore_changes = true
-  }
 }

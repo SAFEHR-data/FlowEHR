@@ -49,6 +49,8 @@ jobs:
   make_core:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
+    outputs:
+      runner_name: ${{ steps.dc.outputs.runner_name }}
 
     steps:
       - name: Checkout
@@ -132,7 +134,7 @@ jobs:
   make:
     if: ${{ inputs.command }} != 'deploy-core'
     needs: [make_core]
-    runs-on: ${{ steps.dc.outputs.runner_name }}
+    runs-on: ${{ needs.make_core.outputs.runner_name }}
     environment: ${{ inputs.environment }}
 
     steps:
