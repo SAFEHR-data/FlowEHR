@@ -144,7 +144,6 @@ jobs:
             ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
             DATA_SOURCE_CONNECTIONS=${{ (secrets.DATA_SOURCE_CONNECTIONS != '' && secrets.DATA_SOURCE_CONNECTIONS) || '[]' }}
             USE_RANDOM_ADDRESS_SPACE=${{ (inputs.suffix_override != '' && '1') || '0' }}
-            LOCAL_MODE=false
             GITHUB_RUNNER_NAME=${{ steps.dc.outputs.runner_name }}
             GITHUB_RUNNER_TOKEN=${{ secrets.GH_RUNNER_CREATE_TOKEN }}
             GITHUB_REPOSITORY=${{ github.repository }}
@@ -180,7 +179,6 @@ jobs:
           DEVCONTAINER_IMAGE_IMAGE: flowehr/devcontainer
           DEVCONTAINER_TAG: ${{ needs.make_core.outputs.dc_tag }}
           ORG_GH_TOKEN: ${{ secrets.ORG_GH_TOKEN }}
-          LOCAL_MODE: false
         run: |
           ./scripts/pipeline_repo_checkout.sh
           make ${{ inputs.command }}
