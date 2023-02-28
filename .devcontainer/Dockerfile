@@ -91,25 +91,22 @@ RUN python3 -m pip install --no-cache-dir \
     pyodbc=="${PYODBC_VERSION}" \
     build=="${PYTHON_BUILD_VERSION}" \
     numpy=="${NUMPY_VERSION}" \
-    databricks-cli=="${DATABRICKS_CLI_VERSION}"
-RUN python3 -m pip install pyspark=="${SPARK_VERSION}" pyodbc=="${PYODBC_VERSION}" sqlalchemy=="${SQLALCHEMY_VERSION}" pandas=="${PANDAS_VERSION}" build numpy=="${NUMPY_VERSION}" databricks-cli=="${DATABRICKS_CLI_VERSION}" --no-cache-dir
+    databricks-cli=="${DATABRICKS_CLI_VERSION}" \
+    sqlalchemy=="${SQLALCHEMY_VERSION}" \
+    pandas=="${PANDAS_VERSION}"
 
 # Get the local Spark installed to be able to run unit tests
 # Borrowed from https://github.com/beandrad/pyspark-sample/blob/main/.devcontainer/Dockerfile#L36
-
-
-## TODO: comment back in
-# COPY config.transform.yaml /tmp/config.transform.yaml
-# RUN mkdir -p /tmp/docker-downloads \
-#    && SPARK_VERSION=$(yq e .spark_version /tmp/config.transform.yaml) \
-#    && python3 -m pip install --no-cache-dir pyspark=="${SPARK_VERSION}" \
-#    && apt-get update \
-#    && apt-get -y install openjdk-11-jdk wget --no-install-recommends \
-#    && wget -q https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz -O /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
-#    && tar -xvzf /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
-#    && mv spark-${SPARK_VERSION}-bin-hadoop3 /opt/spark \
-#    && rm -rf /tmp/docker-downloads
-
+COPY config.transform.yaml /tmp/config.transform.yaml
+RUN mkdir -p /tmp/docker-downloads \
+   && SPARK_VERSION=$(yq e .spark_version /tmp/config.transform.yaml) \
+   && python3 -m pip install --no-cache-dir pyspark=="${SPARK_VERSION}" \
+   && apt-get update \
+   && apt-get -y install openjdk-11-jdk wget --no-install-recommends \
+   && wget -q https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz -O /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
+   && tar -xvzf /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
+   && mv spark-${SPARK_VERSION}-bin-hadoop3 /opt/spark \
+   && rm -rf /tmp/docker-downloads
 
 # Install prerequsites for using this container as a GitHub runner. Assuming an x86 runner
 COPY .devcontainer/library-scripts/start-gh-runner.sh /tmp/library-scripts/
