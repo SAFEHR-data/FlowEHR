@@ -120,6 +120,8 @@ jobs:
 
       - name: Deploy core and build agent
         uses: devcontainers/ci@v0.2
+        env:
+          ORG_GH_TOKEN: "${{ secrets.ORG_GH_TOKEN }}"
         with:
           imageName: ${{ steps.dc.outputs.image_path }}
           imageTag: ${{ steps.dc.outputs.tag }}
@@ -179,4 +181,6 @@ jobs:
           DEVCONTAINER_TAG: ${{ needs.make_core.outputs.dc_tag }}
           ORG_GH_TOKEN: ${{ secrets.ORG_GH_TOKEN }}
           LOCAL_MODE: false
-        run: make ${{ inputs.command }}
+        run: |
+          ./scripts/pipeline_repo_checkout.sh
+          make ${{ inputs.command }}
