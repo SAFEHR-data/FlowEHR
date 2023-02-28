@@ -16,8 +16,7 @@ name: Deploy Infra-Test
 
 on:
   push:
-    # TODO revert
-    # branches: [main]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
