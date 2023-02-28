@@ -42,6 +42,7 @@ provider "azurerm" {
   }
 }
 EOF
+
   required_provider_azure = <<EOF
 azurerm = {
   source  = "hashicorp/azurerm"
