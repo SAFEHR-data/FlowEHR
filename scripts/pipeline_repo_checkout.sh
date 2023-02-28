@@ -25,9 +25,9 @@ CONFIG_PATH="${SCRIPT_DIR}/../config.transform.yaml"
 ORG_GH_TOKEN="${ORG_GH_TOKEN:-}" # May be unset
 
 if [[ -n "${ORG_GH_TOKEN}" ]]; then
-  REPO_CHECKOUT_COMMAND="GH_TOKEN=${ORG_GH_TOKEN} git -c credential.helper= -c credential.helper='!gh auth git-credential' clone"
+  GIT_COMMAND="GH_TOKEN=${ORG_GH_TOKEN} git -c credential.helper= -c credential.helper='!gh auth git-credential'"
 else
-  REPO_CHECKOUT_COMMAND="git clone"
+  GIT_COMMAND="git"
 fi
 
 pushd "${PIPELINE_DIR}" > /dev/null
@@ -35,12 +35,12 @@ pushd "${PIPELINE_DIR}" > /dev/null
 while IFS=$'\n' read -r repo _; do
   # Name for the directory to check out to,
   # e.g. git@github.com:UCLH-Foundry/Data-Pipeline.git becomes Data-Pipeline 
-  # If the directory with checked out repo already exists, remove it
+  # If the directory with checked out repo already exists, pull the latest
   dir_name=$(basename "${repo}" | sed -e 's/\.git$//')
   if [ -d "${dir_name}" ]; then
-    echo "${dir_name} already exists. Not cloning"
+    eval "${GIT_COMMAND} pull ${repo}"
   else
-    eval "${REPO_CHECKOUT_COMMAND}" "${repo}"
+    eval "${GIT_COMMAND} clone ${repo}"
   fi
 
 done < <(yq e -I=0 '.repositories[]' "${CONFIG_PATH}")
