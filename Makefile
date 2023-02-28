@@ -110,8 +110,8 @@ destroy-no-terraform: az-login ## Destroy all resource groups associated with th
 clean: ## Remove all local terraform state
 	find ${MAKEFILE_DIR} -type d -name ".terraform" -exec rm -rf "{}" \;
 
-tf-init: az-login ## Init Terraform (use for updating lock files)
+tf-init: az-login ## Init Terraform (use for updating lock files in the case of a conflict)
 	$(call target_title, "Terraform init") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR} \
-	&& terragrunt run-all init
+	&& terragrunt run-all init -upgrade
