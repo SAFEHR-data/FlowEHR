@@ -168,7 +168,7 @@ jobs:
           ENVIRONMENT: ${{ inputs.environment }}
           DEVCONTAINER_ACR_NAME: ${{ secrets.DEVCONTAINER_ACR_NAME }}
           DEVCONTAINER_IMAGE_IMAGE: flowehr/devcontainer
-          DEVCONTAINER_TAG: ${{ steps.dc.outputs.tag }}
+          DEVCONTAINER_TAG: ${{ needs.make_core.outputs.dc_tag }}
           ORG_GH_TOKEN: ${{ secrets.ORG_GH_TOKEN }}
           LOCAL_MODE: false
         run: make ${{ inputs.command }}

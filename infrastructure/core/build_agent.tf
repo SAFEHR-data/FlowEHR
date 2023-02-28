@@ -52,3 +52,16 @@ resource "azurerm_container_group" "build_agent" {
     server   = data.azurerm_container_registry.devcontainer[0].login_server
   }
 }
+
+## TF ensure container is running as 
+resource "null_resource" "ensure_build_agent_is_running" {
+
+  provisioner "local-exec" {
+    command = <<EOF
+    az container start \
+      --name ${azurerm_container_group.build_agent[0].name} \
+      --resource-group ${azurerm_resource_group.core.name} \
+    || true
+    EOF
+  }
+}

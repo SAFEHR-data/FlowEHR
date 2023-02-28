@@ -77,6 +77,13 @@ EOF
     version = "2.2.3"
   }
 EOF
+
+  required_provider_null = <<EOF
+    null = {
+      source = "hashicorp/null"
+      version = "3.2.1"
+    }
+EOF
 }
 
 generate "terraform" {
@@ -88,6 +95,7 @@ terraform {
 
   required_providers {
     ${local.required_provider_azure}
+    ${local.required_provider_null}
     ${local.required_provider_external}
   }
 }
