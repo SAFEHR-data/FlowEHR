@@ -38,7 +38,7 @@ For the full reference of possible configuration values, see the [config schema 
 
 1. Log in to Azure
 
-    Run `az login` to authenticate to Azure
+    Run `az login` to authenticate to Azure. If you have multiple tenants associated with your account then you may need to run `az login --tenant [tenant id]` with your desired tenant.
 
 2. Run `make all`
 
