@@ -22,3 +22,9 @@ resource "github_repository" "example" {
     repository = "terraform-template-module"
   }
 }
+
+resource "github_actions_secret" "example_secret" {
+  repository      = "example_repository"
+  secret_name     = "ACR_REPOSITORY_TOKEN"
+  plaintext_value = var.some_secret_string
+}
