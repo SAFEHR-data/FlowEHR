@@ -50,7 +50,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     outputs:
-      runner_name: ${{ steps.dc.outputs.runner_name }}
+      dc_tag: ${{ steps.dc.outputs.tag }}
+      dc_image_path: ${{ steps.dc.outputs.image }}
+      dc_runner_name: ${{ steps.dc.outputs.runner_name }}
 
     steps:
       - name: Checkout
@@ -76,14 +78,14 @@ jobs:
         id: dc
         run: |
           echo "tag=${{ inputs.environment }}" >> $GITHUB_OUTPUT
-          echo "image=${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer" >> $GITHUB_OUTPUT
-          echo "runner_name=${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}" >> $GITHUB_OUTPUT
+          echo "image_path=${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer" >> $GITHUB_OUTPUT
+          echo "runner_name=dc-${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}" >> $GITHUB_OUTPUT
 
       - name: Bootstrap
         uses: devcontainers/ci@v0.2
         with:
-          imageName: ${{ steps.dc.outputs.image }}
-          cacheFrom: ${{ steps.dc.outputs.image }}
+          imageName: ${{ steps.dc.outputs.image_path }}
+          cacheFrom: ${{ steps.dc.outputs.image_path }}
           imageTag: ${{ steps.dc.outputs.tag }}
           runCmd: make bootstrap
           # Push is manual otherwise the post step command doesn't execute before core deploy
@@ -102,12 +104,12 @@ jobs:
 
       - name: Push devcontainer
         run: |
-          docker push ${{ steps.dc.outputs.image }}:${{ steps.dc.outputs.tag }}
+          docker push ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
 
       - name: Deploy core and build agent
         uses: devcontainers/ci@v0.2
         with:
-          imageName: ${{ steps.dc.outputs.image }}
+          imageName: ${{ steps.dc.outputs.image_path }}
           imageTag: ${{ steps.dc.outputs.tag }}
           runCmd: make deploy-core
           push: never
@@ -123,7 +125,7 @@ jobs:
             LOCATION=${{ secrets.LOCATION }}
             ENVIRONMENT=${{ inputs.environment }}
             DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
-            DEVCONTAINER_IMAGE_IMAGE=flowehr/devcontainer
+            DEVCONTAINER_IMAGE_NAME=flowehr/devcontainer
             DEVCONTAINER_TAG=${{ steps.dc.outputs.tag }}
             ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
             LOCAL_MODE=false
@@ -134,7 +136,7 @@ jobs:
   make:
     if: ${{ inputs.command }} != 'deploy-core'
     needs: [make_core]
-    runs-on: ${{ needs.make_core.outputs.runner_name }}
+    runs-on: ${{ needs.make_core.outputs.dc_runner_name }}
     environment: ${{ inputs.environment }}
 
     steps:
@@ -159,8 +161,8 @@ jobs:
           LOCATION=${{ secrets.LOCATION }} \
           ENVIRONMENT=${{ inputs.environment }} \
           DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }} \
-          DEVCONTAINER_IMAGE_IMAGE=flowehr/devcontainer \
-          DEVCONTAINER_TAG=${{ steps.dc.outputs.tag }} \
+          DEVCONTAINER_IMAGE_NAME=flowehr/devcontainer \
+          DEVCONTAINER_TAG= ${{ needs.make_core.outputs.dc_tag }} \
           ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }} \
           LOCAL_MODE=false \
           make ${{ inputs.command }}
