@@ -33,6 +33,7 @@ terraform {
     ${include.root.locals.required_provider_azuread}
     ${include.root.locals.required_provider_random}
     ${include.root.locals.required_provider_databricks}
+    ${include.root.locals.required_provider_null}
   }
 }
 EOF
