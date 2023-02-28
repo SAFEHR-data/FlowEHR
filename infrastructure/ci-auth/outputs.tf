@@ -12,23 +12,23 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-data "azurerm_virtual_network" "core" {
-  name                = var.core_vnet_name
-  resource_group_name = var.core_rg_name
+output "clientId" {
+  value = azuread_application.ci_app.application_id
 }
 
-data "azurerm_private_dns_zone" "blobcore" {
-  name                = "privatelink.blob.core.windows.net"
-  resource_group_name = var.core_rg_name
+output "clientSecret" {
+  value     = azuread_application_password.ci_app.value
+  sensitive = true
 }
 
-data "azurerm_client_config" "current" {}
+output "tenantId" {
+  value = data.azurerm_client_config.current.tenant_id
+}
 
-# get the MSGraph app
-data "azuread_application_published_app_ids" "well_known" {}
+output "subscriptionId" {
+  value = data.azurerm_client_config.current.subscription_id
+}
 
-data "azurerm_virtual_network" "peered_data_source_networks" {
-  for_each            = local.peerings
-  name                = each.value.virtual_network_name
-  resource_group_name = each.value.resource_group_name
+output "resourceManagerEndpointUrl" {
+  value = "management.azure.com"
 }
