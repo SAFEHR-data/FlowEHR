@@ -38,10 +38,11 @@ while IFS=$'\n' read -r repo _; do
   # If the directory with checked out repo already exists, remove it
   dir_name=$(basename "${repo}" | sed -e 's/\.git$//')
   if [ -d "${dir_name}" ]; then
-    rm -rf "${dir_name}"
+    echo "${dir_name} already exists. Not cloning"
+  else
+    eval "${REPO_CHECKOUT_COMMAND}" "${repo}"
   fi
 
-  eval "${REPO_CHECKOUT_COMMAND}" "${repo}"
 done < <(yq e -I=0 '.repositories[]' "${CONFIG_PATH}")
 
 popd > /dev/null

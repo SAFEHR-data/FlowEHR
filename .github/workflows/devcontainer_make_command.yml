@@ -125,7 +125,7 @@ jobs:
         with:
           imageName: ${{ steps.dc.outputs.image_path }}
           imageTag: ${{ steps.dc.outputs.tag }}
-          runCmd: make deploy-core
+          runCmd: make infrastructure-core
           push: never
           env: |
             DOCKER_BUILDKIT=1
@@ -149,7 +149,7 @@ jobs:
             GITHUB_REPOSITORY=${{ github.repository }}
 
   make:
-    if: ${{ inputs.command }} != 'deploy-core'
+    if: ${{ inputs.command }} != 'infrastructure-core'
     needs: [make_core]
     runs-on: ${{ needs.make_core.outputs.dc_runner_name }}
     environment: ${{ inputs.environment }}

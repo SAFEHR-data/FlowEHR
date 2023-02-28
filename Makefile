@@ -74,8 +74,8 @@ infrastructure-transform: bootstrap transform-artifacts ## Deploy transform infr
 	&& cd ${MAKEFILE_DIR}/infrastructure/transform \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
 
-PIPELINE_DIR = ${MAKEFILE_DIR}/transform/pipelines
 transform-artifacts: ## Build transform artifacts
+	${MAKEFILE_DIR}/scripts/pipeline_repo_checkout.sh \
 	${MAKEFILE_DIR}/scripts/build_artifacts.sh
 
 infrastructure-serve: bootstrap ## Deploy serve infrastructure
