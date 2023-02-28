@@ -78,6 +78,11 @@ deploy-serve: bootstrap ## Deploy serve infrastructure
 	&& cd ${MAKEFILE_DIR}/infrastructure/serve \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
 
+deploy-hosting: 
+	$(call target_title, "Deploy Hosting Infrastructure") \
+	&& cd ${MAKEFILE_DIR}/infrastructure/serve/hosting \
+	&& terragrunt run-all apply --terragrunt-non-interactive
+
 destroy: az-login ## Destroy all infrastructure
 	$(call target_title, "Destroy All") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
