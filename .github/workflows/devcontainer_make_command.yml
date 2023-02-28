@@ -114,6 +114,11 @@ jobs:
             ENVIRONMENT=${{ inputs.environment }}
             DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
 
+      - name: ACR Login
+        if: steps.acr_login.conclusion == 'failure'
+        run: |
+          az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
+
       - name: Push devcontainer
         run: |
           docker push ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
