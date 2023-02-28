@@ -51,9 +51,13 @@ resource "azurerm_container_group" "build_agent" {
     password = data.azurerm_container_registry.devcontainer[0].admin_password
     server   = data.azurerm_container_registry.devcontainer[0].login_server
   }
+
+  lifecycle {
+    ignore_changes = [container]
+  }
 }
 
-## TF ensure container is running as 
+## TF ensure container is running as it may have been deployed and is now stopped
 resource "null_resource" "ensure_build_agent_is_running" {
 
   provisioner "local-exec" {
