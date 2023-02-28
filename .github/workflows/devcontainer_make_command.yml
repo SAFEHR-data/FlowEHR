@@ -115,7 +115,7 @@ jobs:
             DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
 
       - name: ACR Login
-        if: steps.acr_login.conclusion == 'failure'
+        if: steps.acr_login.outcome == 'failure'
         run: |
           az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
 
