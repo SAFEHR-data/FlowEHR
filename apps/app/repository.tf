@@ -12,14 +12,14 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-resource "github_repository" "example" {
-  name        = "example"
-  description = "My awesome codebase"
+resource "github_repository" "app" {
+  name        = var.app_id
+  description = var.app_config.description
   visibility  = "private"
 
   template {
-    owner      = "github"
-    repository = "terraform-template-module"
+    owner      = "UCLH-Foundry"
+    repository = var.managed_repo.template
   }
 }
 
