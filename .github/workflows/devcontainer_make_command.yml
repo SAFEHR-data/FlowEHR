@@ -28,7 +28,7 @@ on:
       suffix_override:
         type: string
         required: false
-        description: An override for the naming suffix
+        description: An override for the naming suffix. If defined the core address space is random
       sha:
         type: string
         required: false
@@ -50,6 +50,9 @@ on:
         required: true
       ORG_GH_TOKEN:
         required: true
+      DATA_SOURCE_CONNECTIONS:
+        required: false
+        # default: "[]"
 
 jobs:
   make_core:
@@ -89,6 +92,8 @@ jobs:
 
       - name: Bootstrap
         uses: devcontainers/ci@v0.2
+        env:
+          ORG_GH_TOKEN: "${{ secrets.ORG_GH_TOKEN }}"
         with:
           imageName: ${{ steps.dc.outputs.image_path }}
           cacheFrom: ${{ steps.dc.outputs.image_path }}
@@ -134,6 +139,8 @@ jobs:
             DEVCONTAINER_IMAGE_NAME=flowehr/devcontainer
             DEVCONTAINER_TAG=${{ steps.dc.outputs.tag }}
             ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
+            DATA_SOURCE_CONNECTIONS=${{ (secrets.DATA_SOURCE_CONNECTIONS != '' && secrets.DATA_SOURCE_CONNECTIONS) || '[]' }}
+            USE_RANDOM_ADDRESS_SPACE=${{ (inputs.suffix_override != '' && '1') || '0' }}
             LOCAL_MODE=false
             GITHUB_RUNNER_NAME=${{ steps.dc.outputs.runner_name }}
             GITHUB_RUNNER_TOKEN=${{ secrets.GH_RUNNER_CREATE_TOKEN }}

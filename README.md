@@ -42,19 +42,19 @@ For the full reference of possible configuration values, see the [config schema 
 
 2. Run `make all`
 
-    To bootstrap Terraform, and deploy all infrastructure, run
+    To bootstrap Terraform, and deploy all infrastructure and apps, run
 
     ```bash
     make all
     ```
 
-    Alternatively, you can deploy individual modules separately with their corresponding make command:
+    Alternatively, you can deploy just infrastructure:
 
     ```bash
-    make deploy-core
+    make infrastructure
     ```
 
-    To see all options:
+    You can also deploy individual infrastructure modules, as well as destroy and other operations. To see all options:
 
     ```bash
     make help
@@ -65,25 +65,30 @@ For the full reference of possible configuration values, see the [config schema 
 CI deployment workflows are run in [Github environments](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment). These should
 be created in a private repository created from this template repository.
 
-1. Create a service principal
+This step will create an AAD Application and Service Principal in the specified tenancy, and grant that service principal permissions in Azure and AAD needed for deployment. These are detailed below. 
 
-    CI deployments require a service principal with access to deploy resources
-    in the subscription. One will be required for each subscription into which the
-    environment deploys. Create one with:
+> _NOTE_: The user following the steps below will need to be an `Owner` of the target Azure Subscription as well as a `Global Administrator` in AAD.
+
+1. Open this repo in the dev container, and create the `config.yaml` file as outlined above.
+
+2. Create the service principal with required AAD permissions: 
 
     ```bash
-    subscription_id=<e.g 00000000-0000-0000-0000-00000000>
-    az ad sp create-for-rbac --name "sp-flowehr-cicd" --role Owner --scopes "/subscriptions/${subscription_id}"
+    make ci-auth
     ```
 
-    The output will be used in the next step.
+    _NOTE_: CI deployments require a service principal with access to deploy resources
+    in the subscription, and the following permissions within the associated AAD tenancy:
+    - `Application.ReadWrite.All`: Required to query the directory for the MSGraph app, and create applications used to administer the SQL Server.   
+    - `AppRoleAssignment.ReadWrite.All`: Required to assign the following permissions to the System Managed Identity for SQL Server. 
 
+    - Copy the block of JSON from the terminal for the next step.
 
-2. Create and populate a GitHub environment
+1. Create and populate a GitHub environment
 
     Add an environment called `Infra-Test` with the following secrets:
 
-    - `AZURE_CREDENTIALS`: json containing the credentials of the service principal in the format:
+    - `AZURE_CREDENTIALS`: json containing the credentials of the service principal (outputted from the previous step) in the following format:
 
         ```json
         {
@@ -99,8 +104,45 @@ be created in a private repository created from this template repository.
     - `LOCATION`: Name of an Azure location e.g. `uksouth`. These can be listed with `az account list-locations -o table`
     - `ENVIRONMENT`: Name of the environment e.g. `dev`, also used to name resources
     - `DEVCONTAINER_ACR_NAME`: Name of the Azure Container Registry to use for the devcontainer build. This may or may not exist. e.g. `flowehrmgmtacr`
+    - [Optional] `DATA_SOURCE_CONNECTIONS`: *single line* json containing connectivity information to data sources in the format:
     - `GH_RUNNER_CREATE_TOKEN` GitHub [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) with scopes to "Read access to metadata" and "Read and Write access to administration" on this repository.
+
+    ```json
+    [
+    {
+        "name": "xxx",
+        "peering": {
+            "virtual_network_name": "xxx",
+            "resource_group_name": "xxx",
+            "dns_zones": [
+                "privatelink.xxx.xxx.azure.com"
+            ]
+        },
+        "connection_string": "postgresql://<hostname>:5432/<database-name>?user=<username>&password=<***>"
+    }
+    ]
+    ```
 
 3. Run `Deploy Infra-Test`
 
     Trigger a deployment using a workflow dispatch trigger on the `Actions` tab.
+
+## Identities
+
+This table summarises the various authentication identities involved in the deployment and operation of FlowEHR:
+
+| Name | Type | Access Needed | Purpose |
+|--|--|--|--|
+| Local Developer | User context of developer running `az login` | Azure: `Owner`. <br/> AAD: Either `Global Administrator` or `Priviliged Role Administrator`. | To automate the deployment of resources and identities during development |
+| `sp-flowehr-cicd-<naming-suffix>` | App / Service Principal | Azure: `Owner`. <br/>AAD: `Application.ReadWrite.All` / `AppRoleAssignment.ReadWrite.All` | Context for GitHub runner for CICD. Needs to query apps, create new apps (detailed below), and assign roles to identities |
+| `flowehr-sql-owner-<naming-suffix>` | App / Service Principal | AAD Administrator of SQL Feature Data Store | Used to connect to SQL as a Service Principal, and create logins + users during deployment |
+| `flowehr-databricks-datawriter-<naming-suffix>` | App / Service Principal | No access to resources or AAD. Added as a `db_owner` of the Feature Data Store database. Credentials stored in databricks secrets to be used in saving features to SQL |
+| `sql-server-features-<naming-suffix>` | System Managed Identity | AAD: `User.Read.All` / `GroupMember.Read.All` / `Application.Read.All` | For SQL to accept AAD connections |
+
+## Common issues
+
+### Inconsistent dependency lock file
+
+When deploying locally, you might encounter an error message from Terraform saying you have inconsistent lock files. This is likely due to an update to some of the provider configurations and lock files upstream, that when pulled down to your machine, might not match the cached providers you have locally from a previous deployment.
+
+The easiest fix is to run `make tf-init`, which will re-initialise these caches in all of the Terraform modules to match the lock files.

@@ -12,18 +12,30 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-output "cosmos_account_name" {
-  value = azurerm_cosmosdb_account.serve.name
+include "root" {
+  path = find_in_parent_folders()
+  expose = true
 }
 
-output "app_service_plan_name" {
-  value = azurerm_service_plan.serve.name
+generate "terraform" {
+  path      = "terraform.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+terraform {
+  required_version = "${include.root.locals.terraform_version}"
+
+  required_providers {
+    ${include.root.locals.required_provider_azuread}
+  }
+}
+EOF
 }
 
-output "acr_name" {
-  value = azurerm_container_registry.serve.name
-}
-
-output "webapps_subnet_id" {
-  value = azurerm_subnet.serve_webapps.id
+remote_state {
+  backend = "local"
+  config = {}
+  generate = {
+    path      = "backend.tf"
+    if_exists = "overwrite_terragrunt"
+  }
 }

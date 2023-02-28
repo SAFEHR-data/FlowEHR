@@ -39,3 +39,7 @@ output "core_kv_uri" {
 output "subnet_address_spaces" {
   value = local.subnet_address_spaces
 }
+
+output "core_log_analytics_name" {
+  value = azurerm_log_analytics_workspace.core.name
+}

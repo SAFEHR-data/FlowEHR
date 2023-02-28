@@ -12,18 +12,23 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-output "cosmos_account_name" {
-  value = azurerm_cosmosdb_account.serve.name
+output "clientId" {
+  value = azuread_application.ci_app.application_id
 }
 
-output "app_service_plan_name" {
-  value = azurerm_service_plan.serve.name
+output "clientSecret" {
+  value     = azuread_application_password.ci_app.value
+  sensitive = true
 }
 
-output "acr_name" {
-  value = azurerm_container_registry.serve.name
+output "tenantId" {
+  value = data.azurerm_client_config.current.tenant_id
 }
 
-output "webapps_subnet_id" {
-  value = azurerm_subnet.serve_webapps.id
+output "subscriptionId" {
+  value = data.azurerm_client_config.current.subscription_id
+}
+
+output "resourceManagerEndpointUrl" {
+  value = "management.azure.com"
 }

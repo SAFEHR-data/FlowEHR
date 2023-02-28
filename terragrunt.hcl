@@ -13,7 +13,6 @@
 #  limitations under the License.
 
 terraform {
-  # Pass arguments to terraform commands
   extra_arguments "auto_approve" {
     commands  = ["apply"]
     arguments = ["-auto-approve"]
@@ -53,7 +52,7 @@ EOF
   required_provider_azuread = <<EOF
 azuread = {
   source  = "hashicorp/azuread"
-  version = "2.33.0" # pinned due to https://github.com/hashicorp/terraform-provider-azuread/issues/1017
+  version = "2.35.0"
 }
 EOF
 
@@ -80,6 +79,13 @@ EOF
 
   required_provider_null = <<EOF
     null = {
+      source = "hashicorp/null"
+      version = "3.2.1"
+    }
+EOF
+
+  required_provider_null = <<EOF
+  null = {
       source = "hashicorp/null"
       version = "3.2.1"
     }
@@ -129,6 +135,7 @@ inputs = {
   truncated_naming_suffix = get_env("TRUNCATED_NAMING_SUFFIX")
   deployer_ip_address = get_env("DEPLOYER_IP_ADDRESS", "") # deployer's IP address is added to resource firewall exceptions IF in local_mode
   local_mode = get_env("LOCAL_MODE", false)
+  core_address_space = get_env("CORE_ADDRESS_SPACE")
   tags = {
     environment = get_env("ENVIRONMENT")
   }

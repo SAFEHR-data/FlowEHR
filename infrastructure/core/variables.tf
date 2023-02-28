@@ -34,7 +34,6 @@ variable "tags" {
 variable "core_address_space" {
   type        = string
   description = "The CIDR address space for the core virtual network (must be a min of /24)"
-  default     = "10.0.0.0/24"
 }
 
 variable "deployer_ip_address" {

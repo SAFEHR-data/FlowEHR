@@ -12,18 +12,10 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-output "cosmos_account_name" {
-  value = azurerm_cosmosdb_account.serve.name
+output "feature_store_server_name" {
+  value = azurerm_mssql_server.sql_server_features.name
 }
 
-output "app_service_plan_name" {
-  value = azurerm_service_plan.serve.name
-}
-
-output "acr_name" {
-  value = azurerm_container_registry.serve.name
-}
-
-output "webapps_subnet_id" {
-  value = azurerm_subnet.serve_webapps.id
+output "feature_store_db_name" {
+  value = azurerm_mssql_database.feature_database.name
 }

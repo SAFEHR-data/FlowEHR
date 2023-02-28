@@ -12,18 +12,9 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-output "cosmos_account_name" {
-  value = azurerm_cosmosdb_account.serve.name
-}
+data "azurerm_client_config" "current" {}
 
-output "app_service_plan_name" {
-  value = azurerm_service_plan.serve.name
-}
+data "azurerm_subscription" "primary" {}
 
-output "acr_name" {
-  value = azurerm_container_registry.serve.name
-}
-
-output "webapps_subnet_id" {
-  value = azurerm_subnet.serve_webapps.id
-}
+# get the MSGraph app
+data "azuread_application_published_app_ids" "well_known" {}

@@ -83,6 +83,8 @@ RUN sudo apt-get update \
 # Install Python dependencies for data transform pipeline
 ARG NUMPY_VERSION="1.24.2"
 ARG DATABRICKS_CLI_VERSION="0.17.4"
+ARG PANDAS_VERSION="1.5.3"
+ARG SQLALCHEMY_VERSION="2.0.4"
 ARG PYODBC_VERSION="4.0.35"
 ARG PYTHON_BUILD_VERSION="0.10.0"
 RUN python3 -m pip install --no-cache-dir \
@@ -90,6 +92,7 @@ RUN python3 -m pip install --no-cache-dir \
     build=="${PYTHON_BUILD_VERSION}" \
     numpy=="${NUMPY_VERSION}" \
     databricks-cli=="${DATABRICKS_CLI_VERSION}"
+RUN python3 -m pip install pyspark=="${SPARK_VERSION}" pyodbc=="${PYODBC_VERSION}" sqlalchemy=="${SQLALCHEMY_VERSION}" pandas=="${PANDAS_VERSION}" build numpy=="${NUMPY_VERSION}" databricks-cli=="${DATABRICKS_CLI_VERSION}" --no-cache-dir
 
 # Get the local Spark installed to be able to run unit tests
 # Borrowed from https://github.com/beandrad/pyspark-sample/blob/main/.devcontainer/Dockerfile#L36

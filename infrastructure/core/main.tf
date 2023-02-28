@@ -102,3 +102,13 @@ resource "azurerm_role_assignment" "deployer_can_administrate_kv" {
   role_definition_name = "Key Vault Administrator"
   principal_id         = data.azurerm_client_config.current.object_id
 }
+
+resource "azurerm_log_analytics_workspace" "core" {
+  name                       = "log-${var.naming_suffix}"
+  location                   = azurerm_resource_group.core.location
+  resource_group_name        = azurerm_resource_group.core.name
+  internet_ingestion_enabled = var.local_mode ? true : false
+  sku                        = "PerGB2018"
+  retention_in_days          = 30
+  tags                       = var.tags
+}
