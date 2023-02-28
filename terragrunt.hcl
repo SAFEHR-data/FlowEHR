@@ -52,7 +52,7 @@ EOF
   required_provider_azuread = <<EOF
 azuread = {
   source  = "hashicorp/azuread"
-  version = "2.33.0" # pinned due to https://github.com/hashicorp/terraform-provider-azuread/issues/1017
+  version = "2.35.0"
 }
 EOF
 
@@ -67,6 +67,13 @@ EOF
  databricks = {
       source = "databricks/databricks"
       version = "1.9.1"
+    }
+EOF
+
+  required_provider_null = <<EOF
+  null = {
+      source = "hashicorp/null"
+      version = "3.2.1"
     }
 EOF
 }

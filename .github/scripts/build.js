@@ -74,8 +74,7 @@ async function getCommandFromComment({ core, context, github }) {
     switch (commandText) {
       case "/test":
         {
-          // Docs only changes don't run tests with secrets so don't require the check for
-          // whether a SHA needs to be supplied
+          // Don't require the check for whether a SHA needs to be supplied
           if (!gotNonDocChanges) {
             command = "test-force-approve";
             const message = `:white_check_mark: PR only contains docs changes - marking tests as complete`;
@@ -98,10 +97,18 @@ async function getCommandFromComment({ core, context, github }) {
           break;
         }
 
-      case "/destroy-env":
+      case "/destroy":
         {
-          command = "destroy-env";
+          command = "destroy";
           const message = `Destroying environment (with refid ${prRefId})`;
+          await addActionComment({ github }, repoOwner, repoName, prNumber, commentUsername, commentLink, message);
+          break;
+        }
+
+      case "/destroy-no-terraform":
+        {
+          command = "destroy-no-terraform";
+          const message = `Destroying environment no terraform (with refid ${prRefId}).	:warning: This will leave orphaned resources`;
           await addActionComment({ github }, repoOwner, repoName, prNumber, commentUsername, commentLink, message);
           break;
         }
@@ -228,7 +235,8 @@ async function showHelp({ github }, repoOwner, repoName, prNumber, commentUser, 
 You can use the following commands:
 &nbsp;&nbsp;&nbsp;&nbsp;/test - deply and destroy
 &nbsp;&nbsp;&nbsp;&nbsp;/test-force-approve - force approval of the PR tests (i.e. skip the deployment checks)
-&nbsp;&nbsp;&nbsp;&nbsp;/destroy-env - delete the validation environment for a PR (e.g. to enable testing a deployment from a clean start after previous tests)
+&nbsp;&nbsp;&nbsp;&nbsp;/destroy - delete the PR environment (e.g. to enable testing a deployment from a clean start after previous tests)
+&nbsp;&nbsp;&nbsp;&nbsp;/destroy-no-terraform - delete the PR environment without terraform
 &nbsp;&nbsp;&nbsp;&nbsp;/help - show this help`;
 
   await addActionComment({ github }, repoOwner, repoName, prNumber, commentUser, commentLink, body);
