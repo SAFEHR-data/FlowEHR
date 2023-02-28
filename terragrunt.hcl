@@ -76,6 +76,13 @@ EOF
       version = "3.2.1"
     }
 EOF
+
+  required_provider_github = <<EOF
+  github = {
+      source  = "integrations/github"
+      version = "~> 5.0"
+    }
+EOF
 }
 
 generate "terraform" {

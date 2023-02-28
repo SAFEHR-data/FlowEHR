@@ -12,4 +12,13 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-// TODO: GH stuff will go here
+resource "github_repository" "example" {
+  name        = "example"
+  description = "My awesome codebase"
+  visibility  = "private"
+
+  template {
+    owner      = "github"
+    repository = "terraform-template-module"
+  }
+}
