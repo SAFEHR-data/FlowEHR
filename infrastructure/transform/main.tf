@@ -59,6 +59,8 @@ resource "databricks_cluster" "fixed_single_node" {
   spark_conf = {
     "spark.databricks.cluster.profile" : "singleNode"
     "spark.master" : "local[*]"
+    "spark.secret.sql_app_id" : "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_spn_app_id.key}}}"
+    "spark.secret.sql_app_secret" : "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_spn_app_secret.key}}}"
   }
 
   custom_tags = {
