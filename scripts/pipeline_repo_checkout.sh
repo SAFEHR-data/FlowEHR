@@ -38,6 +38,7 @@ while IFS=$'\n' read -r repo _; do
   # If the directory with checked out repo already exists, pull the latest
   dir_name=$(basename "${repo}" | sed -e 's/\.git$//')
   if [ -d "${dir_name}" ]; then
+    # This will fail if there are local changes present
     eval "${GIT_COMMAND} pull ${repo}"
   else
     eval "${GIT_COMMAND} clone ${repo}"
