@@ -23,7 +23,9 @@ define terragrunt  # Arguments: <command>, <folder name>
     $(call target_title, "Running: terragrunt $(1) on $(2)") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/$(2) \
-	&& terragrunt run-all $(1) --terragrunt-include-external-dependencies --terragrunt-non-interactive
+	&& terragrunt run-all $(1) --terragrunt-include-external-dependencies \
+		--terragrunt-non-interactive \
+		--terragrunt-exclude-dir ${MAKEFILE_DIR}/infrastructure/ci-auth
 endef
 
 all: bootstrap infrastructure apps
