@@ -62,8 +62,39 @@ jobs:
       dc_tag: ${{ steps.dc.outputs.tag }}
       dc_image_path: ${{ steps.dc.outputs.image }}
       dc_runner_name: ${{ steps.dc.outputs.runner_name }}
+      build_agent_command: ${{ steps.post_make_core_commands.build_agent_command }}
+      post_build_agent_command: ${{ steps.post_make_core_commands.post_build_agent_command }}
 
     steps:
+      - name: Set devcontainer attributes
+        id: dc
+        run: |
+          echo "tag=${{ inputs.environment }}" >> $GITHUB_OUTPUT
+          echo "image_path=${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer" >> $GITHUB_OUTPUT
+          echo "runner_name=dc-${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}" >> $GITHUB_OUTPUT
+
+      - name: Set make commands to execute after the core deployment
+        id: post_make_core_commands
+        run: |
+          build_agent_command="none"
+          post_build_agent_command="none"
+
+          if echo ${{ inputs.command }} | grep -q "test" ; then
+              build_agent_command="${command}-without-core-destroy"
+              post_build_agent_command="destroy"
+          elif [ ${{ inputs.command }} = "destroy" ]; then
+              build_agent_command="destroy-non-core"
+              post_build_agent_command="destroy"
+          elif echo ${{ inputs.command }} | grep -q "infrastructure"; then
+              build_agent_command="$command"
+          fi
+
+          echo "Running ${build_agent_command} on the build agent"
+          echo "Running ${post_build_agent_command} teardown"
+
+          echo "build_agent_command=${build_agent_command}" >> $GITHUB_OUTPUT
+          echo "post_build_agent_command=${post_build_agent_command}" >> $GITHUB_OUTPUT
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -82,13 +113,6 @@ jobs:
         continue-on-error: true  # ACR may not exist yet
         run: |
           az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
-
-      - name: Set devcontainer attributes
-        id: dc
-        run: |
-          echo "tag=${{ inputs.environment }}" >> $GITHUB_OUTPUT
-          echo "image_path=${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer" >> $GITHUB_OUTPUT
-          echo "runner_name=dc-${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}" >> $GITHUB_OUTPUT
 
       - name: Bootstrap
         uses: devcontainers/ci@v0.2
@@ -153,8 +177,8 @@ jobs:
             GITHUB_RUNNER_TOKEN=${{ secrets.GH_RUNNER_CREATE_TOKEN }}
             GITHUB_REPOSITORY=${{ github.repository }}
 
-  make:
-    if: ${{ inputs.command }} != 'infrastructure-core'
+  build_agent_make:
+    if: ${{ needs.make_core.outputs.build_agent_command }} != 'none'
     needs: [make_core]
     runs-on: ${{ needs.make_core.outputs.dc_runner_name }}
     environment: ${{ inputs.environment }}
@@ -185,4 +209,48 @@ jobs:
           DEVCONTAINER_TAG: ${{ needs.make_core.outputs.dc_tag }}
           ORG_GH_TOKEN: ${{ secrets.ORG_GH_TOKEN }}
         run: |
-          make ${{ inputs.command }}
+          make ${{ needs.make_core.outputs.build_agent_command }}
+
+  post_build_agent_make:
+    if: ${{ needs.make_core.outputs.post_build_agent_command }} != 'none'
+    needs: [build_agent_make]
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.sha }}
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
+
+      - name: ACR Login
+        run: az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
+
+      - name: Post build agent command
+        uses: devcontainers/ci@v0.2
+        env:
+          ORG_GH_TOKEN: "${{ secrets.ORG_GH_TOKEN }}"
+        with:
+          imageName: ${{ needs.make_core.outputs.dc_image_path }}
+          cacheFrom: ${{ needs.make_core.outputs.dc_image_path }}
+          imageTag: ${{ needs.make_core.outputs.dc_tag }}
+          runCmd: make ${{ needs.make_core.outputs.post_build_agent_command }}
+          push: never
+          env: |
+            DOCKER_BUILDKIT=1
+            TF_IN_AUTOMATION=1
+            ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}
+            ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
+            ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
+            ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
+            ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
+            SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
+            LOCATION=${{ secrets.LOCATION }}
+            ENVIRONMENT=${{ inputs.environment }}
+            DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}

@@ -17,7 +17,7 @@ resource "azurerm_container_group" "build_agent" {
   name                = "cg-build-agent-${var.naming_suffix}"
   resource_group_name = azurerm_resource_group.core.name
   location            = azurerm_resource_group.core.location
-  subnet_ids          = [azurerm_subnet.core_containers.id]
+  subnet_ids          = [azurerm_subnet.core_container.id]
   ip_address_type     = "Private"
   os_type             = "Linux"
   restart_policy      = "Never"
@@ -60,6 +60,7 @@ resource "azurerm_container_group" "build_agent" {
 
 ## TF ensure container is running as it may have been deployed and is now stopped
 resource "null_resource" "ensure_build_agent_is_running" {
+  count = var.local_mode == true ? 0 : 1
 
   triggers = {
     always_run = timestamp()

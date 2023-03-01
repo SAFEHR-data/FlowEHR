@@ -44,8 +44,11 @@ if az acr list | grep -q "$DEVCONTAINER_ACR_NAME"; then
    echo "ACR already exists. Not attempting to create it"
 else
    az acr create --resource-group "$MGMT_RG" --name "$DEVCONTAINER_ACR_NAME" --sku Basic --admin-enabled true -o table
-   echo "Waiting for the ACR to become availible for push..." 
-   sleep 60
+
+   if [ "${LOCAL_MODE}" != "true" ]; then
+      echo "Waiting for the ACR to become availible for push..." 
+      sleep 60
+   fi
 fi
 
 echo "Bootstrapping complete."
