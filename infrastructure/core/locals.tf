@@ -13,5 +13,12 @@
 #  limitations under the License.
 
 locals {
-  subnet_address_spaces = cidrsubnets(var.core_address_space, 3, 3, 2, 2, 2)
+  # Split the /24 address space into (30, 30, 62, 62, 62) usable IP addresses
+  # for the different terraform modules/required delegations
+  subnet_address_spaces              = cidrsubnets(var.core_address_space, 3, 3, 2, 2, 2)
+  core_shared_address_space          = local.subnet_address_spaces[0]
+  core_container_address_space       = local.subnet_address_spaces[1]
+  databricks_host_address_space      = local.subnet_address_spaces[2]
+  databricks_container_address_space = local.subnet_address_spaces[3]
+  serve_webapps_address_space        = local.subnet_address_spaces[4]
 }

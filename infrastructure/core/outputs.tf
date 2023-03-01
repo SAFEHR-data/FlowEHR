@@ -36,8 +36,20 @@ output "core_kv_uri" {
   value = azurerm_key_vault.core.vault_uri
 }
 
-output "subnet_address_spaces" {
-  value = local.subnet_address_spaces
+output "core_shared_address_space" {
+  value = local.core_shared_address_space
+}
+
+output "databricks_host_address_space" {
+  value = local.databricks_host_address_space
+}
+
+output "databricks_container_address_space" {
+  value = local.databricks_container_address_space
+}
+
+output "serve_webapps_address_space" {
+  value = local.serve_webapps_address_space
 }
 
 output "core_log_analytics_name" {

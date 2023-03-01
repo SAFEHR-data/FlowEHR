@@ -30,15 +30,15 @@ resource "azurerm_subnet" "core_shared" {
   name                 = "subnet-core-shared-${var.naming_suffix}"
   resource_group_name  = azurerm_resource_group.core.name
   virtual_network_name = azurerm_virtual_network.core.name
-  address_prefixes     = [local.subnet_address_spaces[0]]
+  address_prefixes     = [local.core_shared_address_space]
   service_endpoints    = ["Microsoft.KeyVault", "Microsoft.Storage"]
 }
 
-resource "azurerm_subnet" "core_containers" {
+resource "azurerm_subnet" "core_container" {
   name                 = "subnet-core-containers-${var.naming_suffix}"
   resource_group_name  = azurerm_resource_group.core.name
   virtual_network_name = azurerm_virtual_network.core.name
-  address_prefixes     = [local.subnet_address_spaces[1]]
+  address_prefixes     = [local.core_container_address_space]
 
   delegation {
     name = "delegation-core-containers-${var.naming_suffix}"

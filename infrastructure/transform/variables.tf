@@ -28,8 +28,12 @@ variable "access_databricks_management_publicly" {
   default     = true
 }
 
-variable "subnet_address_spaces" {
-  type = list(string)
+variable "databricks_host_address_space" {
+  type = string
+}
+
+variable "databricks_container_address_space" {
+  type = string
 }
 
 variable "tags" {
