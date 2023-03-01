@@ -38,6 +38,14 @@ az-login: ## Check logged in/log into azure with a service principal
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& . ${MAKEFILE_DIR}/scripts/az_login.sh
 
+ci-auth: ## Deploy an AAD app with permissions to use for CI builds
+	$(call target_title, "Log-in to Azure") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& . ${MAKEFILE_DIR}/scripts/az_login.sh \
+	&& cd ${MAKEFILE_DIR}/infrastructure/ci-auth \
+	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive \
+	&& terraform output -json | jq 'with_entries(.value |= .value)'
+
 bootstrap: az-login ## Boostrap Terraform backend
 	$(call target_title, "Bootstrap") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
