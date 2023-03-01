@@ -80,17 +80,17 @@ jobs:
           post_build_agent_command="none"
 
           if echo ${{ inputs.command }} | grep -q "test" ; then
-              build_agent_command="${command}-without-core-destroy"
+              build_agent_command="${{ inputs.command }}-without-core-destroy"
               post_build_agent_command="destroy"
           elif [ ${{ inputs.command }} = "destroy" ]; then
               build_agent_command="destroy-non-core"
               post_build_agent_command="destroy"
           elif echo ${{ inputs.command }} | grep -q "infrastructure"; then
-              build_agent_command="$command"
+              build_agent_command="${{ inputs.command }}"
           fi
 
-          echo "Running ${build_agent_command} on the build agent"
-          echo "Running ${post_build_agent_command} teardown"
+          echo "Running [${build_agent_command}] on the build agent"
+          echo "Running [${post_build_agent_command}] teardown"
 
           echo "build_agent_command=${build_agent_command}" >> $GITHUB_OUTPUT
           echo "post_build_agent_command=${post_build_agent_command}" >> $GITHUB_OUTPUT

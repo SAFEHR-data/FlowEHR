@@ -16,8 +16,8 @@ name: Deploy Infra-Test
 
 on:
   push:
-    # branches: [main]
-    # TODO uncomment
+  #   branches: [main]
+  # TODO: revert
   workflow_dispatch:
 
 permissions:
@@ -28,6 +28,6 @@ jobs:
     uses: ./.github/workflows/devcontainer_make_command.yml
     name: Make Infrastructure
     with:
-      command: infrastructure
+      command: test #infrastructure  # TODO: revert
       environment: Infra-Test
     secrets: inherit
