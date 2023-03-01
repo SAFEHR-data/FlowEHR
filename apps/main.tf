@@ -28,5 +28,6 @@ module "app" {
   cosmos_account_name       = var.serve_cosmos_account_name
   feature_store_db_name     = var.transform_feature_store_db_name
   feature_store_server_name = var.transform_feature_store_server_name
+  github_owner              = var.github_owner
   app_config                = each.value
 }

@@ -38,9 +38,7 @@ generate "provider" {
   contents  = <<EOF
 ${include.root.locals.azure_provider}
 
-provider "github" {
-  owner = "${get_env("GITHUB_OWNER")}"
-}
+provider "github" {}
 EOF
 }
 
@@ -69,4 +67,6 @@ inputs = {
   serve_acr_name              = dependency.serve.outputs.acr_name
   serve_cosmos_account_name   = dependency.serve.outputs.cosmos_account_name
   serve_webapps_subnet_id     = dependency.serve.outputs.webapps_subnet_id
+
+  github_owner = get_env(GITHUB_OWNER)
 }

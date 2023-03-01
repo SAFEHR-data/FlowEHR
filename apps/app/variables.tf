@@ -74,6 +74,10 @@ variable "feature_store_server_name" {
   type = string
 }
 
+variable "github_owner" {
+  type = string
+}
+
 variable "app_config" {
   type = object({
     name        = string

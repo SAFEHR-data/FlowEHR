@@ -25,7 +25,7 @@ resource "github_repository" "app" {
 
 resource "github_team" "owners" {
   name        = "${var.app_id} - owners"
-  description = "Owners of the ${var.app_id} FlowEHR app."
+  description = "Owners of the ${var.app_id} FlowEHR app (with write/push permissions)."
 }
 
 resource "github_team_members" "owners" {
@@ -40,9 +40,30 @@ resource "github_team_members" "owners" {
   }
 }
 
+resource "github_team_repository" "owners_repo_permissions" {
+  team_id    = github_team.owners.id
+  repository = github_repository.app.name
+  permission = "push"
+}
+
+resource "github_repository_file" "codeowners" {
+  repository          = github_repository.app.name
+  branch              = var.environment
+  file                = "CODEOWNERS"
+  content             = <<EOF
+# Owners for branch protection
+# Users within this team are required reviewers for this deployment branch
+*       @${github_owner}/${github_team.owners.slug}
+EOF
+  commit_message      = "Add codeowners (managed by Terraform)"
+  commit_author       = "Terraform"
+  commit_email        = "terraform@flowehr.io"
+  overwrite_on_create = true
+}
+
 resource "github_team" "contributors" {
   name        = "${var.app_id} - contributors"
-  description = "Contributors to the ${var.app_id} FlowEHR app (with push permissions)."
+  description = "Contributors to the ${var.app_id} FlowEHR app (with read/pull permissions)."
 }
 
 resource "github_team_members" "contributors" {
@@ -60,7 +81,7 @@ resource "github_team_members" "contributors" {
 resource "github_team_repository" "contributors_repo_permissions" {
   team_id    = github_team.contributors.id
   repository = github_repository.app.name
-  permission = "push"
+  permission = "pull"
 }
 
 resource "github_branch" "deployment" {

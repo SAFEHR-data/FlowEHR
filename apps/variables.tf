@@ -73,3 +73,7 @@ variable "serve_acr_name" {
 variable "serve_webapps_subnet_id" {
   type = string
 }
+
+variable "github_owner" {
+  type = string
+}
