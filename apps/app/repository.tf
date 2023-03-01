@@ -56,6 +56,13 @@ resource "github_repository_environment" "app" {
   environment = var.environment
 }
 
+resource "github_actions_environment_secret" "acr_name" {
+  repository      = github_repository.app.name
+  environment     = github_repository_environment.app.environment
+  secret_name     = "ACR_NAME"
+  plaintext_value = data.azurerm_container_registry.serve.name
+}
+
 resource "github_actions_environment_secret" "acr_token_username" {
   repository      = github_repository.app.name
   environment     = github_repository_environment.app.environment
