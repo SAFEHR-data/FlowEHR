@@ -62,8 +62,8 @@ jobs:
       dc_tag: ${{ steps.dc.outputs.tag }}
       dc_image_path: ${{ steps.dc.outputs.image }}
       dc_runner_name: ${{ steps.dc.outputs.runner_name }}
-      build_agent_command: ${{ steps.post_make_core_commands.build_agent_command }}
-      post_build_agent_command: ${{ steps.post_make_core_commands.post_build_agent_command }}
+      build_agent_command: ${{ steps.post_core.outputs.build_agent_command }}
+      post_build_agent_command: ${{ steps.post_core.outputs.post_build_agent_command }}
 
     steps:
       - name: Set devcontainer attributes
@@ -74,7 +74,7 @@ jobs:
           echo "runner_name=dc-${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}" >> $GITHUB_OUTPUT
 
       - name: Set make commands to execute after the core deployment
-        id: post_make_core_commands
+        id: post_core
         run: |
           build_agent_command="none"
           post_build_agent_command="none"
