@@ -86,6 +86,7 @@ variable "app_config" {
     }))
 
     managed_repo = object({
+      private          = bool
       template         = string,
       branch_approvers = list(string)
     })

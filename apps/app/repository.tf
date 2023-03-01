@@ -15,8 +15,7 @@
 resource "github_repository" "app" {
   name        = var.app_id
   description = var.app_config.description
-  visibility  = "public" # TODO: change to private after testing
-
+  visibility  = var.app_config.managed_repo.private ? "private" : "public"
   template {
     owner      = "UCLH-Foundry"
     repository = var.app_config.managed_repo.template

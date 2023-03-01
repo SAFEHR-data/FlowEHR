@@ -7,6 +7,7 @@ dash_seedling: # unique ID for the app
     - email: contributor@mycompany.com
       gh_username: octocat
   managed_repo: # details for created repo
+    private: false # repo visibility
     template: Dash-Seedling
     branch_approvers:
       - important_persons_gh_username
