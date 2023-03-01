@@ -13,5 +13,6 @@
 #  limitations under the License.
 
 locals {
-  apps = yamldecode(file("apps.yaml"))
+  apps_config = "apps.yaml"
+  apps        = fileexists(local.apps_config) ? yamldecode(file(local.apps_config)) : {}
 }
