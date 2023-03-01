@@ -17,6 +17,7 @@ module "app" {
   source                    = "./app"
   app_id                    = each.key
   naming_suffix             = var.naming_suffix
+  environment               = var.environment
   local_mode                = var.local_mode
   webapps_subnet_id         = var.serve_webapps_subnet_id
   resource_group_name       = var.core_rg_name

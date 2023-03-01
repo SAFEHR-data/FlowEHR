@@ -39,8 +39,7 @@ generate "provider" {
 ${include.root.locals.azure_provider}
 
 provider "github" {
-  owner = ${get_env("GH_OWNER")}
-  token = ${get_env("GH_TOKEN")}
+  owner = "${get_env("GITHUB_OWNER")}"
 }
 EOF
 }

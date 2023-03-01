@@ -10,23 +10,15 @@ For FlowEHR to create and manage repositories for FlowEHR Apps, it needs a [GitH
 
 > You will need the appropriate permissions to create PATs in the scope of your organisation.
 
-Follow the instructions [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-fine-grained-personal-access-token) to create a fine-grained token. For `Resource owner`, select the appropriate GitHub organisation which will contain the repositories created by FlowEHR (or select yourself if desired).
+Follow the instructions [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#personal-access-tokens-classic) to create a classic token (fine-grained tokens don't currently support the GitHub GraphQL API which we require).
 
 Then, make sure you have enabled the following permissions:
 
-#### Repository permissions
+- `repo`
+- `write:org`
+- `delete_repo`
 
-- `Administration`: `Read and write`
-- `Environments`: `Read and write`
-- `Metadata`: `Read`
-- `Secrets`: `Read and write`
-- `Variables`: `Read and write`
-
-#### Organisation permissions
-
-- `Members`: `Read and write`
-
-When ready, click `Generate` and copy the token. Paste it into the `gh_token` field in your `config.yaml`.
+When ready, click `Generate` and copy the token. Paste it into the `github_token` field in your `config.yaml`.
 
 ### Deploy apps
 
