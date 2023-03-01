@@ -15,7 +15,7 @@
 resource "github_repository" "app" {
   name        = var.app_id
   description = var.app_config.description
-  visibility  = "private"
+  visibility  = "public" # TODO: change to private after testing
 
   # template {
   #   owner      = "UCLH-Foundry"
@@ -56,9 +56,16 @@ resource "github_repository_environment" "app" {
   environment = var.environment
 }
 
-resource "github_actions_environment_secret" "acr_token" {
+resource "github_actions_environment_secret" "acr_token_username" {
   repository      = github_repository.app.name
   environment     = github_repository_environment.app.environment
-  secret_name     = "ACR_TOKEN"
+  secret_name     = "ACR_USERNAME"
+  plaintext_value = azurerm_container_registry_token.app_access.name
+}
+
+resource "github_actions_environment_secret" "acr_token_password" {
+  repository      = github_repository.app.name
+  environment     = github_repository_environment.app.environment
+  secret_name     = "ACR_PASSWORD"
   plaintext_value = azurerm_container_registry_token_password.app_access.password1[0].value
 }
