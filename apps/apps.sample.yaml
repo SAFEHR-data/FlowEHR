@@ -2,14 +2,16 @@
 dash_seedling: # unique ID for the app
   name: Dash Seedling
   description: Hello world app for Dash
-  owner: me@mycompany.com
+  owners: # owners to add to repo (for reviews)
+    - email: me@mycompany.com
+      gh_username: octocat
   contributors: # contributors to add to repo
     - email: contributor@mycompany.com
       gh_username: octocat
   managed_repo: # details for created repo
     private: false # repo visibility
     template: Dash-Seedling
-    branch_approvers:
-      - important_persons_gh_username
+    num_of_approvals: 1
+    dismiss_stale_reviews: false
   env: # any env vars to pass to the app container
     WEBSITES_PORT: 8000

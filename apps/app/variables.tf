@@ -78,7 +78,10 @@ variable "app_config" {
   type = object({
     name        = string
     description = string
-    owner       = string
+    owners = list(object({
+      email       = string
+      gh_username = string
+    }))
 
     contributors = list(object({
       email       = string
@@ -86,9 +89,10 @@ variable "app_config" {
     }))
 
     managed_repo = object({
-      private          = bool
-      template         = string,
-      branch_approvers = list(string)
+      private               = bool
+      template              = string,
+      num_of_approvals      = optional(number, 1),
+      dismiss_stale_reviews = optional(bool, false)
     })
 
     env = optional(map(string))

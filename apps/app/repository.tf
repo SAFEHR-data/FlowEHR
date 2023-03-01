@@ -16,15 +16,75 @@ resource "github_repository" "app" {
   name        = var.app_id
   description = var.app_config.description
   visibility  = var.app_config.managed_repo.private ? "private" : "public"
+
   template {
     owner      = "UCLH-Foundry"
     repository = var.app_config.managed_repo.template
   }
 }
 
+resource "github_team" "owners" {
+  name        = "${var.app_id} - owners"
+  description = "Owners of the ${var.app_id} FlowEHR app."
+}
+
+resource "github_team_members" "owners" {
+  team_id = github_team.owners.id
+
+  dynamic "members" {
+    for_each = var.app_config.owners
+    content {
+      username = members.value.gh_username
+      role     = "member"
+    }
+  }
+}
+
 resource "github_team" "contributors" {
   name        = "${var.app_id} - contributors"
-  description = "Contributors to the ${var.app_id} FlowEHR app."
+  description = "Contributors to the ${var.app_id} FlowEHR app (with push permissions)."
+}
+
+resource "github_team_members" "contributors" {
+  team_id = github_team.contributors.id
+
+  dynamic "members" {
+    for_each = var.app_config.contributors
+    content {
+      username = members.value.gh_username
+      role     = "member"
+    }
+  }
+}
+
+resource "github_team_repository" "contributors_repo_permissions" {
+  team_id    = github_team.contributors.id
+  repository = github_repository.app.name
+  permission = "push"
+}
+
+resource "github_branch" "deployment" {
+  repository = github_repository.app.name
+  branch     = var.environment
+}
+
+resource "github_branch_protection" "deployment" {
+  repository_id       = github_repository.app.name
+  pattern             = var.environment
+  allows_deletions    = false
+  allows_force_pushes = false
+
+  required_status_checks {
+    strict   = true
+    contexts = ["lint"]
+  }
+
+  required_pull_request_reviews {
+    dismiss_stale_reviews           = var.app_config.managed_repo.dismiss_stale_reviews
+    restrict_dismissals             = true
+    require_code_owner_reviews      = true
+    required_approving_review_count = var.app_config.managed_repo.num_of_approvals
+  }
 }
 
 resource "azurerm_container_registry_scope_map" "app_access" {
