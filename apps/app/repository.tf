@@ -17,10 +17,10 @@ resource "github_repository" "app" {
   description = var.app_config.description
   visibility  = "public" # TODO: change to private after testing
 
-  # template {
-  #   owner      = "UCLH-Foundry"
-  #   repository = var.app_config.managed_repo.template
-  # }
+  template {
+    owner      = "UCLH-Foundry"
+    repository = var.app_config.managed_repo.template
+  }
 }
 
 resource "github_team" "contributors" {
