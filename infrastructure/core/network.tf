@@ -58,4 +58,8 @@ resource "azurerm_private_dns_zone_virtual_network_link" "all" {
   private_dns_zone_name = each.value
   virtual_network_id    = azurerm_virtual_network.core.id
   tags                  = var.tags
+
+  depends_on = [
+    azurerm_private_dns_zone.all
+  ]
 }
