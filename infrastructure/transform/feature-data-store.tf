@@ -148,7 +148,6 @@ resource "azuread_service_principal" "flowehr_databricks_sql" {
   owners         = [data.azurerm_client_config.current.object_id]
 }
 
-/* TODO - enable when build agent can communicate with KV
 # Push secrets to KV
 resource "azurerm_key_vault_secret" "sql_server_owner_app_id" {
   name         = "sql-owner-app-id"
@@ -180,7 +179,6 @@ resource "azurerm_key_vault_secret" "flowehr_databricks_sql_spn_app_secret" {
   value        = azuread_application_password.flowehr_databricks_sql.value
   key_vault_id = var.core_kv_id
 }
-*/
 
 # Push SPN details to databricks secret scope
 resource "databricks_secret" "flowehr_databricks_sql_spn_app_id" {
