@@ -25,7 +25,8 @@ resource "github_repository" "app" {
 
 resource "github_team" "owners" {
   name        = "${var.app_id} - owners"
-  description = "Owners of the ${var.app_id} FlowEHR app (with write/push permissions)."
+  description = "Owners of the ${var.app_id} FlowEHR app with push and PR/deployment approval permissions."
+  privacy     = "closed"
 }
 
 resource "github_team_members" "owners" {
@@ -61,7 +62,8 @@ EOF
 
 resource "github_team" "contributors" {
   name        = "${var.app_id} - contributors"
-  description = "Contributors to the ${var.app_id} FlowEHR app (with read/pull permissions)."
+  description = "Contributors to the ${var.app_id} FlowEHR app with push permissions."
+  privacy     = "closed"
 }
 
 resource "github_team_members" "contributors" {
@@ -130,6 +132,23 @@ resource "azurerm_container_registry_token_password" "app_access" {
 resource "github_repository_environment" "app" {
   repository  = github_repository.app.name
   environment = var.environment
+
+  deployment_branch_policy {
+    custom_branch_policies = true
+    protected_branches     = false
+  }
+
+  # TODO: remove when https://github.com/integrations/terraform-provider-github/pull/1530 is merged
+  provisioner "local-exec" {
+    command = <<EOF
+gh api \
+  --method POST \
+  -H "Accept: application/vnd.github+json" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  /repos/${var.github_owner}/${github_repository.app.name}/environments/${var.environment}/deployment-branch-policies \
+  -f name='${var.environment}'
+EOF
+  }
 }
 
 resource "github_actions_environment_secret" "acr_name" {
