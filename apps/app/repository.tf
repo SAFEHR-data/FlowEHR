@@ -29,14 +29,12 @@ resource "github_team" "owners" {
 }
 
 resource "github_team_members" "owners" {
-  team_id = github_team.owners.id
+  for_each = var.app_config.owners
+  team_id  = github_team.owners.id
 
-  dynamic "members" {
-    for_each = var.app_config.owners
-    content {
-      username = members.value.gh_username
-      role     = "member"
-    }
+  members {
+    username = each.value
+    role     = "maintainer"
   }
 }
 
@@ -53,7 +51,7 @@ resource "github_repository_file" "codeowners" {
   content             = <<EOF
 # Owners for branch protection
 # Users within this team are required reviewers for this deployment branch
-*       @${github_owner}/${github_team.owners.slug}
+*       @${var.github_owner}/${github_team.owners.slug}
 EOF
   commit_message      = "Add codeowners (managed by Terraform)"
   commit_author       = "Terraform"
@@ -67,21 +65,19 @@ resource "github_team" "contributors" {
 }
 
 resource "github_team_members" "contributors" {
-  team_id = github_team.contributors.id
+  for_each = var.app_config.contributors
+  team_id  = github_team.contributors.id
 
-  dynamic "members" {
-    for_each = var.app_config.contributors
-    content {
-      username = members.value.gh_username
-      role     = "member"
-    }
+  members {
+    username = each.value
+    role     = "member"
   }
 }
 
 resource "github_team_repository" "contributors_repo_permissions" {
   team_id    = github_team.contributors.id
   repository = github_repository.app.name
-  permission = "pull"
+  permission = "push"
 }
 
 resource "github_branch" "deployment" {

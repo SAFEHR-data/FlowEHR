@@ -80,17 +80,10 @@ variable "github_owner" {
 
 variable "app_config" {
   type = object({
-    name        = string
-    description = string
-    owners = list(object({
-      email       = string
-      gh_username = string
-    }))
-
-    contributors = list(object({
-      email       = string
-      gh_username = string
-    }))
+    name         = string
+    description  = string
+    owners       = set(string)
+    contributors = set(string)
 
     managed_repo = object({
       private               = bool

@@ -3,11 +3,9 @@ dash_seedling: # unique ID for the app
   name: Dash Seedling
   description: Hello world app for Dash
   owners: # owners to add to repo (for reviews)
-    - email: me@mycompany.com
-      gh_username: octocat
+    - octocat
   contributors: # contributors to add to repo
-    - email: contributor@mycompany.com
-      gh_username: octocat
+    - octokitten
   managed_repo: # details for created repo
     private: false # repo visibility
     template: Dash-Seedling
