@@ -127,4 +127,4 @@ tf-init: az-login ## Init Terraform (use for updating lock files)
 	$(call target_title, "Terraform init") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR} \
-	&& terragrunt run-all init
+	&& terragrunt run-all init -upgrade
