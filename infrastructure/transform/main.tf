@@ -60,12 +60,13 @@ resource "databricks_cluster" "fixed_single_node" {
     tomap({
       "spark.databricks.cluster.profile" = "singleNode"
       "spark.master"                     = "local[*]"
-      // Feature store configuration
+      // Secrets for Feature store
       "spark.secret.feature_store_app_id"     = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_spn_app_id.key}}}"
       "spark.secret.feature_store_app_secret" = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_spn_app_secret.key}}}"
       "spark.secret.feature_store_fqdn"       = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_fqdn.key}}}"
       "spark.secret.feature_store_database"   = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_database.key}}}"
     }),
+    // Secrets for each data source
     tomap({ for secret in local.data_source_connection_secrets :
       "spark.secret.${secret.name}_fqdn" => secret.fqdn
     }),
