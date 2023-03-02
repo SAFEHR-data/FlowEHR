@@ -24,8 +24,7 @@ define terragrunt  # Arguments: <command>, <folder name>
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/$(2) \
 	&& terragrunt run-all $(1) --terragrunt-include-external-dependencies \
-		--terragrunt-non-interactive \
-		--terragrunt-exclude-dir ${MAKEFILE_DIR}/infrastructure/ci-auth
+		--terragrunt-non-interactive --terragrunt-exclude-dir ${MAKEFILE_DIR}/ci
 endef
 
 all: bootstrap infrastructure apps
@@ -47,8 +46,12 @@ az-login: ## Check logged in/log into azure with a service principal
 	&& . ${MAKEFILE_DIR}/scripts/az_login.sh
 
 ci-auth: az-login ## Deploy an AAD app with permissions to use for CI builds
-	$(call terragrunt,apply,infrastructure/ci-auth) \
-	&& terraform output -json | jq 'with_entries(.value |= .value)'
+	$(call target_title, "Creating CI auth") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& cd ${MAKEFILE_DIR}/ci \
+	&& terragrunt run-all apply \
+	&& terraform output -json \
+	  | jq -r 'with_entries(.value |= .value) | to_entries[] | "\(.key +": "+ .value)"'
 
 bootstrap: az-login ## Boostrap Terraform backend
 	$(call target_title, "Bootstrap") \
@@ -111,7 +114,7 @@ destroy-non-core: ## Destroy non-core
 		--terragrunt-include-external-dependencies \
 		--terragrunt-non-interactive \
 		--terragrunt-exclude-dir ${MAKEFILE_DIR}/infrastructure/core \
-		--terragrunt-exclude-dir ${MAKEFILE_DIR}/infrastructure/ci-auth
+		--terragrunt-exclude-dir ${MAKEFILE_DIR}/ci
 
 destroy-all: destroy bootstrap-destroy  ## Destroy infrastrcture and bootstrap resources
 

@@ -48,6 +48,7 @@ apps.yaml
 
 # Python artifacts
 **/__pycache__/**
+.pytest_cache
 
 # vs code settings
 .vscode/
