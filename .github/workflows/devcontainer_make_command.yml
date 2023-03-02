@@ -203,6 +203,7 @@ jobs:
           SUFFIX: ${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
           LOCATION: ${{ secrets.LOCATION }}
           ENVIRONMENT: ${{ inputs.environment }}
+          USE_RANDOM_ADDRESS_SPACE: ${{ (inputs.suffix_override != '' && '1') || '0' }}
           DEVCONTAINER_ACR_NAME: ${{ secrets.DEVCONTAINER_ACR_NAME }}
           DEVCONTAINER_IMAGE_IMAGE: flowehr/devcontainer
           DEVCONTAINER_TAG: ${{ needs.make_core.outputs.dc_tag }}
@@ -254,3 +255,4 @@ jobs:
             LOCATION=${{ secrets.LOCATION }}
             ENVIRONMENT=${{ inputs.environment }}
             DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
+            USE_RANDOM_ADDRESS_SPACE=${{ (inputs.suffix_override != '' && '1') || '0' }}
