@@ -95,7 +95,7 @@ resource "github_branch_protection" "deployment" {
 
   required_status_checks {
     strict   = true
-    contexts = ["lint"]
+    contexts = ["Lint"]
   }
 
   required_pull_request_reviews {
