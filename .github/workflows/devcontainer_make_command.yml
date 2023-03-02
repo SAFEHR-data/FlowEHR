@@ -237,8 +237,9 @@ jobs:
         env:
           ORG_GH_TOKEN: "${{ secrets.ORG_GH_TOKEN }}"
         with:
-          imageName: ${{ needs.make_core.outputs.dc_image_path }}
-          cacheFrom: ${{ needs.make_core.outputs.dc_image_path }}
+          # The image name cannot be set from the make_core output because it contains a secret
+          imageName: ${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer
+          cacheFrom: ${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer
           imageTag: ${{ needs.make_core.outputs.dc_tag }}
           runCmd: make ${{ needs.make_core.outputs.post_build_agent_command }}
           push: never

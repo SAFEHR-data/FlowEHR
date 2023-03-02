@@ -108,7 +108,8 @@ resource "null_resource" "create_sql_user" {
     azuread_application.flowehr_databricks_sql,
     azuread_app_role_assignment.sql_user_read_all,
     azuread_app_role_assignment.sql_groupmember_read_all,
-    azuread_app_role_assignment.sql_application_read_all
+    azuread_app_role_assignment.sql_application_read_all,
+    azurerm_private_endpoint.sql_server_features_pe
   ]
 
   triggers = {
