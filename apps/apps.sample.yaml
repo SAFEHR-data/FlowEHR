@@ -2,7 +2,7 @@
 dash_seedling: # unique ID for the app
   name: Dash Seedling
   description: Hello world app for Dash
-  owners: # owners to add to repo (for reviews)
+  owners: # GitHub usernames of owners to add to repo (for reviews)
     - octocat
   contributors: # contributors to add to repo
     - octokitten
