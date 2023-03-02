@@ -56,12 +56,29 @@ resource "databricks_cluster" "fixed_single_node" {
   node_type_id            = data.databricks_node_type.smallest.id
   autotermination_minutes = 10
 
-  spark_conf = {
-    "spark.databricks.cluster.profile" : "singleNode"
-    "spark.master" : "local[*]"
-    "spark.secret.sql_app_id" : "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_spn_app_id.key}}}"
-    "spark.secret.sql_app_secret" : "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_spn_app_secret.key}}}"
-  }
+  spark_conf = merge(
+    tomap({
+      "spark.databricks.cluster.profile" = "singleNode"
+      "spark.master"                     = "local[*]"
+      // Feature store configuration
+      "spark.secret.feature_store_app_id"     = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_spn_app_id.key}}}"
+      "spark.secret.feature_store_app_secret" = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_spn_app_secret.key}}}"
+      "spark.secret.feature_store_fqdn"       = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_fqdn.key}}}"
+      "spark.secret.feature_store_database"   = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_database.key}}}"
+    }),
+    tomap({ for secret in local.data_source_connection_secrets :
+      "spark.secret.${secret.name}_fqdn" => secret.fqdn
+    }),
+    tomap({ for secret in local.data_source_connection_secrets :
+      "spark.secret.${secret.name}_database" => secret.database
+    }),
+    tomap({ for secret in local.data_source_connection_secrets :
+      "spark.secret.${secret.name}_username" => secret.username
+    }),
+    tomap({ for secret in local.data_source_connection_secrets :
+      "spark.secret.${secret.name}_password" => secret.password
+    })
+  )
 
   custom_tags = {
     "ResourceClass" = "SingleNode"
