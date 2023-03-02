@@ -15,3 +15,7 @@ data_source_connections:
       dns_zones:
         - __CHANGE_ME__
     connection_string: postgresql://<hostname>:5432/<database-name>?user=<username>&password=<***>
+
+github:
+  gh_owner: __CHANGE_ME__
+  gh_token: __CHANGE_ME__

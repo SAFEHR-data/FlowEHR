@@ -53,6 +53,7 @@ export_config_from_yaml () {
     # Export as UPPERCASE keys env vars
     # shellcheck disable=SC2046
     export $(yq e "$GET_LEAF_KEYS|$UPCASE_KEYS| $FORMAT_FOR_ENV_EXPORT" "$config_file_path")
+
     # Export as Terraform keys env vars
     # shellcheck disable=SC2046
     export $(yq e "$GET_LEAF_KEYS|$TF_KEYS| $FORMAT_FOR_ENV_EXPORT" "$config_file_path")

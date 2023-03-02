@@ -48,6 +48,8 @@ For the full reference of possible configuration values, see the [config schema 
     make all
     ```
 
+    > For more info on configuring and deploying apps, see the [README](./apps/README.md)
+
     Alternatively, you can deploy just infrastructure:
 
     ```bash

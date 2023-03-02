@@ -46,6 +46,7 @@ resource "azurerm_linux_web_app" "app" {
     DOCKER_ENABLE_CI                           = true
     COSMOS_STATE_STORE_ENDPOINT                = data.azurerm_cosmosdb_account.state_store.endpoint
     FEATURE_STORE_CONNECTION_STRING            = local.feature_store_odbc
+    ENVIRONMENT                                = var.environment
   })
 
   identity {
