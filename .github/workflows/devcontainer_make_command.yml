@@ -60,7 +60,7 @@ jobs:
     environment: ${{ inputs.environment }}
     outputs:
       dc_tag: ${{ steps.dc.outputs.tag }}
-      dc_image_path: ${{ steps.dc.outputs.image }}
+      dc_image_path: ${{ steps.dc.outputs.image_path }}
       dc_runner_name: ${{ steps.dc.outputs.runner_name }}
       build_agent_command: ${{ steps.post_core.outputs.build_agent_command }}
       post_build_agent_command: ${{ steps.post_core.outputs.post_build_agent_command }}
@@ -81,10 +81,10 @@ jobs:
 
           if echo ${{ inputs.command }} | grep -q "test" ; then
               build_agent_command="${{ inputs.command }}-without-core-destroy"
-              post_build_agent_command="destroy"
-          elif [ ${{ inputs.command }} = "destroy" ]; then
+              post_build_agent_command="destroy-all"
+          elif echo ${{ inputs.command }} | grep -q "destroy" ; then
               build_agent_command="destroy-non-core"
-              post_build_agent_command="destroy"
+              post_build_agent_command="${{ inputs.command }}"
           elif echo ${{ inputs.command }} | grep -q "infrastructure"; then
               build_agent_command="${{ inputs.command }}"
           fi

@@ -92,8 +92,7 @@ apps: bootstrap ## Deploy FlowEHR apps
 	$(call terragrunt,apply,apps)
 
 destroy: az-login ## Destroy all infrastructure
-	$(call terragrunt,destroy,infrastructure) \
-	$(call terragrunt,destroy,apps)
+	$(call terragrunt,destroy,.)
 
 destroy-core: ## Destroy core infrastructure
 	$(call terragrunt,destroy,infrastructure/core)
@@ -113,6 +112,8 @@ destroy-non-core: ## Destroy non-core
 		--terragrunt-non-interactive \
 		--terragrunt-exclude-dir ${MAKEFILE_DIR}/infrastructure/core \
 		--terragrunt-exclude-dir ${MAKEFILE_DIR}/infrastructure/ci-auth
+
+destroy-all: destroy bootstrap-destroy  ## Destroy infrastrcture and bootstrap resources
 
 destroy-no-terraform: az-login ## Destroy all resource groups associated with this deployment
 	$(call target_title, "Destroy no terraform") \
