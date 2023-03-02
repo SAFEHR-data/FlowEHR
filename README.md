@@ -118,7 +118,10 @@ This step will create an AAD Application and Service Principal in the specified 
                 "privatelink.xxx.xxx.azure.com"
             ]
         },
-        "connection_string": "postgresql://<hostname>:5432/<database-name>?user=<username>&password=<***>"
+        "fqdn": "<fqdn>",
+        "database_name": "<database_name>",
+        "username": "username",
+        "password": "password"
     }
     ]
     ```
