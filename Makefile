@@ -96,10 +96,9 @@ apps: bootstrap ## Deploy FlowEHR apps
 	&& cd ${MAKEFILE_DIR}/apps \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
 
-destroy: az-login ## Destroy all infrastructure
+destroy: az-login ## Destroy all
 	$(call target_title, "Destroy All") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
-	&& cd ${MAKEFILE_DIR}/infrastructure \
 	&& terragrunt run-all destroy --terragrunt-non-interactive
 
 destroy-no-terraform: az-login ## Destroy all resource groups associated with this deployment
@@ -107,11 +106,23 @@ destroy-no-terraform: az-login ## Destroy all resource groups associated with th
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& . ${MAKEFILE_DIR}/scripts/destroy_no_terraform.sh
 
+destroy-infrastructure: az-login ## Destroy infrastructure
+	$(call target_title, "Destroy Infrastructure") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& cd ${MAKEFILE_DIR}/infrastructure \
+	&& terragrunt run-all destroy --terragrunt-non-interactive
+
+destroy-apps: az-login ## Destroy apps
+	$(call target_title, "Destroy Apps") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& cd ${MAKEFILE_DIR}/apps \
+	&& terragrunt run-all destroy --terragrunt-non-interactive
+
 clean: ## Remove all local terraform state
 	find ${MAKEFILE_DIR} -type d -name ".terraform" -exec rm -rf "{}" \;
 
-tf-init: az-login ## Init Terraform (use for updating lock files)
+tf-init: az-login ## Init Terraform (use for updating lock files in the case of a conflict)
 	$(call target_title, "Terraform init") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR} \
-	&& terragrunt run-all init
+	&& terragrunt run-all init -upgrade

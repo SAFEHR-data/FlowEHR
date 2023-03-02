@@ -13,7 +13,33 @@
 #  limitations under the License.
 
 include "root" {
-  path = find_in_parent_folders()
+  path   = find_in_parent_folders()
+  expose = true
+}
+
+generate "terraform" {
+  path      = "terraform.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+terraform {
+  required_version = "${include.root.locals.terraform_version}"
+
+  required_providers {
+    ${include.root.locals.required_provider_azure}
+    ${include.root.locals.required_provider_github}
+  }
+}
+EOF
+}
+
+generate "provider" {
+  path      = "provider.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+${include.root.locals.azure_provider}
+
+provider "github" {}
+EOF
 }
 
 dependency "core" {
@@ -41,4 +67,6 @@ inputs = {
   serve_acr_name              = dependency.serve.outputs.acr_name
   serve_cosmos_account_name   = dependency.serve.outputs.cosmos_account_name
   serve_webapps_subnet_id     = dependency.serve.outputs.webapps_subnet_id
+
+  github_owner = get_env("GITHUB_OWNER", "")
 }
