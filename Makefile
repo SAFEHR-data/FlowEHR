@@ -76,11 +76,11 @@ transform-artifacts: ## Build transform artifacts
 infrastructure-serve: bootstrap ## Deploy serve infrastructure
 	$(call terragrunt,apply,infrastructure/serve)
 
-test: infrastructure destroy bootstrap-destroy  ## Test by deploy->destroy
+test: infrastructure apps destroy-all  ## Test by deploy->destroy
 
-test-transform: infrastructure-transform destroy bootstrap-destroy  ## Test transform deploy->destroy
+test-transform: infrastructure-transform destroy-all  ## Test transform deploy->destroy
 
-test-serve: infrastructure-serve destroy bootstrap-destroy  ## Test transform deploy->destroy
+test-serve: infrastructure-serve destroy-all  ## Test transform deploy->destroy
 
 test-without-core-destroy: infrastructure apps destroy-non-core ## Test non-core deploy->destroy destroying core
 

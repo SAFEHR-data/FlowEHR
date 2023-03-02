@@ -60,7 +60,6 @@ jobs:
     environment: ${{ inputs.environment }}
     outputs:
       dc_tag: ${{ steps.dc.outputs.tag }}
-      dc_image_path: ${{ steps.dc.outputs.image_path }}
       dc_runner_name: ${{ steps.dc.outputs.runner_name }}
       build_agent_command: ${{ steps.post_core.outputs.build_agent_command }}
       post_build_agent_command: ${{ steps.post_core.outputs.post_build_agent_command }}
