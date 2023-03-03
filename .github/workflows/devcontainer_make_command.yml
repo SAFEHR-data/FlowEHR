@@ -140,7 +140,7 @@ jobs:
       - name: ACR Login
         if: steps.acr_login.outcome == 'failure'
         run: |
-          az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
+          ./scripts/retry.sh az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
 
       - name: Push devcontainer
         run: |

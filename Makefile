@@ -42,8 +42,7 @@ lint: ## Call pre-commit hooks to lint files & check for headers
 
 az-login: ## Check logged in/log into azure with a service principal 
 	$(call target_title, "Log-in to Azure") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
-	&& . ${MAKEFILE_DIR}/scripts/az_login.sh
+	&& cd ${MAKEFILE_DIR}/scripts && source load_env.sh && ./az_login.sh
 
 ci-auth: az-login ## Deploy an AAD app with permissions to use for CI builds
 	$(call target_title, "Creating CI auth") \
@@ -55,13 +54,11 @@ ci-auth: az-login ## Deploy an AAD app with permissions to use for CI builds
 
 bootstrap: az-login ## Boostrap Terraform backend
 	$(call target_title, "Bootstrap") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
-	&& . ${MAKEFILE_DIR}/scripts/bootstrap.sh
+	&& cd ${MAKEFILE_DIR}/scripts && source load_env.sh && ./bootstrap.sh
 
 bootstrap-destroy: az-login ## Destroy boostrap rg
 	$(call target_title, "Destroy Bootstrap Env") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
-	&& . ${MAKEFILE_DIR}/scripts/bootstrap.sh -d
+	&& cd ${MAKEFILE_DIR}/scripts && source load_env.sh && ./bootstrap.sh -d
 
 infrastructure: transform-artifacts bootstrap ## Deploy all infrastructure
 	$(call terragrunt,apply,infrastructure)
@@ -97,6 +94,12 @@ apps: bootstrap ## Deploy FlowEHR apps
 destroy: az-login ## Destroy all infrastructure
 	$(call terragrunt,destroy,.)
 
+destroy-infrastructure: az-login ## Destroy infrastructure
+	$(call terragrunt,destroy,infrastructure)
+
+destroy-apps: az-login ## Destroy apps
+	$(call terragrunt,destroy,apps)
+
 destroy-core: ## Destroy core infrastructure
 	$(call terragrunt,destroy,infrastructure/core)
 
@@ -122,18 +125,6 @@ destroy-no-terraform: az-login ## Destroy all resource groups associated with th
 	$(call target_title, "Destroy no terraform") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& . ${MAKEFILE_DIR}/scripts/destroy_no_terraform.sh
-
-destroy-infrastructure: az-login ## Destroy infrastructure
-	$(call target_title, "Destroy Infrastructure") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
-	&& cd ${MAKEFILE_DIR}/infrastructure \
-	&& terragrunt run-all destroy --terragrunt-non-interactive
-
-destroy-apps: az-login ## Destroy apps
-	$(call target_title, "Destroy Apps") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
-	&& cd ${MAKEFILE_DIR}/apps \
-	&& terragrunt run-all destroy --terragrunt-non-interactive
 
 clean: ## Remove all local terraform state
 	find ${MAKEFILE_DIR} -type d -name ".terraform" -exec rm -rf "{}" \; || true
