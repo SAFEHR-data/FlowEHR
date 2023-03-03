@@ -181,29 +181,6 @@ resource "azurerm_key_vault_secret" "flowehr_databricks_sql_spn_app_secret" {
   key_vault_id = var.core_kv_id
 }
 
-# Push SPN details to databricks secret scope
-resource "databricks_secret" "flowehr_databricks_sql_spn_app_id" {
-  key          = "flowehr-dbks-sql-app-id"
-  string_value = azuread_service_principal.flowehr_databricks_sql.application_id
-  scope        = databricks_secret_scope.secrets.id
-}
-
-resource "databricks_secret" "flowehr_databricks_sql_spn_app_secret" {
-  key          = "flowehr-dbks-sql-app-secret"
-  string_value = azuread_application_password.flowehr_databricks_sql.value
-  scope        = databricks_secret_scope.secrets.id
-}
-resource "databricks_secret" "flowehr_databricks_sql_server" {
-  key          = "flowehr-dbks-sql-server"
-  string_value = azurerm_mssql_server.sql_server_features.fully_qualified_domain_name
-  scope        = databricks_secret_scope.secrets.id
-}
-resource "databricks_secret" "flowehr_databricks_sql_database" {
-  key          = "flowehr-dbks-sql-database"
-  string_value = azurerm_mssql_database.feature_database.name
-  scope        = databricks_secret_scope.secrets.id
-}
-
 # Private DNS + endpoint for SQL Server
 resource "azurerm_private_dns_zone" "sql" {
   name                = "privatelink.database.windows.net"
