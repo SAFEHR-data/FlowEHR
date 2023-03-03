@@ -178,7 +178,7 @@ jobs:
 
   build_agent_make:
     needs: [make_core]
-    if: ${{ needs.make_core.outputs.build_agent_command }} != 'none'
+    if: needs.make_core.outputs.build_agent_command != 'none'
     runs-on: ${{ needs.make_core.outputs.dc_runner_name }}
     environment: ${{ inputs.environment }}
 
@@ -213,7 +213,7 @@ jobs:
 
   post_build_agent_make:
     needs: [make_core, build_agent_make]
-    if: ${{ needs.make_core.outputs.post_build_agent_command }} != 'none'
+    if: needs.make_core.outputs.post_build_agent_command != 'none'
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
 

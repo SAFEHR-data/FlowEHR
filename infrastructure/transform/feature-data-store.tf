@@ -121,8 +121,9 @@ resource "null_resource" "create_sql_user" {
   # load a csv file into a new SQL table
   provisioner "local-exec" {
     command = <<EOF
-      python ../../scripts/sql/create_sql_user.py
-      python ../../scripts/sql/load_csv_data.py
+      SCRIPTS_DIR="../../scripts"
+      $SCRIPTS_DIR/retry.sh python $SCRIPTS_DIR/sql/create_sql_user.py
+      $SCRIPTS_DIR/retry.sh python $SCRIPTS_DIR/sql/load_csv_data.py
     EOF
     environment = {
       SERVER          = azurerm_mssql_server.sql_server_features.fully_qualified_domain_name
