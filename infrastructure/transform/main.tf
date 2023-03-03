@@ -56,10 +56,34 @@ resource "databricks_cluster" "fixed_single_node" {
   node_type_id            = data.databricks_node_type.smallest.id
   autotermination_minutes = 10
 
-  spark_conf = {
-    "spark.databricks.cluster.profile" : "singleNode"
-    "spark.master" : "local[*]"
-  }
+  spark_conf = merge(
+    tomap({
+      "spark.databricks.cluster.profile" = "singleNode"
+      "spark.master"                     = "local[*]"
+      // Secrets for Feature store
+      // Formatted according to syntax for referencing secrets in Spark config:
+      // https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secrets
+      "spark.secret.feature_store_app_id"     = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_spn_app_id.key}}}"
+      "spark.secret.feature_store_app_secret" = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_spn_app_secret.key}}}"
+      "spark.secret.feature_store_fqdn"       = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_fqdn.key}}}"
+      "spark.secret.feature_store_database"   = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_database.key}}}"
+    }),
+    // Secrets for each data source
+    // Formatted according to syntax for referencing secrets in Spark config:
+    // https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secrets
+    tomap({ for connection in var.data_source_connections :
+      "spark.secret.${connection.name}_fqdn" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-fqdn}}"
+    }),
+    tomap({ for connection in var.data_source_connections :
+      "spark.secret.${connection.name}_database" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-database}}"
+    }),
+    tomap({ for connection in var.data_source_connections :
+      "spark.secret.${connection.name}_username" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-username}}"
+    }),
+    tomap({ for connection in var.data_source_connections :
+      "spark.secret.${connection.name}_password" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-password}}"
+    })
+  )
 
   custom_tags = {
     "ResourceClass" = "SingleNode"
@@ -148,13 +172,4 @@ resource "azurerm_data_factory_linked_service_key_vault" "msi_linked" {
   data_factory_id = azurerm_data_factory.adf.id
   description     = "Key Vault linked service via MSI"
   key_vault_id    = var.core_kv_id
-}
-
-resource "databricks_secret" "data_source_connections" {
-  for_each = { for connection in var.data_source_connections :
-    connection.name => connection.connection_string
-  }
-  key          = "flowehr-dbks-${each.key}"
-  string_value = each.value
-  scope        = databricks_secret_scope.secrets.id
 }
