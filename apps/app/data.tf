@@ -12,6 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+data "azurerm_client_config" "current" {}
+
 data "azurerm_log_analytics_workspace" "core" {
   name                = var.log_analytics_name
   resource_group_name = var.resource_group_name
