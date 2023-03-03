@@ -53,6 +53,7 @@ export_config_from_yaml () {
     # Export as UPPERCASE keys env vars
     # shellcheck disable=SC2046
     export $(yq e "$GET_LEAF_KEYS|$UPCASE_KEYS| $FORMAT_FOR_ENV_EXPORT" "$config_file_path")
+
     # Export as Terraform keys env vars
     # shellcheck disable=SC2046
     export $(yq e "$GET_LEAF_KEYS|$TF_KEYS| $FORMAT_FOR_ENV_EXPORT" "$config_file_path")
@@ -72,23 +73,6 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 echo "Loading core configuration..."
 export_config_from_yaml "${SCRIPT_DIR}/../config.yaml" "${SCRIPT_DIR}/../config_schema.json"
 
-# Get IP address for "local" deployments
-if [[ "${LOCAL_MODE}" == "true" ]];
-then
-    echo "Local Mode: TRUE"
-    if [[ -z "${DEPLOYER_IP_ADDRESS+x}" ]];
-    then
-        echo "No IP address assigned in config, getting client IP and setting in ENV"
-        this_ip="$(curl -s 'https://api64.ipify.org')"
-        export DEPLOYER_IP_ADDRESS="${this_ip}"
-    else
-        echo "Have IP address from config.yaml"
-    fi
-    echo "IP Address: ${DEPLOYER_IP_ADDRESS}"
-else
-    echo "Local Mode: FALSE"
-fi
-
 # Export naming suffixes
 NAMING_SUFFIX=$("${SCRIPT_DIR}/name_suffix.py")
 echo "Naming resources with suffixed with: ${NAMING_SUFFIX}"
@@ -106,6 +90,11 @@ export CORE_ADDRESS_SPACE
 export MGMT_RG="rg-mgmt-${NAMING_SUFFIX}"
 export MGMT_STORAGE="strgm${TRUNCATED_NAMING_SUFFIX}"
 export STATE_CONTAINER="tfstate"
+
+if [ "${TF_IN_AUTOMATION:-}" == "1" ]; then
+    echo -e "Running terraform in automation setting LOCAL_MODE=false"
+    export LOCAL_MODE="false"
+fi
 
 # Get IP address for local deployments
 if [[ "${LOCAL_MODE}" == "true" ]];

@@ -18,3 +18,7 @@ data_source_connections:
     database: __CHANGE_ME__
     username: __CHANGE_ME__
     password: __CHANGE_ME__
+
+github:
+  gh_owner: __CHANGE_ME__
+  gh_token: __CHANGE_ME__

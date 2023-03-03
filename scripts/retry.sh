@@ -1,3 +1,4 @@
+#!/bin/bash
 #  Copyright (c) University College London Hospitals NHS Foundation Trust
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,22 +13,22 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-data "azurerm_client_config" "current" {}
+set -o errexit
+set -o pipefail
+set -o nounset
 
-# Find the resource group which contains the ACR holding the devcontainer
-data "external" "devcontainer_acr" {
-  count = var.local_mode == true ? 0 : 1
-  program = [
-    "bash", "-c",
-    <<EOF
-rg=$(az acr list --query "[? name == '${var.devcontainer_acr_name}'].[resourceGroup] | [0]" -o tsv)
-echo "{\"resourceGroup\": \"$rg\"}"
-EOF
-  ]
-}
+WAIT_TIME="${WAIT_TIME:=30}"  # seconds
+NUMBER_OF_RETRYS="${NUMBER_OF_RETRYS:=3}"
 
-data "azurerm_container_registry" "devcontainer" {
-  count               = var.local_mode == true ? 0 : 1
-  name                = var.devcontainer_acr_name
-  resource_group_name = data.external.devcontainer_acr[0].result["resourceGroup"]
-}
+for ((i=1; i<="$NUMBER_OF_RETRYS"; i++)); do
+  if "$@"; then
+    break
+  fi
+  if [[ "$i" -lt "$NUMBER_OF_RETRYS" ]]; then
+    echo "Command failed. Retrying in ${WAIT_TIME} seconds..."
+    sleep "$WAIT_TIME"
+  else
+    echo "Failed with the maximum number of retrys: ${NUMBER_OF_RETRYS}"
+    exit 1
+  fi
+done
