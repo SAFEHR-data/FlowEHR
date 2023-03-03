@@ -64,13 +64,4 @@ locals {
       }
     ]
   ]))
-
-  data_source_connection_secrets = flatten([for connection in var.data_source_connections : {
-    name     = connection.name
-    fqdn     = "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-fqdn}}"
-    database = "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-database}}"
-    username = "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-username}}"
-    password = "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-password}}"
-    }
-  ])
 }

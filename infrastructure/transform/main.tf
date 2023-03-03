@@ -61,23 +61,27 @@ resource "databricks_cluster" "fixed_single_node" {
       "spark.databricks.cluster.profile" = "singleNode"
       "spark.master"                     = "local[*]"
       // Secrets for Feature store
+      // Formatted according to syntax for referencing secrets in Spark config:
+      // https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secrets
       "spark.secret.feature_store_app_id"     = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_spn_app_id.key}}}"
       "spark.secret.feature_store_app_secret" = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_spn_app_secret.key}}}"
       "spark.secret.feature_store_fqdn"       = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_fqdn.key}}}"
       "spark.secret.feature_store_database"   = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_database.key}}}"
     }),
     // Secrets for each data source
-    tomap({ for secret in local.data_source_connection_secrets :
-      "spark.secret.${secret.name}_fqdn" => secret.fqdn
+    // Formatted according to syntax for referencing secrets in Spark config:
+    // https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secrets
+    tomap({ for connection in var.data_source_connections :
+      "spark.secret.${connection.name}_fqdn" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-fqdn}}"
     }),
-    tomap({ for secret in local.data_source_connection_secrets :
-      "spark.secret.${secret.name}_database" => secret.database
+    tomap({ for connection in var.data_source_connections :
+      "spark.secret.${connection.name}_database" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-database}}"
     }),
-    tomap({ for secret in local.data_source_connection_secrets :
-      "spark.secret.${secret.name}_username" => secret.username
+    tomap({ for connection in var.data_source_connections :
+      "spark.secret.${connection.name}_username" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-username}}"
     }),
-    tomap({ for secret in local.data_source_connection_secrets :
-      "spark.secret.${secret.name}_password" => secret.password
+    tomap({ for connection in var.data_source_connections :
+      "spark.secret.${connection.name}_password" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-password}}"
     })
   )
 
