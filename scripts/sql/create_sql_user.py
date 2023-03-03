@@ -21,6 +21,8 @@ client_id = os.environ.get("CLIENT_ID")
 client_secret = os.environ.get("CLIENT_SECRET")
 login_to_create = os.environ.get("LOGIN_TO_CREATE")
 
+exit()
+
 
 def create_con_str(db: str) -> str:
     driver = "{ODBC Driver 18 for SQL Server}"
