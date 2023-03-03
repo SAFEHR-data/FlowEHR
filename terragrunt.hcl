@@ -12,6 +12,10 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+dependency "bootstrap" {
+  config_path = "${get_repo_root()}/bootstrap"
+}
+
 terraform {
   extra_arguments "auto_approve" {
     commands  = ["apply"]
@@ -21,7 +25,7 @@ terraform {
 
 locals {
   terraform_version = "1.3.7"
-  azure_provider = <<EOF
+  azure_provider    = <<EOF
 provider "azurerm" {
   features {
     resource_group {
@@ -95,9 +99,9 @@ EOF
 remote_state {
   backend = "azurerm"
   config = {
-    resource_group_name  = get_env("MGMT_RG")
-    storage_account_name = get_env("MGMT_STORAGE")
-    container_name       = get_env("STATE_CONTAINER")
+    resource_group_name  = dependency.bootstrap.outputs.mgmt_rg
+    storage_account_name = dependency.bootstrap.outputs.mgmt_storage
+    container_name       = "tfstate"
     key                  = "${path_relative_to_include()}/terraform.tfstate"
   }
   generate = {
@@ -114,13 +118,12 @@ generate "provider" {
 
 # Here we define common variables to be inhereted by each module (as long as they're set in its variables.tf)
 inputs = {
-  location = get_env("LOCATION")
-  naming_suffix = get_env("NAMING_SUFFIX")
-  truncated_naming_suffix = get_env("TRUNCATED_NAMING_SUFFIX")
-  deployer_ip_address = get_env("DEPLOYER_IP_ADDRESS", "") // deployer's IP address is added to resource firewall exceptions IF in local_mode
-  local_mode = get_env("LOCAL_MODE", false)
-  core_address_space = get_env("CORE_ADDRESS_SPACE")
+  naming_suffix           = dependency.bootstrap.outputs.naming_suffix
+  naming_suffix_truncated = dependency.bootstrap.outputs.naming_suffix_truncated
+  deployer_ip_address     = dependency.bootstrap.outputs.deployer_ip_address
+  in_automation           = get_env("IN_AUTOMATION", false)
+
   tags = {
-    environment = get_env("ENVIRONMENT")
+    environment = dependency.bootstrap.outputs.environment
   }
 }

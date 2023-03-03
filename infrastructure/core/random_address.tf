@@ -12,10 +12,20 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-include "root" {
-  path = find_in_parent_folders()
+resource "random_integer" "ip1" {
+  count = var.use_random_address_space ? 1 : 0
+  min   = 0
+  max   = 255
+  keepers = {
+    suffix = var.suffix
+  }
 }
 
-inputs = {
-  use_random_address_space = get_env("USE_RANDOM_ADDRESS_SPACE", false)
+resource "random_integer" "ip2" {
+  count = var.use_random_address_space ? 1 : 0
+  min   = 0
+  max   = 255
+  keepers = {
+    suffix = var.suffix
+  }
 }

@@ -22,7 +22,7 @@ resource "azurerm_virtual_network" "core" {
   name                = "vnet-${var.naming_suffix}"
   resource_group_name = azurerm_resource_group.core.name
   location            = azurerm_resource_group.core.location
-  address_space       = [var.core_address_space]
+  address_space       = [local.address_space]
   tags                = var.tags
 }
 
@@ -35,7 +35,7 @@ resource "azurerm_subnet" "core" {
 }
 
 resource "azurerm_storage_account" "core" {
-  name                     = "strg${var.truncated_naming_suffix}"
+  name                     = "strg${var.naming_suffix_truncated}"
   resource_group_name      = azurerm_resource_group.core.name
   location                 = azurerm_resource_group.core.location
   account_tier             = "Standard"
@@ -63,7 +63,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "blobcore" {
 }
 
 resource "azurerm_key_vault" "core" {
-  name                       = "kv-${var.truncated_naming_suffix}"
+  name                       = "kv-${var.naming_suffix_truncated}"
   location                   = azurerm_resource_group.core.location
   resource_group_name        = azurerm_resource_group.core.name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
@@ -77,7 +77,7 @@ resource "azurerm_key_vault" "core" {
     bypass                     = "AzureServices"
     default_action             = "Deny"
     virtual_network_subnet_ids = [azurerm_subnet.core.id]
-    ip_rules                   = var.local_mode == true ? [var.deployer_ip_address] : []
+    ip_rules                   = var.in_automation ? [] : [var.deployer_ip_address]
   }
 }
 
@@ -91,7 +91,7 @@ resource "azurerm_log_analytics_workspace" "core" {
   name                       = "log-${var.naming_suffix}"
   location                   = azurerm_resource_group.core.location
   resource_group_name        = azurerm_resource_group.core.name
-  internet_ingestion_enabled = var.local_mode ? true : false
+  internet_ingestion_enabled = var.in_automation ? false : true
   sku                        = "PerGB2018"
   retention_in_days          = 30
   tags                       = var.tags

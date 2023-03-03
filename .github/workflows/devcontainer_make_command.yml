@@ -34,21 +34,16 @@ on:
         required: false
         description: Commit SHA to override the default GitHub checkout
     secrets:
-      AZURE_CREDENTIALS:
+      ARM_CLIENT_ID:
         required: true
-      DEVCONTAINER_ACR_NAME:
+      ARM_CLIENT_SECRET:
         required: true
-      SUFFIX:
+      ARM_TENANT_ID:
         required: true
-      LOCATION:
+      ARM_SUBSCRIPTION_ID:
         required: true
       ORG_GH_TOKEN:
         required: true
-      LOCAL_MODE:
-        required: true
-      DATA_SOURCE_CONNECTIONS:
-        required: false
-        # default: "[]"
 
 jobs:
   make_command:
@@ -91,16 +86,9 @@ jobs:
           env: |
             DOCKER_BUILDKIT=1
             TF_INPUT=0
-            TF_IN_AUTOMATION=1
-            LOCAL_MODE=${{ secrets.LOCAL_MODE }}
-            ARM_CLIENT_ID=${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
-            ARM_CLIENT_SECRET=${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
-            ARM_TENANT_ID=${{ fromJSON(secrets.AZURE_CREDENTIALS).tenantId }}
-            ARM_SUBSCRIPTION_ID=${{ fromJSON(secrets.AZURE_CREDENTIALS).subscriptionId }}
-            SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
-            LOCATION=${{ secrets.LOCATION }}
-            ENVIRONMENT=${{ inputs.environment }}
-            DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
+            IN_AUTOMATION=1
+            ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}
+            ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
+            ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
+            ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
             ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
-            DATA_SOURCE_CONNECTIONS=${{ (secrets.DATA_SOURCE_CONNECTIONS != '' && secrets.DATA_SOURCE_CONNECTIONS) || '[]' }}
-            USE_RANDOM_ADDRESS_SPACE=${{ (inputs.suffix_override != '' && '1') || '0' }}

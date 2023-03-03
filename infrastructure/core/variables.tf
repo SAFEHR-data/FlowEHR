@@ -17,7 +17,7 @@ variable "naming_suffix" {
   description = "Suffix used to name resources"
 }
 
-variable "truncated_naming_suffix" {
+variable "naming_suffix_truncated" {
   type        = string
   description = "Truncated (max 20 chars, no hyphens etc.) suffix to name e.g storage accounts"
 }
@@ -33,7 +33,16 @@ variable "tags" {
 
 variable "core_address_space" {
   type        = string
-  description = "The CIDR address space for the core virtual network (must be a min of /24)"
+  description = "The CIDR address space for the core virtual network (must be /24 or wider)"
+  default     = "10.0.0.0/24"
+}
+
+variable "use_random_address_space" {
+  type        = bool
+  description = <<EOF
+Whether to randomise the core address space (if set to true this will override the core_address_space variable).
+Use for PR/transient environments that peer with other static vnets (i.e. data sources) to reduce chance of conflicts."
+EOF
 }
 
 variable "deployer_ip_address" {
@@ -41,8 +50,6 @@ variable "deployer_ip_address" {
   default = ""
 }
 
-variable "local_mode" {
-  type        = bool
-  description = "Dev mode will enable more debugging, and set the deployer's IP address as an exception in resource firewalls"
-  default     = false
+variable "in_automation" {
+  type = bool
 }

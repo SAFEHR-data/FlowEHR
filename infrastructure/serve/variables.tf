@@ -16,7 +16,7 @@ variable "naming_suffix" {
   type = string
 }
 
-variable "truncated_naming_suffix" {
+variable "naming_suffix_truncated" {
   type = string
 }
 
@@ -48,6 +48,6 @@ variable "subnet_address_spaces" {
   type = list(string)
 }
 
-variable "local_mode" {
+variable "in_automation" {
   type = bool
 }

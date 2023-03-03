@@ -17,7 +17,7 @@ variable "naming_suffix" {
   description = "Suffix used to name resources"
 }
 
-variable "truncated_naming_suffix" {
+variable "naming_suffix_truncated" {
   type        = string
   description = "Truncated (max 20 chars, no hyphens etc.) suffix to name e.g storage accounts"
 }
@@ -64,7 +64,7 @@ variable "deployer_ip_address" {
   type = string
 }
 
-variable "local_mode" {
+variable "in_automation" {
   type = bool
 }
 

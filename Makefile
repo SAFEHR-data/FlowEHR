@@ -35,12 +35,10 @@ lint: ## Call pre-commit hooks to lint files & check for headers
 
 az-login: ## Check logged in/log into azure with a service principal 
 	$(call target_title, "Log-in to Azure") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& . ${MAKEFILE_DIR}/scripts/az_login.sh
 
 ci-auth: ## Deploy an AAD app with permissions to use for CI builds
 	$(call target_title, "Log-in to Azure") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& . ${MAKEFILE_DIR}/scripts/az_login.sh \
 	&& cd ${MAKEFILE_DIR}/infrastructure/ci-auth \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive \
@@ -48,29 +46,26 @@ ci-auth: ## Deploy an AAD app with permissions to use for CI builds
 
 bootstrap: az-login ## Boostrap Terraform backend
 	$(call target_title, "Bootstrap") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
-	&& . ${MAKEFILE_DIR}/scripts/bootstrap.sh
+	&& cd ${MAKEFILE_DIR}/bootstrap \
+	&& terragrunt run-all apply --terragrunt-non-interactive
 
 bootstrap-destroy: az-login ## Destroy boostrap rg
 	$(call target_title, "Destroy Bootstrap Env") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
-	&& . ${MAKEFILE_DIR}/scripts/bootstrap.sh -d
+	&& cd ${MAKEFILE_DIR}/bootstrap \
+	&& terragrunt run-all destroy --terragrunt-non-interactive
 
 infrastructure: transform-artifacts bootstrap ## Deploy all infrastructure
 	$(call target_title, "Deploy All Infrastructure") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/infrastructure \
 	&& terragrunt run-all apply --terragrunt-non-interactive
 
 infrastructure-core: bootstrap ## Deploy core infrastructure
 	$(call target_title, "Deploy Core Infrastructure") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/infrastructure/core \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
 
 infrastructure-transform: bootstrap transform-artifacts ## Deploy transform infrastructure
 	$(call target_title, "Deploy Transform Infrastructure") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/infrastructure/transform \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
 
@@ -80,7 +75,6 @@ transform-artifacts: ## Build transform artifacts
 
 infrastructure-serve: bootstrap ## Deploy serve infrastructure
 	$(call target_title, "Deploy Serve Infrastructure") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/infrastructure/serve \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
 
@@ -92,19 +86,16 @@ test-serve: infrastructure-serve destroy bootstrap-destroy  ## Test transform de
 
 apps: bootstrap ## Deploy FlowEHR apps
 	$(call target_title, "Deploy FlowEHR apps") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/apps \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
 
 destroy: az-login ## Destroy all infrastructure
 	$(call target_title, "Destroy All") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/infrastructure \
 	&& terragrunt run-all destroy --terragrunt-non-interactive
 
 destroy-no-terraform: az-login ## Destroy all resource groups associated with this deployment
 	$(call target_title, "Destroy no terraform") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& . ${MAKEFILE_DIR}/scripts/destroy_no_terraform.sh
 
 clean: ## Remove all local terraform state
@@ -112,6 +103,5 @@ clean: ## Remove all local terraform state
 
 tf-init: az-login ## Init Terraform (use for updating lock files)
 	$(call target_title, "Terraform init") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR} \
 	&& terragrunt run-all init

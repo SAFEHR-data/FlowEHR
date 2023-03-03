@@ -38,7 +38,7 @@ resource "azurerm_mssql_server" "sql_server_features" {
   version                              = "12.0"
   administrator_login                  = local.sql_server_features_admin_username
   administrator_login_password         = random_password.sql_admin_password.result
-  public_network_access_enabled        = var.local_mode
+  public_network_access_enabled        = !var.in_automation
   outbound_network_restriction_enabled = true
   tags                                 = var.tags
   azuread_administrator {
@@ -73,9 +73,9 @@ resource "azuread_app_role_assignment" "sql_application_read_all" {
   resource_object_id  = azuread_service_principal.msgraph.object_id
 }
 
-# optional firewall rule when running in local_mode
+# optional firewall rule when running locally
 resource "azurerm_mssql_firewall_rule" "deployer_ip_exception" {
-  count            = var.local_mode == true ? 1 : 0
+  count            = var.in_automation ? 0 : 1
   name             = "DeployerIP"
   server_id        = azurerm_mssql_server.sql_server_features.id
   start_ip_address = var.deployer_ip_address
