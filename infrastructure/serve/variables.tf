@@ -48,6 +48,6 @@ variable "subnet_address_spaces" {
   type = list(string)
 }
 
-variable "in_automation" {
+variable "tf_in_automation" {
   type = bool
 }

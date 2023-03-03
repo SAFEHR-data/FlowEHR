@@ -50,6 +50,6 @@ variable "deployer_ip_address" {
   default = ""
 }
 
-variable "in_automation" {
+variable "tf_in_automation" {
   type = bool
 }

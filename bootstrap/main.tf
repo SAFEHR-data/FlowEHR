@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 locals {
-  naming_suffix           = "${var.suffix}-${var.environment}"
+  naming_suffix           = var.suffix_override == "" ? "${var.suffix}-${var.environment}" : var.suffix_override
   naming_suffix_truncated = replace(replace(local.naming_suffix, "-", ""), "_", "")
 }
 
@@ -67,5 +67,5 @@ output "mgmt_storage" {
 }
 
 output "deployer_ip_address" {
-  value = var.in_automation ? "" : chomp(data.http.local_ip.body)
+  value = var.tf_in_automation ? "" : chomp(data.http.local_ip.body)
 }

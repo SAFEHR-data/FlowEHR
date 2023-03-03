@@ -52,6 +52,12 @@ variable "location" {
   }
 }
 
-variable "in_automation" {
+variable "tf_in_automation" {
   description = "Whether Terraform is being run in CI or locally. Local mode will whitelist deployer ip on certain resources to enable deployment outside of vnet."
+  type        = bool
+}
+
+variable "suffix_override" {
+  description = "Override the standard suffix that would be created from suffix + environment. Useful for transient PR environments"
+  type        = string
 }

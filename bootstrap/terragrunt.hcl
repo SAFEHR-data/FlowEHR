@@ -48,5 +48,6 @@ remote_state {
 }
 
 inputs = {
-  in_automation = get_env("IN_AUTOMATION", false)
+  tf_in_automation = get_env("TF_IN_AUTOMATION", false)
+  suffix_override  = get_env("SUFFIX_OVERRIDE", "")
 }

@@ -21,7 +21,7 @@ set -o nounset
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PIPELINE_DIR="${SCRIPT_DIR}/../transform/pipelines"
-CONFIG_PATH="${SCRIPT_DIR}/../config.transform.yaml"
+CONFIG_PATH="${SCRIPT_DIR}/../config.tfvars.json"
 ORG_GH_TOKEN="${ORG_GH_TOKEN:-}" # May be unset
 
 if [[ -n "${ORG_GH_TOKEN}" ]]; then
@@ -42,6 +42,6 @@ while IFS=$'\n' read -r repo _; do
   fi
 
   eval "${REPO_CHECKOUT_COMMAND}" "${repo}"
-done < <(yq e -I=0 '.repositories[]' "${CONFIG_PATH}")
+done < <(jq -c '.transform.repositories[]' "${CONFIG_PATH}")
 
 popd > /dev/null

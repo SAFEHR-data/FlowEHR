@@ -64,7 +64,7 @@ variable "deployer_ip_address" {
   type = string
 }
 
-variable "in_automation" {
+variable "tf_in_automation" {
   type = bool
 }
 

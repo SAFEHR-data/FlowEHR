@@ -38,7 +38,7 @@ variable "location" {
   type = string
 }
 
-variable "in_automation" {
+variable "tf_in_automation" {
   type = bool
 }
 

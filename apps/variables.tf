@@ -26,7 +26,7 @@ variable "tags" {
   type = map(any)
 }
 
-variable "in_automation" {
+variable "tf_in_automation" {
   type = bool
 }
 

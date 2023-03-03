@@ -86,7 +86,7 @@ jobs:
           env: |
             DOCKER_BUILDKIT=1
             TF_INPUT=0
-            IN_AUTOMATION=1
+            TF_IN_AUTOMATION=1
             ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}
             ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
             ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}

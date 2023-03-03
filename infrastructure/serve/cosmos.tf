@@ -20,8 +20,8 @@ resource "azurerm_cosmosdb_account" "serve" {
   kind                = "GlobalDocumentDB"
   tags                = var.tags
 
-  public_network_access_enabled = !var.in_automation
-  local_authentication_disabled = var.in_automation
+  public_network_access_enabled = !var.tf_in_automation
+  local_authentication_disabled = var.tf_in_automation
 
   capabilities {
     name = "EnableServerless"

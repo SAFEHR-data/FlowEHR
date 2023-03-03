@@ -121,7 +121,7 @@ inputs = {
   naming_suffix           = dependency.bootstrap.outputs.naming_suffix
   naming_suffix_truncated = dependency.bootstrap.outputs.naming_suffix_truncated
   deployer_ip_address     = dependency.bootstrap.outputs.deployer_ip_address
-  in_automation           = get_env("IN_AUTOMATION", false)
+  tf_in_automation           = get_env("TF_IN_AUTOMATION", false)
 
   tags = {
     environment = dependency.bootstrap.outputs.environment

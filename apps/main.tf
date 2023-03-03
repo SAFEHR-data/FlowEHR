@@ -17,7 +17,7 @@ module "app" {
   source                    = "./app"
   app_id                    = each.key
   naming_suffix             = var.naming_suffix
-  in_automation             = var.in_automation
+  tf_in_automation          = var.tf_in_automation
   webapps_subnet_id         = var.serve_webapps_subnet_id
   resource_group_name       = var.core_rg_name
   location                  = var.core_rg_location
