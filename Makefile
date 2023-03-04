@@ -21,7 +21,6 @@ target_title = @echo -e "\n\e[34m»»» 🌺 \e[96m$(1)\e[0m..."
 
 define terragrunt  # Arguments: <command>, <folder name>
     $(call target_title, "Running: terragrunt $(1) on $(2)") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR}/$(2) \
 	&& terragrunt run-all $(1) --terragrunt-include-external-dependencies \
 		--terragrunt-non-interactive --terragrunt-exclude-dir ${MAKEFILE_DIR}/ci
@@ -57,7 +56,7 @@ bootstrap: az-login ## Boostrap Terraform backend
 bootstrap-destroy: az-login ## Destroy boostrap rg
 	$(call terragrunt,destroy,bootstrap)
 
-infrastructure: transform-artifacts bootstrap ## Deploy all infrastructure
+infrastructure: transform-artifacts ## Deploy all infrastructure
 	$(call terragrunt,apply,infrastructure)
 
 infrastructure-core: ## Deploy core infrastructure
@@ -108,7 +107,6 @@ destroy-serve: ## Destroy serve infrastructure
 
 destroy-non-core: ## Destroy non-core 
 	$(call target_title, "Destroying non-core infrastructure") \
-	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR} \
 	&& terragrunt run-all destroy \
 		--terragrunt-include-external-dependencies \

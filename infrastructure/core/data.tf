@@ -16,7 +16,7 @@ data "azurerm_client_config" "current" {}
 
 # Find the resource group which contains the ACR holding the devcontainer
 data "external" "devcontainer_acr" {
-  count = var.local_mode == true ? 0 : 1
+  count = var.tf_in_automation ? 1 : 0
   program = [
     "bash", "-c",
     <<EOF
@@ -27,7 +27,7 @@ EOF
 }
 
 data "azurerm_container_registry" "devcontainer" {
-  count               = var.local_mode == true ? 0 : 1
+  count               = var.tf_in_automation ? 1 : 0
   name                = var.devcontainer_acr_name
   resource_group_name = data.external.devcontainer_acr[0].result["resourceGroup"]
 }

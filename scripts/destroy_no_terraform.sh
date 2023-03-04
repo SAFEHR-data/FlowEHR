@@ -17,6 +17,12 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SUFFIX=$(yq '.suffix' "$SCRIPT_DIR/../config.yaml")
+ENVIRONMENT=$(yq '.environment' "$SCRIPT_DIR/../config.yaml")
+
+[[ -z "${SUFFIX_OVERRIDE:-}" ]] && NAMING_SUFFIX="$SUFFIX-$ENVIRONMENT" || NAMING_SUFFIX="$SUFFIX_OVERRIDE"
+
 az group list -o table | while read -r line ; do
 
   if echo "$line" | grep -q "${NAMING_SUFFIX}"; then

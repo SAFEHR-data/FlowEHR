@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 resource "azurerm_container_group" "build_agent" {
-  count               = var.local_mode == true ? 0 : 1
+  count               = var.tf_in_automation ? 1 : 0
   name                = "cg-build-agent-${var.naming_suffix}"
   resource_group_name = azurerm_resource_group.core.name
   location            = azurerm_resource_group.core.location
@@ -60,7 +60,7 @@ resource "azurerm_container_group" "build_agent" {
 
 ## TF ensure container is running as it may have been deployed and is now stopped
 resource "null_resource" "ensure_build_agent_is_running" {
-  count = var.local_mode == true ? 0 : 1
+  count = var.tf_in_automation ? 1 : 0
 
   triggers = {
     always_run = timestamp()
