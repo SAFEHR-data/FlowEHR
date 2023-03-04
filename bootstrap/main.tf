@@ -44,6 +44,7 @@ resource "azurerm_container_registry" "acr" {
   resource_group_name = azurerm_resource_group.bootstrap.name
   location            = azurerm_resource_group.bootstrap.location
   sku                 = "Basic"
+  admin_enabled       = true
 }
 
 output "naming_suffix" {

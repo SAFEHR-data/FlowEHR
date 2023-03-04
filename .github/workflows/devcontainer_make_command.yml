@@ -74,7 +74,7 @@ jobs:
 
           if echo ${{ inputs.command }} | grep -q "test" ; then
               build_agent_command="${{ inputs.command }}-without-core-destroy"
-              post_build_agent_command="destroy-all"
+              post_build_agent_command="destroy"
           elif echo ${{ inputs.command }} | grep -q "destroy" ; then
               build_agent_command="destroy-non-core"
               post_build_agent_command="${{ inputs.command }}"
