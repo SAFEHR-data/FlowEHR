@@ -16,9 +16,16 @@
 SHELL:=/bin/bash
 MAKEFILE_FULLPATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MAKEFILE_DIR := $(dir $(MAKEFILE_FULLPATH))
-LINTER_REGEX_INCLUDE?=all # regex to specify which files to include in local linting (defaults to "all")
 
 target_title = @echo -e "\n\e[34m»»» 🌺 \e[96m$(1)\e[0m..."
+
+define terragrunt  # Arguments: <command>, <folder name>
+    $(call target_title, "Running: terragrunt $(1) on $(2)") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& cd ${MAKEFILE_DIR}/$(2) \
+	&& terragrunt run-all $(1) --terragrunt-include-external-dependencies \
+		--terragrunt-non-interactive --terragrunt-exclude-dir ${MAKEFILE_DIR}/ci
+endef
 
 all: infrastructure apps
 
@@ -35,73 +42,88 @@ lint: ## Call pre-commit hooks to lint files & check for headers
 
 az-login: ## Check logged in/log into azure with a service principal 
 	$(call target_title, "Log-in to Azure") \
-	&& . ${MAKEFILE_DIR}/scripts/az_login.sh
+	&& cd ${MAKEFILE_DIR}/scripts && ./az_login.sh
 
-ci-auth: ## Deploy an AAD app with permissions to use for CI builds
-	$(call target_title, "Log-in to Azure") \
-	&& . ${MAKEFILE_DIR}/scripts/az_login.sh \
-	&& cd ${MAKEFILE_DIR}/infrastructure/ci-auth \
-	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive \
-	&& terraform output -json | jq 'with_entries(.value |= .value)'
+ci-auth: az-login ## Deploy an AAD app with permissions to use for CI builds
+	$(call target_title, "Creating CI auth") \
+	&& cd ${MAKEFILE_DIR}/ci \
+	&& terragrunt run-all apply \
+	&& terraform output -json \
+	  | jq -r 'with_entries(.value |= .value) | to_entries[] | "\(.key +": "+ .value)"'
 
 bootstrap: az-login ## Boostrap Terraform backend
-	$(call target_title, "Bootstrap") \
-	&& cd ${MAKEFILE_DIR}/bootstrap \
-	&& terragrunt apply --terragrunt-non-interactive
+	$(call terragrunt,apply,bootstrap)
 
 bootstrap-destroy: az-login ## Destroy boostrap rg
-	$(call target_title, "Destroy Bootstrap Env") \
-	&& cd ${MAKEFILE_DIR}/bootstrap \
-	&& terragrunt destroy --terragrunt-non-interactive
+	$(call terragrunt,destroy,bootstrap)
 
-infrastructure: transform-artifacts ## Deploy all infrastructure
-	$(call target_title, "Deploy All Infrastructure") \
-	&& cd ${MAKEFILE_DIR}/infrastructure \
-	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
+infrastructure: transform-artifacts bootstrap ## Deploy all infrastructure
+	$(call terragrunt,apply,infrastructure)
 
 infrastructure-core: ## Deploy core infrastructure
-	$(call target_title, "Deploy Core Infrastructure") \
-	&& cd ${MAKEFILE_DIR}/infrastructure/core \
-	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
+	$(call terragrunt,apply,infrastructure/core)
 
-infrastructure-transform: bootstrap transform-artifacts ## Deploy transform infrastructure
-	$(call target_title, "Deploy Transform Infrastructure") \
-	&& cd ${MAKEFILE_DIR}/infrastructure/transform \
-	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
+infrastructure-transform: transform-artifacts ## Deploy transform infrastructure
+	$(call terragrunt,apply,infrastructure/transform)
 
-PIPELINE_DIR = ${MAKEFILE_DIR}/transform/pipelines
 transform-artifacts: ## Build transform artifacts
+	${MAKEFILE_DIR}/scripts/pipeline_repo_checkout.sh \
 	${MAKEFILE_DIR}/scripts/build_artifacts.sh
 
 infrastructure-serve: ## Deploy serve infrastructure
-	$(call target_title, "Deploy Serve Infrastructure") \
-	&& cd ${MAKEFILE_DIR}/infrastructure/serve \
-	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
+	$(call terragrunt,apply,infrastructure/serve)
 
-test: infrastructure destroy bootstrap-destroy  ## Test by deploy->destroy
+test: infrastructure apps destroy-all  ## Test by deploy->destroy
 
-test-transform: infrastructure-transform destroy bootstrap-destroy  ## Test transform deploy->destroy
+test-transform: infrastructure-transform destroy-all  ## Test transform deploy->destroy
 
-test-serve: infrastructure-serve destroy bootstrap-destroy  ## Test transform deploy->destroy
+test-serve: infrastructure-serve destroy-all  ## Test transform deploy->destroy
+
+test-without-core-destroy: infrastructure apps destroy-non-core ## Test non-core deploy->destroy destroying core
+
+test-transform-without-core-destroy: infrastructure-transform destroy-non-core  ## Test transform deploy->destroy destroying core
+
+test-serve-without-core-destroy: infrastructure-serve destroy-non-core  ## Test serve deploy->destroy without destroying core
 
 apps: ## Deploy FlowEHR apps
-	$(call target_title, "Deploy FlowEHR apps") \
-	&& cd ${MAKEFILE_DIR}/apps \
-	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
+	$(call terragrunt,apply,apps)
 
-destroy: az-login ## Destroy all infrastructure
-	$(call target_title, "Destroy All") \
-	&& cd ${MAKEFILE_DIR}/infrastructure \
-	&& terragrunt run-all destroy --terragrunt-non-interactive
+destroy: az-login ## Destroy everything
+	$(call terragrunt,destroy,.)
+
+destroy-infrastructure: az-login ## Destroy infrastructure
+	$(call terragrunt,destroy,infrastructure)
+
+destroy-apps: az-login ## Destroy apps
+	$(call terragrunt,destroy,apps)
+
+destroy-core: ## Destroy core infrastructure
+	$(call terragrunt,destroy,infrastructure/core)
+
+destroy-transform: ## Destroy transform infrastructure
+	$(call terragrunt,destroy,infrastructure/transform)
+
+destroy-serve: ## Destroy serve infrastructure
+	$(call terragrunt,destroy,infrastructure/serve)
+
+destroy-non-core: ## Destroy non-core 
+	$(call target_title, "Destroying non-core infrastructure") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& cd ${MAKEFILE_DIR} \
+	&& terragrunt run-all destroy \
+		--terragrunt-include-external-dependencies \
+		--terragrunt-non-interactive \
+		--terragrunt-exclude-dir ${MAKEFILE_DIR}/infrastructure/core \
+		--terragrunt-exclude-dir ${MAKEFILE_DIR}/ci
 
 destroy-no-terraform: az-login ## Destroy all resource groups associated with this deployment
 	$(call target_title, "Destroy no terraform") \
 	&& . ${MAKEFILE_DIR}/scripts/destroy_no_terraform.sh
 
 clean: ## Remove all local terraform state
-	find ${MAKEFILE_DIR} -type d -name ".terraform" -exec rm -rf "{}" \;
+	find ${MAKEFILE_DIR} -type d -name ".terraform" -exec rm -rf "{}" \; || true
 
 tf-reinit: clean ## Init Terraform (use for updating lock files)
 	$(call target_title, "Terraform init") \
 	&& cd ${MAKEFILE_DIR} \
-	&& terragrunt run-all init
+	&& terragrunt run-all init -upgrade

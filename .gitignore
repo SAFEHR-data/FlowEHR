@@ -1,6 +1,5 @@
 # Local .terraform directories
 **/.terraform/*
-.terraform.lock.hcl
 
 # .tfstate files
 *.tfstate
@@ -47,6 +46,7 @@ terraform.tf
 
 # Python artifacts
 **/__pycache__/**
+.pytest_cache
 
 # vs code settings
 .vscode/

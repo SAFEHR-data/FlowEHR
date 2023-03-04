@@ -46,6 +46,7 @@ provider "azurerm" {
   }
 }
 EOF
+
   required_provider_azure = <<EOF
 azurerm = {
   source  = "hashicorp/azurerm"
@@ -69,15 +70,29 @@ EOF
 
   required_provider_databricks = <<EOF
  databricks = {
-      source = "databricks/databricks"
-      version = "1.9.1"
-    }
+    source = "databricks/databricks"
+    version = "1.9.1"
+  }
+EOF
+
+  required_provider_external = <<EOF
+  external = {
+    source = "hashicorp/external"
+    version = "2.2.3"
+  }
 EOF
 
   required_provider_null = <<EOF
-  null = {
+    null = {
       source = "hashicorp/null"
       version = "3.2.1"
+    }
+EOF
+
+  required_provider_github = <<EOF
+  github = {
+      source  = "integrations/github"
+      version = "~> 5.0"
     }
 EOF
 }
@@ -91,6 +106,8 @@ terraform {
 
   required_providers {
     ${local.required_provider_azure}
+    ${local.required_provider_null}
+    ${local.required_provider_external}
   }
 }
 EOF
@@ -127,7 +144,7 @@ inputs = merge(
   deployer_ip_address     = dependency.bootstrap.outputs.deployer_ip_address
 
   # And any global env vars that should be made available
-  tf_in_automation        = get_env("TF_IN_AUTOMATION", false)
+  tf_in_automation = get_env("TF_IN_AUTOMATION", false)
 
   # Tags to add to every resource that accepts them
   tags = {

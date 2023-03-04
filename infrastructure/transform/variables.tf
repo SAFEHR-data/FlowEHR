@@ -20,8 +20,12 @@ variable "naming_suffix_truncated" {
   type = string
 }
 
-variable "subnet_address_spaces" {
-  type = list(string)
+variable "databricks_host_address_space" {
+  type = string
+}
+
+variable "databricks_container_address_space" {
+  type = string
 }
 
 variable "tags" {
@@ -77,8 +81,11 @@ variable "transform" {
 variable "data_source_connections" {
   description = "List of data sources for the transform pipeline"
   type = list(object({
-    name              = string
-    connection_string = string
+    name     = string
+    fqdn     = string
+    database = string
+    username = string
+    password = string
     peering = optional(
       object({
         virtual_network_name = string

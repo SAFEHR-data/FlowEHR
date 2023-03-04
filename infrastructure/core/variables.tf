@@ -53,3 +53,33 @@ variable "deployer_ip_address" {
 variable "tf_in_automation" {
   type = bool
 }
+
+variable "devcontainer_acr_name" {
+  type        = string
+  description = "Name of the azure container registry i.e. <acr-name>.azurecr.io"
+}
+
+variable "devcontainer_tag" {
+  type        = string
+  description = ""
+}
+
+variable "devcontainer_image_name" {
+  type        = string
+  description = "Name of the azure container registry i.e. aregistry.azurecr.io/<image-name>:tag"
+}
+
+variable "github_runner_name" {
+  type        = string
+  description = "Name of the GitHub runner that will be created"
+}
+
+variable "github_runner_token" {
+  type        = string
+  description = "GitHub token with permissions to register a runner on this repository"
+}
+
+variable "github_repository" {
+  type        = string
+  description = "Github repository in which to create the build agent. e.g. UCLH-Foundry/FlowEHR"
+}

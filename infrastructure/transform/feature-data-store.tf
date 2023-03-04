@@ -108,7 +108,8 @@ resource "null_resource" "create_sql_user" {
     azuread_application.flowehr_databricks_sql,
     azuread_app_role_assignment.sql_user_read_all,
     azuread_app_role_assignment.sql_groupmember_read_all,
-    azuread_app_role_assignment.sql_application_read_all
+    azuread_app_role_assignment.sql_application_read_all,
+    azurerm_private_endpoint.sql_server_features_pe
   ]
 
   triggers = {
@@ -120,8 +121,9 @@ resource "null_resource" "create_sql_user" {
   # load a csv file into a new SQL table
   provisioner "local-exec" {
     command = <<EOF
-      python ../../scripts/sql/create_sql_user.py
-      python ../../scripts/sql/load_csv_data.py
+      SCRIPTS_DIR="../../scripts"
+      $SCRIPTS_DIR/retry.sh python $SCRIPTS_DIR/sql/create_sql_user.py
+      $SCRIPTS_DIR/retry.sh python $SCRIPTS_DIR/sql/load_csv_data.py
     EOF
     environment = {
       SERVER          = azurerm_mssql_server.sql_server_features.fully_qualified_domain_name
@@ -148,7 +150,6 @@ resource "azuread_service_principal" "flowehr_databricks_sql" {
   owners         = [data.azurerm_client_config.current.object_id]
 }
 
-/* TODO - enable when build agent can communicate with KV
 # Push secrets to KV
 resource "azurerm_key_vault_secret" "sql_server_owner_app_id" {
   name         = "sql-owner-app-id"
@@ -179,30 +180,6 @@ resource "azurerm_key_vault_secret" "flowehr_databricks_sql_spn_app_secret" {
   name         = "flowehr-dbks-sql-app-secret"
   value        = azuread_application_password.flowehr_databricks_sql.value
   key_vault_id = var.core_kv_id
-}
-*/
-
-# Push SPN details to databricks secret scope
-resource "databricks_secret" "flowehr_databricks_sql_spn_app_id" {
-  key          = "flowehr-dbks-sql-app-id"
-  string_value = azuread_service_principal.flowehr_databricks_sql.application_id
-  scope        = databricks_secret_scope.secrets.id
-}
-
-resource "databricks_secret" "flowehr_databricks_sql_spn_app_secret" {
-  key          = "flowehr-dbks-sql-app-secret"
-  string_value = azuread_application_password.flowehr_databricks_sql.value
-  scope        = databricks_secret_scope.secrets.id
-}
-resource "databricks_secret" "flowehr_databricks_sql_server" {
-  key          = "flowehr-dbks-sql-server"
-  string_value = azurerm_mssql_server.sql_server_features.fully_qualified_domain_name
-  scope        = databricks_secret_scope.secrets.id
-}
-resource "databricks_secret" "flowehr_databricks_sql_database" {
-  key          = "flowehr-dbks-sql-database"
-  string_value = azurerm_mssql_database.feature_database.name
-  scope        = databricks_secret_scope.secrets.id
 }
 
 # Private DNS + endpoint for SQL Server

@@ -18,6 +18,7 @@ module "app" {
   app_id                    = each.key
   naming_suffix             = var.naming_suffix
   tf_in_automation          = var.tf_in_automation
+  environment               = var.environment
   webapps_subnet_id         = var.serve_webapps_subnet_id
   resource_group_name       = var.core_rg_name
   location                  = var.core_rg_location
@@ -27,5 +28,6 @@ module "app" {
   cosmos_account_name       = var.serve_cosmos_account_name
   feature_store_db_name     = var.transform_feature_store_db_name
   feature_store_server_name = var.transform_feature_store_server_name
+  github_owner              = var.github_owner
   app_config                = each.value
 }

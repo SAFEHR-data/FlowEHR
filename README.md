@@ -53,6 +53,8 @@ Then edit `config.tfvars` and specify the following values:
     make all
     ```
 
+    > For more info on configuring and deploying apps, see the [README](./apps/README.md)
+
     Alternatively, you can deploy just infrastructure:
 
     ```bash
@@ -93,22 +95,16 @@ This step will create an AAD Application and Service Principal in the specified 
 
     Add an environment called `Infra-Test` with the following secrets:
 
-    - `AZURE_CREDENTIALS`: json containing the credentials of the service principal (outputted from the previous step) in the following format:
-
-        ```json
-        {
-            "clientId": "xxx",
-            "clientSecret": "xxx",
-            "tenantId": "xxx",
-            "subscriptionId": "xxx",
-            "resourceManagerEndpointUrl": "management.azure.com"
-        }
-        ```
-
+    - `ARM_CLIENT_ID`: Client ID of the service pricipal created in step 2
+    - `ARM_CLIENT_SECRET`: Client secret of the service pricipal created in step 2
+    - `ARM_TENANT_ID`: Tennant ID containing the Azure subscription to deploy into
+    - `ARM_SUBSCRIPTION_ID`: Subscription ID of the Azure subscription to deploy into
     - `SUFFIX`: Suffix used for naming resources. Must be unique to this repository e.g. `abcd`
     - `LOCATION`: Name of an Azure location e.g. `uksouth`. These can be listed with `az account list-locations -o table`
     - `ENVIRONMENT`: Name of the environment e.g. `dev`, also used to name resources
     - `DEVCONTAINER_ACR_NAME`: Name of the Azure Container Registry to use for the devcontainer build. This may or may not exist. e.g. `flowehrmgmtacr`
+    - `ORG_GH_TOKEN`: GitHub [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) with scopes to clone any repositories defined in `config.transform.yaml`. This may be added as a repository rather than envrionment secret and be reused betweeen envrionments
+    - `GH_RUNNER_CREATE_TOKEN` Similar to `ORG_GH_TOKEN` but with scopes: "Read access to metadata" and "Read and Write access to administration" on this repository
     - [Optional] `DATA_SOURCE_CONNECTIONS`: *single line* json containing connectivity information to data sources in the format:
 
     ```json
@@ -122,7 +118,10 @@ This step will create an AAD Application and Service Principal in the specified 
                 "privatelink.xxx.xxx.azure.com"
             ]
         },
-        "connection_string": "postgresql://<hostname>:5432/<database-name>?user=<username>&password=<***>"
+        "fqdn": "<fqdn>",
+        "database_name": "<database_name>",
+        "username": "username",
+        "password": "password"
     }
     ]
     ```

@@ -18,36 +18,6 @@ resource "azurerm_resource_group" "core" {
   tags     = var.tags
 }
 
-resource "random_integer" "ip" {
-  count = var.use_random_address_space ? 2 : 0
-  min   = 0
-  max   = 255
-  keepers = {
-    suffix = var.naming_suffix
-  }
-}
-
-resource "azurerm_virtual_network" "core" {
-  name                = "vnet-${var.naming_suffix}"
-  resource_group_name = azurerm_resource_group.core.name
-  location            = azurerm_resource_group.core.location
-  tags                = var.tags
-
-  address_space = [
-    var.use_random_address_space
-    ? "10.${random_integer.ip[0].result}.${random_integer.ip[1].result}.0/24"
-    : var.core_address_space
-  ]
-}
-
-resource "azurerm_subnet" "core" {
-  name                 = "subnet-core-${var.naming_suffix}"
-  resource_group_name  = azurerm_resource_group.core.name
-  virtual_network_name = azurerm_virtual_network.core.name
-  address_prefixes     = [local.subnet_address_spaces[0]]
-  service_endpoints    = ["Microsoft.KeyVault", "Microsoft.Storage"]
-}
-
 resource "azurerm_storage_account" "core" {
   name                     = "strg${var.naming_suffix_truncated}"
   resource_group_name      = azurerm_resource_group.core.name
@@ -58,39 +28,26 @@ resource "azurerm_storage_account" "core" {
 
   network_rules {
     default_action             = "Deny"
-    virtual_network_subnet_ids = [azurerm_subnet.core.id]
+    virtual_network_subnet_ids = [azurerm_subnet.core_shared.id]
   }
 }
 
-resource "azurerm_private_dns_zone" "blobcore" {
-  name                = "privatelink.blob.core.windows.net"
-  resource_group_name = azurerm_resource_group.core.name
-  tags                = var.tags
-}
-
-resource "azurerm_private_dns_zone_virtual_network_link" "blobcore" {
-  name                  = "vnl-blob-${var.naming_suffix}"
-  resource_group_name   = azurerm_resource_group.core.name
-  private_dns_zone_name = azurerm_private_dns_zone.blobcore.name
-  virtual_network_id    = azurerm_virtual_network.core.id
-  tags                  = var.tags
-}
-
 resource "azurerm_key_vault" "core" {
-  name                       = "kv-${var.naming_suffix_truncated}"
-  location                   = azurerm_resource_group.core.location
-  resource_group_name        = azurerm_resource_group.core.name
-  tenant_id                  = data.azurerm_client_config.current.tenant_id
-  soft_delete_retention_days = 7
-  purge_protection_enabled   = false
-  enable_rbac_authorization  = true
-  sku_name                   = "standard"
-  tags                       = var.tags
+  name                          = "kv-${var.naming_suffix_truncated}"
+  location                      = azurerm_resource_group.core.location
+  resource_group_name           = azurerm_resource_group.core.name
+  tenant_id                     = data.azurerm_client_config.current.tenant_id
+  soft_delete_retention_days    = 7
+  purge_protection_enabled      = false
+  enable_rbac_authorization     = true
+  public_network_access_enabled = var.tf_in_automation ? false : true
+  sku_name                      = "standard"
+  tags                          = var.tags
 
   network_acls {
     bypass                     = "AzureServices"
     default_action             = "Deny"
-    virtual_network_subnet_ids = [azurerm_subnet.core.id]
+    virtual_network_subnet_ids = [azurerm_subnet.core_shared.id]
     ip_rules                   = var.tf_in_automation ? [] : [var.deployer_ip_address]
   }
 }
@@ -99,6 +56,25 @@ resource "azurerm_role_assignment" "deployer_can_administrate_kv" {
   scope                = azurerm_key_vault.core.id
   role_definition_name = "Key Vault Administrator"
   principal_id         = data.azurerm_client_config.current.object_id
+}
+
+resource "azurerm_private_endpoint" "flowehr_keyvault" {
+  name                = "ep-kv-${var.naming_suffix}"
+  location            = azurerm_resource_group.core.location
+  resource_group_name = azurerm_resource_group.core.name
+  subnet_id           = azurerm_subnet.core_shared.id
+
+  private_dns_zone_group {
+    name                 = "private-dns-zone-group-kv-${var.naming_suffix}"
+    private_dns_zone_ids = [azurerm_private_dns_zone.all["keyvault"].id]
+  }
+
+  private_service_connection {
+    name                           = "private-service-connection-kv-${var.naming_suffix}"
+    is_manual_connection           = false
+    private_connection_resource_id = azurerm_key_vault.core.id
+    subresource_names              = ["Vault"]
+  }
 }
 
 resource "azurerm_log_analytics_workspace" "core" {

@@ -22,6 +22,10 @@ variable "naming_suffix_truncated" {
   description = "Truncated (max 20 chars, no hyphens etc.) suffix for e.g storage accounts"
 }
 
+variable "environment" {
+  type = string
+}
+
 variable "tags" {
   type = map(any)
 }
@@ -67,5 +71,9 @@ variable "serve_acr_name" {
 }
 
 variable "serve_webapps_subnet_id" {
+  type = string
+}
+
+variable "github_owner" {
   type = string
 }

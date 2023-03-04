@@ -30,6 +30,10 @@ variable "naming_suffix" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
 variable "resource_group_name" {
   type = string
 }
@@ -70,20 +74,22 @@ variable "feature_store_server_name" {
   type = string
 }
 
+variable "github_owner" {
+  type = string
+}
+
 variable "app_config" {
   type = object({
-    name        = string
-    description = string
-    owner       = string
-
-    contributors = list(object({
-      email       = string
-      gh_username = string
-    }))
+    name         = string
+    description  = string
+    owners       = set(string)
+    contributors = set(string)
 
     managed_repo = object({
-      template         = string,
-      branch_approvers = list(string)
+      private               = bool
+      template              = string,
+      num_of_approvals      = optional(number, 1),
+      dismiss_stale_reviews = optional(bool, false)
     })
 
     env = optional(map(string))
