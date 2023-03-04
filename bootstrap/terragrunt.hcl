@@ -12,10 +12,11 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-include "root" {
-  path           = find_in_parent_folders()
-  merge_strategy = "no_merge"
-  expose         = true
+terraform {
+  extra_arguments "auto_approve" {
+    commands  = ["apply"]
+    arguments = ["-auto-approve"]
+  }
 }
 
 generate "terraform" {
@@ -23,10 +24,13 @@ generate "terraform" {
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
 terraform {
-  required_version = "${include.root.locals.terraform_version}"
+  required_version = "1.3.7"
 
   required_providers {
-    ${include.root.locals.required_provider_azurerm}
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 3.32"
+    }
   }
 }
 EOF
@@ -35,7 +39,15 @@ EOF
 generate "provider" {
   path      = "provider.tf"
   if_exists = "overwrite_terragrunt"
-  contents  = include.root.locals.azure_provider
+  contents  = <<EOF
+provider "azurerm" {
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
+}
+EOF
 }
 
 remote_state {
@@ -47,7 +59,8 @@ remote_state {
   }
 }
 
-inputs = {
+inputs = merge(
+  yamldecode(file(find_in_parent_folders("config.yaml"))), {
   tf_in_automation = get_env("TF_IN_AUTOMATION", false)
   suffix_override  = get_env("SUFFIX_OVERRIDE", "")
-}
+})

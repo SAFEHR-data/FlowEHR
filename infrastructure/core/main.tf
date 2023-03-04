@@ -18,12 +18,26 @@ resource "azurerm_resource_group" "core" {
   tags     = var.tags
 }
 
+resource "random_integer" "ip" {
+  count = var.use_random_address_space ? 2 : 0
+  min   = 0
+  max   = 255
+  keepers = {
+    suffix = var.naming_suffix
+  }
+}
+
 resource "azurerm_virtual_network" "core" {
   name                = "vnet-${var.naming_suffix}"
   resource_group_name = azurerm_resource_group.core.name
   location            = azurerm_resource_group.core.location
-  address_space       = [local.address_space]
   tags                = var.tags
+
+  address_space = [
+    var.use_random_address_space
+    ? "10.${random_integer.ip[0].result}.${random_integer.ip[1].result}.0/24"
+    : var.core_address_space
+  ]
 }
 
 resource "azurerm_subnet" "core" {

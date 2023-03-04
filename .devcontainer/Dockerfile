@@ -16,7 +16,7 @@ FROM mcr.microsoft.com/vscode/devcontainers/python:3.10
 
 COPY .devcontainer/library-scripts/*.sh /tmp/library-scripts/
 
-COPY config.tfvars.json /tmp/config.tfvars.json
+COPY config.yaml /tmp/config.yaml
 
 # [Option] Install zsh
 ARG INSTALL_ZSH="true"
@@ -90,7 +90,7 @@ RUN python3 -m pip install pyspark=="${SPARK_VERSION}" pyodbc=="${PYODBC_VERSION
 # Get the local Spark installed to be able to run unit tests
 # Borrowed from https://github.com/beandrad/pyspark-sample/blob/main/.devcontainer/Dockerfile#L36
 RUN mkdir -p /tmp/docker-downloads \
-    && SPARK_VERSION=$(jq -r .transform.spark_version /tmp/config.tfvars.json) \
+    && SPARK_VERSION=$(yq e .transform.spark_version /tmp/config.yaml) \
     && sudo apt-get update && sudo apt-get -y install openjdk-11-jdk wget \
     && wget https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz -O /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
     && tar -xvzf /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \

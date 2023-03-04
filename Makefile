@@ -20,7 +20,7 @@ LINTER_REGEX_INCLUDE?=all # regex to specify which files to include in local lin
 
 target_title = @echo -e "\n\e[34m»»» 🌺 \e[96m$(1)\e[0m..."
 
-all: bootstrap infrastructure apps
+all: infrastructure apps
 
 help: ## Show this help
 	@echo
@@ -47,19 +47,19 @@ ci-auth: ## Deploy an AAD app with permissions to use for CI builds
 bootstrap: az-login ## Boostrap Terraform backend
 	$(call target_title, "Bootstrap") \
 	&& cd ${MAKEFILE_DIR}/bootstrap \
-	&& terragrunt run-all apply --terragrunt-non-interactive
+	&& terragrunt apply --terragrunt-non-interactive
 
 bootstrap-destroy: az-login ## Destroy boostrap rg
 	$(call target_title, "Destroy Bootstrap Env") \
 	&& cd ${MAKEFILE_DIR}/bootstrap \
-	&& terragrunt run-all destroy --terragrunt-non-interactive
+	&& terragrunt destroy --terragrunt-non-interactive
 
-infrastructure: transform-artifacts bootstrap ## Deploy all infrastructure
+infrastructure: transform-artifacts ## Deploy all infrastructure
 	$(call target_title, "Deploy All Infrastructure") \
 	&& cd ${MAKEFILE_DIR}/infrastructure \
-	&& terragrunt run-all apply --terragrunt-non-interactive
+	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
 
-infrastructure-core: bootstrap ## Deploy core infrastructure
+infrastructure-core: ## Deploy core infrastructure
 	$(call target_title, "Deploy Core Infrastructure") \
 	&& cd ${MAKEFILE_DIR}/infrastructure/core \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
@@ -73,7 +73,7 @@ PIPELINE_DIR = ${MAKEFILE_DIR}/transform/pipelines
 transform-artifacts: ## Build transform artifacts
 	${MAKEFILE_DIR}/scripts/build_artifacts.sh
 
-infrastructure-serve: bootstrap ## Deploy serve infrastructure
+infrastructure-serve: ## Deploy serve infrastructure
 	$(call target_title, "Deploy Serve Infrastructure") \
 	&& cd ${MAKEFILE_DIR}/infrastructure/serve \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
@@ -84,7 +84,7 @@ test-transform: infrastructure-transform destroy bootstrap-destroy  ## Test tran
 
 test-serve: infrastructure-serve destroy bootstrap-destroy  ## Test transform deploy->destroy
 
-apps: bootstrap ## Deploy FlowEHR apps
+apps: ## Deploy FlowEHR apps
 	$(call target_title, "Deploy FlowEHR apps") \
 	&& cd ${MAKEFILE_DIR}/apps \
 	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive
@@ -101,7 +101,7 @@ destroy-no-terraform: az-login ## Destroy all resource groups associated with th
 clean: ## Remove all local terraform state
 	find ${MAKEFILE_DIR} -type d -name ".terraform" -exec rm -rf "{}" \;
 
-tf-init: az-login ## Init Terraform (use for updating lock files)
+tf-reinit: clean ## Init Terraform (use for updating lock files)
 	$(call target_title, "Terraform init") \
 	&& cd ${MAKEFILE_DIR} \
 	&& terragrunt run-all init

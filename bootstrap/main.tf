@@ -67,5 +67,5 @@ output "mgmt_storage" {
 }
 
 output "deployer_ip_address" {
-  value = var.tf_in_automation ? "" : chomp(data.http.local_ip.body)
+  value = var.tf_in_automation ? "" : chomp(data.http.local_ip.response_body)
 }

@@ -13,19 +13,11 @@
 #  limitations under the License.
 
 variable "naming_suffix" {
-  type        = string
-  description = "Suffix used to name resources"
+  type = string
 }
 
 variable "naming_suffix_truncated" {
-  type        = string
-  description = "Truncated (max 20 chars, no hyphens etc.) suffix to name e.g storage accounts"
-}
-
-variable "access_databricks_management_publicly" {
-  type        = bool
-  description = "Whether to allow access to the Databricks workspace management plane via a public network"
-  default     = true
+  type = string
 }
 
 variable "subnet_address_spaces" {
@@ -68,7 +60,22 @@ variable "tf_in_automation" {
   type = bool
 }
 
+variable "access_databricks_management_publicly" {
+  type        = bool
+  description = "Whether to allow access to the Databricks workspace management plane via a public network"
+  default     = true
+}
+
+variable "transform" {
+  description = "Transform configuration block (populated from root config file)"
+  type = object({
+    spark_version = optional(string, "3.3.1")
+    repositories  = optional(list(string), [])
+  })
+}
+
 variable "data_source_connections" {
+  description = "List of data sources for the transform pipeline"
   type = list(object({
     name              = string
     connection_string = string

@@ -38,8 +38,6 @@ locals {
   ])
   storage_account_name = "dbfs${var.naming_suffix_truncated}"
 
-  spark_version = yamldecode(file("../../config.transform.yaml")).spark_version
-
   data_source_connections_with_peerings = [
     for idx, item in var.data_source_connections : item if item.peering != null
   ]

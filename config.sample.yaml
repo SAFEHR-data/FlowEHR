@@ -1,0 +1,26 @@
+suffix: __CHANGE_ME__
+location: __CHANGE_ME__
+environment: __CHANGE_ME__
+devcontainer_acr_name: __CHANGE_ME__
+
+data_source_connections:
+  - example:
+    name: __CHANGE_ME__
+    peering: # Optional
+      virtual_network_name: __CHANGE_ME__
+      resource_group_name: __CHANGE_ME__
+      dns_zones:
+        - __CHANGE_ME__
+    fqdn: __CHANGE_ME__
+    database: __CHANGE_ME__
+    username: __CHANGE_ME__
+    password: __CHANGE_ME__
+
+transform:
+  spark_version: 3.3.1
+  repositories:
+    - https://github.com/MY_TRANSFORM_CODE_REPO.git
+
+serve:
+  github_owner: __CHANGE_ME__
+  github_token: __CHANGE_ME__

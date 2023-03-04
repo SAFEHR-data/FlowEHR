@@ -13,10 +13,5 @@
 #  limitations under the License.
 
 locals {
-  address_space = (
-    var.use_random_address_space
-    ? "10.${random_integer.ip1.value}.${random_integer.ip2.value}.0/24"
-    : var.core_address_space
-  )
-  subnet_address_spaces = cidrsubnets(local.address_space, 2, 2, 2, 2)
+  subnet_address_spaces = cidrsubnets(azurerm_virtual_network.core.address_space[0], 2, 2, 2, 2)
 }

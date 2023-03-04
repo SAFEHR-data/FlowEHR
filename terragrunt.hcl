@@ -117,13 +117,20 @@ generate "provider" {
 }
 
 # Here we define common variables to be inhereted by each module (as long as they're set in its variables.tf)
-inputs = {
+inputs = merge(
+  # Add values from the root config.yaml file
+  yamldecode(file(find_in_parent_folders("config.yaml"))), {
+
+  # And values from terraform bootstrapping
   naming_suffix           = dependency.bootstrap.outputs.naming_suffix
   naming_suffix_truncated = dependency.bootstrap.outputs.naming_suffix_truncated
   deployer_ip_address     = dependency.bootstrap.outputs.deployer_ip_address
-  tf_in_automation           = get_env("TF_IN_AUTOMATION", false)
 
+  # And any global env vars that should be made available
+  tf_in_automation        = get_env("TF_IN_AUTOMATION", false)
+
+  # Tags to add to every resource that accepts them
   tags = {
     environment = dependency.bootstrap.outputs.environment
   }
-}
+})
