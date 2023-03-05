@@ -39,7 +39,7 @@ resource "azurerm_storage_container" "tfstate" {
   storage_account_name = azurerm_storage_account.bootstrap.name
 }
 
-resource "azurerm_container_registry" "acr" {
+resource "azurerm_container_registry" "bootstrap" {
   name                = "acrmgmt${local.naming_suffix_truncated}"
   resource_group_name = azurerm_resource_group.bootstrap.name
   location            = azurerm_resource_group.bootstrap.location

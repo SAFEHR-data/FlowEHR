@@ -27,8 +27,12 @@ az group list -o table | while read -r line ; do
 
   if echo "$line" | grep -q "${NAMING_SUFFIX}"; then
     rg_name=$(echo "$line" | awk '{print $1;}')
-    echo "Deleting ${rg_name}..."
-    az group delete --resource-group "$rg_name" --yes
+
+    # Skip databricks-managed rgs as these are deleted automatically
+    if [[ "$line" != rg-dbks* ]]; then
+      echo "Deleting ${rg_name}..."
+      az group delete --resource-group "$rg_name" --yes
+    fi
   fi
 
 done
