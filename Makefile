@@ -56,20 +56,20 @@ bootstrap: az-login ## Boostrap Terraform backend
 bootstrap-destroy: az-login ## Destroy boostrap rg
 	$(call terragrunt,destroy,bootstrap)
 
-infrastructure: transform-artifacts ## Deploy all infrastructure
+infrastructure: az-login transform-artifacts ## Deploy all infrastructure
 	$(call terragrunt,apply,infrastructure)
 
-infrastructure-core: ## Deploy core infrastructure
+infrastructure-core: az-login ## Deploy core infrastructure
 	$(call terragrunt,apply,infrastructure/core)
 
-infrastructure-transform: transform-artifacts ## Deploy transform infrastructure
+infrastructure-transform: az-login transform-artifacts ## Deploy transform infrastructure
 	$(call terragrunt,apply,infrastructure/transform)
 
-transform-artifacts: ## Build transform artifacts
+transform-artifacts: az-login ## Build transform artifacts
 	${MAKEFILE_DIR}/scripts/pipeline_repo_checkout.sh \
 	${MAKEFILE_DIR}/scripts/build_artifacts.sh
 
-infrastructure-serve: ## Deploy serve infrastructure
+infrastructure-serve: az-login ## Deploy serve infrastructure
 	$(call terragrunt,apply,infrastructure/serve)
 
 test: infrastructure apps destroy  ## Test by deploy->destroy
@@ -84,7 +84,7 @@ test-transform-without-core-destroy: infrastructure-transform destroy-non-core  
 
 test-serve-without-core-destroy: infrastructure-serve destroy-non-core  ## Test serve deploy->destroy without destroying core
 
-apps: ## Deploy FlowEHR apps
+apps: az-login ## Deploy FlowEHR apps
 	$(call terragrunt,apply,apps)
 
 destroy: az-login ## Destroy everything
@@ -96,16 +96,16 @@ destroy-infrastructure: az-login ## Destroy infrastructure
 destroy-apps: az-login ## Destroy apps
 	$(call terragrunt,destroy,apps)
 
-destroy-core: ## Destroy core infrastructure
+destroy-core: az-login ## Destroy core infrastructure
 	$(call terragrunt,destroy,infrastructure/core)
 
-destroy-transform: ## Destroy transform infrastructure
+destroy-transform: az-login ## Destroy transform infrastructure
 	$(call terragrunt,destroy,infrastructure/transform)
 
-destroy-serve: ## Destroy serve infrastructure
+destroy-serve: az-login ## Destroy serve infrastructure
 	$(call terragrunt,destroy,infrastructure/serve)
 
-destroy-non-core: ## Destroy non-core 
+destroy-non-core: az-login ## Destroy non-core 
 	$(call target_title, "Destroying non-core infrastructure") \
 	&& cd ${MAKEFILE_DIR} \
 	&& terragrunt run-all destroy \
@@ -121,7 +121,7 @@ destroy-no-terraform: az-login ## Destroy all resource groups associated with th
 clean: ## Remove all local terraform state
 	find ${MAKEFILE_DIR} -type d -name ".terraform" -exec rm -rf "{}" \; || true
 
-tf-reinit: clean ## Init Terraform (use for updating lock files)
+tf-reinit: clean ## Re-init Terraform (use for updating lock files)
 	$(call target_title, "Terraform init") \
 	&& cd ${MAKEFILE_DIR} \
 	&& terragrunt run-all init -upgrade

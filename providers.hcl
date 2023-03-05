@@ -58,30 +58,30 @@ random = {
 EOF
 
   required_provider_databricks = <<EOF
- databricks = {
-    source = "databricks/databricks"
-    version = "1.9.1"
-  }
+databricks = {
+  source = "databricks/databricks"
+  version = "1.9.1"
+}
 EOF
 
   required_provider_external = <<EOF
-  external = {
-    source = "hashicorp/external"
-    version = "2.2.3"
-  }
+external = {
+  source = "hashicorp/external"
+  version = "2.2.3"
+}
 EOF
 
   required_provider_null = <<EOF
-    null = {
-      source = "hashicorp/null"
-      version = "3.2.1"
-    }
+null = {
+  source = "hashicorp/null"
+  version = "3.2.1"
+}
 EOF
 
   required_provider_github = <<EOF
-  github = {
-      source  = "integrations/github"
-      version = "~> 5.0"
-    }
+github = {
+  source  = "integrations/github"
+  version = "5.18.0"
+}
 EOF
 }

@@ -74,6 +74,16 @@ variable "serve_webapps_subnet_id" {
   type = string
 }
 
-variable "github_owner" {
-  type = string
+# -- FROM CONFIGURATION FILES --------
+variable "serve" {
+  description = "Serve configuration block (populated from root config file)"
+  type = object({
+    github_owner = string
+    github_token = string
+  })
+}
+
+variable "apps" {
+  description = "Apps configuration file containing the apps to deploy"
+  type        = map(any) # App config is validated within ./app module
 }

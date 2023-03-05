@@ -13,11 +13,13 @@
 #  limitations under the License.
 
 include "root" {
-  path   = find_in_parent_folders()
+  path = find_in_parent_folders()
 }
 
 locals {
-  providers = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+  providers        = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+  apps_config_path = "${get_terragrunt_dir()}/apps.yaml"
+  apps_config      = fileexists(local.apps_config_path) ? yamldecode(file(local.apps_config_path)) : {}
 }
 
 generate "terraform" {
@@ -41,7 +43,10 @@ generate "provider" {
   contents  = <<EOF
 ${local.providers.locals.azure_provider}
 
-provider "github" {}
+provider "github" {
+  token = var.serve.github_token
+  owner = var.serve.github_owner
+}
 EOF
 }
 
@@ -93,5 +98,5 @@ inputs = {
   serve_cosmos_account_name   = dependency.serve.outputs.cosmos_account_name
   serve_webapps_subnet_id     = dependency.serve.outputs.webapps_subnet_id
 
-  github_owner = get_env("GITHUB_OWNER", "")
+  apps = local.apps_config
 }
