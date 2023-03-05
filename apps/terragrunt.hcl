@@ -14,7 +14,10 @@
 
 include "root" {
   path   = find_in_parent_folders()
-  expose = true
+}
+
+locals {
+  providers = read_terragrunt_config("${get_repo_root()}/providers.hcl")
 }
 
 generate "terraform" {
@@ -22,11 +25,11 @@ generate "terraform" {
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
 terraform {
-  required_version = "${include.root.locals.terraform_version}"
+  required_version = "${local.providers.locals.terraform_version}"
 
   required_providers {
-    ${include.root.locals.required_provider_azure}
-    ${include.root.locals.required_provider_github}
+    ${local.providers.locals.required_provider_azure}
+    ${local.providers.locals.required_provider_github}
   }
 }
 EOF
@@ -36,7 +39,7 @@ generate "provider" {
   path      = "provider.tf"
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
-${include.root.locals.azure_provider}
+${local.providers.locals.azure_provider}
 
 provider "github" {}
 EOF

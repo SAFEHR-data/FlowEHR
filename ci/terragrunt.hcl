@@ -14,7 +14,10 @@
 
 include "root" {
   path = find_in_parent_folders()
-  expose = true
+}
+
+locals {
+  providers = read_terragrunt_config("${get_repo_root()}/providers.hcl")
 }
 
 generate "terraform" {
@@ -22,10 +25,10 @@ generate "terraform" {
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
 terraform {
-  required_version = "${include.root.locals.terraform_version}"
+  required_version = "${local.providers.locals.terraform_version}"
 
   required_providers {
-    ${include.root.locals.required_provider_azuread}
+    ${local.providers.locals.required_provider_azuread}
   }
 }
 EOF

@@ -12,6 +12,10 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+locals {
+  providers = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+}
+
 terraform {
   extra_arguments "auto_approve" {
     commands  = ["apply"]
@@ -24,13 +28,10 @@ generate "terraform" {
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
 terraform {
-  required_version = "1.3.7"
+  required_version = "${local.providers.locals.terraform_version}"
 
   required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = ">= 3.32"
-    }
+    ${local.providers.locals.required_provider_azure}
   }
 }
 EOF
@@ -39,15 +40,7 @@ EOF
 generate "provider" {
   path      = "provider.tf"
   if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-provider "azurerm" {
-  features {
-    resource_group {
-      prevent_deletion_if_contains_resources = false
-    }
-  }
-}
-EOF
+  contents  = local.providers.locals.azure_provider
 }
 
 remote_state {
