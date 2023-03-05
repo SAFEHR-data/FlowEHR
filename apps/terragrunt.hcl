@@ -18,8 +18,25 @@ include "root" {
 
 locals {
   providers        = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+  core_config      = yamldecode(file("${get_repo_root()}/config.yaml"))
   apps_config_path = "${get_terragrunt_dir()}/apps.yaml"
   apps_config      = fileexists(local.apps_config_path) ? yamldecode(file(local.apps_config_path)) : {}
+}
+
+terraform {
+  extra_arguments "auto_approve" {
+    commands  = ["apply"]
+    arguments = ["-auto-approve"]
+  }
+
+  # Export GitHub credentials for use by both TF provider and CLI
+  extra_arguments "set_github_vars" {
+    commands = ["init", "apply", "plan", "destroy", "taint", "untaint", "refresh"]
+    env_vars = {
+      GITHUB_TOKEN = "${local.core_config.serve.github_token}"
+      GITHUB_OWNER = "${local.core_config.serve.github_owner}"
+    }
+  }
 }
 
 generate "terraform" {
@@ -37,16 +54,27 @@ terraform {
 EOF
 }
 
+# Child module also needs GH required provider reference due to provider inheritance bug:
+# https://github.com/integrations/terraform-provider-github/issues/876
+generate "child_terraform" {
+  path      = "app/terraform.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+terraform {
+  required_providers {
+    ${local.providers.locals.required_provider_github}
+  }
+}
+EOF
+}
+
 generate "provider" {
   path      = "provider.tf"
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
 ${local.providers.locals.azure_provider}
 
-provider "github" {
-  token = var.serve.github_token
-  owner = var.serve.github_owner
-}
+provider "github" {}
 EOF
 }
 
