@@ -1,0 +1,12 @@
+---
+id: flwrgriff
+location: uksouth
+environment: local
+core_address_space: 10.0.0.0/24
+
+transform:
+  spark_version: 3.3.1
+  repositories:
+
+serve:
+  github_owner: Griff-Labs
