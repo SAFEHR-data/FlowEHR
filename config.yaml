@@ -1,7 +1,7 @@
 ---
 id: flwrgriff
 location: uksouth
-environment: local
+environment: infratest
 core_address_space: 10.0.0.0/24
 
 transform:

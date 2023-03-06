@@ -26,7 +26,8 @@ define terragrunt  # Arguments: <command>, <folder name>
 		--terragrunt-non-interactive --terragrunt-exclude-dir ${MAKEFILE_DIR}/ci
 endef
 
-all: infrastructure apps
+all: az-login ## Deploy everything
+	$(call terragrunt,apply,.)
 
 help: ## Show this help
 	@echo
@@ -46,7 +47,7 @@ az-login: ## Check logged in/log into azure with a service principal
 ci-auth: az-login ## Deploy an AAD app with permissions to use for CI builds
 	$(call target_title, "Creating CI auth") \
 	&& cd ${MAKEFILE_DIR}/ci \
-	&& terragrunt run-all apply \
+	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive \
 	&& terraform output -json \
 	  | jq -r 'with_entries(.value |= .value) | to_entries[] | "\(.key +": "+ .value)"'
 
