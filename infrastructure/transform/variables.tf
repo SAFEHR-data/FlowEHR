@@ -94,4 +94,5 @@ variable "data_source_connections" {
       })
     )
   }))
+  default = []
 }

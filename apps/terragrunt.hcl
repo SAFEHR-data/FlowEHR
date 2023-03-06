@@ -32,12 +32,10 @@ terraform {
   # Export GitHub credentials for use by both TF provider and CLI
   extra_arguments "set_github_vars" {
     commands = ["init", "apply", "plan", "destroy", "taint", "untaint", "refresh"]
-    env_vars = merge({
-      GITHUB_OWNER = "${local.core_config.serve.github_owner}"
-    }, run_cmd("[[ -z $GITHUB_TOKEN ]]") ? {
-      # This is only required for local deployments. Env var will be set in CI
-      GITHUB_TOKEN = "${local.core_config.serve.github_token}"
-    } : {})
+    env_vars = {
+      GITHUB_OWNER = local.core_config.serve.github_owner
+      GITHUB_TOKEN = get_env("GITHUB_TOKEN", local.core_config.serve.github_token)
+    }
   }
 }
 
