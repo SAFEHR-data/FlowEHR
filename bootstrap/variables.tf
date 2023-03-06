@@ -17,12 +17,12 @@ variable "id" {
   type        = string
 
   validation {
-    condition     = length(var.suffix) < 10
+    condition     = length(var.id) < 10
     error_message = "Must be less than 10 chars"
   }
 
   validation {
-    condition     = can(regex("^[a-zA-Z0-9\\_-]*$", var.suffix))
+    condition     = can(regex("^[a-zA-Z0-9\\_-]*$", var.id))
     error_message = "Cannot contain spaces or special characters except '-' and '_'"
   }
 }

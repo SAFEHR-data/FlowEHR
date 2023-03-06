@@ -86,7 +86,6 @@ variable "github_runner_name" {
 variable "github_runner_token" {
   type        = string
   description = "GitHub token with permissions to register a runner on this repository"
-  default     = ""
 }
 
 variable "github_repository" {

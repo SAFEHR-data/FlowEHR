@@ -45,36 +45,40 @@ Then edit `config.yaml` and specify the following values:
     az account set -s SUB_NAME_OR_ID
     ```
 
-3. Run `make all`
+3. Run `make infrastructure`
 
     To bootstrap Terraform, and deploy all infrastructure and apps, run
-
-    ```bash
-    make all
-    ```
-
-    > For more info on configuring and deploying apps, see the [README](./apps/README.md)
-
-    Alternatively, you can deploy just infrastructure:
 
     ```bash
     make infrastructure
     ```
 
-    You can also deploy individual infrastructure modules, as well as destroy and other operations. To see all options:
+    Alternatively, you can deploy just core infrastructure:
+
+    ```bash
+    make infrastructure-core
+    ```
+
+    You can also deploy other individual infrastructure modules, as well as destroy and other operations. To see all options:
 
     ```bash
     make help
     ```
 
+4. (Optional) Deploy FlowEHR apps
+
+    You can run `make apps` to deploy any configured apps to the FlowEHR infrastructure.
+
+    > For more info on configuring and deploying apps, see the [README](./apps/README.md)
+
+
 ### CI (GitHub Actions)
 
-CI deployment workflows are run in [Github environments](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment). These should
-be created in a private repository created from this template repository.
+CI deployment workflows are run in [Github environments](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment). These should be created in a private repository created from this template repository.
 
 This step will create an AAD Application and Service Principal in the specified tenancy, and grant that service principal permissions in Azure and AAD needed for deployment. These are detailed below. 
 
-> _NOTE_: The user following the steps below will need to be an `Owner` of the target Azure Subscription as well as a `Global Administrator` in AAD.
+> _NOTE_: The user following the steps below will need to be an `Owner` of the target Azure Subscription as well as a `Global Administrator` in AAD (and have organization owner permissions on the GitHub orgnization you wish to use to create a token with org scopes).
 
 1. Open this repo in the dev container, and create the `config.yaml` file as outlined above.
 
@@ -91,17 +95,30 @@ This step will create an AAD Application and Service Principal in the specified 
 
     - Copy the block of JSON from the terminal for the next step.
 
+3. Create GitHub PATs (access tokens)
+
+    We require a GitHub [Classic PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#personal-access-tokens-classic) with scopes to clone any transform repositories defined in `config.yaml`, as well as scopes to create and manage repositories within your org for deploying FlowEHR applications, and to deploy GitHub runners for executing CI deployments.
+
+    Follow the instructions [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#personal-access-tokens-classic) to create a classic token (fine-grained tokens don't currently support the GitHub GraphQL API which we require).
+
+    Then, make sure you have enabled the following permissions:
+
+    - `repo` - read/write repositories
+    - `admin:org` - manage team memberships and runners
+    - `delete_repo` - delete repositories
+
+    Finally, generate it and copy it for the next step.
+
 3. Create and populate a GitHub environment
 
     Add an environment called `Infra-Test` with the following secrets:
 
     - `ARM_CLIENT_ID`: Client ID of the service pricipal created in step 2
     - `ARM_CLIENT_SECRET`: Client secret of the service pricipal created in step 2
-    - `ARM_TENANT_ID`: Tennant ID containing the Azure subscription to deploy into
+    - `ARM_TENANT_ID`: Tenant ID containing the Azure subscription to deploy into
     - `ARM_SUBSCRIPTION_ID`: Subscription ID of the Azure subscription to deploy into
     - `DEVCONTAINER_ACR_NAME`: Name of the Azure Container Registry to use for the devcontainer build. This may or may not exist. e.g. `flowehrmgmtacr`
-    - `ORG_GH_TOKEN`: GitHub [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) with scopes to clone any repositories defined in `config.transform.yaml`. This may be added as a repository rather than envrionment secret and be reused betweeen envrionments
-    - `GH_RUNNER_CREATE_TOKEN` Similar to `ORG_GH_TOKEN` but with scopes: "Read access to metadata" and "Read and Write access to administration" on this repository
+    - `GITHUB_TOKEN`: The token you created in the previous step (this may be added as a repository or organisation secret rather than environment secret and be re-used betweeen environments if you prefer)
 
 4. Run `Deploy Infra-Test`
 

@@ -22,10 +22,10 @@ set -o nounset
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PIPELINE_DIR="${SCRIPT_DIR}/../transform/pipelines"
 CONFIG_PATH="${SCRIPT_DIR}/../config.yaml"
-ORG_GH_TOKEN="${ORG_GH_TOKEN:-}" # May be unset
+GITHUB_TOKEN="${GITHUB_TOKEN:-}" # May be unset
 
-if [[ -n "${ORG_GH_TOKEN}" ]]; then
-  GIT_COMMAND="GH_TOKEN=${ORG_GH_TOKEN} git -c credential.helper= -c credential.helper='!gh auth git-credential'"
+if [[ -n "${GITHUB_TOKEN}" ]]; then
+  GIT_COMMAND="GH_TOKEN=${GITHUB_TOKEN} git -c credential.helper= -c credential.helper='!gh auth git-credential'"
 else
   GIT_COMMAND="git"
 fi

@@ -66,7 +66,7 @@ generate "provider" {
 # Here we define common variables to be inhereted by each module (as long as they're set in its variables.tf)
 inputs = merge(
   # Add values from the root config.yaml file
-  yamldecode(file(find_in_parent_folders("config.yaml"))), {
+  yamldecode(file("${get_repo_root()}/config.yaml")), {
 
   # And values from terraform bootstrapping
   naming_suffix           = dependency.bootstrap.outputs.naming_suffix
