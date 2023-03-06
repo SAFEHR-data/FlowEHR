@@ -42,7 +42,7 @@ on:
         required: true
       ARM_SUBSCRIPTION_ID:
         required: true
-      GITHUB_TOKEN:
+      ORG_GITHUB_TOKEN:
         required: true
 
 jobs:
@@ -107,7 +107,7 @@ jobs:
       - name: Bootstrap
         uses: devcontainers/ci@v0.2
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.ORG_GITHUB_TOKEN }}"
         with:
           imageName: ${{ steps.dc.outputs.image_path }}
           cacheFrom: ${{ steps.dc.outputs.image_path }}
@@ -122,7 +122,7 @@ jobs:
             ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
             ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
             ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
-            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+            GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
             TF_VAR_SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) }}
             TF_VAR_MGMT_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
 
@@ -152,7 +152,7 @@ jobs:
             ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
             ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
             ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
-            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+            GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
             TF_VAR_SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) }}
             TF_VAR_MGMT_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
             TF_VAR_DEVCONTAINER_IMAGE_NAME=flowehr/devcontainer
@@ -185,7 +185,7 @@ jobs:
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ORG_GITHUB_TOKEN }}
           TF_VAR_SUFFIX: ${{ (inputs.suffix_override != '' && inputs.suffix_override) }}
           TF_VAR_MGMT_ACR_NAME: ${{ secrets.DEVCONTAINER_ACR_NAME }}
           TF_VAR_USE_RANDOM_ADDRESS_SPACE: ${{ (inputs.suffix_override != '' && '1') || '0' }}
@@ -218,7 +218,7 @@ jobs:
       - name: Post build agent command
         uses: devcontainers/ci@v0.2
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.ORG_GITHUB_TOKEN }}"
         with:
           # The image name cannot be set from the make_core output because it contains a secret
           imageName: ${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer
@@ -233,7 +233,7 @@ jobs:
             ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
             ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
             ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
-            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+            GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
             TF_VAR_SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
             TF_VAR_MGMT_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
             TF_VAR_USE_RANDOM_ADDRESS_SPACE=${{ (inputs.suffix_override != '' && '1') || '0' }}
