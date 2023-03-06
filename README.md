@@ -18,13 +18,13 @@ Then open it in [VS Code](https://code.visualstudio.com) and, when prompted, cli
 
 ## Configuring
 
-Deployment requires a `config.tfvars` file in the root. Copy the `config.example.tfvars` file and save it as `config.tfvars`.
+Deployment requires a `config.yaml` file in the root. Copy the `config.example.yaml` file and save it as `config.yaml`.
 
 ```bash
-cp config.sample.tfvars config.tfvars
+cp config.sample.yaml config.yaml
 ```
 
-Then edit `config.tfvars` and specify the following values:
+Then edit `config.yaml` and specify the following values:
 
 - `id` - a unique identifier to apply to all deployed resources (i.e. `flwruclh`)
 - `environment` - a unique name for your environment (i.e. `jgdev`)
