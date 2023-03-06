@@ -62,7 +62,6 @@ inputs = {
   core_subnet_id                     = dependency.core.outputs.core_subnet_id
   core_kv_id                         = dependency.core.outputs.core_kv_id
   core_kv_uri                        = dependency.core.outputs.core_kv_uri
-  data_source_connections            = get_env("DATA_SOURCE_CONNECTIONS", "[]")
   databricks_host_address_space      = dependency.core.outputs.databricks_host_address_space
   databricks_container_address_space = dependency.core.outputs.databricks_container_address_space
 }

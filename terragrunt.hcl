@@ -72,6 +72,8 @@ inputs = merge(
   naming_suffix           = dependency.bootstrap.outputs.naming_suffix
   naming_suffix_truncated = dependency.bootstrap.outputs.naming_suffix_truncated
   deployer_ip_address     = dependency.bootstrap.outputs.deployer_ip_address
+  mgmt_rg                 = dependency.bootstrap.outputs.mgmt_rg
+  mgmt_acr                = dependency.bootstrap.outputs.mgmt_acr
 
   # And any global env vars that should be made available
   tf_in_automation = get_env("TF_IN_AUTOMATION", false)

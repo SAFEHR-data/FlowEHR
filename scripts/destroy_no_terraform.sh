@@ -18,14 +18,15 @@ set -o pipefail
 set -o nounset
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-SUFFIX=$(yq '.suffix' "$SCRIPT_DIR/../config.yaml")
+ID=$(yq '.id' "$SCRIPT_DIR/../config.yaml")
 ENVIRONMENT=$(yq '.environment' "$SCRIPT_DIR/../config.yaml")
 
-[[ -z "${SUFFIX_OVERRIDE:-}" ]] && NAMING_SUFFIX="$SUFFIX-$ENVIRONMENT" || NAMING_SUFFIX="$SUFFIX_OVERRIDE"
+# If suffix env var isn't set (i.e. by build agent), use id-environment
+[[ -z "${SUFFIX:-}" ]] && SUFFIX="$ID-$ENVIRONMENT"
 
 az group list -o table | while read -r line ; do
 
-  if echo "$line" | grep -q "${NAMING_SUFFIX}"; then
+  if echo "$line" | grep -q "${SUFFIX}"; then
     rg_name=$(echo "$line" | awk '{print $1;}')
 
     # Skip databricks-managed rgs as these are deleted automatically

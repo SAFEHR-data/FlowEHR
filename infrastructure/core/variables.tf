@@ -43,6 +43,7 @@ variable "use_random_address_space" {
 Whether to randomise the core address space (if set to true this will override the core_address_space variable).
 Use for PR/transient environments that peer with other static vnets (i.e. data sources) to reduce chance of conflicts."
 EOF
+  default     = false
 }
 
 variable "deployer_ip_address" {
@@ -54,32 +55,42 @@ variable "tf_in_automation" {
   type = bool
 }
 
-variable "devcontainer_acr_name" {
+variable "mgmt_acr" {
   type        = string
-  description = "Name of the azure container registry i.e. <acr-name>.azurecr.io"
+  description = "Name of the management azure container registry (created by bootstrap)"
+}
+
+variable "mgmt_rg" {
+  type        = string
+  description = "Management resource group name (created by bootstrap)"
 }
 
 variable "devcontainer_tag" {
   type        = string
-  description = ""
+  description = "Tag for the devcontainer image"
+  default     = ""
 }
 
 variable "devcontainer_image_name" {
   type        = string
-  description = "Name of the azure container registry i.e. aregistry.azurecr.io/<image-name>:tag"
+  description = "Name of the devcontainer image i.e. aregistry.azurecr.io/<image-name>:tag"
+  default     = ""
 }
 
 variable "github_runner_name" {
   type        = string
   description = "Name of the GitHub runner that will be created"
+  default     = ""
 }
 
 variable "github_runner_token" {
   type        = string
   description = "GitHub token with permissions to register a runner on this repository"
+  default     = ""
 }
 
 variable "github_repository" {
   type        = string
   description = "Github repository in which to create the build agent. e.g. UCLH-Foundry/FlowEHR"
+  default     = ""
 }

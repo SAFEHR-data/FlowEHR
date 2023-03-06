@@ -13,8 +13,8 @@
 #  limitations under the License.
 
 locals {
-  naming_suffix           = var.suffix_override == "" ? "${var.suffix}-${var.environment}" : var.suffix_override
-  naming_suffix_truncated = replace(replace(local.naming_suffix, "-", ""), "_", "")
+  naming_suffix           = var.suffix == "" ? "${var.id}-${var.environment}" : var.suffix
+  naming_suffix_truncated = substr(replace(replace(local.naming_suffix, "-", ""), "_", ""), 0, 12)
 }
 
 data "http" "local_ip" {
@@ -61,6 +61,10 @@ output "environment" {
 
 output "mgmt_rg" {
   value = azurerm_resource_group.bootstrap.name
+}
+
+output "mgmt_acr" {
+  value = azurerm_container_registry.bootstrap.name
 }
 
 output "mgmt_storage" {

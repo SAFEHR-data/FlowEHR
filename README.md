@@ -26,7 +26,7 @@ cp config.sample.tfvars config.tfvars
 
 Then edit `config.tfvars` and specify the following values:
 
-- `suffix` - a suffix to apply to all deployed resources (i.e. `flowehr-uclh`)
+- `id` - a unique identifier to apply to all deployed resources (i.e. `flwruclh`)
 - `environment` - a unique name for your environment (i.e. `jgdev`)
 - `location` - the [Azure region](https://azuretracks.com/2021/04/current-azure-region-names-reference/) you wish to deploy resources to
 
@@ -91,7 +91,7 @@ This step will create an AAD Application and Service Principal in the specified 
 
     - Copy the block of JSON from the terminal for the next step.
 
-1. Create and populate a GitHub environment
+3. Create and populate a GitHub environment
 
     Add an environment called `Infra-Test` with the following secrets:
 
@@ -99,34 +99,11 @@ This step will create an AAD Application and Service Principal in the specified 
     - `ARM_CLIENT_SECRET`: Client secret of the service pricipal created in step 2
     - `ARM_TENANT_ID`: Tennant ID containing the Azure subscription to deploy into
     - `ARM_SUBSCRIPTION_ID`: Subscription ID of the Azure subscription to deploy into
-    - `SUFFIX`: Suffix used for naming resources. Must be unique to this repository e.g. `abcd`
-    - `LOCATION`: Name of an Azure location e.g. `uksouth`. These can be listed with `az account list-locations -o table`
-    - `ENVIRONMENT`: Name of the environment e.g. `dev`, also used to name resources
     - `DEVCONTAINER_ACR_NAME`: Name of the Azure Container Registry to use for the devcontainer build. This may or may not exist. e.g. `flowehrmgmtacr`
     - `ORG_GH_TOKEN`: GitHub [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) with scopes to clone any repositories defined in `config.transform.yaml`. This may be added as a repository rather than envrionment secret and be reused betweeen envrionments
     - `GH_RUNNER_CREATE_TOKEN` Similar to `ORG_GH_TOKEN` but with scopes: "Read access to metadata" and "Read and Write access to administration" on this repository
-    - [Optional] `DATA_SOURCE_CONNECTIONS`: *single line* json containing connectivity information to data sources in the format:
 
-    ```json
-    [
-    {
-        "name": "xxx",
-        "peering": {
-            "virtual_network_name": "xxx",
-            "resource_group_name": "xxx",
-            "dns_zones": [
-                "privatelink.xxx.xxx.azure.com"
-            ]
-        },
-        "fqdn": "<fqdn>",
-        "database_name": "<database_name>",
-        "username": "username",
-        "password": "password"
-    }
-    ]
-    ```
-
-3. Run `Deploy Infra-Test`
+4. Run `Deploy Infra-Test`
 
     Trigger a deployment using a workflow dispatch trigger on the `Actions` tab.
 

@@ -1,7 +1,6 @@
-suffix: __CHANGE_ME__
+id: __CHANGE_ME__
 location: __CHANGE_ME__
 environment: __CHANGE_ME__
-devcontainer_acr_name: __CHANGE_ME__
 
 data_source_connections:
   - example:

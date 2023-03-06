@@ -12,13 +12,13 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-variable "suffix" {
-  description = "Unique value for differentiating organisations/projects"
+variable "id" {
+  description = "Unique value for differentiating FlowEHR deployments across organisations/projects"
   type        = string
 
   validation {
-    condition     = length(var.suffix) < 7
-    error_message = "Must be less than 7 chars"
+    condition     = length(var.suffix) < 10
+    error_message = "Must be less than 10 chars"
   }
 
   validation {
@@ -32,8 +32,8 @@ variable "environment" {
   type        = string
 
   validation {
-    condition     = length(var.environment) < 7
-    error_message = "Must be less than 7 chars"
+    condition     = length(var.environment) < 10
+    error_message = "Must be less than 10 chars"
   }
 
   validation {
@@ -57,7 +57,14 @@ variable "tf_in_automation" {
   type        = bool
 }
 
-variable "suffix_override" {
-  description = "Override the standard suffix that would be created from suffix + environment. Useful for transient PR environments"
+variable "suffix" {
+  description = "Override the suffix that would be generated from id + environment. Useful for transient PR environments"
   type        = string
+  default     = ""
+}
+
+variable "mgmt_acr_name" {
+  description = "Override the ACR name (used from CI pipelines so it can be referenced before deployment to tag devcontainer image)"
+  type        = string
+  default     = ""
 }

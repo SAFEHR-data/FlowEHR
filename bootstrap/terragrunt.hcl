@@ -55,5 +55,4 @@ remote_state {
 inputs = merge(
   yamldecode(file(find_in_parent_folders("config.yaml"))), {
   tf_in_automation = get_env("TF_IN_AUTOMATION", false)
-  suffix_override  = get_env("SUFFIX_OVERRIDE", "")
 })
