@@ -139,7 +139,11 @@ resource "azurerm_role_definition" "slot_swap" {
   description = "Slot swap role"
 
   permissions {
-    actions = ["Microsoft.Web/sites/slotsswap/Action"]
+    actions = [
+      "Microsoft.Web/sites/slots/slotsswap/action",
+      "Microsoft.Web/sites/slots/operationresults/read",
+      "Microsoft.web/sites/slots/operations/read"
+    ]
   }
 
   assignable_scopes = [
