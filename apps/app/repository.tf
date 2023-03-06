@@ -180,7 +180,7 @@ resource "github_actions_environment_secret" "sp_client_id" {
   repository      = github_repository.app.name
   environment     = github_repository_environment.app.environment
   secret_name     = "ARM_CLIENT_ID"
-  plaintext_value = azuread_application.webapp_sp.application_id
+  plaintext_value = azuread_application.webapp_sp[0].application_id
 }
 
 resource "github_actions_environment_secret" "sp_client_secret" {
@@ -188,7 +188,7 @@ resource "github_actions_environment_secret" "sp_client_secret" {
   repository      = github_repository.app.name
   environment     = github_repository_environment.app.environment
   secret_name     = "ARM_CLIENT_SECRET"
-  plaintext_value = azuread_application_password.webapp_sp.value
+  plaintext_value = azuread_application_password.webapp_sp[0].value
 }
 
 resource "github_actions_environment_secret" "tennant_id" {
@@ -205,4 +205,20 @@ resource "github_actions_environment_secret" "subscription_id" {
   environment     = github_repository_environment.app.environment
   secret_name     = "ARM_SUBSCRIPTION_ID"
   plaintext_value = data.azurerm_client_config.current.subscription_id
+}
+
+resource "github_actions_environment_secret" "resource_group_name" {
+  count           = local.is_prod ? 1 : 0
+  repository      = github_repository.app.name
+  environment     = github_repository_environment.app.environment
+  secret_name     = "RESOURCE_GROUP_NAME"
+  plaintext_value = var.resource_group_name
+}
+
+resource "github_actions_environment_secret" "webapp _name" {
+  count           = local.is_prod ? 1 : 0
+  repository      = github_repository.app.name
+  environment     = github_repository_environment.app.environment
+  secret_name     = "WEBAPP_NAME"
+  plaintext_value = azurerm_linux_web_app.app.name
 }

@@ -116,26 +116,30 @@ resource "azurerm_cosmosdb_sql_role_assignment" "webapp" {
 }
 
 resource "azuread_application" "webapp_sp" {
+  count        = local.is_prod ? 1 : 0
   display_name = "sp-flowehr-app-${replace(var.app_id, "_", "-")}"
   owners       = [data.azurerm_client_config.current.object_id]
 }
 
 resource "azuread_application_password" "webapp_sp" {
-  application_object_id = azuread_application.webapp_sp.object_id
+  count                 = local.is_prod ? 1 : 0
+  application_object_id = azuread_application.webapp_sp[0].object_id
 }
 
 resource "azuread_service_principal" "webapp_sp" {
-  application_id = azuread_application.webapp_sp.application_id
+  count          = local.is_prod ? 1 : 0
+  application_id = azuread_application.webapp_sp[0].application_id
   owners         = [data.azurerm_client_config.current.object_id]
 }
 
 resource "azurerm_role_definition" "slot_swap" {
+  count       = local.is_prod ? 1 : 0
   name        = "role-slot-swap-on-${replace(var.app_id, "_", "-")}"
   scope       = azurerm_linux_web_app.app.id
   description = "Slot swap role"
 
   permissions {
-    actions     = ["Microsoft.Web/sites/slotsswap/Action"]
+    actions = ["Microsoft.Web/sites/slotsswap/Action"]
   }
 
   assignable_scopes = [
@@ -143,10 +147,11 @@ resource "azurerm_role_definition" "slot_swap" {
   ]
 }
 
-resource "azuread_app_role_assignment" "webapp_sp_slot_swap" {
-  app_role_id         = azurerm_role_definition.slot_swap.role_definition_id
-  principal_object_id = azuread_service_principal.webapp_sp.object_id
-  resource_object_id  = azurerm_linux_web_app.app.identity[0].principal_id
+resource "azurerm_role_assignment" "webapp_sp_slot_swap" {
+  count                = local.is_prod ? 1 : 0
+  principal_id         = azuread_service_principal.webapp_sp[0].object_id
+  scope                = azurerm_linux_web_app.app.id
+  role_definition_name = azurerm_role_definition.slot_swap[0].name
 }
 
 // TODO: once Feature Store SQL SPN stuff is in, add connection from App Service here
