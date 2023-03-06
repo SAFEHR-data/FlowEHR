@@ -191,7 +191,7 @@ resource "github_actions_environment_secret" "sp_client_secret" {
   plaintext_value = azuread_application_password.webapp_sp[0].value
 }
 
-resource "github_actions_environment_secret" "tennant_id" {
+resource "github_actions_environment_secret" "tenant_id" {
   count           = local.is_prod ? 1 : 0
   repository      = github_repository.app.name
   environment     = github_repository_environment.app.environment
@@ -215,7 +215,7 @@ resource "github_actions_environment_secret" "resource_group_name" {
   plaintext_value = var.resource_group_name
 }
 
-resource "github_actions_environment_secret" "webapp _name" {
+resource "github_actions_environment_secret" "webapp_name" {
   count           = local.is_prod ? 1 : 0
   repository      = github_repository.app.name
   environment     = github_repository_environment.app.environment
