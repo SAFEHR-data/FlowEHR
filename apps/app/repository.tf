@@ -207,18 +207,10 @@ resource "github_actions_environment_secret" "subscription_id" {
   plaintext_value = data.azurerm_client_config.current.subscription_id
 }
 
-resource "github_actions_environment_secret" "resource_group_name" {
+resource "github_actions_environment_secret" "webapp_id" {
   count           = local.is_prod ? 1 : 0
   repository      = github_repository.app.name
   environment     = github_repository_environment.app.environment
-  secret_name     = "RESOURCE_GROUP_NAME"
-  plaintext_value = var.resource_group_name
-}
-
-resource "github_actions_environment_secret" "webapp_name" {
-  count           = local.is_prod ? 1 : 0
-  repository      = github_repository.app.name
-  environment     = github_repository_environment.app.environment
-  secret_name     = "WEBAPP_NAME"
-  plaintext_value = azurerm_linux_web_app.app.name
+  secret_name     = "WEBAPP_ID"
+  plaintext_value = azurerm_linux_web_app.app.id
 }
