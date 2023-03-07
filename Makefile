@@ -45,10 +45,10 @@ az-login: ## Check logged in/log into azure with a service principal
 	&& cd ${MAKEFILE_DIR}/scripts && ./az_login.sh
 
 ci: az-login ## Deploy bootstrap resources for CI builds (management infrastructure and AAD app with deployment permissions)
-	$(call target_title, "Creating CI resources...") \
+	$(call target_title, "Creating CI resources") \
 	&& cd ${MAKEFILE_DIR}/bootstrap/ci \
 	&& terragrunt apply \
-	&& echo "\nUse the below values to create your CI GitHub secrets:"
+	&& printf "\n🌺 Use the below values to create your CI GitHub secrets:\033[36m\n\n" \
 	&& terraform output -json \
 	  | jq -r 'with_entries(.value |= .value) | to_entries[] | "\(.key +": "+ .value)"'
 

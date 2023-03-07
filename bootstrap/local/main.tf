@@ -12,11 +12,18 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-# TODO: skip this in automation / ignore in terragrunt - need to get the management ACR name to pass as output etc.
-module "management" {
-  source      = "../shared"
+module "naming" {
+  source      = "../shared/naming"
   id          = var.id
-  location    = var.location
   environment = var.environment
   suffix      = var.suffix
+}
+
+# Only deploy management resources locally; otherwise we use existing shared ci resources
+module "management" {
+  count                   = tf_in_automation ? 0 : 1
+  source                  = "../shared/management"
+  naming_suffix           = module.naming.suffix
+  naming_suffix_truncated = module.naming.suffix_truncated
+  location                = var.location
 }

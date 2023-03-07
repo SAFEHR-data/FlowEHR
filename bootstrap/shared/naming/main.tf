@@ -42,18 +42,21 @@ variable "environment" {
   }
 }
 
-variable "location" {
-  description = "The Azure region you wish to deploy resources to"
-  type        = string
-
-  validation {
-    condition     = can(regex("[a-z]+", var.location))
-    error_message = "Only lowercase letters allowed"
-  }
-}
-
 variable "suffix" {
   description = "Override the suffix that would be generated from id + environment. Useful for transient PR environments"
   type        = string
   default     = ""
+}
+
+locals {
+  naming_suffix           = var.suffix == "" ? "${var.id}-${var.environment}" : var.suffix
+  naming_suffix_truncated = substr(replace(replace(local.naming_suffix, "-", ""), "_", ""), 0, 12)
+}
+
+output "suffix" {
+  value = local.naming_suffix
+}
+
+output "suffix_truncated" {
+  value = local.naming_suffix_truncated
 }

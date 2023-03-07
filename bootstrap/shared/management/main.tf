@@ -12,13 +12,31 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+variable "naming_suffix" {
+  type = string
+}
+
+variable "naming_suffix_truncated" {
+  type = string
+}
+
+variable "location" {
+  description = "The Azure region you wish to deploy resources to"
+  type        = string
+
+  validation {
+    condition     = can(regex("[a-z]+", var.location))
+    error_message = "Only lowercase letters allowed"
+  }
+}
+
 resource "azurerm_resource_group" "management" {
-  name     = "rg-mgmt-${local.naming_suffix}"
+  name     = "rg-mgmt-${var.naming_suffix}"
   location = var.location
 }
 
 resource "azurerm_storage_account" "management" {
-  name                     = "stgmgmt${local.naming_suffix_truncated}"
+  name                     = "stgmgmt${var.naming_suffix_truncated}"
   resource_group_name      = azurerm_resource_group.management.name
   location                 = azurerm_resource_group.management.location
   account_tier             = "Standard"
@@ -31,9 +49,21 @@ resource "azurerm_storage_container" "tfstate" {
 }
 
 resource "azurerm_container_registry" "management" {
-  name                = "acrmgmt${local.naming_suffix_truncated}"
+  name                = "acrmgmt${var.naming_suffix_truncated}"
   resource_group_name = azurerm_resource_group.management.name
   location            = azurerm_resource_group.management.location
   sku                 = "Basic"
   admin_enabled       = true
+}
+
+output "rg" {
+  value = azurerm_resource_group.management.name
+}
+
+output "acr" {
+  value = azurerm_container_registry.management.name
+}
+
+output "storage" {
+  value = azurerm_storage_account.management.name
 }

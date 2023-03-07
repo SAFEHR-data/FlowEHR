@@ -17,7 +17,8 @@ dependency "bootstrap" {
 }
 
 locals {
-  providers = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+  providers        = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+  tf_in_automation = get_env("TF_IN_AUTOMATION", false)
 }
 
 terraform {
@@ -46,10 +47,10 @@ EOF
 remote_state {
   backend = "azurerm"
   config = {
-    resource_group_name  = dependency.bootstrap.outputs.mgmt_rg
-    storage_account_name = dependency.bootstrap.outputs.mgmt_storage
+    resource_group_name  = local.tf_in_automation ? get_env("CI_RESOURCE_GROUP") : dependency.bootstrap.outputs.mgmt_rg
+    storage_account_name = local.tf_in_automation ? get_env("CI_STORAGE_ACCOUNT") : dependency.bootstrap.outputs.mgmt_storage
     container_name       = "tfstate"
-    key                  = "${path_relative_to_include()}/terraform.tfstate"
+    key                  = "${dependency.bootstrap.outputs.naming_suffix_truncated}/${path_relative_to_include()}/terraform.tfstate"
   }
   generate = {
     path      = "backend.tf"
@@ -68,15 +69,15 @@ inputs = merge(
   # Add values from the root config.yaml file
   yamldecode(file("${get_repo_root()}/config.yaml")), {
 
-  # And values from terraform bootstrapping
+  # And values from terraform bootstrapping (& env vars in CI)
   naming_suffix           = dependency.bootstrap.outputs.naming_suffix
   naming_suffix_truncated = dependency.bootstrap.outputs.naming_suffix_truncated
   deployer_ip_address     = dependency.bootstrap.outputs.deployer_ip_address
-  mgmt_rg                 = dependency.bootstrap.outputs.mgmt_rg
-  mgmt_acr                = dependency.bootstrap.outputs.mgmt_acr
+  mgmt_rg                 = local.tf_in_automation ? get_env("CI_RESOURCE_GROUP") : dependency.bootstrap.outputs.mgmt_rg
+  mgmt_acr                = local.tf_in_automation ? get_env("CI_CONTAINER_REGISTRY") : dependency.bootstrap.outputs.mgmt_acr
 
   # And any global env vars that should be made available
-  tf_in_automation = get_env("TF_IN_AUTOMATION", false)
+  tf_in_automation = local.tf_in_automation
 
   # Tags to add to every resource that accepts them
   tags = {

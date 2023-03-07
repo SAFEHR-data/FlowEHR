@@ -13,11 +13,11 @@
 #  limitations under the License.
 
 output "naming_suffix" {
-  value = module.management.naming_suffix
+  value = module.naming.suffix
 }
 
 output "naming_suffix_truncated" {
-  value = module.management.naming_suffix_truncated
+  value = module.naming.suffix_truncated
 }
 
 output "environment" {
@@ -25,15 +25,15 @@ output "environment" {
 }
 
 output "mgmt_rg" {
-  value = module.management.rg
+  value = var.tf_in_automation ? "" : module.management[0].rg
 }
 
 output "mgmt_acr" {
-  value = module.management.acr
+  value = var.tf_in_automation ? "" : module.management[0].acr
 }
 
 output "mgmt_storage" {
-  value = module.management.storage
+  value = var.tf_in_automation ? "" : module.management[0].storage
 }
 
 output "deployer_ip_address" {
