@@ -12,33 +12,23 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-include "root" {
-  path = find_in_parent_folders()
+variable "id" {
+  type = string
 }
 
-locals {
-  providers = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+variable "environment" {
+  type = string
 }
 
-generate "terraform" {
-  path      = "terraform.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-terraform {
-  required_version = "${local.providers.locals.terraform_version}"
-
-  required_providers {
-    ${local.providers.locals.required_provider_azuread}
-  }
-}
-EOF
+variable "location" {
+  type = string
 }
 
-remote_state {
-  backend = "local"
-  config = {}
-  generate = {
-    path      = "backend.tf"
-    if_exists = "overwrite_terragrunt"
-  }
+variable "tf_in_automation" {
+  type = bool
+}
+
+variable "suffix" {
+  type    = string
+  default = ""
 }

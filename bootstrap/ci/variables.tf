@@ -12,19 +12,19 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-output "ARM_CLIENT_ID" {
-  value = azuread_application.ci_app.application_id
+variable "id" {
+  type = string
 }
 
-output "ARM_CLIENT_SECRET" {
-  value     = azuread_application_password.ci_app.value
-  sensitive = true
+variable "location" {
+  type = string
 }
 
-output "ARM_TENANT_ID" {
-  value = data.azurerm_client_config.current.tenant_id
-}
+variable "tf_in_automation" {
+  type = bool
 
-output "ARM_SUBSCRIPTION_ID" {
-  value = data.azurerm_client_config.current.subscription_id
+  validation {
+    condition     = var.tf_in_automation
+    error_message = "CI bootstrapping should be ran locally to create credentials & resources for CI. Please run this from a local machine as a user with rights to assign AD roles."
+  }
 }

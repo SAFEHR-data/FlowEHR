@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 dependency "bootstrap" {
-  config_path = "${get_repo_root()}/bootstrap"
+  config_path = "${get_repo_root()}/bootstrap/local"
 }
 
 locals {

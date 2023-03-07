@@ -23,7 +23,7 @@ define terragrunt  # Arguments: <command>, <folder name>
     $(call target_title, "Running: terragrunt $(1) on $(2)") \
 	&& cd ${MAKEFILE_DIR}/$(2) \
 	&& terragrunt run-all $(1) --terragrunt-include-external-dependencies \
-		--terragrunt-non-interactive --terragrunt-exclude-dir ${MAKEFILE_DIR}/ci
+		--terragrunt-non-interactive --terragrunt-exclude-dir ${MAKEFILE_DIR}/bootstrap/ci
 endef
 
 all: az-login ## Deploy everything
@@ -44,18 +44,19 @@ az-login: ## Check logged in/log into azure with a service principal
 	$(call target_title, "Log-in to Azure") \
 	&& cd ${MAKEFILE_DIR}/scripts && ./az_login.sh
 
-ci-auth: az-login ## Deploy an AAD app with permissions to use for CI builds
-	$(call target_title, "Creating CI auth") \
-	&& cd ${MAKEFILE_DIR}/ci \
-	&& terragrunt run-all apply --terragrunt-include-external-dependencies --terragrunt-non-interactive \
+ci: az-login ## Deploy bootstrap resources for CI builds (management infrastructure and AAD app with deployment permissions)
+	$(call target_title, "Creating CI resources...") \
+	&& cd ${MAKEFILE_DIR}/bootstrap/ci \
+	&& terragrunt apply \
+	&& echo "\nUse the below values to create your CI GitHub secrets:"
 	&& terraform output -json \
 	  | jq -r 'with_entries(.value |= .value) | to_entries[] | "\(.key +": "+ .value)"'
 
 bootstrap: az-login ## Boostrap Terraform backend
-	$(call terragrunt,apply,bootstrap)
+	$(call terragrunt,apply,bootstrap/local)
 
 bootstrap-destroy: az-login ## Destroy boostrap rg
-	$(call terragrunt,destroy,bootstrap)
+	$(call terragrunt,destroy,bootstrap/local)
 
 infrastructure: az-login transform-artifacts ## Deploy all infrastructure
 	$(call terragrunt,apply,infrastructure)
@@ -113,7 +114,7 @@ destroy-non-core: az-login ## Destroy non-core
 		--terragrunt-include-external-dependencies \
 		--terragrunt-non-interactive \
 		--terragrunt-exclude-dir ${MAKEFILE_DIR}/infrastructure/core \
-		--terragrunt-exclude-dir ${MAKEFILE_DIR}/ci
+		--terragrunt-exclude-dir ${MAKEFILE_DIR}/bootstrap
 
 destroy-no-terraform: az-login ## Destroy all resource groups associated with this deployment
 	$(call target_title, "Destroy no terraform") \

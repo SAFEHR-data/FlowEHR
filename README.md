@@ -117,7 +117,7 @@ This step will create an AAD Application and Service Principal in the specified 
     - `ARM_CLIENT_SECRET`: Client secret of the service principal created in step 2
     - `ARM_TENANT_ID`: Tenant ID containing the Azure subscription to deploy into
     - `ARM_SUBSCRIPTION_ID`: Subscription ID of the Azure subscription to deploy into
-    - `DEVCONTAINER_ACR_NAME`: Name of the Azure Container Registry to use for the devcontainer build. This may or may not exist. e.g. `flowehrmgmtacr`
+    - `CI_CONTAINER_REGISTRY`: Name of the Azure Container Registry to use for the devcontainer build. This may or may not exist. e.g. `flowehrmgmtacr`
     - `ORG_GITHUB_TOKEN`: The token you created in the previous step (this may be added as a repository or organisation secret rather than environment secret and be re-used betweeen environments if you prefer)
 
 4. Run `Deploy Infra-Test`

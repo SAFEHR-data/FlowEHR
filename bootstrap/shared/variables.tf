@@ -52,19 +52,8 @@ variable "location" {
   }
 }
 
-variable "tf_in_automation" {
-  description = "Whether Terraform is being run in CI or locally. Local mode will whitelist deployer ip on certain resources to enable deployment outside of vnet."
-  type        = bool
-}
-
 variable "suffix" {
   description = "Override the suffix that would be generated from id + environment. Useful for transient PR environments"
-  type        = string
-  default     = ""
-}
-
-variable "mgmt_acr_name" {
-  description = "Override the ACR name (used from CI pipelines so it can be referenced before deployment to tag devcontainer image)"
   type        = string
   default     = ""
 }

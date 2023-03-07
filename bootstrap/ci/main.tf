@@ -12,6 +12,13 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+module "management" {
+  source      = "../shared"
+  id          = var.id
+  location    = var.location
+  environment = "ci"
+}
+
 # Get the MS Graph app 
 resource "azuread_service_principal" "msgraph" {
   application_id = data.azuread_application_published_app_ids.well_known.result.MicrosoftGraph

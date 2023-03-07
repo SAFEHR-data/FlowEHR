@@ -12,7 +12,11 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-variable "naming_suffix" {
-  type        = string
-  description = "Suffix used to name resources"
+# TODO: skip this in automation / ignore in terragrunt - need to get the management ACR name to pass as output etc.
+module "management" {
+  source      = "../shared"
+  id          = var.id
+  location    = var.location
+  environment = var.environment
+  suffix      = var.suffix
 }
