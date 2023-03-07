@@ -46,7 +46,7 @@ resource "azurerm_linux_web_app" "app" {
     DOCKER_ENABLE_CI                           = true
     COSMOS_STATE_STORE_ENDPOINT                = data.azurerm_cosmosdb_account.state_store.endpoint
     FEATURE_STORE_CONNECTION_STRING            = local.feature_store_odbc
-    ENVIRONMENT                                = var.environment
+    ENVIRONMENT                                = var.core_gh_env
   })
 
   identity {
@@ -65,6 +65,33 @@ resource "azurerm_linux_web_app" "app" {
       }
     }
   }
+}
+
+resource "azurerm_linux_web_app_slot" "staging" {
+  count          = var.app_config.add_staging_slot ? 1 : 0
+  name           = "staging"
+  app_service_id = azurerm_linux_web_app.app.id
+  https_only     = true
+
+  site_config {
+    container_registry_use_managed_identity = true
+    remote_debugging_enabled                = var.local_mode
+
+    application_stack {
+      docker_image     = "${var.acr_name}.azurecr.io/${var.app_id}"
+      docker_image_tag = "latest"
+    }
+  }
+
+  app_settings = merge(var.app_config.env, {
+    APPINSIGHTS_INSTRUMENTATIONKEY             = azurerm_application_insights.app.instrumentation_key
+    APPLICATIONINSIGHTS_CONNECTION_STRING      = azurerm_application_insights.app.connection_string
+    ApplicationInsightsAgent_EXTENSION_VERSION = "~3"
+    DOCKER_ENABLE_CI                           = true
+    COSMOS_STATE_STORE_ENDPOINT                = data.azurerm_cosmosdb_account.state_store.endpoint
+    FEATURE_STORE_CONNECTION_STRING            = local.feature_store_odbc
+    ENVIRONMENT                                = var.staging_gh_env
+  })
 }
 
 resource "azurerm_role_assignment" "webapp_acr" {
