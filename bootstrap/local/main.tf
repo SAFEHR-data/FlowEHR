@@ -21,7 +21,7 @@ module "naming" {
 
 # Only deploy management resources locally; otherwise we use existing shared ci resources
 module "management" {
-  count                   = tf_in_automation ? 0 : 1
+  count                   = var.tf_in_automation ? 0 : 1
   source                  = "../shared/management"
   naming_suffix           = module.naming.suffix
   naming_suffix_truncated = module.naming.suffix_truncated
