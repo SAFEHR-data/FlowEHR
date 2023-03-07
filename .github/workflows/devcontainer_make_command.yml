@@ -101,6 +101,7 @@ jobs:
 
       - name: Push devcontainer
         run: |
+          docker tag ${{ env.DEVCONTAINER_NAME }} ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
           docker push ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
 
       - name: Deploy core and build agent
