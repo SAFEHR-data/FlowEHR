@@ -14,6 +14,7 @@
 
 locals {
   feature_store_odbc = "Driver={ODBC Driver 18 for SQL Server};Server=tcp:${data.azurerm_mssql_server.feature_store.fully_qualified_domain_name},1433;Database=${var.feature_store_db_name};Authentication=ActiveDirectoryMsi;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+  acr_repository     = var.app_id
   create_repo        = var.app_config.managed_repo != null
   core_gh_env        = var.environment
   staging_gh_env     = var.app_config.add_staging_slot ? "${var.environment}-staging" : null
@@ -21,4 +22,6 @@ locals {
     "${var.environment}"         = local.core_gh_env
     "${var.environment}-staging" = local.staging_gh_env
   } : { var.environment = local.core_gh_env }
+  site_credential_name     = var.app_config.add_staging_slot ? azurerm_linux_web_app_slot.staging[0].site_credential[0].name : azurerm_linux_web_app.app.site_credential[0].name
+  site_credential_password = var.app_config.add_staging_slot ? azurerm_linux_web_app_slot.staging[0].site_credential[0].password : azurerm_linux_web_app.app.site_credential[0].password
 }

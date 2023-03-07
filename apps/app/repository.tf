@@ -193,6 +193,17 @@ resource "github_actions_environment_secret" "acr_token_password" {
   ]
 }
 
+resource "github_actions_environment_secret" "acr_image_name" {
+  repository      = github_repository.app[0].name
+  environment     = var.app_config.add_staging_slot ? local.staging_gh_env : local.core_gh_env
+  secret_name     = "IMAGE_NAME"
+  plaintext_value = local.acr_repository
+
+  depends_on = [
+    github_repository_environment.all
+  ]
+}
+
 resource "github_actions_environment_secret" "sp_client_id" {
   count           = local.staging_gh_env != null ? 1 : 0
   repository      = github_repository.app[0].name

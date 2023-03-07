@@ -46,7 +46,7 @@ resource "azurerm_linux_web_app" "app" {
     DOCKER_ENABLE_CI                           = true
     COSMOS_STATE_STORE_ENDPOINT                = data.azurerm_cosmosdb_account.state_store.endpoint
     FEATURE_STORE_CONNECTION_STRING            = local.feature_store_odbc
-    ENVIRONMENT                                = var.core_gh_env
+    ENVIRONMENT                                = local.core_gh_env
   })
 
   identity {
@@ -90,7 +90,7 @@ resource "azurerm_linux_web_app_slot" "staging" {
     DOCKER_ENABLE_CI                           = true
     COSMOS_STATE_STORE_ENDPOINT                = data.azurerm_cosmosdb_account.state_store.endpoint
     FEATURE_STORE_CONNECTION_STRING            = local.feature_store_odbc
-    ENVIRONMENT                                = var.staging_gh_env
+    ENVIRONMENT                                = local.staging_gh_env
   })
 }
 
@@ -102,15 +102,14 @@ resource "azurerm_role_assignment" "webapp_acr" {
 
 # Create a web hook that triggers automated deployment of the Docker image
 resource "azurerm_container_registry_webhook" "webhook" {
-  # TODO: hook onto staging slot if it exists
   name                = "acrwh${replace(replace(var.app_id, "_", ""), "-", "")}"
   resource_group_name = var.resource_group_name
   location            = var.location
   registry_name       = data.azurerm_container_registry.serve.name
 
-  service_uri = "https://${azurerm_linux_web_app.app.site_credential[0].name}:${azurerm_linux_web_app.app.site_credential[0].password}@${lower(azurerm_linux_web_app.app.name)}.scm.azurewebsites.net/api/registry/webhook"
+  service_uri = "https://${local.site_credential_name}:${local.site_credential_password}@${lower(azurerm_linux_web_app.app.name)}.scm.azurewebsites.net/api/registry/webhook"
   status      = "enabled"
-  scope       = "${var.app_id}:latest"
+  scope       = "${local.acr_repository}:latest"
   actions     = ["push"]
 
   custom_headers = {
