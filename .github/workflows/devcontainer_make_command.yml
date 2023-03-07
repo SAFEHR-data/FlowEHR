@@ -44,6 +44,12 @@ on:
         required: true
       ORG_GITHUB_TOKEN:
         required: true
+      CI_CONTAINER_REGISTRY:
+        required: true
+      CI_RESOURCE_GROUP:
+        required: true
+      CI_STORAGE_ACCOUNT:
+        required: true
 
 jobs:
   make_core:
@@ -123,6 +129,9 @@ jobs:
             ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
             GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
             TF_VAR_SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) }}
+            TF_VAR_CI_CONTAINER_REGISTRY:${{ secrets.CI_CONTAINER_REGISTRY }}
+            TF_VAR_CI_RESOURCE_GROUP:${{ secrets.CI_RESOURCE_GROUP }}
+            TF_VAR_CI_STORAGE_ACCOUNT:${{ secrets.CI_STORAGE_ACCOUNT }}
 
       - name: Push devcontainer
         run: |
@@ -152,6 +161,9 @@ jobs:
             TF_VAR_USE_RANDOM_ADDRESS_SPACE=${{ (inputs.suffix_override != '' && '1') || '0' }}
             TF_VAR_GITHUB_RUNNER_NAME=${{ steps.dc.outputs.runner_name }}
             TF_VAR_GITHUB_REPOSITORY=${{ github.repository }}
+            TF_VAR_CI_CONTAINER_REGISTRY:${{ secrets.CI_CONTAINER_REGISTRY }}
+            TF_VAR_CI_RESOURCE_GROUP:${{ secrets.CI_RESOURCE_GROUP }}
+            TF_VAR_CI_STORAGE_ACCOUNT:${{ secrets.CI_STORAGE_ACCOUNT }}
 
   build_agent_make:
     needs: [make_core]
@@ -227,3 +239,6 @@ jobs:
             GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
             TF_VAR_SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
             TF_VAR_USE_RANDOM_ADDRESS_SPACE=${{ (inputs.suffix_override != '' && '1') || '0' }}
+            TF_VAR_CI_CONTAINER_REGISTRY:${{ secrets.CI_CONTAINER_REGISTRY }}
+            TF_VAR_CI_RESOURCE_GROUP:${{ secrets.CI_RESOURCE_GROUP }}
+            TF_VAR_CI_STORAGE_ACCOUNT:${{ secrets.CI_STORAGE_ACCOUNT }}
