@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:
-      DEVCONTAINER_NAME: flowehr/devcontainer-${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}
+      DEVCONTAINER_NAME: flowehr/devcontainer
     outputs:
       dc_tag: ${{ steps.dc.outputs.tag }}
       dc_runner_name: ${{ steps.dc.outputs.runner_name }}
@@ -55,7 +55,7 @@ jobs:
       - name: Set devcontainer attributes
         id: dc
         run: |
-          echo "tag=${{ inputs.environment }}" >> $GITHUB_OUTPUT
+          echo "tag=${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}" >> $GITHUB_OUTPUT
           echo "image_path=${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DEVCONTAINER_NAME }}" >> $GITHUB_OUTPUT
           echo "runner_name=dc-${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}" >> $GITHUB_OUTPUT
 
