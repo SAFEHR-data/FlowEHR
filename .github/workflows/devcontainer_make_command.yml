@@ -109,30 +109,6 @@ jobs:
         run: |
           az acr login --name "${{ secrets.CI_CONTAINER_REGISTRY }}"
 
-      - name: Bootstrap
-        uses: devcontainers/ci@v0.2
-        env:
-          GITHUB_TOKEN: "${{ secrets.ORG_GITHUB_TOKEN }}"
-        with:
-          imageName: ${{ steps.dc.outputs.image_path }}
-          cacheFrom: ${{ steps.dc.outputs.image_path }}
-          imageTag: ${{ steps.dc.outputs.tag }}
-          runCmd: make bootstrap
-          # Push is manual otherwise the post step command doesn't execute before core deploy
-          push: never
-          env: |
-            DOCKER_BUILDKIT=1
-            TF_IN_AUTOMATION=1
-            ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}
-            ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
-            ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
-            ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
-            CI_CONTAINER_REGISTRY=${{ secrets.CI_CONTAINER_REGISTRY }}
-            CI_RESOURCE_GROUP=${{ secrets.CI_RESOURCE_GROUP }}
-            CI_STORAGE_ACCOUNT=${{ secrets.CI_STORAGE_ACCOUNT }}
-            GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
-            TF_VAR_SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) }}
-
       - name: Push devcontainer
         run: |
           docker push ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
@@ -159,7 +135,7 @@ jobs:
             CI_STORAGE_ACCOUNT=${{ secrets.CI_STORAGE_ACCOUNT }}
             GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
             TF_VAR_SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) }}
-            TF_VAR_DEVCONTAINER_IMAGE_NAME=flowehr/devcontainer
+            TF_VAR_DEVCONTAINER_IMAGE=flowehr/devcontainer
             TF_VAR_DEVCONTAINER_TAG=${{ steps.dc.outputs.tag }}
             TF_VAR_USE_RANDOM_ADDRESS_SPACE=${{ (inputs.suffix_override != '' && '1') || '0' }}
             TF_VAR_GITHUB_RUNNER_NAME=${{ steps.dc.outputs.runner_name }}
@@ -195,7 +171,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.ORG_GITHUB_TOKEN }}
           TF_VAR_SUFFIX: ${{ (inputs.suffix_override != '' && inputs.suffix_override) }}
           TF_VAR_USE_RANDOM_ADDRESS_SPACE: ${{ (inputs.suffix_override != '' && '1') || '0' }}
-          TF_VAR_DEVCONTAINER_IMAGE_IMAGE: flowehr/devcontainer
+          TF_VAR_DEVCONTAINER_IMAGE: flowehr/devcontainer
           TF_VAR_DEVCONTAINER_TAG: ${{ needs.make_core.outputs.dc_tag }}
         run: |
           make ${{ needs.make_core.outputs.build_agent_command }}

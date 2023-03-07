@@ -71,7 +71,7 @@ variable "devcontainer_tag" {
   default     = ""
 }
 
-variable "devcontainer_image_name" {
+variable "devcontainer_image" {
   type        = string
   description = "Name of the devcontainer image i.e. aregistry.azurecr.io/<image-name>:tag"
   default     = ""

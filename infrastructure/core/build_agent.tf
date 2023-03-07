@@ -24,7 +24,7 @@ resource "azurerm_container_group" "build_agent" {
 
   container {
     name   = "devcontainer"
-    image  = "${data.azurerm_container_registry.devcontainer[0].login_server}/${var.devcontainer_image_name}:${var.devcontainer_tag}"
+    image  = "${data.azurerm_container_registry.devcontainer[0].login_server}/${var.devcontainer_image}:${var.devcontainer_tag}"
     cpu    = "1"
     memory = "4"
     # commands = ["/bin/sleep", "infinity"] # Keep container runniner for debuging
