@@ -84,12 +84,12 @@ variable "app_config" {
     description        = string
     accesses_real_data = bool
     add_staging_slot   = bool
-    owners             = set(string)
-    contributors       = set(string)
 
     managed_repo = object({
-      private  = bool
-      template = string
+      private      = bool
+      template     = string
+      owners       = set(string)
+      contributors = set(string)
     })
 
     branch = object({

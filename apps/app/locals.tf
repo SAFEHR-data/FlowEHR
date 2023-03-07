@@ -18,7 +18,7 @@ locals {
   core_gh_env        = var.environment
   staging_gh_env     = var.app_config.add_staging_slot ? "${var.environment}-staging" : null
   branches_and_envs = var.app_config.add_staging_slot ? {
-    var.environment              = local.core_gh_env,
+    "${var.environment}"         = local.core_gh_env
     "${var.environment}-staging" = local.staging_gh_env
-  } : { var.environment = ocal.core_gh_env }
+  } : { var.environment = local.core_gh_env }
 }

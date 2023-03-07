@@ -30,6 +30,8 @@ def create_con_str(db: str) -> str:
     return f"DRIVER={driver};SERVER={server};DATABASE={db};ENCRYPT=yes;Authentication=ActiveDirectoryServicePrincipal;UID={client_id};PWD={client_secret}"  # noqa: E501
 
 
+exit()
+
 con_str = create_con_str(database)
 engine = create_engine("mssql+pyodbc:///?odbc_connect={}".format(con_str))
 
