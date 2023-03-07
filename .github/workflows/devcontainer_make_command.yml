@@ -34,27 +34,17 @@ on:
         required: false
         description: Commit SHA to override the default GitHub checkout
     secrets:
-      ARM_CLIENT_ID:
-        required: true
       ARM_CLIENT_SECRET:
         required: true
-      ARM_TENANT_ID:
-        required: true
-      ARM_SUBSCRIPTION_ID:
-        required: true
       ORG_GITHUB_TOKEN:
-        required: true
-      CI_CONTAINER_REGISTRY:
-        required: true
-      CI_RESOURCE_GROUP:
-        required: true
-      CI_STORAGE_ACCOUNT:
         required: true
 
 jobs:
   make_core:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
+    env:
+      DEVCONTAINER_NAME: flowehr/devcontainer-${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}
     outputs:
       dc_tag: ${{ steps.dc.outputs.tag }}
       dc_runner_name: ${{ steps.dc.outputs.runner_name }}
@@ -66,7 +56,7 @@ jobs:
         id: dc
         run: |
           echo "tag=${{ inputs.environment }}" >> $GITHUB_OUTPUT
-          echo "image_path=${{ secrets.CI_CONTAINER_REGISTRY }}.azurecr.io/flowehr/devcontainer" >> $GITHUB_OUTPUT
+          echo "image_path=${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DEVCONTAINER_NAME }}" >> $GITHUB_OUTPUT
           echo "runner_name=dc-${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}" >> $GITHUB_OUTPUT
 
       - name: Set make commands to execute after the core deployment
@@ -102,12 +92,12 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
+          creds: '{"clientId":"${{ vars.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ vars.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ vars.ARM_TENANT_ID }}"}'
 
       - name: ACR Login
         id: acr_login
         run: |
-          az acr login --name "${{ secrets.CI_CONTAINER_REGISTRY }}"
+          az acr login --name "${{ vars.CI_CONTAINER_REGISTRY }}"
 
       - name: Push devcontainer
         run: |
@@ -116,7 +106,7 @@ jobs:
       - name: Deploy core and build agent
         uses: devcontainers/ci@v0.2
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.ORG_GITHUB_TOKEN }}"
         with:
           imageName: ${{ steps.dc.outputs.image_path }}
           imageTag: ${{ steps.dc.outputs.tag }}
@@ -126,16 +116,16 @@ jobs:
             DOCKER_BUILDKIT=1
             TF_INPUT=0
             TF_IN_AUTOMATION=1
-            ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}
+            ARM_CLIENT_ID=${{ vars.ARM_CLIENT_ID }}
             ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
-            ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
-            ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
-            CI_CONTAINER_REGISTRY=${{ secrets.CI_CONTAINER_REGISTRY }}
-            CI_RESOURCE_GROUP=${{ secrets.CI_RESOURCE_GROUP }}
-            CI_STORAGE_ACCOUNT=${{ secrets.CI_STORAGE_ACCOUNT }}
+            ARM_TENANT_ID=${{ vars.ARM_TENANT_ID }}
+            ARM_SUBSCRIPTION_ID=${{ vars.ARM_SUBSCRIPTION_ID }}
+            CI_CONTAINER_REGISTRY=${{ vars.CI_CONTAINER_REGISTRY }}
+            CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
+            CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
             GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
             TF_VAR_SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) }}
-            TF_VAR_DEVCONTAINER_IMAGE=flowehr/devcontainer
+            TF_VAR_DEVCONTAINER_IMAGE=${{ env.DEVCONTAINER_NAME }}
             TF_VAR_DEVCONTAINER_TAG=${{ steps.dc.outputs.tag }}
             TF_VAR_USE_RANDOM_ADDRESS_SPACE=${{ (inputs.suffix_override != '' && '1') || '0' }}
             TF_VAR_GITHUB_RUNNER_NAME=${{ steps.dc.outputs.runner_name }}
@@ -161,17 +151,17 @@ jobs:
           DOCKER_BUILDKIT: 1
           TF_INPUT: 0
           TF_IN_AUTOMATION: 1
-          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_ID: ${{ vars.ARM_CLIENT_ID }}
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-          CI_CONTAINER_REGISTRY: ${{ secrets.CI_CONTAINER_REGISTRY }}
-          CI_RESOURCE_GROUP: ${{ secrets.CI_RESOURCE_GROUP }}
-          CI_STORAGE_ACCOUNT: ${{ secrets.CI_STORAGE_ACCOUNT }}
+          ARM_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
+          CI_CONTAINER_REGISTRY: ${{ vars.CI_CONTAINER_REGISTRY }}
+          CI_RESOURCE_GROUP: ${{ vars.CI_RESOURCE_GROUP }}
+          CI_STORAGE_ACCOUNT: ${{ vars.CI_STORAGE_ACCOUNT }}
           GITHUB_TOKEN: ${{ secrets.ORG_GITHUB_TOKEN }}
           TF_VAR_SUFFIX: ${{ (inputs.suffix_override != '' && inputs.suffix_override) }}
           TF_VAR_USE_RANDOM_ADDRESS_SPACE: ${{ (inputs.suffix_override != '' && '1') || '0' }}
-          TF_VAR_DEVCONTAINER_IMAGE: flowehr/devcontainer
+          TF_VAR_DEVCONTAINER_IMAGE: ${{ env.DEVCONTAINER_NAME }}
           TF_VAR_DEVCONTAINER_TAG: ${{ needs.make_core.outputs.dc_tag }}
         run: |
           make ${{ needs.make_core.outputs.build_agent_command }}
@@ -192,10 +182,10 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
+          creds: '{"clientId":"${{ vars.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ vars.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ vars.ARM_TENANT_ID }}"}'
 
       - name: ACR Login
-        run: az acr login --name "${{ secrets.CI_CONTAINER_REGISTRY }}"
+        run: az acr login --name "${{ vars.CI_CONTAINER_REGISTRY }}"
 
       - name: Post build agent command
         uses: devcontainers/ci@v0.2
@@ -203,21 +193,21 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.ORG_GITHUB_TOKEN }}"
         with:
           # The image name cannot be set from the make_core output because it contains a secret
-          imageName: ${{ secrets.CI_CONTAINER_REGISTRY }}.azurecr.io/flowehr/devcontainer
-          cacheFrom: ${{ secrets.CI_CONTAINER_REGISTRY }}.azurecr.io/flowehr/devcontainer
+          imageName: ${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DEVCONTAINER_NAME }}
+          cacheFrom: ${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DEVCONTAINER_NAME }}
           imageTag: ${{ needs.make_core.outputs.dc_tag }}
           runCmd: make ${{ needs.make_core.outputs.post_build_agent_command }}
           push: never
           env: |
             DOCKER_BUILDKIT=1
             TF_IN_AUTOMATION=1
-            ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}
+            ARM_CLIENT_ID=${{ vars.ARM_CLIENT_ID }}
             ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
-            ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
-            ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
-            CI_CONTAINER_REGISTRY=${{ secrets.CI_CONTAINER_REGISTRY }}
-            CI_RESOURCE_GROUP=${{ secrets.CI_RESOURCE_GROUP }}
-            CI_STORAGE_ACCOUNT=${{ secrets.CI_STORAGE_ACCOUNT }}
+            ARM_TENANT_ID=${{ vars.ARM_TENANT_ID }}
+            ARM_SUBSCRIPTION_ID=${{ vars.ARM_SUBSCRIPTION_ID }}
+            CI_CONTAINER_REGISTRY=${{ vars.CI_CONTAINER_REGISTRY }}
+            CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
+            CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
             GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
             TF_VAR_SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
             TF_VAR_USE_RANDOM_ADDRESS_SPACE=${{ (inputs.suffix_override != '' && '1') || '0' }}
