@@ -96,8 +96,7 @@ jobs:
 
       - name: ACR Login
         id: acr_login
-        run: |
-          az acr login --name "${{ vars.CI_CONTAINER_REGISTRY }}"
+        run: az acr login --name "${{ vars.CI_CONTAINER_REGISTRY }}"
 
       - name: Pre-build & push devcontainer
         uses: devcontainers/ci@v0.3
@@ -127,12 +126,12 @@ jobs:
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
             GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
-            TF_VAR_SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) }}
-            TF_VAR_DEVCONTAINER_IMAGE=${{ env.DEVCONTAINER_NAME }}
-            TF_VAR_DEVCONTAINER_TAG=${{ steps.dc.outputs.tag }}
-            TF_VAR_USE_RANDOM_ADDRESS_SPACE=${{ (inputs.suffix_override != '' && '1') || '0' }}
-            TF_VAR_GITHUB_RUNNER_NAME=${{ steps.dc.outputs.runner_name }}
-            TF_VAR_GITHUB_REPOSITORY=${{ github.repository }}
+            TF_VAR_suffix=${{ (inputs.suffix_override != '' && inputs.suffix_override) }}
+            TF_VAR_devcontainer_image=${{ env.DEVCONTAINER_NAME }}
+            TF_VAR_devcontainer_tag=${{ steps.dc.outputs.tag }}
+            TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
+            TF_VAR_github_runner_name=${{ steps.dc.outputs.runner_name }}
+            TF_VAR_github_repository=${{ github.repository }}
 
   build_agent_make:
     needs: [make_core]
@@ -162,10 +161,10 @@ jobs:
           CI_RESOURCE_GROUP: ${{ vars.CI_RESOURCE_GROUP }}
           CI_STORAGE_ACCOUNT: ${{ vars.CI_STORAGE_ACCOUNT }}
           GITHUB_TOKEN: ${{ secrets.ORG_GITHUB_TOKEN }}
-          TF_VAR_SUFFIX: ${{ (inputs.suffix_override != '' && inputs.suffix_override) }}
-          TF_VAR_USE_RANDOM_ADDRESS_SPACE: ${{ (inputs.suffix_override != '' && '1') || '0' }}
-          TF_VAR_DEVCONTAINER_IMAGE: ${{ env.DEVCONTAINER_NAME }}
-          TF_VAR_DEVCONTAINER_TAG: ${{ needs.make_core.outputs.dc_tag }}
+          TF_VAR_suffix: ${{ (inputs.suffix_override != '' && inputs.suffix_override) }}
+          TF_VAR_use_random_address_space: ${{ (inputs.suffix_override != '' && '1') || '0' }}
+          TF_VAR_devcontainer_image: ${{ env.DEVCONTAINER_NAME }}
+          TF_VAR_devcontainer_tag: ${{ needs.make_core.outputs.dc_tag }}
         run: |
           make ${{ needs.make_core.outputs.build_agent_command }}
 
@@ -210,5 +209,5 @@ jobs:
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
             GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
-            TF_VAR_SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
-            TF_VAR_USE_RANDOM_ADDRESS_SPACE=${{ (inputs.suffix_override != '' && '1') || '0' }}
+            TF_VAR_suffix=${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
+            TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
