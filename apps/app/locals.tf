@@ -14,5 +14,11 @@
 
 locals {
   feature_store_odbc = "Driver={ODBC Driver 18 for SQL Server};Server=tcp:${data.azurerm_mssql_server.feature_store.fully_qualified_domain_name},1433;Database=${var.feature_store_db_name};Authentication=ActiveDirectoryMsi;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
-  is_prod            = length(regexall("prod", lower(var.environment))) > 0
+  create_repo        = var.app_config.managed_repo != null
+  core_gh_env        = var.environment
+  staging_gh_env     = var.app_config.add_staging_slot ? "${var.environment}-staging" : null
+  branches_and_envs = var.app_config.add_staging_slot ? {
+    var.environment              = local.core_gh_env,
+    "${var.environment}-staging" = local.staging_gh_env
+  } : { var.environment = ocal.core_gh_env }
 }

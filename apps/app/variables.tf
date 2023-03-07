@@ -80,14 +80,19 @@ variable "github_owner" {
 
 variable "app_config" {
   type = object({
-    name         = string
-    description  = string
-    owners       = set(string)
-    contributors = set(string)
+    name               = string
+    description        = string
+    accesses_real_data = bool
+    add_staging_slot   = bool
+    owners             = set(string)
+    contributors       = set(string)
 
     managed_repo = object({
-      private               = bool
-      template              = string,
+      private  = bool
+      template = string
+    })
+
+    branch = object({
       num_of_approvals      = optional(number, 1),
       dismiss_stale_reviews = optional(bool, false)
     })

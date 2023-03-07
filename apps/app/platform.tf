@@ -75,6 +75,7 @@ resource "azurerm_role_assignment" "webapp_acr" {
 
 # Create a web hook that triggers automated deployment of the Docker image
 resource "azurerm_container_registry_webhook" "webhook" {
+  # TODO: hook onto staging slot if it exists
   name                = "acrwh${replace(replace(var.app_id, "_", ""), "-", "")}"
   resource_group_name = var.resource_group_name
   location            = var.location
@@ -116,24 +117,24 @@ resource "azurerm_cosmosdb_sql_role_assignment" "webapp" {
 }
 
 resource "azuread_application" "webapp_sp" {
-  count        = local.is_prod ? 1 : 0
+  count        = local.staging_gh_env != null ? 1 : 0
   display_name = "sp-flowehr-app-${replace(var.app_id, "_", "-")}"
   owners       = [data.azurerm_client_config.current.object_id]
 }
 
 resource "azuread_application_password" "webapp_sp" {
-  count                 = local.is_prod ? 1 : 0
+  count                 = local.staging_gh_env != null ? 1 : 0
   application_object_id = azuread_application.webapp_sp[0].object_id
 }
 
 resource "azuread_service_principal" "webapp_sp" {
-  count          = local.is_prod ? 1 : 0
+  count          = local.staging_gh_env != null ? 1 : 0
   application_id = azuread_application.webapp_sp[0].application_id
   owners         = [data.azurerm_client_config.current.object_id]
 }
 
 resource "azurerm_role_definition" "slot_swap" {
-  count       = local.is_prod ? 1 : 0
+  count       = local.staging_gh_env != null ? 1 : 0
   name        = "role-slot-swap-on-${replace(var.app_id, "_", "-")}"
   scope       = azurerm_linux_web_app.app.id
   description = "Slot swap role"
@@ -152,7 +153,7 @@ resource "azurerm_role_definition" "slot_swap" {
 }
 
 resource "azurerm_role_assignment" "webapp_sp_slot_swap" {
-  count                = local.is_prod ? 1 : 0
+  count                = local.staging_gh_env != null ? 1 : 0
   principal_id         = azuread_service_principal.webapp_sp[0].object_id
   scope                = azurerm_linux_web_app.app.id
   role_definition_name = azurerm_role_definition.slot_swap[0].name

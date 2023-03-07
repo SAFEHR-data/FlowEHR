@@ -13,6 +13,7 @@
 #  limitations under the License.
 
 resource "github_repository" "app" {
+  count       = local.create_repo ? 1 : 0
   name        = var.app_id
   description = var.app_config.description
   visibility  = var.app_config.managed_repo.private ? "private" : "public"
@@ -24,12 +25,14 @@ resource "github_repository" "app" {
 }
 
 resource "github_team" "owners" {
+  count       = local.create_repo ? 1 : 0
   name        = "${var.app_id} - owners"
   description = "Owners of the ${var.app_id} FlowEHR app with push and PR/deployment approval permissions."
   privacy     = "closed"
 }
 
 resource "github_team_members" "owners" {
+  count    = var.app_config.managed_repo != null ? 1 : 0
   for_each = var.app_config.owners
   team_id  = github_team.owners.id
 
@@ -40,6 +43,7 @@ resource "github_team_members" "owners" {
 }
 
 resource "github_team_repository" "owners_repo_permissions" {
+  count      = local.create_repo ? 1 : 0
   team_id    = github_team.owners.id
   repository = github_repository.app.name
   permission = "push"
@@ -61,12 +65,14 @@ EOF
 }
 
 resource "github_team" "contributors" {
+  count       = local.create_repo ? 1 : 0
   name        = "${var.app_id} - contributors"
   description = "Contributors to the ${var.app_id} FlowEHR app with push permissions."
   privacy     = "closed"
 }
 
 resource "github_team_members" "contributors" {
+  count    = local.create_repo ? 1 : 0
   for_each = var.app_config.contributors
   team_id  = github_team.contributors.id
 
@@ -77,14 +83,16 @@ resource "github_team_members" "contributors" {
 }
 
 resource "github_team_repository" "contributors_repo_permissions" {
+  count      = local.create_repo ? 1 : 0
   team_id    = github_team.contributors.id
   repository = github_repository.app.name
   permission = "push"
 }
 
-resource "github_branch" "deployment" {
+resource "github_branch" "all" {
+  for_each   = local.branches_and_envs
   repository = github_repository.app.name
-  branch     = var.environment
+  branch     = each.key
 }
 
 resource "github_branch_protection" "deployment" {
@@ -94,15 +102,15 @@ resource "github_branch_protection" "deployment" {
   allows_force_pushes = false
 
   required_status_checks {
-    strict   = true
+    strict   = var.app_config.accesses_real_data
     contexts = ["Lint"]
   }
 
   required_pull_request_reviews {
-    dismiss_stale_reviews           = var.app_config.managed_repo.dismiss_stale_reviews
-    restrict_dismissals             = true
-    require_code_owner_reviews      = true
-    required_approving_review_count = var.app_config.managed_repo.num_of_approvals
+    dismiss_stale_reviews           = var.app_config.accesses_real_data
+    restrict_dismissals             = !var.app_config.accesses_real_data
+    require_code_owner_reviews      = !var.app_config.accesses_real_data
+    required_approving_review_count = max(var.app_config.managed_repo.num_of_approvals, 1)
   }
 }
 
@@ -129,7 +137,8 @@ resource "azurerm_container_registry_token_password" "app_access" {
   password1 {}
 }
 
-resource "github_repository_environment" "app" {
+resource "github_repository_environment" "all" {
+  for_each    = local.branches_and_envs
   repository  = github_repository.app.name
   environment = var.environment
 
@@ -145,72 +154,69 @@ gh api \
   --method POST \
   -H "Accept: application/vnd.github+json" \
   -H "X-GitHub-Api-Version: 2022-11-28" \
-  /repos/${var.github_owner}/${github_repository.app.name}/environments/${var.environment}/deployment-branch-policies \
-  -f name='${var.environment}'
+  /repos/${var.github_owner}/${github_repository.app.name}/environments/${each.value}/deployment-branch-policies \
+  -f name='${each.key}'
 EOF
   }
 }
 
 resource "github_actions_environment_secret" "acr_name" {
-  count           = local.is_prod ? 0 : 1
   repository      = github_repository.app.name
-  environment     = github_repository_environment.app.environment
+  environment     = var.add_staging_slot ? local.staging_gh_env : local.core_gh_env
   secret_name     = "ACR_NAME"
   plaintext_value = data.azurerm_container_registry.serve.name
 }
 
 resource "github_actions_environment_secret" "acr_token_username" {
-  count           = local.is_prod ? 0 : 1
   repository      = github_repository.app.name
-  environment     = github_repository_environment.app.environment
+  environment     = var.add_staging_slot ? local.staging_gh_env : local.core_gh_env
   secret_name     = "ACR_USERNAME"
   plaintext_value = azurerm_container_registry_token.app_access.name
 }
 
 resource "github_actions_environment_secret" "acr_token_password" {
-  count           = local.is_prod ? 0 : 1
   repository      = github_repository.app.name
-  environment     = github_repository_environment.app.environment
+  environment     = var.add_staging_slot ? local.staging_gh_env : local.core_gh_env
   secret_name     = "ACR_PASSWORD"
   plaintext_value = azurerm_container_registry_token_password.app_access.password1[0].value
 }
 
 resource "github_actions_environment_secret" "sp_client_id" {
-  count           = local.is_prod ? 1 : 0
+  count           = local.staging_gh_env != null ? 1 : 0
   repository      = github_repository.app.name
-  environment     = github_repository_environment.app.environment
+  environment     = local.core_gh_env
   secret_name     = "ARM_CLIENT_ID"
   plaintext_value = azuread_application.webapp_sp[0].application_id
 }
 
 resource "github_actions_environment_secret" "sp_client_secret" {
-  count           = local.is_prod ? 1 : 0
+  count           = local.staging_gh_env != null ? 1 : 0
   repository      = github_repository.app.name
-  environment     = github_repository_environment.app.environment
+  environment     = local.core_gh_env
   secret_name     = "ARM_CLIENT_SECRET"
   plaintext_value = azuread_application_password.webapp_sp[0].value
 }
 
 resource "github_actions_environment_secret" "tenant_id" {
-  count           = local.is_prod ? 1 : 0
+  count           = local.staging_gh_env != null ? 1 : 0
   repository      = github_repository.app.name
-  environment     = github_repository_environment.app.environment
+  environment     = local.core_gh_env
   secret_name     = "ARM_TENANT_ID"
   plaintext_value = data.azurerm_client_config.current.tenant_id
 }
 
 resource "github_actions_environment_secret" "subscription_id" {
-  count           = local.is_prod ? 1 : 0
+  count           = local.staging_gh_env != null ? 1 : 0
   repository      = github_repository.app.name
-  environment     = github_repository_environment.app.environment
+  environment     = local.core_gh_env
   secret_name     = "ARM_SUBSCRIPTION_ID"
   plaintext_value = data.azurerm_client_config.current.subscription_id
 }
 
 resource "github_actions_environment_secret" "webapp_id" {
-  count           = local.is_prod ? 1 : 0
+  count           = local.staging_gh_env != null ? 1 : 0
   repository      = github_repository.app.name
-  environment     = github_repository_environment.app.environment
+  environment     = local.core_gh_env
   secret_name     = "WEBAPP_ID"
   plaintext_value = azurerm_linux_web_app.app.id
 }
