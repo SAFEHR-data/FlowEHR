@@ -36,11 +36,11 @@ help: ## Show this help
         | column -t -s '|'
 	@echo
 
-lint: ## Call pre-commit hooks to lint files & check for headers 
+lint: ## Call pre-commit hooks to lint files & check for headers
 	$(call target_title, "Linting") \
 	&& pre-commit run --all-files
 
-az-login: ## Check logged in/log into azure with a service principal 
+az-login: ## Check logged in/log into azure with a service principal
 	$(call target_title, "Log-in to Azure") \
 	&& cd ${MAKEFILE_DIR}/scripts && source load_env.sh && ./az_login.sh
 
@@ -71,7 +71,7 @@ infrastructure-transform: bootstrap transform-artifacts ## Deploy transform infr
 
 transform-artifacts: ## Build transform artifacts
 	${MAKEFILE_DIR}/scripts/pipeline_repo_checkout.sh \
-	${MAKEFILE_DIR}/scripts/build_artifacts.sh
+	&& ${MAKEFILE_DIR}/scripts/build_artifacts.sh
 
 infrastructure-serve: bootstrap ## Deploy serve infrastructure
 	$(call terragrunt,apply,infrastructure/serve)
@@ -109,7 +109,7 @@ destroy-transform: ## Destroy transform infrastructure
 destroy-serve: ## Destroy serve infrastructure
 	$(call terragrunt,destroy,infrastructure/serve)
 
-destroy-non-core: ## Destroy non-core 
+destroy-non-core: ## Destroy non-core
 	$(call target_title, "Destroying non core infrastructure") \
 	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
 	&& cd ${MAKEFILE_DIR} \
