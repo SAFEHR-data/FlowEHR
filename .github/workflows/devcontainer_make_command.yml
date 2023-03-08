@@ -213,5 +213,5 @@ jobs:
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
             GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
-            TF_VAR_suffix=${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
+            TF_VAR_suffix=${{ (inputs.suffix_override != '' && inputs.suffix_override) }}
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
