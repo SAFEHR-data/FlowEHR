@@ -19,7 +19,7 @@ include "root" {
 locals {
   providers            = read_terragrunt_config("${get_repo_root()}/providers.hcl")
   configuration        = read_terragrunt_config("${get_repo_root()}/configuration.hcl")
-  root_config          = local.configuration.locals.root_config
+  merged_root_config   = local.configuration.locals.merged_root_config
   apps_config_path     = "${get_terragrunt_dir()}/apps.yaml"
   apps_config          = fileexists(local.apps_config_path) ? yamldecode(file(local.apps_config_path)) : null
   apps_env_config_path = "${get_terragrunt_dir()}/apps.${get_env("ENVIRONMENT", "local")}.yaml"
@@ -36,8 +36,8 @@ terraform {
   extra_arguments "set_github_vars" {
     commands = ["init", "apply", "plan", "destroy", "taint", "untaint", "refresh"]
     env_vars = {
-      GITHUB_OWNER = local.root_config.serve.github_owner
-      GITHUB_TOKEN = get_env("GITHUB_TOKEN", local.root_config.serve.github_token)
+      GITHUB_OWNER = local.merged_root_config.serve.github_owner
+      GITHUB_TOKEN = get_env("GITHUB_TOKEN", local.merged_root_config.serve.github_token)
     }
   }
 }

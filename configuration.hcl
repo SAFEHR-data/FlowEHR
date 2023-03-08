@@ -21,5 +21,5 @@ locals {
   env_config      = fileexists(local.env_config_path) ? yamldecode(file(local.env_config_path)) : null
 
   # Merged configuration (with environment-specific config values overwriting root values)
-  merged_config = merge(local.root_config, local.env_config)
+  merged_root_config = merge(local.root_config, local.env_config)
 }

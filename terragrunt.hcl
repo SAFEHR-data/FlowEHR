@@ -68,7 +68,7 @@ generate "provider" {
 # Here we define common variables to be inhereted by each module (as long as they're set in its variables.tf)
 inputs = merge(
   # Add values from the merged config files (root and environment-specific)
-  local.configuration.locals.merged_config, {
+  local.configuration.locals.merged_root_config, {
 
   # And values from terraform bootstrapping (& env vars in CI)
   naming_suffix           = dependency.bootstrap.outputs.naming_suffix

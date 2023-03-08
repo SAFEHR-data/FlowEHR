@@ -55,6 +55,6 @@ remote_state {
 }
 
 inputs = merge(
-  local.configuration.locals.merged_config, {
+  local.configuration.locals.merged_root_config, {
   tf_in_automation = get_env("TF_IN_AUTOMATION", false)
 })
