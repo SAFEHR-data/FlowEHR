@@ -229,7 +229,7 @@ resource "azuread_group" "ad_group_developers" {
   security_enabled = true
 }
 
-resource "azuread_group" "ad_groups_data_scientists" {
+resource "azuread_group" "ad_group_data_scientists" {
   display_name     = "${var.naming_suffix} flowehr-data-scientists"
   owners           = [data.azurerm_client_config.current.object_id]
   security_enabled = true
