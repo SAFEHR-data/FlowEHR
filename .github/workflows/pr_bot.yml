@@ -143,7 +143,7 @@ jobs:
   run_test:
     needs: [pr_comment]
     if: |
-      (needs.pr_comment.outputs.command == 'test') &&
+      (needs.pr_comment.outputs.command == 'test' || needs.pr_comment.outputs.command == 'test-all') &&
       (needs.pr_comment.outputs.makeCommand != 'none')
     name: Deploy PR
     uses: ./.github/workflows/devcontainer_make_command.yml
