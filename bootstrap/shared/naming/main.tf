@@ -22,8 +22,8 @@ variable "id" {
   }
 
   validation {
-    condition     = can(regex("^[a-zA-Z0-9\\_-]*$", var.id))
-    error_message = "Cannot contain spaces or special characters except '-' and '_'"
+    condition     = can(regex("^[a-z0-9\\_-]*$", var.id))
+    error_message = "Cannot contain spaces, uppercase or special characters except '-' and '_'"
   }
 }
 
@@ -37,8 +37,8 @@ variable "environment" {
   }
 
   validation {
-    condition     = can(regex("^[a-zA-Z0-9\\_-]*$", var.environment))
-    error_message = "Cannot contain spaces or special characters except '-' and '_'"
+    condition     = can(regex("^[a-z0-9\\_-]*$", var.environment))
+    error_message = "Cannot contain spaces, uppercase or special characters except '-' and '_'"
   }
 }
 
@@ -46,11 +46,16 @@ variable "suffix" {
   description = "Override the suffix that would be generated from id + environment. Useful for transient PR environments"
   type        = string
   default     = ""
+
+  validation {
+    condition     = can(regex("^[a-z0-9\\_-]*$", var.suffix))
+    error_message = "Cannot contain spaces, uppercase or special characters except '-' and '_'"
+  }
 }
 
 locals {
   naming_suffix           = var.suffix == "" ? "${var.id}-${var.environment}" : var.suffix
-  naming_suffix_truncated = substr(replace(replace(local.naming_suffix, "-", ""), "_", ""), 0, 12)
+  naming_suffix_truncated = substr(replace(replace(local.naming_suffix, "-", ""), "_", ""), 0, 17)
 }
 
 output "suffix" {
