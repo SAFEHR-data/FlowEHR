@@ -64,4 +64,11 @@ locals {
       }
     ]
   ]))
+
+  sql_users_to_create = {
+    "users" : [
+      { "name" : "${local.databricks_app_name}", "role" : "db_owner" },
+      { "name" : "${azuread_group.ad_groups_data_scientists.display_name}", "role" : "db_reader" }
+    ]
+  }
 }
