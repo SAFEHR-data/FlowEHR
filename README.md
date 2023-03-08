@@ -29,6 +29,15 @@ Then edit `config.yaml` and specify the following values:
 - `id` - a unique identifier to apply to all deployed resources (i.e. `flwruclh`)
 - `environment` - a unique name for your environment (i.e. `jgdev`)
 - `location` - the [Azure region](https://azuretracks.com/2021/04/current-azure-region-names-reference/) you wish to deploy resources to
+- `core_address_space` (optional) - override the default core address space, e.g. `10.1.0.0/24`
+
+- `transform` (optional)
+    - `spark_version` (optional) - the Spark version to install on your local cluster and Databricks clusters
+    - `repositories` (optional) - list of Git repositories containing transform artifacts to clone and deploy to FlowEHR
+
+- `serve`
+    - `github_owner` - the GitHub organisation to deploy FlowEHR app repositories to
+    - `github_token` (local only) - a GitHub PAT for authenticating to GitHub. See the [apps README](./apps/README.md) for details.
 
 ## Deploying
 ### Locally
@@ -75,6 +84,8 @@ Then edit `config.yaml` and specify the following values:
 ### CI (GitHub Actions)
 
 CI deployment workflows are run in [Github environments](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment). These should be created in a private repository created from this template repository.
+
+After you've forked this template repository, you will need to check in a config file for the environment you wish to deploy.
 
 This step will create an AAD Application and Service Principal in the specified tenancy, and grant that service principal permissions in Azure and AAD needed for deployment. These are detailed below. 
 

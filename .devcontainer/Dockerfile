@@ -92,19 +92,6 @@ RUN python3 -m pip install --no-cache-dir \
     sqlalchemy=="${SQLALCHEMY_VERSION}" \
     pandas=="${PANDAS_VERSION}"
 
-# Get the local Spark installed to be able to run unit tests
-# Borrowed from https://github.com/beandrad/pyspark-sample/blob/main/.devcontainer/Dockerfile#L36
-COPY config.yaml /tmp/config.yaml
-RUN mkdir -p /tmp/docker-downloads \
-   && SPARK_VERSION=$(yq e .transform.spark_version /tmp/config.yaml) \
-   && python3 -m pip install --no-cache-dir pyspark=="${SPARK_VERSION}" \
-   && apt-get update \
-   && apt-get -y install openjdk-11-jdk wget --no-install-recommends \
-   && wget -q https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz -O /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
-   && tar -xvzf /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
-   && mv spark-${SPARK_VERSION}-bin-hadoop3 /opt/spark \
-   && rm -rf /tmp/docker-downloads
-
 # Install prerequsites for using this container as a GitHub runner. Assuming an x86 runner
 COPY .devcontainer/library-scripts/start-gh-runner.sh /tmp/library-scripts/
 ARG GH_RUNNER_VERSION="v2.302.1"

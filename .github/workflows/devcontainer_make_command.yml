@@ -98,13 +98,17 @@ jobs:
         id: acr_login
         run: az acr login --name "${{ vars.CI_CONTAINER_REGISTRY }}"
 
-      - name: Pre-build & push devcontainer
+      - name: Pre-build devcontainer
         uses: devcontainers/ci@v0.3
         with:
           imageName: ${{ steps.dc.outputs.image_path }}
           cacheFrom: ${{ steps.dc.outputs.image_path }}
           imageTag: ${{ steps.dc.outputs.tag }}
-          push: always
+          push: never # Happens as a post-step after the job so we need to do this manually
+
+      - name: Push devcontainer
+        id: devcontainer_push
+        run: docker push ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
 
       - name: Deploy core and build agent
         uses: devcontainers/ci@v0.3
