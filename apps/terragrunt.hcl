@@ -17,10 +17,13 @@ include "root" {
 }
 
 locals {
-  providers        = read_terragrunt_config("${get_repo_root()}/providers.hcl")
-  core_config      = yamldecode(file("${get_repo_root()}/config.yaml"))
-  apps_config_path = "${get_terragrunt_dir()}/apps.yaml"
-  apps_config      = fileexists(local.apps_config_path) ? yamldecode(file(local.apps_config_path)) : {}
+  providers            = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+  configuration        = read_terragrunt_config("${get_repo_root()}/configuration.hcl")
+  root_config          = local.configuration.locals.root_config
+  apps_config_path     = "${get_terragrunt_dir()}/apps.yaml"
+  apps_config          = fileexists(local.apps_config_path) ? yamldecode(file(local.apps_config_path)) : null
+  apps_env_config_path = "${get_terragrunt_dir()}/apps.${get_env("ENVIRONMENT", "local")}.yaml"
+  apps_env_config      = fileexists(local.apps_env_config_path) ? yamldecode(file(local.apps_env_config_path)) : null
 }
 
 terraform {
@@ -33,8 +36,8 @@ terraform {
   extra_arguments "set_github_vars" {
     commands = ["init", "apply", "plan", "destroy", "taint", "untaint", "refresh"]
     env_vars = {
-      GITHUB_OWNER = local.core_config.serve.github_owner
-      GITHUB_TOKEN = get_env("GITHUB_TOKEN", local.core_config.serve.github_token)
+      GITHUB_OWNER = local.root_config.serve.github_owner
+      GITHUB_TOKEN = get_env("GITHUB_TOKEN", local.root_config.serve.github_token)
     }
   }
 }
@@ -126,5 +129,6 @@ inputs = {
   serve_cosmos_account_name   = dependency.serve.outputs.cosmos_account_name
   serve_webapps_subnet_id     = dependency.serve.outputs.webapps_subnet_id
 
-  apps = local.apps_config
+  # Generate app config by merging 
+  apps = merge(local.apps_config, local.apps_env_config)
 }

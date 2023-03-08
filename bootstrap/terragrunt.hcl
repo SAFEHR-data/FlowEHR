@@ -13,7 +13,8 @@
 #  limitations under the License.
 
 locals {
-  providers = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+  providers     = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+  configuration = read_terragrunt_config("${get_repo_root()}/configuration.hcl")
 }
 
 terraform {
@@ -54,6 +55,6 @@ remote_state {
 }
 
 inputs = merge(
-  yamldecode(file(find_in_parent_folders("config.yaml"))), {
+  local.configuration.locals.merged_config, {
   tf_in_automation = get_env("TF_IN_AUTOMATION", false)
 })

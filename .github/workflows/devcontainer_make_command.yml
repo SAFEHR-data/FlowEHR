@@ -24,7 +24,7 @@ on:
       environment:
         type: string
         required: true
-        description: The GitHub environment in which to run
+        description: The environment to deploy e.g. staging (selects the env config file and GitHub environment to use)
       suffix_override:
         type: string
         required: false
@@ -104,7 +104,7 @@ jobs:
           imageName: ${{ steps.dc.outputs.image_path }}
           cacheFrom: ${{ steps.dc.outputs.image_path }}
           imageTag: ${{ steps.dc.outputs.tag }}
-          push: never # Happens as a post-step after the job so we need to do this manually
+          push: never  # Happens as a post-step after the job so we need to do this manually
 
       - name: Push devcontainer
         id: devcontainer_push
@@ -126,6 +126,7 @@ jobs:
             ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
             ARM_TENANT_ID=${{ vars.ARM_TENANT_ID }}
             ARM_SUBSCRIPTION_ID=${{ vars.ARM_SUBSCRIPTION_ID }}
+            ENVIRONMENT=${{ inputs.environment }}
             CI_CONTAINER_REGISTRY=${{ vars.CI_CONTAINER_REGISTRY }}
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
@@ -161,6 +162,7 @@ jobs:
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
           ARM_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
+          ENVIRONMENT: ${{ inputs.environment }}
           CI_CONTAINER_REGISTRY: ${{ vars.CI_CONTAINER_REGISTRY }}
           CI_RESOURCE_GROUP: ${{ vars.CI_RESOURCE_GROUP }}
           CI_STORAGE_ACCOUNT: ${{ vars.CI_STORAGE_ACCOUNT }}
@@ -209,6 +211,7 @@ jobs:
             ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
             ARM_TENANT_ID=${{ vars.ARM_TENANT_ID }}
             ARM_SUBSCRIPTION_ID=${{ vars.ARM_SUBSCRIPTION_ID }}
+            ENVIRONMENT=${{ inputs.environment }}
             CI_CONTAINER_REGISTRY=${{ vars.CI_CONTAINER_REGISTRY }}
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}

@@ -18,6 +18,7 @@ dependency "bootstrap" {
 
 locals {
   providers        = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+  configuration    = read_terragrunt_config("${get_repo_root()}/configuration.hcl")
   tf_in_automation = get_env("TF_IN_AUTOMATION", false)
 }
 
@@ -66,8 +67,8 @@ generate "provider" {
 
 # Here we define common variables to be inhereted by each module (as long as they're set in its variables.tf)
 inputs = merge(
-  # Add values from the root config.yaml file
-  yamldecode(file("${get_repo_root()}/config.yaml")), {
+  # Add values from the merged config files (root and environment-specific)
+  local.configuration.locals.merged_config, {
 
   # And values from terraform bootstrapping (& env vars in CI)
   naming_suffix           = dependency.bootstrap.outputs.naming_suffix
