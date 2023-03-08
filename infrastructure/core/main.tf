@@ -59,7 +59,7 @@ resource "azurerm_role_assignment" "deployer_can_administrate_kv" {
 }
 
 resource "azurerm_private_endpoint" "flowehr_keyvault" {
-  name                = "ep-kv-${var.naming_suffix}"
+  name                = "pe-kv-${var.naming_suffix}"
   location            = azurerm_resource_group.core.location
   resource_group_name = azurerm_resource_group.core.name
   subnet_id           = azurerm_subnet.core_shared.id
