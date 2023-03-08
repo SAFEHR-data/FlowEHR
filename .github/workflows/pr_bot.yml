@@ -85,7 +85,9 @@ jobs:
 
       - id: set_make_command
         run: |
-          if [ ${{ steps.changes.outputs.transform }} = "true" ] && \
+          if [ ${{ steps.check_command.outputs.command }} = "test-all" ]; then
+              make_command="test"
+          elif [ ${{ steps.changes.outputs.transform }} = "true" ] && \
             [ ${{ steps.changes.outputs.serve }} = "true" ]; then
               make_command="test"
           elif [ ${{ steps.changes.outputs.transform }} = "true" ]; then
@@ -100,7 +102,7 @@ jobs:
           echo "makeCommand=${make_command}" >> $GITHUB_OUTPUT
 
       - name: Report check status start
-        if: ${{ steps.check_command.outputs.command == 'test' }}
+        if: ${{ steps.check_command.outputs.command == 'test' || steps.check_command.outputs.command == 'test-all' }}
         uses: LouisBrunner/checks-action@v1.5.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
