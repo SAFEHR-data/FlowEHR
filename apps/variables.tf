@@ -54,6 +54,10 @@ variable "transform_feature_store_db_name" {
   type = string
 }
 
+variable "transform_apps_ad_group_display_name" {
+  type = string
+}
+
 variable "transform_feature_store_server_name" {
   type = string
 }
