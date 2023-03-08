@@ -13,8 +13,11 @@
 #  limitations under the License.
 
 resource "random_password" "sql_admin_password" {
-  length  = 16
-  special = true
+  length      = 16
+  min_lower   = 2
+  min_upper   = 2
+  min_numeric = 2
+  min_special = 2
 }
 
 # AAD App + secret to set as AAD Admin of SQL Server
