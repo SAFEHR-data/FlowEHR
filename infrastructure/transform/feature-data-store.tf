@@ -216,3 +216,25 @@ resource "azurerm_private_endpoint" "sql_server_features_pe" {
     private_dns_zone_ids = [azurerm_private_dns_zone.sql.id]
   }
 }
+
+resource "azuread_group" "ad_group_apps" {
+  display_name     = "${var.naming_suffix} flowehr-apps"
+  owners           = [data.azurerm_client_config.current.object_id]
+  security_enabled = true
+}
+
+resource "azuread_group" "ad_group_developers" {
+  display_name     = "${var.naming_suffix} flowehr-developers"
+  owners           = [data.azurerm_client_config.current.object_id]
+  security_enabled = true
+}
+
+output "apps_ad_group_principal_id" {
+  description = "Apps AD group principal id "
+  value       = azuread_group.ad_group_apps.object_id
+}
+
+output "developers_ad_group_principal_id" {
+  description = "Developers AD group principal id "
+  value       = azuread_group.ad_group_developers.object_id
+}
