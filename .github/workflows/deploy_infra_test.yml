@@ -30,11 +30,3 @@ jobs:
       command: infrastructure
       environment: Infra-Test
     secrets: inherit
-
-  transform_test:
-    uses: ./.github/workflows/devcontainer_make_command.yml
-    name: Test Pipeline Transforms
-    with:
-      command: transform-test
-      environment: Infra-Test
-    secrets: inherit
