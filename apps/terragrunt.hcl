@@ -37,7 +37,7 @@ terraform {
     commands = ["init", "apply", "plan", "destroy", "taint", "untaint", "refresh"]
     env_vars = {
       GITHUB_OWNER = local.merged_root_config.serve.github_owner
-      GITHUB_TOKEN = get_env("GITHUB_TOKEN", local.merged_root_config.serve.github_token)
+      GITHUB_TOKEN = get_env("ORG_GITHUB_TOKEN", local.merged_root_config.serve.github_token)
     }
   }
 }
