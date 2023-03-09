@@ -46,6 +46,10 @@ variable "location" {
   type = string
 }
 
+variable "accesses_real_data" {
+  type = bool
+}
+
 variable "webapps_subnet_id" {
   type = string
 }
@@ -80,10 +84,9 @@ variable "github_owner" {
 
 variable "app_config" {
   type = object({
-    name               = string
-    description        = string
-    accesses_real_data = bool
-    add_staging_slot   = bool
+    name             = string
+    description      = string
+    add_staging_slot = bool
 
     managed_repo = object({
       private      = bool

@@ -49,9 +49,8 @@ resource "github_team_repository" "owners_repo_permissions" {
 }
 
 resource "github_repository_file" "codeowners" {
-  for_each            = local.branches_and_envs
   repository          = github_repository.app[0].name
-  branch              = each.key
+  branch              = "main"
   file                = "CODEOWNERS"
   content             = <<EOF
 # Owners for branch protection
@@ -102,14 +101,14 @@ resource "github_branch_protection" "deployment" {
   allows_force_pushes = false
 
   required_status_checks {
-    strict   = var.app_config.accesses_real_data
+    strict   = var.accesses_real_data
     contexts = ["Lint"]
   }
 
   required_pull_request_reviews {
-    dismiss_stale_reviews           = var.app_config.accesses_real_data
-    restrict_dismissals             = !var.app_config.accesses_real_data
-    require_code_owner_reviews      = !var.app_config.accesses_real_data
+    dismiss_stale_reviews           = var.accesses_real_data
+    restrict_dismissals             = !var.accesses_real_data
+    require_code_owner_reviews      = !var.accesses_real_data
     required_approving_review_count = max(var.app_config.branch.num_of_approvals, 1)
   }
 }

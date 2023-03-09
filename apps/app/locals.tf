@@ -17,10 +17,10 @@ locals {
   acr_repository     = var.app_id
   create_repo        = var.app_config.managed_repo != null
   core_gh_env        = var.environment
-  staging_gh_env     = var.app_config.add_staging_slot ? "${var.environment}-staging" : null
+  staging_gh_env     = var.app_config.add_staging_slot ? "${var.environment}-testing-slot" : null
   branches_and_envs = var.app_config.add_staging_slot ? {
-    "${var.environment}"         = local.core_gh_env
-    "${var.environment}-staging" = local.staging_gh_env
+    "${var.environment}"              = local.core_gh_env
+    "${var.environment}-testing-slot" = local.staging_gh_env
   } : { var.environment = local.core_gh_env }
   site_credential_name     = var.app_config.add_staging_slot ? azurerm_linux_web_app_slot.staging[0].site_credential[0].name : azurerm_linux_web_app.app.site_credential[0].name
   site_credential_password = var.app_config.add_staging_slot ? azurerm_linux_web_app_slot.staging[0].site_credential[0].password : azurerm_linux_web_app.app.site_credential[0].password

@@ -27,8 +27,6 @@ def create_con_str(db: str) -> str:
     return f"DRIVER={driver};SERVER={server};DATABASE={db};ENCRYPT=yes;Authentication=ActiveDirectoryServicePrincipal;UID={client_id};PWD={client_secret}"  # noqa: E501
 
 
-exit()
-
 # connect to master database to create login
 cnxn = pyodbc.connect(create_con_str("master"))
 cursor = cnxn.cursor()
