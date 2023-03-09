@@ -73,18 +73,23 @@ transform-artifacts: ## Build transform artifacts
 	${MAKEFILE_DIR}/scripts/pipeline_repo_checkout.sh \
 	&& ${MAKEFILE_DIR}/scripts/build_artifacts.sh
 
+test-pipelines:
+	$(call target_title, "Test Transform Pipelines") \
+	&& . ${MAKEFILE_DIR}/scripts/load_env.sh \
+	&& ${MAKEFILE_DIR}/transform/run_pipelines.sh
+
 infrastructure-serve: bootstrap ## Deploy serve infrastructure
 	$(call terragrunt,apply,infrastructure/serve)
 
 test: infrastructure apps destroy-all  ## Test by deploy->destroy
 
-test-transform: infrastructure-transform destroy-all  ## Test transform deploy->destroy
+test-transform: infrastructure-transform test-pipelines destroy-all  ## Test transform deploy->destroy
 
 test-serve: infrastructure-serve destroy-all  ## Test transform deploy->destroy
 
 test-without-core-destroy: infrastructure apps destroy-non-core ## Test non-core deploy->destroy destroying core
 
-test-transform-without-core-destroy: infrastructure-transform destroy-non-core  ## Test transform deploy->destroy destroying core
+test-transform-without-core-destroy: infrastructure-transform test-pipelines destroy-non-core  ## Test transform deploy->destroy destroying core
 
 test-serve-without-core-destroy: infrastructure-serve destroy-non-core  ## Test serve deploy->destroy without destroying core
 

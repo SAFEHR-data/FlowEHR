@@ -72,16 +72,16 @@ resource "databricks_cluster" "fixed_single_node" {
     // Formatted according to syntax for referencing secrets in Spark config:
     // https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secrets
     tomap({ for connection in var.data_source_connections :
-      "spark.secret.${connection.name}_fqdn" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-fqdn}}"
+      "spark.secret.${connection.name}-fqdn" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-fqdn}}"
     }),
     tomap({ for connection in var.data_source_connections :
-      "spark.secret.${connection.name}_database" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-database}}"
+      "spark.secret.${connection.name}-database" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-database}}"
     }),
     tomap({ for connection in var.data_source_connections :
-      "spark.secret.${connection.name}_username" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-username}}"
+      "spark.secret.${connection.name}-username" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-username}}"
     }),
     tomap({ for connection in var.data_source_connections :
-      "spark.secret.${connection.name}_password" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-password}}"
+      "spark.secret.${connection.name}-password" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-password}}"
     })
   )
 

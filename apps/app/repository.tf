@@ -152,6 +152,7 @@ EOF
 }
 
 resource "github_actions_environment_secret" "acr_name" {
+  count           = local.is_prod ? 0 : 1
   repository      = github_repository.app.name
   environment     = github_repository_environment.app.environment
   secret_name     = "ACR_NAME"
@@ -159,6 +160,7 @@ resource "github_actions_environment_secret" "acr_name" {
 }
 
 resource "github_actions_environment_secret" "acr_token_username" {
+  count           = local.is_prod ? 0 : 1
   repository      = github_repository.app.name
   environment     = github_repository_environment.app.environment
   secret_name     = "ACR_USERNAME"
@@ -166,8 +168,49 @@ resource "github_actions_environment_secret" "acr_token_username" {
 }
 
 resource "github_actions_environment_secret" "acr_token_password" {
+  count           = local.is_prod ? 0 : 1
   repository      = github_repository.app.name
   environment     = github_repository_environment.app.environment
   secret_name     = "ACR_PASSWORD"
   plaintext_value = azurerm_container_registry_token_password.app_access.password1[0].value
+}
+
+resource "github_actions_environment_secret" "sp_client_id" {
+  count           = local.is_prod ? 1 : 0
+  repository      = github_repository.app.name
+  environment     = github_repository_environment.app.environment
+  secret_name     = "ARM_CLIENT_ID"
+  plaintext_value = azuread_application.webapp_sp[0].application_id
+}
+
+resource "github_actions_environment_secret" "sp_client_secret" {
+  count           = local.is_prod ? 1 : 0
+  repository      = github_repository.app.name
+  environment     = github_repository_environment.app.environment
+  secret_name     = "ARM_CLIENT_SECRET"
+  plaintext_value = azuread_application_password.webapp_sp[0].value
+}
+
+resource "github_actions_environment_secret" "tenant_id" {
+  count           = local.is_prod ? 1 : 0
+  repository      = github_repository.app.name
+  environment     = github_repository_environment.app.environment
+  secret_name     = "ARM_TENANT_ID"
+  plaintext_value = data.azurerm_client_config.current.tenant_id
+}
+
+resource "github_actions_environment_secret" "subscription_id" {
+  count           = local.is_prod ? 1 : 0
+  repository      = github_repository.app.name
+  environment     = github_repository_environment.app.environment
+  secret_name     = "ARM_SUBSCRIPTION_ID"
+  plaintext_value = data.azurerm_client_config.current.subscription_id
+}
+
+resource "github_actions_environment_secret" "webapp_id" {
+  count           = local.is_prod ? 1 : 0
+  repository      = github_repository.app.name
+  environment     = github_repository_environment.app.environment
+  secret_name     = "WEBAPP_ID"
+  plaintext_value = azurerm_linux_web_app.app.id
 }
