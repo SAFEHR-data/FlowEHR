@@ -12,11 +12,22 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-#TODO remove
-
 resource "random_password" "sql_admin_password" {
   length  = 16
   special = true
+}
+
+# AAD App + secret to set as AAD Admin of SQL Server
+resource "azuread_application" "flowehr_sql_owner" {
+  display_name = local.sql_owner_app_name
+  owners       = [data.azurerm_client_config.current.object_id]
+}
+resource "azuread_application_password" "flowehr_sql_owner" {
+  application_object_id = azuread_application.flowehr_sql_owner.object_id
+}
+resource "azuread_service_principal" "flowehr_sql_owner" {
+  application_id = azuread_application.flowehr_sql_owner.application_id
+  owners         = [data.azurerm_client_config.current.object_id]
 }
 
 # Azure SQL logical server, public access disabled - will use private endpoints for access
@@ -30,6 +41,36 @@ resource "azurerm_mssql_server" "sql_server_features" {
   public_network_access_enabled        = var.local_mode
   outbound_network_restriction_enabled = true
   tags                                 = var.tags
+  azuread_administrator {
+    login_username = local.sql_owner_app_name
+    object_id      = azuread_service_principal.flowehr_sql_owner.object_id
+  }
+  identity {
+    type = "SystemAssigned"
+  }
+}
+
+# Assign the SQL Identity User.Read.All / GroupMember.Read.All / Application.Read.All
+# Doc here: https://learn.microsoft.com/en-us/azure/azure-sql/database/authentication-azure-ad-user-assigned-managed-identity
+resource "azuread_service_principal" "msgraph" {
+  application_id = data.azuread_application_published_app_ids.well_known.result.MicrosoftGraph
+  use_existing   = true
+}
+
+resource "azuread_app_role_assignment" "sql_user_read_all" {
+  app_role_id         = azuread_service_principal.msgraph.app_role_ids["User.Read.All"]
+  principal_object_id = azurerm_mssql_server.sql_server_features.identity[0].principal_id
+  resource_object_id  = azuread_service_principal.msgraph.object_id
+}
+resource "azuread_app_role_assignment" "sql_groupmember_read_all" {
+  app_role_id         = azuread_service_principal.msgraph.app_role_ids["GroupMember.Read.All"]
+  principal_object_id = azurerm_mssql_server.sql_server_features.identity[0].principal_id
+  resource_object_id  = azuread_service_principal.msgraph.object_id
+}
+resource "azuread_app_role_assignment" "sql_application_read_all" {
+  app_role_id         = azuread_service_principal.msgraph.app_role_ids["Application.Read.All"]
+  principal_object_id = azurerm_mssql_server.sql_server_features.identity[0].principal_id
+  resource_object_id  = azuread_service_principal.msgraph.object_id
 }
 
 # optional firewall rule when running in local_mode
@@ -60,21 +101,66 @@ resource "azurerm_mssql_database" "feature_database" {
   tags                 = var.tags
 }
 
-# AAD App + SPN for Databricks -> SQL Access.
+resource "null_resource" "create_sql_user" {
+  # make sure we have the identity created with aad perms, a client + secret to connect with, and an identity to set as dbo
+  depends_on = [
+    azuread_application_password.flowehr_sql_owner,
+    azuread_application.flowehr_databricks_sql,
+    azuread_app_role_assignment.sql_user_read_all,
+    azuread_app_role_assignment.sql_groupmember_read_all,
+    azuread_app_role_assignment.sql_application_read_all,
+    azurerm_private_endpoint.sql_server_features_pe
+  ]
+
+  triggers = {
+    app_name      = azuread_application.flowehr_databricks_sql.display_name
+    database_name = azurerm_mssql_database.feature_database.name
+  }
+
+  # set the databricks 'user' app as dbo on the flowehr database
+  # load a csv file into a new SQL table
+  provisioner "local-exec" {
+    command = <<EOF
+      SCRIPTS_DIR="../../scripts"
+      $SCRIPTS_DIR/retry.sh python $SCRIPTS_DIR/sql/create_sql_user.py
+      $SCRIPTS_DIR/retry.sh python $SCRIPTS_DIR/sql/load_csv_data.py
+    EOF
+    environment = {
+      SERVER          = azurerm_mssql_server.sql_server_features.fully_qualified_domain_name
+      DATABASE        = azurerm_mssql_database.feature_database.name
+      CLIENT_ID       = azuread_application.flowehr_sql_owner.application_id
+      CLIENT_SECRET   = azuread_application_password.flowehr_sql_owner.value
+      LOGIN_TO_CREATE = local.databricks_app_name
+      PATH_TO_CSV     = "../../scripts/sql/nhsd-diabetes.csv"
+      TABLE_NAME      = "deploy-test-diabetes"
+    }
+  }
+}
+
+# AAD App + SPN for Databricks -> SQL Access
 resource "azuread_application" "flowehr_databricks_sql" {
-  display_name = "FlowEHR-Databricks-SQL-${var.naming_suffix}"
+  display_name = local.databricks_app_name
   owners       = [data.azurerm_client_config.current.object_id]
+}
+resource "azuread_application_password" "flowehr_databricks_sql" {
+  application_object_id = azuread_application.flowehr_databricks_sql.object_id
 }
 resource "azuread_service_principal" "flowehr_databricks_sql" {
   application_id = azuread_application.flowehr_databricks_sql.application_id
   owners         = [data.azurerm_client_config.current.object_id]
 }
-resource "azuread_service_principal_password" "flowehr_databricks_sql" {
-  service_principal_id = azuread_service_principal.flowehr_databricks_sql.object_id
-}
 
-/* TODO - enable when build agent can communicate with KV
 # Push secrets to KV
+resource "azurerm_key_vault_secret" "sql_server_owner_app_id" {
+  name         = "sql-owner-app-id"
+  value        = azuread_application.flowehr_sql_owner.application_id
+  key_vault_id = var.core_kv_id
+}
+resource "azurerm_key_vault_secret" "sql_server_owner_secret" {
+  name         = "sql-owner-secret"
+  value        = azuread_application_password.flowehr_sql_owner.value
+  key_vault_id = var.core_kv_id
+}
 resource "azurerm_key_vault_secret" "sql_server_features_admin_username" {
   name         = "sql-features-admin-username"
   value        = local.sql_server_features_admin_username
@@ -86,27 +172,14 @@ resource "azurerm_key_vault_secret" "sql_server_features_admin_password" {
   key_vault_id = var.core_kv_id
 }
 resource "azurerm_key_vault_secret" "flowehr_databricks_sql_spn_app_id" {
-  name         = "flowehr-dbks-sql-spn-app-id"
+  name         = "flowehr-dbks-sql-app-id"
   value        = azuread_service_principal.flowehr_databricks_sql.application_id
   key_vault_id = var.core_kv_id
 }
 resource "azurerm_key_vault_secret" "flowehr_databricks_sql_spn_app_secret" {
-  name         = "flowehr-dbks-sql-spn-app-secret"
-  value        = azuread_service_principal_password.flowehr_databricks_sql.value
+  name         = "flowehr-dbks-sql-app-secret"
+  value        = azuread_application_password.flowehr_databricks_sql.value
   key_vault_id = var.core_kv_id
-}
-*/
-
-# Push SPN details to databricks secret scope
-resource "databricks_secret" "flowehr_databricks_sql_spn_app_id" {
-  key          = "flowehr-dbks-sql-spn-app-id"
-  string_value = azuread_service_principal.flowehr_databricks_sql.application_id
-  scope        = databricks_secret_scope.secrets.id
-}
-resource "databricks_secret" "flowehr_databricks_sql_spn_app_secret" {
-  key          = "flowehr-dbks-sql-spn-app-secret"
-  string_value = azuread_service_principal_password.flowehr_databricks_sql.value
-  scope        = databricks_secret_scope.secrets.id
 }
 
 # Private DNS + endpoint for SQL Server

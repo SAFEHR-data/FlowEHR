@@ -28,13 +28,19 @@ on:
       suffix_override:
         type: string
         required: false
-        description: An override for the naming suffix
+        description: An override for the naming suffix. If defined the core address space is random
       sha:
         type: string
         required: false
         description: Commit SHA to override the default GitHub checkout
     secrets:
-      AZURE_CREDENTIALS:
+      ARM_SUBSCRIPTION_ID:
+        required: true
+      ARM_TENANT_ID:
+        required: true
+      ARM_CLIENT_ID:
+        required: true
+      ARM_CLIENT_SECRET:
         required: true
       DEVCONTAINER_ACR_NAME:
         required: true
@@ -44,15 +50,50 @@ on:
         required: true
       ORG_GH_TOKEN:
         required: true
-      LOCAL_MODE:
-        required: true
+      DATA_SOURCE_CONNECTIONS:
+        required: false
+        # default: "[]"
 
 jobs:
-  make_command:
+  make_core:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
+    outputs:
+      dc_tag: ${{ steps.dc.outputs.tag }}
+      dc_runner_name: ${{ steps.dc.outputs.runner_name }}
+      build_agent_command: ${{ steps.post_core.outputs.build_agent_command }}
+      post_build_agent_command: ${{ steps.post_core.outputs.post_build_agent_command }}
 
     steps:
+      - name: Set devcontainer attributes
+        id: dc
+        run: |
+          echo "tag=${{ inputs.environment }}" >> $GITHUB_OUTPUT
+          echo "image_path=${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer" >> $GITHUB_OUTPUT
+          echo "runner_name=dc-${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}" >> $GITHUB_OUTPUT
+
+      - name: Set make commands to execute after the core deployment
+        id: post_core
+        run: |
+          build_agent_command="none"
+          post_build_agent_command="none"
+
+          if echo ${{ inputs.command }} | grep -q "test" ; then
+              build_agent_command="${{ inputs.command }}-without-core-destroy"
+              post_build_agent_command="destroy-all"
+          elif echo ${{ inputs.command }} | grep -q "destroy" ; then
+              build_agent_command="destroy-non-core"
+              post_build_agent_command="${{ inputs.command }}"
+          elif echo ${{ inputs.command }} | grep -q "infrastructure"; then
+              build_agent_command="${{ inputs.command }}"
+          fi
+
+          echo "Running [${build_agent_command}] on the build agent"
+          echo "Running [${post_build_agent_command}] teardown"
+
+          echo "build_agent_command=${build_agent_command}" >> $GITHUB_OUTPUT
+          echo "post_build_agent_command=${post_build_agent_command}" >> $GITHUB_OUTPUT
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -64,39 +105,155 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
 
       - name: ACR Login
         id: acr_login
-        continue-on-error: true
+        continue-on-error: true  # ACR may not exist yet
         run: |
           az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
 
-      - name: Build and run dev container task
+      - name: Bootstrap
         uses: devcontainers/ci@v0.2
         env:
           ORG_GH_TOKEN: "${{ secrets.ORG_GH_TOKEN }}"
           AAATESTENV: "true"
         with:
-          imageName: "${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer"
-          cacheFrom: "${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer"
-          imageTag: ${{ inputs.environment }}
-          runCmd: make ${{ inputs.command }}
-          # Only push the devcontainer if this workflow is triggered from a push to main
-          # and if the ACR login has succeeded
-          refFilterForPush: refs/heads/main
-          push: ${{ steps.acr_login.outcome == 'success' && 'filter' || 'never'  }}
+          imageName: ${{ steps.dc.outputs.image_path }}
+          cacheFrom: ${{ steps.dc.outputs.image_path }}
+          imageTag: ${{ steps.dc.outputs.tag }}
+          runCmd: make bootstrap
+          # Push is manual otherwise the post step command doesn't execute before core deploy
+          push: never
           env: |
             DOCKER_BUILDKIT=1
-            TF_INPUT=0
             TF_IN_AUTOMATION=1
-            ARM_CLIENT_ID=${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
-            ARM_CLIENT_SECRET=${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
-            ARM_TENANT_ID=${{ fromJSON(secrets.AZURE_CREDENTIALS).tenantId }}
-            ARM_SUBSCRIPTION_ID=${{ fromJSON(secrets.AZURE_CREDENTIALS).subscriptionId }}
+            ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}
+            ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
+            ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
+            ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
+            ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
             SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
             LOCATION=${{ secrets.LOCATION }}
             ENVIRONMENT=${{ inputs.environment }}
             DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
+
+      - name: ACR Login
+        if: steps.acr_login.outcome == 'failure'
+        run: |
+          ./scripts/retry.sh az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
+
+      - name: Push devcontainer
+        run: |
+          docker push ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
+
+      - name: Deploy core and build agent
+        uses: devcontainers/ci@v0.2
+        env:
+          ORG_GH_TOKEN: "${{ secrets.ORG_GH_TOKEN }}"
+        with:
+          imageName: ${{ steps.dc.outputs.image_path }}
+          imageTag: ${{ steps.dc.outputs.tag }}
+          runCmd: make infrastructure-core
+          push: never
+          env: |
+            DOCKER_BUILDKIT=1
+            TF_INPUT=0
+            TF_IN_AUTOMATION=1
+            ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}
+            ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
+            ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
+            ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
+            SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
+            LOCATION=${{ secrets.LOCATION }}
+            ENVIRONMENT=${{ inputs.environment }}
+            DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
+            DEVCONTAINER_IMAGE_NAME=flowehr/devcontainer
+            DEVCONTAINER_TAG=${{ steps.dc.outputs.tag }}
             ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
-            LOCAL_MODE=${{ secrets.LOCAL_MODE }}
+            DATA_SOURCE_CONNECTIONS=${{ (secrets.DATA_SOURCE_CONNECTIONS != '' && secrets.DATA_SOURCE_CONNECTIONS) || '[]' }}
+            USE_RANDOM_ADDRESS_SPACE=${{ (inputs.suffix_override != '' && '1') || '0' }}
+            GITHUB_RUNNER_NAME=${{ steps.dc.outputs.runner_name }}
+            GITHUB_RUNNER_TOKEN=${{ secrets.GH_RUNNER_CREATE_TOKEN }}
+            GITHUB_REPOSITORY=${{ github.repository }}
+
+  build_agent_make:
+    needs: [make_core]
+    if: needs.make_core.outputs.build_agent_command != 'none'
+    runs-on: ${{ needs.make_core.outputs.dc_runner_name }}
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          # if the following values are missing (i.e. not triggered via comment workflow)
+          # then the default checkout will apply
+          ref: ${{ inputs.sha }}
+
+      - name: Deploy
+        env:
+          DOCKER_BUILDKIT: 1
+          TF_INPUT: 0
+          TF_IN_AUTOMATION: 1
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          SUFFIX: ${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
+          LOCATION: ${{ secrets.LOCATION }}
+          ENVIRONMENT: ${{ inputs.environment }}
+          USE_RANDOM_ADDRESS_SPACE: ${{ (inputs.suffix_override != '' && '1') || '0' }}
+          DEVCONTAINER_ACR_NAME: ${{ secrets.DEVCONTAINER_ACR_NAME }}
+          DEVCONTAINER_IMAGE_IMAGE: flowehr/devcontainer
+          DEVCONTAINER_TAG: ${{ needs.make_core.outputs.dc_tag }}
+          ORG_GH_TOKEN: ${{ secrets.ORG_GH_TOKEN }}
+        run: |
+          make ${{ needs.make_core.outputs.build_agent_command }}
+
+  post_build_agent_make:
+    needs: [make_core, build_agent_make]
+    if: needs.make_core.outputs.post_build_agent_command != 'none'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.sha }}
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
+
+      - name: ACR Login
+        run: az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
+
+      - name: Post build agent command
+        uses: devcontainers/ci@v0.2
+        env:
+          ORG_GH_TOKEN: "${{ secrets.ORG_GH_TOKEN }}"
+        with:
+          # The image name cannot be set from the make_core output because it contains a secret
+          imageName: ${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer
+          cacheFrom: ${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer
+          imageTag: ${{ needs.make_core.outputs.dc_tag }}
+          runCmd: make ${{ needs.make_core.outputs.post_build_agent_command }}
+          push: never
+          env: |
+            DOCKER_BUILDKIT=1
+            TF_IN_AUTOMATION=1
+            ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}
+            ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
+            ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
+            ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
+            ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
+            SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
+            LOCATION=${{ secrets.LOCATION }}
+            ENVIRONMENT=${{ inputs.environment }}
+            DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
+            USE_RANDOM_ADDRESS_SPACE=${{ (inputs.suffix_override != '' && '1') || '0' }}

@@ -13,7 +13,6 @@
 #  limitations under the License.
 
 terraform {
-  # Pass arguments to terraform commands
   extra_arguments "auto_approve" {
     commands  = ["apply"]
     arguments = ["-auto-approve"]
@@ -43,6 +42,7 @@ provider "azurerm" {
   }
 }
 EOF
+
   required_provider_azure = <<EOF
 azurerm = {
   source  = "hashicorp/azurerm"
@@ -53,7 +53,7 @@ EOF
   required_provider_azuread = <<EOF
 azuread = {
   source  = "hashicorp/azuread"
-  version = "2.33.0" # pinned due to https://github.com/hashicorp/terraform-provider-azuread/issues/1017
+  version = "2.35.0"
 }
 EOF
 
@@ -66,8 +66,29 @@ EOF
 
   required_provider_databricks = <<EOF
  databricks = {
-      source = "databricks/databricks"
-      version = "1.9.1"
+    source = "databricks/databricks"
+    version = "1.9.1"
+  }
+EOF
+
+  required_provider_external = <<EOF
+  external = {
+    source = "hashicorp/external"
+    version = "2.2.3"
+  }
+EOF
+
+  required_provider_null = <<EOF
+    null = {
+      source = "hashicorp/null"
+      version = "3.2.1"
+    }
+EOF
+
+  required_provider_github = <<EOF
+  github = {
+      source  = "integrations/github"
+      version = "~> 5.0"
     }
 EOF
 }
@@ -81,6 +102,8 @@ terraform {
 
   required_providers {
     ${local.required_provider_azure}
+    ${local.required_provider_null}
+    ${local.required_provider_external}
   }
 }
 EOF
@@ -111,8 +134,10 @@ inputs = {
   location = get_env("LOCATION")
   naming_suffix = get_env("NAMING_SUFFIX")
   truncated_naming_suffix = get_env("TRUNCATED_NAMING_SUFFIX")
-  deployer_ip_address = get_env("DEPLOYER_IP_ADDRESS", "") // deployer's IP address is added to resource firewall exceptions IF in local_mode
+  environment = get_env("ENVIRONMENT")
+  deployer_ip_address = get_env("DEPLOYER_IP_ADDRESS", "") # deployer's IP address is added to resource firewall exceptions IF in local_mode
   local_mode = get_env("LOCAL_MODE", false)
+  core_address_space = get_env("CORE_ADDRESS_SPACE")
   tags = {
     environment = get_env("ENVIRONMENT")
   }

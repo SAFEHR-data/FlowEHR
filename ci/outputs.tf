@@ -12,21 +12,19 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from pyspark.context import SparkContext
-from pyspark.sql.session import SparkSession
+output "ARM_CLIENT_ID" {
+  value = azuread_application.ci_app.application_id
+}
 
-from src.transform import example_transform
+output "ARM_CLIENT_SECRET" {
+  value     = azuread_application_password.ci_app.value
+  sensitive = true
+}
 
+output "ARM_TENANT_ID" {
+  value = data.azurerm_client_config.current.tenant_id
+}
 
-sc = SparkContext.getOrCreate()
-spark = SparkSession(sc)
-
-
-# For an ADF pipeline that triggers a Databricks job though,
-# we have to define an entrypoint file (I haven't found another way.)
-if __name__ == "__main__":
-    df = spark.createDataFrame([(1,), (2,), (3,), (2,), (3,)], ["value"])
-    # This is an example of how transform from a built Python wheel library
-    # will be used in the entrypoint pipeline
-    out_df = example_transform(df)
-    out_df.display()
+output "ARM_SUBSCRIPTION_ID" {
+  value = data.azurerm_client_config.current.subscription_id
+}

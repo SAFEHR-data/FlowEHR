@@ -44,6 +44,10 @@ variable "core_subnet_id" {
   type = string
 }
 
-variable "subnet_address_spaces" {
-  type = list(string)
+variable "serve_webapps_address_space" {
+  type = string
+}
+
+variable "local_mode" {
+  type = bool
 }

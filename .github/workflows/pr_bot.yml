@@ -124,16 +124,17 @@ jobs:
           status: "completed"
           conclusion: "success"
 
-  destroy_pr_env:  # Remove the resource group(s)
+  destroy_pr_env:  # Remove the resource groups
     needs: [pr_comment]
     if: |
-      needs.pr_comment.outputs.command == 'destroy-env'
+      (needs.pr_comment.outputs.command == 'destroy') ||
+      (needs.pr_comment.outputs.command == 'destroy-no-terraform')
     name: Destroy PR
     uses: ./.github/workflows/devcontainer_make_command.yml
     with:
       suffix_override: ${{ needs.pr_comment.outputs.prRefId }}
       environment: Infra-Test
-      command: destroy-no-terraform
+      command: ${{ needs.pr_comment.outputs.command }}
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}
     secrets: inherit
 

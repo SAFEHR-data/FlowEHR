@@ -1,4 +1,3 @@
-#!/bin/bash
 #  Copyright (c) University College London Hospitals NHS Foundation Trust
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,15 +12,30 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-# Run this script as follows:
-# DATABRICKS_URI=https://<your-databricks-instance>.azuredatabricks.net ./setup_cli.sh
+include "root" {
+  path = find_in_parent_folders()
+  expose = true
+}
 
-set +e
+generate "terraform" {
+  path      = "terraform.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+terraform {
+  required_version = "${include.root.locals.terraform_version}"
 
-# Resource ID here is the same for all Databricks workspaces
-# (see https://learn.microsoft.com/en-us/azure/databricks/dev-tools/api/latest/aad/service-prin-aad-token)
-token_response=$(az account get-access-token --resource 2ff814a6-3304-4ab8-85cb-cd0e6f879c1d)
-DATABRICKS_AAD_TOKEN=$(jq .accessToken -r <<< "$token_response")
-export DATABRICKS_AAD_TOKEN
+  required_providers {
+    ${include.root.locals.required_provider_azuread}
+  }
+}
+EOF
+}
 
-databricks configure --host "${DATABRICKS_URI}" --aad-token
+remote_state {
+  backend = "local"
+  config = {}
+  generate = {
+    path      = "backend.tf"
+    if_exists = "overwrite_terragrunt"
+  }
+}

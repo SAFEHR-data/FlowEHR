@@ -1,6 +1,5 @@
 # Local .terraform directories
 **/.terraform/*
-.terraform.lock.hcl
 
 # .tfstate files
 *.tfstate
@@ -41,12 +40,14 @@ terraform.tf
 .env
 *.env
 config.yaml
+apps.yaml
 
 # Mac specific metadata
 .DS_store
 
 # Python artifacts
 **/__pycache__/**
+.pytest_cache
 
 # vs code settings
 .vscode/

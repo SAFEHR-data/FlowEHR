@@ -23,3 +23,7 @@ output "app_service_plan_name" {
 output "acr_name" {
   value = azurerm_container_registry.serve.name
 }
+
+output "webapps_subnet_id" {
+  value = azurerm_subnet.serve_webapps.id
+}

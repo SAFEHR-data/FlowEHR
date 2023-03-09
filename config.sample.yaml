@@ -5,3 +5,20 @@ environment: __CHANGE_ME__
 arm_subscription_id: __CHANGE_ME__
 devcontainer_acr_name: __CHANGE_ME__
 local_mode: false
+
+data_source_connections:
+  - example:
+    name: __CHANGE_ME__
+    peering: # Optional
+      virtual_network_name: __CHANGE_ME__
+      resource_group_name: __CHANGE_ME__
+      dns_zones:
+        - __CHANGE_ME__
+    fqdn: __CHANGE_ME__
+    database: __CHANGE_ME__
+    username: __CHANGE_ME__
+    password: __CHANGE_ME__
+
+github:
+  gh_owner: __CHANGE_ME__
+  gh_token: __CHANGE_ME__

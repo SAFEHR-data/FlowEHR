@@ -19,25 +19,19 @@ variable "naming_suffix" {
 
 variable "truncated_naming_suffix" {
   type        = string
-  description = "Truncated (max 20 chars, no hyphens etc.) suffix to name e.g storage accounts"
+  description = "Truncated (max 20 chars, no hyphens etc.) suffix for e.g storage accounts"
 }
 
-variable "access_databricks_management_publicly" {
-  type        = bool
-  description = "Whether to allow access to the Databricks workspace management plane via a public network"
-  default     = true
-}
-
-variable "databricks_host_address_space" {
-  type = string
-}
-
-variable "databricks_container_address_space" {
+variable "environment" {
   type = string
 }
 
 variable "tags" {
   type = map(any)
+}
+
+variable "local_mode" {
+  type = bool
 }
 
 variable "core_rg_name" {
@@ -48,11 +42,7 @@ variable "core_rg_location" {
   type = string
 }
 
-variable "core_vnet_name" {
-  type = string
-}
-
-variable "core_subnet_id" {
+variable "core_log_analytics_name" {
   type = string
 }
 
@@ -60,31 +50,30 @@ variable "core_kv_id" {
   type = string
 }
 
-variable "core_kv_uri" {
+variable "transform_feature_store_db_name" {
   type = string
 }
 
-variable "deployer_ip_address" {
+variable "transform_feature_store_server_name" {
   type = string
 }
 
-variable "local_mode" {
-  type = bool
+variable "serve_app_service_plan_name" {
+  type = string
 }
 
-variable "data_source_connections" {
-  type = list(object({
-    name     = string
-    fqdn     = string
-    database = string
-    username = string
-    password = string
-    peering = optional(
-      object({
-        virtual_network_name = string
-        resource_group_name  = string
-        dns_zones            = list(string)
-      })
-    )
-  }))
+variable "serve_cosmos_account_name" {
+  type = string
+}
+
+variable "serve_acr_name" {
+  type = string
+}
+
+variable "serve_webapps_subnet_id" {
+  type = string
+}
+
+variable "github_owner" {
+  type = string
 }

@@ -12,17 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import unittest
-from pyspark.sql import SparkSession
-
-
-class PySparkTest(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.spark = (
-            SparkSession.builder.master("local[*]").appName("Unit-tests").getOrCreate()
-        )
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.spark.stop()
+locals {
+  feature_store_odbc = "Driver={ODBC Driver 18 for SQL Server};Server=tcp:${data.azurerm_mssql_server.feature_store.fully_qualified_domain_name},1433;Database=${var.feature_store_db_name};Authentication=ActiveDirectoryMsi;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+}
