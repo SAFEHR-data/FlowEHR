@@ -32,7 +32,7 @@ jobs:
     secrets: inherit
 
   transform_test:
-    uses:
+    uses: ./.github/workflows/devcontainer_make_command.yml
     name: Test Pipeline Transforms
     with:
       command: transform-test
