@@ -115,6 +115,7 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.ORG_GITHUB_TOKEN }}"
         with:
+          imageFrom: ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
           cacheFrom: ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
           runCmd: make infrastructure-core
           push: never
@@ -201,6 +202,7 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.ORG_GITHUB_TOKEN }}"
         with:
           # The image name cannot be set from the make_core output because it contains a secret
+          imageFrom: ${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DEVCONTAINER_NAME }}:${{ needs.make_core.outputs.dc_tag }}
           cacheFrom: ${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DEVCONTAINER_NAME }}:${{ needs.make_core.outputs.dc_tag }}
           runCmd: make ${{ needs.make_core.outputs.post_build_agent_command }}
           push: never
