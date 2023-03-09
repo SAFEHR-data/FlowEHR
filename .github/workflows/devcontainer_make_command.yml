@@ -115,7 +115,7 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.ORG_GITHUB_TOKEN }}"
         with:
-          cacheFrom: ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.image_path }}
+          cacheFrom: ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
           runCmd: make infrastructure-core
           push: never
           env: |
@@ -131,7 +131,7 @@ jobs:
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
             GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
-            TF_VAR_suffix=${{ (inputs.suffix_override != '' && inputs.suffix_override) }}
+            SUFFIX=${{ inputs.suffix_override }}
             TF_VAR_devcontainer_image=${{ env.DEVCONTAINER_NAME }}
             TF_VAR_devcontainer_tag=${{ steps.dc.outputs.tag }}
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
@@ -167,7 +167,7 @@ jobs:
           CI_RESOURCE_GROUP: ${{ vars.CI_RESOURCE_GROUP }}
           CI_STORAGE_ACCOUNT: ${{ vars.CI_STORAGE_ACCOUNT }}
           GITHUB_TOKEN: ${{ secrets.ORG_GITHUB_TOKEN }}
-          TF_VAR_suffix: ${{ (inputs.suffix_override != '' && inputs.suffix_override) }}
+          SUFFIX: ${{ inputs.suffix_override }}
           TF_VAR_use_random_address_space: ${{ (inputs.suffix_override != '' && '1') || '0' }}
           TF_VAR_devcontainer_image: ${{ env.DEVCONTAINER_NAME }}
           TF_VAR_devcontainer_tag: ${{ needs.make_core.outputs.dc_tag }}
@@ -216,7 +216,7 @@ jobs:
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
             GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
-            TF_VAR_suffix=${{ (inputs.suffix_override != '' && inputs.suffix_override) }}
+            SUFFIX=${{ inputs.suffix_override }}
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
 
       - name: Clean up
