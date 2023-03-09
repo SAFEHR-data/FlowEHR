@@ -136,6 +136,7 @@ This table summarises the various authentication identities involved in the depl
 | `flowehr-sql-owner-<naming-suffix>` | App / Service Principal | AAD Administrator of SQL Feature Data Store | Used to connect to SQL as a Service Principal, and create logins + users during deployment |
 | `flowehr-databricks-datawriter-<naming-suffix>` | App / Service Principal | No access to resources or AAD. Added as a `db_owner` of the Feature Data Store database. Credentials stored in databricks secrets to be used in saving features to SQL |
 | `sql-server-features-<naming-suffix>` | System Managed Identity | AAD: `User.Read.All` / `GroupMember.Read.All` / `Application.Read.All` | For SQL to accept AAD connections |
+| `sp-flowehr-app-<app_id>` | App / Service Principal | Slot swap action | Per-app identity allowed to run [slot swaps](https://learn.microsoft.com/en-us/azure/app-service/deploy-staging-slots) for that app |
 
 ## Common issues
 
