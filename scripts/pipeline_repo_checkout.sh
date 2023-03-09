@@ -21,8 +21,23 @@ set -o nounset
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PIPELINE_DIR="${SCRIPT_DIR}/../transform/pipelines"
-CONFIG_PATH="${SCRIPT_DIR}/../config.yaml"
 GITHUB_TOKEN="${GITHUB_TOKEN:-}" # May be unset
+ENVIRONMENT="${ENVIRONMENT:=local}"
+CONFIG_PATH="${SCRIPT_DIR}/../config.yaml"
+
+# Get either the environment-specific config file if contains repositories, otherwise fall back to core config
+env_config="config.${ENVIRONMENT}.yaml"
+env_config_path="$SCRIPT_DIR/../$env_config"
+if [ -f "$env_config_path" ]; then
+  if [[ $(yq '.transform | has("repositories")' "$env_config") == "true" ]]; then
+    echo "Transform repositories config found in $env_config"
+    CONFIG_PATH="$env_config_path"
+  else
+    echo "No transform repositories config found in $env_config. Using root config.yaml"
+  fi
+else
+  echo "No environment-specific config file found (searched for $env_config_path). Using root config.yaml"
+fi
 
 if [[ -n "${GITHUB_TOKEN}" ]]; then
   GIT_COMMAND="GH_TOKEN=${GITHUB_TOKEN} git -c credential.helper= -c credential.helper='!gh auth git-credential'"
