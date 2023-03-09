@@ -51,7 +51,7 @@ remote_state {
     resource_group_name  = local.tf_in_automation ? get_env("CI_RESOURCE_GROUP") : dependency.bootstrap.outputs.mgmt_rg
     storage_account_name = local.tf_in_automation ? get_env("CI_STORAGE_ACCOUNT") : dependency.bootstrap.outputs.mgmt_storage
     container_name       = "tfstate"
-    key                  = "${dependency.bootstrap.outputs.naming_suffix_truncated}/${path_relative_to_include()}/terraform.tfstate"
+    key                  = "${get_env("SUFFIX", dependency.bootstrap.outputs.environment)}/${path_relative_to_include()}/terraform.tfstate"
   }
   generate = {
     path      = "backend.tf"

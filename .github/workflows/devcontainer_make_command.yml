@@ -218,3 +218,14 @@ jobs:
             GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
             TF_VAR_suffix=${{ (inputs.suffix_override != '' && inputs.suffix_override) }}
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
+
+      - name: Clean up
+        if: needs.make_core.outputs.post_build_agent_command == 'destroy'
+        run: |
+          az acr repository delete \
+            --name ${{ vars.CI_CONTAINER_REGISTRY }} \
+            --image ${{ env.DEVCONTAINER_NAME }}:${{ needs.make_core.outputs.dc_tag }}
+          az storage blob directory delete \
+            -c tfstate \
+            -d ${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }} \
+            --account-name ${{ vars.CI_STORAGE_ACCOUNT }}
