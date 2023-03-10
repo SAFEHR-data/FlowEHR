@@ -83,7 +83,7 @@ test-pipelines:
 infrastructure-serve: bootstrap ## Deploy serve infrastructure
 	$(call terragrunt,apply,infrastructure/serve)
 
-test: infrastructure apps destroy-all  ## Test by deploy->destroy
+test: infrastructure test-pipelines apps destroy-all  ## Test by deploy->destroy
 
 test-transform: infrastructure-transform test-pipelines destroy-all  ## Test transform deploy->destroy
 
