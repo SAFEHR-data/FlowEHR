@@ -19,8 +19,8 @@ resource "github_repository" "app" {
   visibility  = var.app_config.managed_repo.private ? "private" : "public"
 
   template {
-    owner      = "UCLH-Foundry"
-    repository = var.app_config.managed_repo.template
+    owner      = split("/", var.app_config.managed_repo.template)[0]
+    repository = split("/", var.app_config.managed_repo.template)[1]
   }
 }
 
@@ -91,6 +91,11 @@ resource "github_branch" "all" {
   for_each   = local.branches_and_envs
   repository = github_repository.app[0].name
   branch     = each.key
+
+  depends_on = [
+    # Need the codeowners file on each branch
+    github_repository_file.codeowners
+  ]
 }
 
 resource "github_branch_protection" "deployment" {
@@ -107,8 +112,8 @@ resource "github_branch_protection" "deployment" {
 
   required_pull_request_reviews {
     dismiss_stale_reviews           = var.accesses_real_data
-    restrict_dismissals             = !var.accesses_real_data
-    require_code_owner_reviews      = !var.accesses_real_data
+    restrict_dismissals             = var.accesses_real_data
+    require_code_owner_reviews      = var.accesses_real_data
     required_approving_review_count = max(var.app_config.branch.num_of_approvals, 1)
   }
 }
@@ -260,5 +265,22 @@ resource "github_actions_environment_secret" "webapp_id" {
 
   depends_on = [
     github_repository_environment.all
+  ]
+}
+
+resource "github_repository_file" "deploy_workflows" {
+  for_each            = local.envs_and_workflow_templates
+  repository          = github_repository.app[0].name
+  branch              = "main"
+  file                = ".github/workflows/deploy_${each.key}.yml"
+  content             = each.value.rendered
+  commit_message      = "Add workflow (managed by Terraform)"
+  commit_author       = "Terraform"
+  commit_email        = "terraform@flowehr.io"
+  overwrite_on_create = true
+
+  depends_on = [
+    # Only create these on main otherwise they will be triggered on push
+    github_branch.all
   ]
 }

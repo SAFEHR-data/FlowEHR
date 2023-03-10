@@ -32,11 +32,6 @@ resource "azurerm_linux_web_app" "app" {
   site_config {
     container_registry_use_managed_identity = true
     remote_debugging_enabled                = var.local_mode
-
-    application_stack {
-      docker_image     = "${var.acr_name}.azurecr.io/${var.app_id}"
-      docker_image_tag = "latest"
-    }
   }
 
   app_settings = merge(var.app_config.env, {
@@ -107,7 +102,7 @@ resource "azurerm_container_registry_webhook" "webhook" {
   location            = var.location
   registry_name       = data.azurerm_container_registry.serve.name
 
-  service_uri = "https://${local.site_credential_name}:${local.site_credential_password}@${lower(azurerm_linux_web_app.app.name)}.scm.azurewebsites.net/api/registry/webhook"
+  service_uri = "https://${local.site_credential_name}:${local.site_credential_password}@${local.webapp_name_in_webhook}.scm.azurewebsites.net/api/registry/webhook"
   status      = "enabled"
   scope       = "${local.acr_repository}:latest"
   actions     = ["push"]
