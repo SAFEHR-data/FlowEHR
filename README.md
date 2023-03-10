@@ -4,6 +4,7 @@ FlowEHR is a safe, secure &amp; cloud-native development &amp; deployment platfo
 > **Warning**
 > This repository is a _work in progress_. We're working towards a v0.1.0 release
 
+
 ## Getting started
 
 This repository includes a [Dev Container](https://code.visualstudio.com/docs/devcontainers/containers) to avoid "it works on my machine" scenarios.
@@ -16,18 +17,25 @@ git clone https://github.com/UCLH-Foundry/FlowEHR
 
 Then open it in [VS Code](https://code.visualstudio.com) and, when prompted, click to "Open in Container" (make sure Docker is running on your host first). This will create a container with all the required packages for developing this repository.
 
+
 ## Configuring
 
-Deployment requires a `config.yaml` file in the root. Copy the `config.example.yaml` file and save it as `config.yaml`.
+The root `config.yaml` file defines common settings across all your FlowEHR environments. These values can be overidden by an environment-specific config file with the format `config.{ENVIRONMENT_NAME}.yaml`. When an `$ENVIRONMENT` env var is present with an environment name (typically populated in CI), FlowEHR will look for a config file for that environment before getting default values from `config.yaml`.
+
+For CI-deployed environments, you should check those environment files into source control so that your CICD pipelines can use them. Follow the [CI section](#ci) for more info.
+
+### Locally
+
+When working locally and with the `$ENVIRONMENT` env var unset, FlowEHR will look for a file called `config.local.yaml`. This is gitignored by default, so we can create one now for our own environment locally without worrying about accidentally checking it in:
 
 ```bash
-cp config.sample.yaml config.yaml
+cp config.sample.yaml config.local.yaml
 ```
 
-Then edit `config.yaml` and specify the following values:
+Once you've created it, specify the following values:
 
-- `id` - a unique identifier to apply to all deployed resources (i.e. `flwruclh`)
-- `environment` - a unique name for your environment (i.e. `jgdev`)
+- `id` - a unique identifier to apply to all deployed resources (i.e. `myflwr`)
+- `environment` - a name for your environment (set this to `local`)
 - `location` - the [Azure region](https://azuretracks.com/2021/04/current-azure-region-names-reference/) you wish to deploy resources to
 - `core_address_space` (optional) - override the default core address space, e.g. `10.1.0.0/24`
 
@@ -39,7 +47,9 @@ Then edit `config.yaml` and specify the following values:
     - `github_owner` - the GitHub organisation to deploy FlowEHR app repositories to
     - `github_token` (local only) - a GitHub PAT for authenticating to GitHub. See the [apps README](./apps/README.md) for details.
 
+
 ## Deploying
+
 ### Locally
 
 1. Log in to Azure
@@ -56,16 +66,16 @@ Then edit `config.yaml` and specify the following values:
 
 3. Run `make infrastructure`
 
-    To bootstrap Terraform, and deploy all infrastructure and apps, run
+    To bootstrap Terraform, and deploy all infrastructure, run
 
     ```bash
     make infrastructure
     ```
 
-    Alternatively, you can deploy just core infrastructure:
+    Alternatively, if you just want to deploy transform infrastructure but not serve:
 
     ```bash
-    make infrastructure-core
+    make infrastructure-transform
     ```
 
     You can also deploy other individual infrastructure modules, as well as destroy and other operations. To see all options:
@@ -81,7 +91,7 @@ Then edit `config.yaml` and specify the following values:
     > For more info on configuring and deploying apps, see the [README](./apps/README.md)
 
 
-### CI (GitHub Actions)
+### <a name="ci"></a>CI (GitHub Actions)
 
 CI deployment workflows are run in [Github environments](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment). These should be created in a private repository created from this template repository.
 
@@ -91,24 +101,25 @@ This step will create an AAD Application and Service Principal in the specified 
 
 > _NOTE_: The user following the steps below will need to be an `Owner` of the target Azure Subscription as well as a `Global Administrator` in AAD (and have organization owner permissions on the GitHub orgnization you wish to use to create a token with org scopes).
 
-1. Open this repo in the dev container, and create the `config.yaml` file as outlined above.
+1. Open this repo in the dev container, and modify the `config.yaml` file as appropriate for all the default values you wish to share across environments.
 
-2. Create the service principal with required AAD permissions: 
+2. Then, for the environment you wish to deploy (`Infra-Test` in this example), create a config file for that environment in the format `config.{ENVIRONMENT_NAME}.yaml` (so `config.infra-test.yaml`), and populate the relevant settings. Check this into your repo.
+
+3. Create the CI resources and service principal with required AAD permissions: 
 
     ```bash
-    make ci-auth
+    make ci
     ```
 
-    _NOTE_: CI deployments require a service principal with access to deploy resources
-    in the subscription, and the following permissions within the associated AAD tenancy:
+    _NOTE_: CI deployments require a service principal with access to deploy resources in the subscription, and the following permissions within the associated AAD tenancy:
     - `Application.ReadWrite.All`: Required to query the directory for the MSGraph app, and create applications used to administer the SQL Server.   
     - `AppRoleAssignment.ReadWrite.All`: Required to assign the following permissions to the System Managed Identity for SQL Server. 
 
-    - Copy the block of JSON from the terminal for the next step.
+    - Copy the outputted values to populate in step 5
 
-3. Create GitHub PATs (access tokens)
+4. Create GitHub PATs (access tokens)
 
-    We require a GitHub [Classic PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#personal-access-tokens-classic) with scopes to clone any transform repositories defined in `config.yaml`, as well as scopes to create and manage repositories within your org for deploying FlowEHR applications, and to deploy GitHub runners for executing CI deployments.
+    We require a GitHub [Classic PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#personal-access-tokens-classic) with scopes to clone any transform repositories defined in `config.infra-test.yaml`, as well as scopes to create and manage repositories within your org for deploying FlowEHR applications, and to deploy GitHub runners for executing CI deployments.
 
     Follow the instructions [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#personal-access-tokens-classic) to create a classic token (fine-grained tokens don't currently support the GitHub GraphQL API which we require).
 
@@ -120,18 +131,23 @@ This step will create an AAD Application and Service Principal in the specified 
 
     Finally, generate it and copy it for the next step.
 
-3. Create and populate a GitHub environment
+5. Create and populate a GitHub environment
 
-    Add an environment called `Infra-Test` with the following secrets:
+    Add an environment called `Infra-Test` with the following environment variables:
 
-    - `ARM_CLIENT_ID`: Client ID of the service principal created in step 2
-    - `ARM_CLIENT_SECRET`: Client secret of the service principal created in step 2
-    - `ARM_TENANT_ID`: Tenant ID containing the Azure subscription to deploy into
-    - `ARM_SUBSCRIPTION_ID`: Subscription ID of the Azure subscription to deploy into
-    - `CI_CONTAINER_REGISTRY`: Name of the Azure Container Registry to use for the devcontainer build. This may or may not exist. e.g. `flowehrmgmtacr`
+    - `ARM_CLIENT_ID`: Client ID of the service principal (outputted from step 3)
+    - `ARM_TENANT_ID`: Tenant ID containing the Azure subscription to deploy into (outputted from step 3)
+    - `ARM_SUBSCRIPTION_ID`: Subscription ID of the Azure subscription to deploy into (outputted from step 3)
+    - `CI_RESOURCE_GROUP`: Resource group for shared CI resources (outputted from step 3)
+    - `CI_CONTAINER_REGISTRY`: Name of the Azure Container Registry to use for the devcontainer storage (outputted from step 3)
+    - `CI_STORAGE_ACCOUNT`: Storage account for shared CI state storage (outputted from step 3)
+
+    And the following secrets:
+
+    - `ARM_CLIENT_SECRET`: Client secret of the service principal created in step 3
     - `ORG_GITHUB_TOKEN`: The token you created in the previous step (this may be added as a repository or organisation secret rather than environment secret and be re-used betweeen environments if you prefer)
 
-4. Run `Deploy Infra-Test`
+6. Run `Deploy Infra-Test`
 
     Trigger a deployment using a workflow dispatch trigger on the `Actions` tab.
 
