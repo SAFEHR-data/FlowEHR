@@ -1,5 +1,5 @@
 ---
-id: flwrgriff
+id: flwr
 location: uksouth
 environment: infratest
 core_address_space: 10.0.0.0/24
@@ -9,4 +9,4 @@ transform:
   repositories:
 
 serve:
-  github_owner: Griff-Labs
+  github_owner: UCLH-Foundry
