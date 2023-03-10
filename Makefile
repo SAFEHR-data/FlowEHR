@@ -89,7 +89,7 @@ test-transform: infrastructure-transform test-pipelines destroy-all  ## Test tra
 
 test-serve: infrastructure-serve destroy-all  ## Test transform deploy->destroy
 
-test-without-core-destroy: infrastructure apps destroy-non-core ## Test non-core deploy->destroy destroying core
+test-without-core-destroy: infrastructure test-pipelines apps destroy-non-core ## Test non-core deploy->destroy destroying core
 
 test-transform-without-core-destroy: infrastructure-transform test-pipelines destroy-non-core  ## Test transform deploy->destroy destroying core
 
