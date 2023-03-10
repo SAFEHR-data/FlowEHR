@@ -1,3 +1,4 @@
+#!/bin/bash
 #  Copyright (c) University College London Hospitals NHS Foundation Trust
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,23 +13,22 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-output "clientId" {
-  value = azuread_application.ci_app.application_id
-}
+set -o errexit
+set -o pipefail
+set -o nounset
 
-output "clientSecret" {
-  value     = azuread_application_password.ci_app.value
-  sensitive = true
-}
+WAIT_TIME="${WAIT_TIME:=30}"  # seconds
+NUMBER_OF_RETRYS="${NUMBER_OF_RETRYS:=3}"
 
-output "tenantId" {
-  value = data.azurerm_client_config.current.tenant_id
-}
-
-output "subscriptionId" {
-  value = data.azurerm_client_config.current.subscription_id
-}
-
-output "resourceManagerEndpointUrl" {
-  value = "management.azure.com"
-}
+for ((i=1; i<="$NUMBER_OF_RETRYS"; i++)); do
+  if "$@"; then
+    break
+  fi
+  if [[ "$i" -lt "$NUMBER_OF_RETRYS" ]]; then
+    echo "Command failed. Retrying in ${WAIT_TIME} seconds..."
+    sleep "$WAIT_TIME"
+  else
+    echo "Failed with the maximum number of retrys: ${NUMBER_OF_RETRYS}"
+    exit 1
+  fi
+done

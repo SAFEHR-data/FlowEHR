@@ -11,17 +11,20 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-.PHONY: help
 
-help: ## Show this help
-	@echo
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
-		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%s\033[0m|%s\n", $$1, $$2}' \
-        | column -t -s '|'
-	@echo
+output "ARM_CLIENT_ID" {
+  value = azuread_application.ci_app.application_id
+}
 
-build: ## Build the Python wheel(s)
-	python3 -m build
+output "ARM_CLIENT_SECRET" {
+  value     = azuread_application_password.ci_app.value
+  sensitive = true
+}
 
-test: ## Run Python unit tests
-	python3 -m unittest
+output "ARM_TENANT_ID" {
+  value = data.azurerm_client_config.current.tenant_id
+}
+
+output "ARM_SUBSCRIPTION_ID" {
+  value = data.azurerm_client_config.current.subscription_id
+}
