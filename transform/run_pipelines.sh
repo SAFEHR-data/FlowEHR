@@ -42,7 +42,7 @@ run_pipeline_and_wait () {
         fi
 
         if [[ ! "${run_status}" = "InProgress" ]]; then
-            echo "Run ${run_id} of the pipeline ${pipeline_name} failed - please check the logs" 
+            echo "Run ${run_id} of the pipeline ${pipeline_name} failed with status ${run_status} - please check the logs" 
             return 1
         fi
         sleep 5
