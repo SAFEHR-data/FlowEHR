@@ -36,11 +36,11 @@ help: ## Show this help
         | column -t -s '|'
 	@echo
 
-lint: ## Call pre-commit hooks to lint files & check for headers 
+lint: ## Call pre-commit hooks to lint files & check for headers
 	$(call target_title, "Linting") \
 	&& pre-commit run --all-files
 
-az-login: ## Check logged in/log into azure with a service principal 
+az-login: ## Check logged in/log into azure with a service principal
 	$(call target_title, "Log-in to Azure") \
 	&& cd ${MAKEFILE_DIR}/scripts && ./az_login.sh
 
@@ -69,7 +69,7 @@ infrastructure-transform: az-login transform-artifacts ## Deploy transform infra
 
 transform-artifacts: az-login ## Build transform artifacts
 	${MAKEFILE_DIR}/scripts/pipeline_repo_checkout.sh \
-	${MAKEFILE_DIR}/scripts/build_artifacts.sh
+	&& ${MAKEFILE_DIR}/scripts/build_artifacts.sh
 
 infrastructure-serve: az-login ## Deploy serve infrastructure
 	$(call terragrunt,apply,infrastructure/serve)
