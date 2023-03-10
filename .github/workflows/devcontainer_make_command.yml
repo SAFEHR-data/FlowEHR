@@ -112,9 +112,11 @@ jobs:
 
       - name: Deploy core and build agent
         uses: devcontainers/ci@v0.3
+        env: # Add suffix as step env so it's only passed as an env var if it's not empty
+          SUFFIX: ${{ inputs.suffix_override }}
         with:
-          imageName: ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
-          cacheFrom: ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
+          imageName: ${{ steps.dc.outputs.image_path }}
+          imageTag: ${{ steps.dc.outputs.tag }}
           runCmd: make infrastructure-core
           push: never
           env: |
@@ -130,7 +132,6 @@ jobs:
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
             ORG_GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
-            SUFFIX=${{ inputs.suffix_override }}
             TF_VAR_devcontainer_image=${{ env.DEVCONTAINER_NAME }}
             TF_VAR_devcontainer_tag=${{ steps.dc.outputs.tag }}
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
@@ -196,10 +197,13 @@ jobs:
 
       - name: Post build agent command
         uses: devcontainers/ci@v0.3
+        env:
+          SUFFIX: ${{ inputs.suffix_override }}
         with:
           # The image name cannot be set from the make_core output because it contains a secret
-          imageName: ${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DEVCONTAINER_NAME }}:${{ needs.make_core.outputs.dc_tag }}
-          cacheFrom: ${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DEVCONTAINER_NAME }}:${{ needs.make_core.outputs.dc_tag }}
+          imageName: ${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DEVCONTAINER_NAME }}
+          cacheFrom: ${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DEVCONTAINER_NAME }}
+          imageTag: ${{ needs.make_core.outputs.dc_tag }}
           runCmd: make ${{ needs.make_core.outputs.post_build_agent_command }}
           push: never
           env: |
