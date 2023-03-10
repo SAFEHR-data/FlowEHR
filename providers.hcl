@@ -39,7 +39,7 @@ EOF
   required_provider_azure = <<EOF
 azurerm = {
   source  = "hashicorp/azurerm"
-  version = ">= 3.32"
+  version = "3.47.0"
 }
 EOF
 
