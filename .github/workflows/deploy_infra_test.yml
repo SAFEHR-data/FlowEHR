@@ -27,6 +27,6 @@ jobs:
     uses: ./.github/workflows/devcontainer_make_command.yml
     name: Make Infrastructure
     with:
-      command: infrastructure
+      command: infrastructure-and-test-transform
       environment: Infra-Test
     secrets: inherit
