@@ -41,7 +41,7 @@ run_pipeline_and_wait () {
             return
         fi
 
-        if [[ ! "${run_status}" = "InProgress" ]]; then
+        if [[ ! "${run_status}" = "InProgress" && ! "${run_status}" = "Queued" ]]; then
             echo "Run ${run_id} of the pipeline ${pipeline_name} failed with status ${run_status} - please check the logs" 
             return 1
         fi
