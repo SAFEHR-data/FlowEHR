@@ -128,7 +128,7 @@ jobs:
             CI_CONTAINER_REGISTRY=${{ vars.CI_CONTAINER_REGISTRY }}
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
-            GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
+            ORG_GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
             SUFFIX=${{ inputs.suffix_override }}
             TF_VAR_devcontainer_image=${{ env.DEVCONTAINER_NAME }}
             TF_VAR_devcontainer_tag=${{ steps.dc.outputs.tag }}
@@ -164,7 +164,7 @@ jobs:
           CI_CONTAINER_REGISTRY: ${{ vars.CI_CONTAINER_REGISTRY }}
           CI_RESOURCE_GROUP: ${{ vars.CI_RESOURCE_GROUP }}
           CI_STORAGE_ACCOUNT: ${{ vars.CI_STORAGE_ACCOUNT }}
-          GITHUB_TOKEN: ${{ secrets.ORG_GITHUB_TOKEN }}
+          ORG_GITHUB_TOKEN: ${{ secrets.ORG_GITHUB_TOKEN }}
           SUFFIX: ${{ inputs.suffix_override }}
           TF_VAR_use_random_address_space: ${{ (inputs.suffix_override != '' && '1') || '0' }}
           TF_VAR_devcontainer_image: ${{ env.DEVCONTAINER_NAME }}
@@ -211,7 +211,7 @@ jobs:
             CI_CONTAINER_REGISTRY=${{ vars.CI_CONTAINER_REGISTRY }}
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
-            GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
+            ORG_GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
             SUFFIX=${{ inputs.suffix_override }}
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
 
