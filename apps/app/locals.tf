@@ -13,15 +13,15 @@
 #  limitations under the License.
 
 locals {
-  feature_store_odbc  = "Driver={ODBC Driver 18 for SQL Server};Server=tcp:${data.azurerm_mssql_server.feature_store.fully_qualified_domain_name},1433;Database=${var.feature_store_db_name};Authentication=ActiveDirectoryMsi;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
-  acr_repository      = var.app_id
-  create_repo         = var.app_config.managed_repo != null
+  feature_store_odbc = "Driver={ODBC Driver 18 for SQL Server};Server=tcp:${data.azurerm_mssql_server.feature_store.fully_qualified_domain_name},1433;Database=${var.feature_store_db_name};Authentication=ActiveDirectoryMsi;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+  acr_repository     = var.app_id
+  create_repo        = var.app_config.managed_repo != null
 
   core_gh_env         = var.environment
   core_branch_name    = local.core_gh_env
   staging_gh_env      = var.app_config.add_staging_slot ? "${var.environment}-testing_slot" : null
   staging_branch_name = local.staging_gh_env
-  branches_and_envs   = var.app_config.add_staging_slot ? {
+  branches_and_envs = var.app_config.add_staging_slot ? {
     "${local.core_branch_name}"    = local.core_gh_env
     "${local.staging_branch_name}" = local.staging_gh_env
   } : { "${local.core_branch_name}" = local.core_gh_env }

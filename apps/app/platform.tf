@@ -87,12 +87,23 @@ resource "azurerm_linux_web_app_slot" "staging" {
     FEATURE_STORE_CONNECTION_STRING            = local.feature_store_odbc
     ENVIRONMENT                                = local.staging_gh_env
   })
+
+  identity {
+    type = "SystemAssigned"
+  }
 }
 
 resource "azurerm_role_assignment" "webapp_acr" {
   role_definition_name = "AcrPull"
   scope                = data.azurerm_container_registry.serve.id
   principal_id         = azurerm_linux_web_app.app.identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "webapp_staging_slot_acr" {
+  count                = var.app_config.add_staging_slot ? 1 : 0
+  role_definition_name = "AcrPull"
+  scope                = data.azurerm_container_registry.serve.id
+  principal_id         = azurerm_linux_web_app_slot.staging[0].identity[0].principal_id
 }
 
 # Create a web hook that triggers automated deployment of the Docker image
