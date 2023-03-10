@@ -112,8 +112,6 @@ jobs:
 
       - name: Deploy core and build agent
         uses: devcontainers/ci@v0.3
-        env:
-          GITHUB_TOKEN: "${{ secrets.ORG_GITHUB_TOKEN }}"
         with:
           cacheFrom: ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
           runCmd: make infrastructure-core
@@ -197,8 +195,6 @@ jobs:
 
       - name: Post build agent command
         uses: devcontainers/ci@v0.3
-        env:
-          GITHUB_TOKEN: "${{ secrets.ORG_GITHUB_TOKEN }}"
         with:
           # The image name cannot be set from the make_core output because it contains a secret
           cacheFrom: ${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DEVCONTAINER_NAME }}:${{ needs.make_core.outputs.dc_tag }}
