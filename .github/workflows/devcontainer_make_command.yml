@@ -113,6 +113,7 @@ jobs:
       - name: Deploy core and build agent
         uses: devcontainers/ci@v0.3
         with:
+          imageName: ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
           cacheFrom: ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
           runCmd: make infrastructure-core
           push: never
@@ -197,6 +198,7 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
           # The image name cannot be set from the make_core output because it contains a secret
+          imageName: ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
           cacheFrom: ${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DEVCONTAINER_NAME }}:${{ needs.make_core.outputs.dc_tag }}
           runCmd: make ${{ needs.make_core.outputs.post_build_agent_command }}
           push: never
