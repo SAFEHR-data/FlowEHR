@@ -22,9 +22,12 @@ set -o nounset
 # TODO: uncomment before merging
 az extension add --name datafactory
 
-FACTORY_NAME="adf-${SUFFIX}-${ENVIRONMENT}"
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+NAME_SUFFIX_SCRIPT="${SCRIPT_DIR}/../scripts/name_suffix.py"
+NAME_SUFFIX=$(python3 "${NAME_SUFFIX_SCRIPT}")
+FACTORY_NAME="adf-${NAME_SUFFIX}"
 export FACTORY_NAME
-RESOURCE_GROUP_NAME="rg-${SUFFIX}-${ENVIRONMENT}"
+RESOURCE_GROUP_NAME="rg-${NAME_SUFFIX}"
 export RESOURCE_GROUP_NAME
 
 run_pipeline_and_wait () {
