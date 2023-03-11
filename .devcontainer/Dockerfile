@@ -80,21 +80,6 @@ RUN sudo apt-get update \
     && echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc \
     && sudo apt-get update && sudo apt-get install -y unixodbc unixodbc-dev
 
-# Install Python dependencies for data transform pipeline
-ARG NUMPY_VERSION="1.24.2"
-ARG DATABRICKS_CLI_VERSION="0.17.4"
-ARG PANDAS_VERSION="1.5.3"
-ARG SQLALCHEMY_VERSION="2.0.4"
-ARG PYODBC_VERSION="4.0.35"
-ARG PYTHON_BUILD_VERSION="0.10.0"
-RUN python3 -m pip install --no-cache-dir \
-    pyodbc=="${PYODBC_VERSION}" \
-    build=="${PYTHON_BUILD_VERSION}" \
-    numpy=="${NUMPY_VERSION}" \
-    databricks-cli=="${DATABRICKS_CLI_VERSION}" \
-    sqlalchemy=="${SQLALCHEMY_VERSION}" \
-    pandas=="${PANDAS_VERSION}"
-
 # Install prerequsites for using this container as a GitHub runner. Assuming an x86 runner
 COPY .devcontainer/library-scripts/start-gh-runner.sh /tmp/library-scripts/
 ARG GH_RUNNER_VERSION="v2.302.1"

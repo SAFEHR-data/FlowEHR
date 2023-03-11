@@ -19,6 +19,9 @@ set -o nounset
 # Uncomment this line to see each command for debugging (careful: this will show secrets!)
 # set -o xtrace
 
+# TODO: uncomment before merging
+az extension add --name datafactory
+
 FACTORY_NAME="adf-${SUFFIX}-${ENVIRONMENT}"
 export FACTORY_NAME
 RESOURCE_GROUP_NAME="rg-${SUFFIX}-${ENVIRONMENT}"
