@@ -32,7 +32,7 @@ resource "github_team" "owners" {
 }
 
 resource "github_team_members" "owners" {
-  for_each = local.create_repo ? var.app_config.managed_repo.owners : set()
+  for_each = local.create_repo ? var.app_config.managed_repo.owners : toset([])
   team_id  = github_team.owners[0].id
 
   members {
@@ -44,12 +44,13 @@ resource "github_team_members" "owners" {
 resource "github_team_repository" "owners_repo_permissions" {
   count      = local.create_repo ? 1 : 0
   team_id    = github_team.owners[0].id
-  repository = github_repository.app[0].name
+  repository = local.repository_name
   permission = "push"
 }
 
 resource "github_repository_file" "codeowners" {
-  repository          = github_repository.app[0].name
+  count               = local.create_repo ? 1 : 0
+  repository          = local.repository_name
   branch              = "main"
   file                = "CODEOWNERS"
   content             = <<EOF
@@ -71,7 +72,7 @@ resource "github_team" "contributors" {
 }
 
 resource "github_team_members" "contributors" {
-  for_each = var.app_config.managed_repo.contributors
+  for_each = local.create_repo ? var.app_config.managed_repo.contributors : toset([])
   team_id  = github_team.contributors[0].id
 
   members {
@@ -83,13 +84,13 @@ resource "github_team_members" "contributors" {
 resource "github_team_repository" "contributors_repo_permissions" {
   count      = local.create_repo ? 1 : 0
   team_id    = github_team.contributors[0].id
-  repository = github_repository.app[0].name
+  repository = local.repository_name
   permission = "push"
 }
 
 resource "github_branch" "all" {
   for_each   = local.branches_and_envs
-  repository = github_repository.app[0].name
+  repository = local.repository_name
   branch     = each.key
 
   depends_on = [
@@ -100,7 +101,7 @@ resource "github_branch" "all" {
 
 resource "github_branch_protection" "deployment" {
   for_each            = local.branches_and_envs
-  repository_id       = github_repository.app[0].name
+  repository_id       = local.repository_name
   pattern             = each.value
   allows_deletions    = false
   allows_force_pushes = false
@@ -143,7 +144,7 @@ resource "azurerm_container_registry_token_password" "app_access" {
 
 resource "github_repository_environment" "all" {
   for_each    = local.branches_and_envs
-  repository  = github_repository.app[0].name
+  repository  = local.repository_name
   environment = each.value
 
   deployment_branch_policy {
@@ -158,14 +159,14 @@ gh api \
   --method POST \
   -H "Accept: application/vnd.github+json" \
   -H "X-GitHub-Api-Version: 2022-11-28" \
-  /repos/${var.github_owner}/${github_repository.app[0].name}/environments/${each.value}/deployment-branch-policies \
+  /repos/${var.github_owner}/${local.repository_name}/environments/${each.value}/deployment-branch-policies \
   -f name='${each.key}'
 EOF
   }
 }
 
 resource "github_actions_environment_secret" "acr_name" {
-  repository      = github_repository.app[0].name
+  repository      = local.repository_name
   environment     = var.app_config.add_staging_slot ? local.staging_gh_env : local.core_gh_env
   secret_name     = "ACR_NAME"
   plaintext_value = data.azurerm_container_registry.serve.name
@@ -176,7 +177,7 @@ resource "github_actions_environment_secret" "acr_name" {
 }
 
 resource "github_actions_environment_secret" "acr_token_username" {
-  repository      = github_repository.app[0].name
+  repository      = local.repository_name
   environment     = var.app_config.add_staging_slot ? local.staging_gh_env : local.core_gh_env
   secret_name     = "ACR_USERNAME"
   plaintext_value = azurerm_container_registry_token.app_access.name
@@ -187,7 +188,7 @@ resource "github_actions_environment_secret" "acr_token_username" {
 }
 
 resource "github_actions_environment_secret" "acr_token_password" {
-  repository      = github_repository.app[0].name
+  repository      = local.repository_name
   environment     = var.app_config.add_staging_slot ? local.staging_gh_env : local.core_gh_env
   secret_name     = "ACR_PASSWORD"
   plaintext_value = azurerm_container_registry_token_password.app_access.password1[0].value
@@ -198,7 +199,7 @@ resource "github_actions_environment_secret" "acr_token_password" {
 }
 
 resource "github_actions_environment_secret" "acr_image_name" {
-  repository      = github_repository.app[0].name
+  repository      = local.repository_name
   environment     = var.app_config.add_staging_slot ? local.staging_gh_env : local.core_gh_env
   secret_name     = "IMAGE_NAME"
   plaintext_value = local.acr_repository
@@ -210,7 +211,7 @@ resource "github_actions_environment_secret" "acr_image_name" {
 
 resource "github_actions_environment_secret" "sp_client_id" {
   count           = local.staging_gh_env != null ? 1 : 0
-  repository      = github_repository.app[0].name
+  repository      = local.repository_name
   environment     = local.core_gh_env
   secret_name     = "ARM_CLIENT_ID"
   plaintext_value = azuread_application.webapp_sp[0].application_id
@@ -222,7 +223,7 @@ resource "github_actions_environment_secret" "sp_client_id" {
 
 resource "github_actions_environment_secret" "sp_client_secret" {
   count           = local.staging_gh_env != null ? 1 : 0
-  repository      = github_repository.app[0].name
+  repository      = local.repository_name
   environment     = local.core_gh_env
   secret_name     = "ARM_CLIENT_SECRET"
   plaintext_value = azuread_application_password.webapp_sp[0].value
@@ -234,7 +235,7 @@ resource "github_actions_environment_secret" "sp_client_secret" {
 
 resource "github_actions_environment_secret" "tenant_id" {
   count           = local.staging_gh_env != null ? 1 : 0
-  repository      = github_repository.app[0].name
+  repository      = local.repository_name
   environment     = local.core_gh_env
   secret_name     = "ARM_TENANT_ID"
   plaintext_value = data.azurerm_client_config.current.tenant_id
@@ -246,7 +247,7 @@ resource "github_actions_environment_secret" "tenant_id" {
 
 resource "github_actions_environment_secret" "subscription_id" {
   count           = local.staging_gh_env != null ? 1 : 0
-  repository      = github_repository.app[0].name
+  repository      = local.repository_name
   environment     = local.core_gh_env
   secret_name     = "ARM_SUBSCRIPTION_ID"
   plaintext_value = data.azurerm_client_config.current.subscription_id
@@ -258,7 +259,7 @@ resource "github_actions_environment_secret" "subscription_id" {
 
 resource "github_actions_environment_secret" "webapp_id" {
   count           = local.staging_gh_env != null ? 1 : 0
-  repository      = github_repository.app[0].name
+  repository      = local.repository_name
   environment     = local.core_gh_env
   secret_name     = "WEBAPP_ID"
   plaintext_value = azurerm_linux_web_app.app.id
@@ -270,7 +271,7 @@ resource "github_actions_environment_secret" "webapp_id" {
 
 resource "github_repository_file" "deploy_workflows" {
   for_each            = local.envs_and_workflow_templates
-  repository          = github_repository.app[0].name
+  repository          = local.repository_name
   branch              = "main"
   file                = ".github/workflows/deploy_${each.key}.yml"
   content             = each.value.rendered

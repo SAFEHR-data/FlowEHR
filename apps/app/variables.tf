@@ -86,14 +86,14 @@ variable "app_config" {
   type = object({
     name             = string
     description      = string
-    add_staging_slot = bool
+    add_staging_slot = optional(bool, false)
 
-    managed_repo = object({
+    managed_repo = optional(object({
       private      = bool
       template     = string
       owners       = set(string)
       contributors = set(string)
-    })
+    }))
 
     branch = object({
       num_of_approvals      = optional(number, 1),
