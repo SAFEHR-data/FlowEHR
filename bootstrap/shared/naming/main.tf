@@ -17,8 +17,8 @@ variable "flowehr_id" {
   type        = string
 
   validation {
-    condition     = length(var.flowehr_id) < 10
-    error_message = "Must be less than 10 chars"
+    condition     = length(var.flowehr_id) <= 12
+    error_message = "Must be 12 chars or less"
   }
 
   validation {
@@ -32,8 +32,8 @@ variable "environment" {
   type        = string
 
   validation {
-    condition     = length(var.environment) < 10
-    error_message = "Must be less than 10 chars"
+    condition     = length(var.environment) <= 12
+    error_message = "Must be 12 chars or less"
   }
 
   validation {
