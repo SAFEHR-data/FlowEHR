@@ -1,7 +1,7 @@
 ---
 flowehr_id: flwr
 location: uksouth
-environment: infratest
+environment: infra-test
 core_address_space: 10.0.0.0/24
 
 transform:

@@ -37,7 +37,7 @@ Once you've created it, specify the following values:
     - `spark_version` (optional) - the Spark version to install on your local cluster and Databricks clusters
     - `repositories` (optional) - list of Git repositories containing transform artifacts to clone and deploy to FlowEHR
 
-- `serve`
+- `serve` (optional)
     - `github_owner` - the GitHub organisation to deploy FlowEHR app repositories to
     - `github_token` (local only) - a GitHub PAT for authenticating to GitHub. See the [apps README](./apps/README.md) for details.
 
