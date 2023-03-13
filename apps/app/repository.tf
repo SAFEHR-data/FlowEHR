@@ -166,8 +166,9 @@ EOF
 }
 
 resource "github_actions_environment_secret" "acr_name" {
+  for_each        = local.branches_and_envs
   repository      = local.repository_name
-  environment     = var.app_config.add_staging_slot ? local.staging_gh_env : local.core_gh_env
+  environment     = each.value
   secret_name     = "ACR_NAME"
   plaintext_value = data.azurerm_container_registry.serve.name
 
@@ -177,8 +178,9 @@ resource "github_actions_environment_secret" "acr_name" {
 }
 
 resource "github_actions_environment_secret" "acr_token_username" {
+  for_each        = local.branches_and_envs
   repository      = local.repository_name
-  environment     = var.app_config.add_staging_slot ? local.staging_gh_env : local.core_gh_env
+  environment     = each.value
   secret_name     = "ACR_USERNAME"
   plaintext_value = azurerm_container_registry_token.app_access.name
 
@@ -188,8 +190,9 @@ resource "github_actions_environment_secret" "acr_token_username" {
 }
 
 resource "github_actions_environment_secret" "acr_token_password" {
+  for_each        = local.branches_and_envs
   repository      = local.repository_name
-  environment     = var.app_config.add_staging_slot ? local.staging_gh_env : local.core_gh_env
+  environment     = each.value
   secret_name     = "ACR_PASSWORD"
   plaintext_value = azurerm_container_registry_token_password.app_access.password1[0].value
 
@@ -199,8 +202,9 @@ resource "github_actions_environment_secret" "acr_token_password" {
 }
 
 resource "github_actions_environment_secret" "acr_image_name" {
+  for_each        = local.branches_and_envs
   repository      = local.repository_name
-  environment     = var.app_config.add_staging_slot ? local.staging_gh_env : local.core_gh_env
+  environment     = each.value
   secret_name     = "IMAGE_NAME"
   plaintext_value = local.acr_repository
 
@@ -209,10 +213,12 @@ resource "github_actions_environment_secret" "acr_image_name" {
   ]
 }
 
+# If there is a staging environment defined then the SP is needed to bump the deployed
+# docker version tag and in the production slot to slot swap
 resource "github_actions_environment_secret" "sp_client_id" {
-  count           = local.staging_gh_env != null ? 1 : 0
+  for_each        = local.staging_gh_env != null ? local.branches_and_envs : {}
   repository      = local.repository_name
-  environment     = local.core_gh_env
+  environment     = each.value
   secret_name     = "ARM_CLIENT_ID"
   plaintext_value = azuread_application.webapp_sp[0].application_id
 
@@ -222,9 +228,9 @@ resource "github_actions_environment_secret" "sp_client_id" {
 }
 
 resource "github_actions_environment_secret" "sp_client_secret" {
-  count           = local.staging_gh_env != null ? 1 : 0
+  for_each        = local.staging_gh_env != null ? local.branches_and_envs : {}
   repository      = local.repository_name
-  environment     = local.core_gh_env
+  environment     = each.value
   secret_name     = "ARM_CLIENT_SECRET"
   plaintext_value = azuread_application_password.webapp_sp[0].value
 
@@ -234,9 +240,9 @@ resource "github_actions_environment_secret" "sp_client_secret" {
 }
 
 resource "github_actions_environment_secret" "tenant_id" {
-  count           = local.staging_gh_env != null ? 1 : 0
+  for_each        = local.staging_gh_env != null ? local.branches_and_envs : {}
   repository      = local.repository_name
-  environment     = local.core_gh_env
+  environment     = each.value
   secret_name     = "ARM_TENANT_ID"
   plaintext_value = data.azurerm_client_config.current.tenant_id
 
@@ -246,9 +252,9 @@ resource "github_actions_environment_secret" "tenant_id" {
 }
 
 resource "github_actions_environment_secret" "subscription_id" {
-  count           = local.staging_gh_env != null ? 1 : 0
+  for_each        = local.staging_gh_env != null ? local.branches_and_envs : {}
   repository      = local.repository_name
-  environment     = local.core_gh_env
+  environment     = each.value
   secret_name     = "ARM_SUBSCRIPTION_ID"
   plaintext_value = data.azurerm_client_config.current.subscription_id
 
@@ -258,11 +264,23 @@ resource "github_actions_environment_secret" "subscription_id" {
 }
 
 resource "github_actions_environment_secret" "webapp_id" {
-  count           = local.staging_gh_env != null ? 1 : 0
+  for_each        = local.staging_gh_env != null ? local.branches_and_envs : {}
   repository      = local.repository_name
-  environment     = local.core_gh_env
+  environment     = each.value
   secret_name     = "WEBAPP_ID"
   plaintext_value = azurerm_linux_web_app.app.id
+
+  depends_on = [
+    github_repository_environment.all
+  ]
+}
+
+resource "github_actions_environment_secret" "slot_name" {
+  count           = local.staging_gh_env != null ? 1 : 0
+  repository      = local.repository_name
+  environment     = local.staging_gh_env
+  secret_name     = "SLOT_NAME"
+  plaintext_value = local.staging_slot_name
 
   depends_on = [
     github_repository_environment.all

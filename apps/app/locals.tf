@@ -19,6 +19,7 @@ locals {
   acr_repository     = var.app_id
   create_repo        = var.app_config.managed_repo != null
 
+  staging_slot_name   = "staging"
   core_gh_env         = var.environment
   core_branch_name    = local.core_gh_env
   staging_gh_env      = var.app_config.add_staging_slot ? "${var.environment}-testing_slot" : null

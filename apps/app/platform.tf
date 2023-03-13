@@ -75,7 +75,7 @@ resource "azurerm_linux_web_app" "app" {
 
 resource "azurerm_linux_web_app_slot" "staging" {
   count          = var.app_config.add_staging_slot ? 1 : 0
-  name           = "staging"
+  name           = local.staging_slot_name
   app_service_id = azurerm_linux_web_app.app.id
   https_only     = true
 
@@ -83,10 +83,7 @@ resource "azurerm_linux_web_app_slot" "staging" {
     container_registry_use_managed_identity = true
     remote_debugging_enabled                = var.local_mode
 
-    application_stack {
-      docker_image     = "${var.acr_name}.azurecr.io/${var.app_id}"
-      docker_image_tag = "latest"
-    }
+    # Application stack gets populated by GH actions
   }
 
   app_settings = merge(var.app_config.env, {
