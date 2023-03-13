@@ -123,8 +123,15 @@ jobs:
           tokenPattern: ${TOKEN}
           secretsJson: ${{ toJSON(secrets) }}
 
+      - name: Check if environment config exists
+        id: env_config_exists
+        uses: andstor/file-existence-action@v2
+        with:
+          files: config.${{ inputs.environment }}.yaml
+
       - name: Replace tokens in config.{environment}.yaml
         uses: Lambdaspire/action-substitute-secrets-in-file@v1.0.0
+        if: steps.env_config_exists.outputs.files_exists == 'true'
         with:
           file: config.${{ inputs.environment }}.yaml
           tokenPattern: ${TOKEN}
