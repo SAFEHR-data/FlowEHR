@@ -116,26 +116,10 @@ jobs:
         id: devcontainer_push
         run: docker push ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
 
-      - name: Replace tokens in config.yaml
-        uses: Lambdaspire/action-substitute-secrets-in-file@v1.0.0
+      - name: Replace tokens in config files
+        uses: ./.github/actions/config_token_replacement.yml
         with:
-          file: config.yaml
-          tokenPattern: ${TOKEN}
-          secretsJson: ${{ toJSON(secrets) }}
-
-      - name: Check if environment config exists
-        id: env_config_exists
-        uses: andstor/file-existence-action@v2
-        with:
-          files: config.${{ inputs.environment }}.yaml
-
-      - name: Replace tokens in config.${{ inputs.environment }}.yaml
-        uses: Lambdaspire/action-substitute-secrets-in-file@v1.0.0
-        if: steps.env_config_exists.outputs.files_exists == 'true'
-        with:
-          file: config.${{ inputs.environment }}.yaml
-          tokenPattern: ${TOKEN}
-          secretsJson: ${{ toJSON(secrets) }}
+          environment: ${{ inputs.environment }}
 
       - name: Deploy core and build agent
         uses: devcontainers/ci@v0.3
@@ -181,6 +165,11 @@ jobs:
           # then the default checkout will apply
           ref: ${{ inputs.sha }}
 
+      - name: Replace tokens in config files
+        uses: ./.github/actions/config_token_replacement.yml
+        with:
+          environment: ${{ inputs.environment }}
+
       - name: Deploy
         env:
           DOCKER_BUILDKIT: 1
@@ -222,6 +211,11 @@ jobs:
 
       - name: ACR Login
         run: az acr login --name "${{ vars.CI_CONTAINER_REGISTRY }}"
+
+      - name: Replace tokens in config files
+        uses: ./.github/actions/config_token_replacement.yml
+        with:
+          environment: ${{ inputs.environment }}
 
       - name: Post build agent command
         uses: devcontainers/ci@v0.3
