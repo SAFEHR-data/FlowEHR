@@ -129,7 +129,7 @@ jobs:
         with:
           files: config.${{ inputs.environment }}.yaml
 
-      - name: Replace tokens in config.{environment}.yaml
+      - name: Replace tokens in config.${{ inputs.environment }}.yaml
         uses: Lambdaspire/action-substitute-secrets-in-file@v1.0.0
         if: steps.env_config_exists.outputs.files_exists == 'true'
         with:
