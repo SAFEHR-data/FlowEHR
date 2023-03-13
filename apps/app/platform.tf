@@ -132,6 +132,7 @@ resource "azurerm_role_assignment" "webapp_staging_slot_acr" {
 
 # Create a web hook that triggers automated deployment of the Docker image
 resource "azurerm_container_registry_webhook" "webhook" {
+  count               = var.app_config.add_staging_slot ? 0 : 1
   name                = "acrwh${replace(replace(var.app_id, "_", ""), "-", "")}"
   resource_group_name = var.resource_group_name
   location            = var.location
@@ -197,21 +198,32 @@ resource "azurerm_role_definition" "slot_swap" {
 
   permissions {
     actions = [
+      "Microsoft.Web/sites/config/read",
+      "Microsoft.Web/sites/config/list/action",
+      "Microsoft.Web/sites/config/read",
+      "Microsoft.Web/sites/config/write",
+      "Microsoft.Web/sites/slots/read",
       "Microsoft.Web/sites/slots/slotsswap/action",
       "Microsoft.Web/sites/slots/operationresults/read",
-      "Microsoft.web/sites/slots/operations/read"
+      "Microsoft.web/sites/slots/operations/read",
+      "Microsoft.Web/sites/slots/config/list/action",
+      "Microsoft.Web/sites/slots/config/read",
+      "Microsoft.Web/sites/slots/config/write"
     ]
   }
 
   assignable_scopes = [
-    azurerm_linux_web_app.app.id
+    azurerm_linux_web_app.app.id,
+    azurerm_linux_web_app_slot.staging[0].id
   ]
 }
 
 resource "azurerm_role_assignment" "webapp_sp_slot_swap" {
-  count                = local.staging_gh_env != null ? 1 : 0
+  for_each = var.app_config.add_staging_slot ? {
+    for idx, id in [azurerm_linux_web_app_slot.staging[0].id, azurerm_linux_web_app.app.id] : idx => id
+  } : {}
   principal_id         = azuread_service_principal.webapp_sp[0].object_id
-  scope                = azurerm_linux_web_app.app.id
+  scope                = each.value
   role_definition_name = azurerm_role_definition.slot_swap[0].name
 }
 
