@@ -48,13 +48,13 @@ variable "suffix_override" {
   default     = ""
 
   validation {
-    condition     = can(regex("^[a-z0-9\\_-]*$", var.suffix))
+    condition     = can(regex("^[a-z0-9\\_-]*$", var.suffix_override))
     error_message = "Cannot contain spaces, uppercase or special characters except '-' and '_'"
   }
 }
 
 locals {
-  naming_suffix           = var.suffix == "" ? "${var.flowehr_id}-${var.environment}" : var.suffix
+  naming_suffix           = var.suffix_override == "" ? "${var.flowehr_id}-${var.environment}" : var.suffix_override
   naming_suffix_truncated = substr(replace(replace(local.naming_suffix, "-", ""), "_", ""), 0, 17)
 }
 

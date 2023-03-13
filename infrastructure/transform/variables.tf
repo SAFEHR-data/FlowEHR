@@ -76,6 +76,10 @@ variable "transform" {
     spark_version = optional(string, "3.3.1")
     repositories  = optional(list(string), [])
   })
+  default = {
+    spark_version = "3.3.1"
+    repositories  = []
+  }
 }
 
 variable "data_source_connections" {
