@@ -28,7 +28,7 @@ cp config.sample.yaml config.local.yaml
 
 Once you've created it, specify the following values:
 
-- `id` - a unique identifier to apply to all deployed resources (i.e. `myflwr`)
+- `flowehr_id` - a unique identifier to apply to all deployed resources (i.e. `myflwr`)
 - `environment` - a name for your environment (set this to `local`)
 - `location` - the [Azure region](https://azuretracks.com/2021/04/current-azure-region-names-reference/) you wish to deploy resources to
 - `core_address_space` (optional) - override the default core address space, e.g. `10.1.0.0/24`

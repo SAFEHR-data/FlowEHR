@@ -12,17 +12,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-variable "id" {
+variable "flowehr_id" {
   description = "Unique value for differentiating FlowEHR deployments across organisations/projects"
   type        = string
 
   validation {
-    condition     = length(var.id) < 10
+    condition     = length(var.flowehr_id) < 10
     error_message = "Must be less than 10 chars"
   }
 
   validation {
-    condition     = can(regex("^[a-z0-9\\_-]*$", var.id))
+    condition     = can(regex("^[a-z0-9\\_-]*$", var.flowehr_id))
     error_message = "Cannot contain spaces, uppercase or special characters except '-' and '_'"
   }
 }
@@ -54,7 +54,7 @@ variable "suffix" {
 }
 
 locals {
-  naming_suffix           = var.suffix == "" ? "${var.id}-${var.environment}" : var.suffix
+  naming_suffix           = var.suffix == "" ? "${var.flowehr_id}-${var.environment}" : var.suffix
   naming_suffix_truncated = substr(replace(replace(local.naming_suffix, "-", ""), "_", ""), 0, 17)
 }
 

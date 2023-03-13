@@ -14,7 +14,7 @@
 
 module "naming" {
   source      = "../shared/naming"
-  id          = var.id
+  flowehr_id  = var.flowehr_id
   environment = "ci"
 }
 
