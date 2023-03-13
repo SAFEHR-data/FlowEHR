@@ -8,5 +8,13 @@ transform:
   spark_version: 3.3.1
   repositories:
 
+data_source_connections:
+  - sql:
+    name: SQL
+    fqdn: sql-server-features-flwr-867e3d79.database.windows.net
+    database: sql-db-features
+    username: griff
+    password: ${FLWR_DB_PASSWORD}
+
 serve:
   github_owner: UCLH-Foundry
