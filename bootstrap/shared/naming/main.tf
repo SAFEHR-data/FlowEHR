@@ -42,7 +42,7 @@ variable "environment" {
   }
 }
 
-variable "suffix" {
+variable "suffix_override" {
   description = "Override the suffix that would be generated from id + environment. Useful for transient PR environments"
   type        = string
   default     = ""

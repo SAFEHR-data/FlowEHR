@@ -28,7 +28,7 @@ variable "tf_in_automation" {
   type = bool
 }
 
-variable "suffix" {
+variable "suffix_override" {
   type    = string
   default = ""
 }

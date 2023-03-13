@@ -13,10 +13,10 @@
 #  limitations under the License.
 
 module "naming" {
-  source      = "../shared/naming"
-  flowehr_id  = var.flowehr_id
-  environment = var.environment
-  suffix      = var.suffix
+  source          = "../shared/naming"
+  flowehr_id      = var.flowehr_id
+  environment     = var.environment
+  suffix_override = var.suffix_override
 }
 
 # Only deploy management resources locally; otherwise we use existing shared ci resources
