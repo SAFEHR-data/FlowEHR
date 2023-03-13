@@ -34,6 +34,12 @@ on:
         required: false
         description: Commit SHA to override the default GitHub checkout
     secrets:
+      ARM_SUBSCRIPTION_ID:
+        required: true
+      ARM_TENANT_ID:
+        required: true
+      ARM_CLIENT_ID:
+        required: true
       ARM_CLIENT_SECRET:
         required: true
       ORG_GITHUB_TOKEN:
@@ -92,7 +98,7 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          creds: '{"clientId":"${{ vars.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ vars.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ vars.ARM_TENANT_ID }}"}'
+          creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
 
       - name: ACR Login
         id: acr_login
@@ -123,10 +129,10 @@ jobs:
             DOCKER_BUILDKIT=1
             TF_INPUT=0
             TF_IN_AUTOMATION=1
-            ARM_CLIENT_ID=${{ vars.ARM_CLIENT_ID }}
+            ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}
             ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
-            ARM_TENANT_ID=${{ vars.ARM_TENANT_ID }}
-            ARM_SUBSCRIPTION_ID=${{ vars.ARM_SUBSCRIPTION_ID }}
+            ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
+            ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
             ENVIRONMENT=${{ inputs.environment }}
             CI_CONTAINER_REGISTRY=${{ vars.CI_CONTAINER_REGISTRY }}
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
@@ -158,10 +164,10 @@ jobs:
           DOCKER_BUILDKIT: 1
           TF_INPUT: 0
           TF_IN_AUTOMATION: 1
-          ARM_CLIENT_ID: ${{ vars.ARM_CLIENT_ID }}
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-          ARM_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
           ENVIRONMENT: ${{ inputs.environment }}
           CI_CONTAINER_REGISTRY: ${{ vars.CI_CONTAINER_REGISTRY }}
           CI_RESOURCE_GROUP: ${{ vars.CI_RESOURCE_GROUP }}
@@ -190,7 +196,7 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          creds: '{"clientId":"${{ vars.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ vars.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ vars.ARM_TENANT_ID }}"}'
+          creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
 
       - name: ACR Login
         run: az acr login --name "${{ vars.CI_CONTAINER_REGISTRY }}"
@@ -209,10 +215,10 @@ jobs:
           env: |
             DOCKER_BUILDKIT=1
             TF_IN_AUTOMATION=1
-            ARM_CLIENT_ID=${{ vars.ARM_CLIENT_ID }}
+            ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}
             ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
-            ARM_TENANT_ID=${{ vars.ARM_TENANT_ID }}
-            ARM_SUBSCRIPTION_ID=${{ vars.ARM_SUBSCRIPTION_ID }}
+            ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
+            ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
             ENVIRONMENT=${{ inputs.environment }}
             CI_CONTAINER_REGISTRY=${{ vars.CI_CONTAINER_REGISTRY }}
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}

@@ -135,15 +135,15 @@ This step will create an AAD Application and Service Principal in the specified 
 
     Add an environment called `Infra-Test` with the following environment variables:
 
-    - `ARM_CLIENT_ID`: Client ID of the service principal (outputted from step 3)
-    - `ARM_TENANT_ID`: Tenant ID containing the Azure subscription to deploy into (outputted from step 3)
-    - `ARM_SUBSCRIPTION_ID`: Subscription ID of the Azure subscription to deploy into (outputted from step 3)
     - `CI_RESOURCE_GROUP`: Resource group for shared CI resources (outputted from step 3)
     - `CI_CONTAINER_REGISTRY`: Name of the Azure Container Registry to use for the devcontainer storage (outputted from step 3)
     - `CI_STORAGE_ACCOUNT`: Storage account for shared CI state storage (outputted from step 3)
 
     And the following secrets:
 
+    - `ARM_CLIENT_ID`: Client ID of the service principal (outputted from step 3)
+    - `ARM_TENANT_ID`: Tenant ID containing the Azure subscription to deploy into (outputted from step 3)
+    - `ARM_SUBSCRIPTION_ID`: Subscription ID of the Azure subscription to deploy into (outputted from step 3)
     - `ARM_CLIENT_SECRET`: Client secret of the service principal created in step 3
     - `ORG_GITHUB_TOKEN`: The token you created in the previous step (this may be added as a repository or organisation secret rather than environment secret and be re-used betweeen environments if you prefer)
 
