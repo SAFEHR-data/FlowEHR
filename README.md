@@ -41,6 +41,21 @@ Once you've created it, specify the following values:
     - `github_owner` - the GitHub organisation to deploy FlowEHR app repositories to
     - `github_token` (local only) - a GitHub PAT for authenticating to GitHub. See the [apps README](./apps/README.md) for details.
 
+- `data_source_connections` (optional) - list of data source objects for configuring in data pipelines. See below for schema:
+
+```yaml
+  - data_source_key: # unique key
+    name: friendly name
+    peering: # Optional config for vnet peering
+      virtual_network_name: name of the virtual network
+      resource_group_name: resource group name containing vnet
+      dns_zones:
+        - list of dns zones
+    fqdn: fqdn for the datasource (e.g. asqlserver.database.windows.net)
+    database: database name
+    username: db username
+    password: db password
+```
 
 ## Deploying
 
@@ -99,6 +114,8 @@ This step will create an AAD Application and Service Principal in the specified 
 
 2. Then, for the environment you wish to deploy (`Infra-Test` in this example), create a config file for that environment in the format `config.{ENVIRONMENT_NAME}.yaml` (so `config.infra-test.yaml`), and populate the relevant settings. Check this into your repo.
 
+> Note: if you want to reference secrets in these files (i.e. a data source password), you can use the syntax: `${MY_SECRET}`. In the CICD workflow, matching GitHub secrets will be searched for and, if found, will replace these tokens before running deployment steps.
+
 3. Create the CI resources and service principal with required AAD permissions: 
 
     ```bash
@@ -140,6 +157,8 @@ This step will create an AAD Application and Service Principal in the specified 
     - `ARM_SUBSCRIPTION_ID`: Subscription ID of the Azure subscription to deploy into (outputted from step 3)
     - `ARM_CLIENT_SECRET`: Client secret of the service principal created in step 3
     - `ORG_GITHUB_TOKEN`: The token you created in the previous step (this may be added as a repository or organisation secret rather than environment secret and be re-used betweeen environments if you prefer)
+
+> If you used any tokens in your config yaml files, make sure you put the equivalent GitHub secret with an identical name so that the token replacement step will substitute your secret(s) into the configuration on deploy (e.g. if you put `${SQL_CONN_STRING}` in config.yaml, make sure you have a GitHub secret called `SQL_CONN_STRING` containing the secret value).
 
 6. Run `Deploy Infra-Test`
 
