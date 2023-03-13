@@ -228,7 +228,9 @@ jobs:
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
 
       - name: Clean up
-        if: needs.make_core.outputs.post_build_agent_command == 'destroy'
+        if: |
+          (needs.make_core.outputs.post_build_agent_command == 'destroy') ||
+          (needs.make_core.outputs.post_build_agent_command == 'destroy-no-terraform')
         run: |
           az acr repository delete \
             --name ${{ vars.CI_CONTAINER_REGISTRY }} \
