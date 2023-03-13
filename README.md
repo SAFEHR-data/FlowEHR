@@ -9,13 +9,7 @@ FlowEHR is a safe, secure &amp; cloud-native development &amp; deployment platfo
 
 This repository includes a [Dev Container](https://code.visualstudio.com/docs/devcontainers/containers) to avoid "it works on my machine" scenarios.
 
-Simply clone this repo:
-
-```bash
-git clone https://github.com/UCLH-Foundry/FlowEHR
-```
-
-Then open it in [VS Code](https://code.visualstudio.com) and, when prompted, click to "Open in Container" (make sure Docker is running on your host first). This will create a container with all the required packages for developing this repository.
+Simply create a private fork of this repo, clone it to your machine, then open it in [VS Code](https://code.visualstudio.com). When prompted, click to "Open in Container" (make sure Docker is running on your host first). This will create a container with all the required packages for developing this repository.
 
 
 ## Configuring
