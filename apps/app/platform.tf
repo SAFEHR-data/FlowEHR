@@ -115,9 +115,15 @@ resource "azurerm_cosmosdb_sql_role_assignment" "webapp" {
   scope               = "${data.azurerm_cosmosdb_account.state_store.id}/dbs/${azurerm_cosmosdb_sql_database.app.name}"
 }
 
-resource "azuread_group_member" "example" {
-  group_object_id  = var.transform_apps_ad_group_display_name
-  member_object_id = azurerm_linux_web_app.app.identity[0].object_id
+resource "azuread_group_member" "web_app_in_app_ad_group" {
+  group_object_id  = var.apps_ad_group_principal_id
+  member_object_id = azurerm_linux_web_app.app.identity[0].principal_id
+}
+
+resource "azuread_group_member" "contributors_in_dev_ad_group" {
+  for_each         = var.app_config.contributors
+  group_object_id  = var.developers_ad_group_principal_id
+  member_object_id = each.value
 }
 
 // TODO: once Feature Store SQL SPN stuff is in, add connection from App Service here

@@ -78,6 +78,22 @@ variable "github_owner" {
   type = string
 }
 
+variable "developers_ad_group_display_name" {
+  type = string
+}
+
+variable "apps_ad_group_display_name" {
+  type = string
+}
+
+variable "apps_ad_group_principal_id" {
+  type = string
+}
+
+variable "developers_ad_group_principal_id" {
+  type = string
+}
+
 variable "app_config" {
   type = object({
     name         = string

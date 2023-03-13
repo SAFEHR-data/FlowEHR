@@ -240,6 +240,11 @@ output "apps_ad_group_display_name" {
   value       = azuread_group.ad_group_apps.display_name
 }
 
+output "developers_ad_group_display_name" {
+  description = "Apps AD group display name"
+  value       = azuread_group.ad_group_developers.display_name
+}
+
 output "apps_ad_group_principal_id" {
   description = "Apps AD group principal id "
   value       = azuread_group.ad_group_apps.object_id
