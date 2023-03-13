@@ -19,6 +19,9 @@ inputs:
   environment:
     description: The environment to use to check for an environment-specific config file
     required: true
+  secrets:
+    description: The secrets to check for matches in JSON format
+    required: true
 runs:
   using: composite
   steps:
@@ -27,7 +30,7 @@ runs:
       with:
         file: config.yaml
         tokenPattern: ${TOKEN}
-        secretsJson: ${{ toJSON(secrets) }}
+        secretsJson: ${{ inputs.secrets }}
 
     - name: Check if environment config exists
       id: env_config_exists
@@ -41,4 +44,4 @@ runs:
       with:
         file: config.${{ inputs.environment }}.yaml
         tokenPattern: ${TOKEN}
-        secretsJson: ${{ toJSON(secrets) }}
+        secretsJson: ${{ inputs.secrets }}

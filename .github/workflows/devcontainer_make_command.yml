@@ -120,6 +120,7 @@ jobs:
         uses: ./.github/actions/config_token_replacement
         with:
           environment: ${{ inputs.environment }}
+          secrets: ${{ toJSON(secrets) }}
 
       - name: Deploy core and build agent
         uses: devcontainers/ci@v0.3
@@ -169,6 +170,7 @@ jobs:
         uses: ./.github/actions/config_token_replacement
         with:
           environment: ${{ inputs.environment }}
+          secrets: ${{ toJSON(secrets) }}
 
       - name: Deploy
         env:
@@ -216,6 +218,7 @@ jobs:
         uses: ./.github/actions/config_token_replacement
         with:
           environment: ${{ inputs.environment }}
+          secrets: ${{ toJSON(secrets) }}
 
       - name: Post build agent command
         uses: devcontainers/ci@v0.3
