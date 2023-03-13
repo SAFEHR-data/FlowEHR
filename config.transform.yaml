@@ -5,4 +5,3 @@
 ---
 spark_version: 3.3.1
 repositories:
- - https://github.com/UCLH-Foundry/FlowEHR-Data-Forge.git
