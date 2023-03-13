@@ -117,7 +117,7 @@ jobs:
         run: docker push ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
 
       - name: Replace tokens in config files
-        uses: ./.github/actions/config_token_replacement.yml
+        uses: ./.github/actions/config_token_replacement
         with:
           environment: ${{ inputs.environment }}
 
@@ -166,7 +166,7 @@ jobs:
           ref: ${{ inputs.sha }}
 
       - name: Replace tokens in config files
-        uses: ./.github/actions/config_token_replacement.yml
+        uses: ./.github/actions/config_token_replacement
         with:
           environment: ${{ inputs.environment }}
 
@@ -213,7 +213,7 @@ jobs:
         run: az acr login --name "${{ vars.CI_CONTAINER_REGISTRY }}"
 
       - name: Replace tokens in config files
-        uses: ./.github/actions/config_token_replacement.yml
+        uses: ./.github/actions/config_token_replacement
         with:
           environment: ${{ inputs.environment }}
 
