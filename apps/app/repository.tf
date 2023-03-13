@@ -62,6 +62,10 @@ EOF
   commit_author       = "Terraform"
   commit_email        = "terraform@flowehr.io"
   overwrite_on_create = true
+
+  depends_on = [
+    github_repository.app
+  ]
 }
 
 resource "github_team" "contributors" {
@@ -163,6 +167,10 @@ gh api \
   -f name='${each.key}'
 EOF
   }
+
+  depends_on = [
+    github_repository.app
+  ]
 }
 
 resource "github_actions_environment_secret" "acr_name" {
