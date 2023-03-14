@@ -37,7 +37,7 @@ while IFS=$'\n' read -r repo _; do
   # e.g. git@github.com:UCLH-Foundry/Data-Pipeline.git becomes Data-Pipeline 
   # If the directory with checked out repo already exists, pull the latest
   dir_name=$(basename "${repo}" | sed -e 's/\.git$//')
-  if [ -d "${dir_name}" ]; then
+  if [ -d "${dir_name}" ] || [ -L "${dir_name}" ]; then
     echo "Repo already exists, skipping"
   else
     eval "${GIT_COMMAND} clone ${repo}"
