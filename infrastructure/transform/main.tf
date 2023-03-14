@@ -40,9 +40,8 @@ resource "azurerm_databricks_workspace" "databricks" {
 }
 
 data "databricks_spark_version" "latest_lts" {
-  spark_version = local.spark_version
-
-  depends_on = [azurerm_databricks_workspace.databricks]
+  spark_version = var.transform.spark_version
+  depends_on    = [azurerm_databricks_workspace.databricks]
 }
 
 data "databricks_node_type" "smallest" {

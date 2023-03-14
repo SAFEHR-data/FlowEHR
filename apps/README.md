@@ -4,7 +4,9 @@ This directory contains the code for deploying and hosting apps that present and
 
 ## Getting started
 
-### Configure GitHub permissions
+### Local deployment
+
+#### Configure GitHub permissions
 
 For FlowEHR to create and manage repositories for FlowEHR Apps, it needs a [GitHub Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) to be set in your `config.yaml` in the root of the repo.
 
@@ -18,11 +20,13 @@ Then, make sure you have enabled the following permissions:
 - `write:org`
 - `delete_repo`
 
-When ready, click `Generate` and copy the token. Paste it into the `github_token` field in your `config.yaml`.
+When ready, click `Generate` and copy the token. Paste it into the `github_token` field in your `config.local.yaml`.
 
-### Deploy apps
+> This is only for local deployment. In CI, the token will be added as an environment secret and should never be checked into your repo.
 
-1. First, to configure which apps you'd like to deploy, copy the `apps.sample.yaml` to a new `apps.yaml` file:
+#### Deploy apps
+
+1. First, to configure which apps you'd like to deploy, copy the `apps.sample.yaml` to a new `apps.local.yaml` file:
 
 ```bash
 cp apps.sample.yaml apps.yaml

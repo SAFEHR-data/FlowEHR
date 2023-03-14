@@ -16,7 +16,7 @@ variable "naming_suffix" {
   type = string
 }
 
-variable "truncated_naming_suffix" {
+variable "naming_suffix_truncated" {
   type = string
 }
 
@@ -48,6 +48,6 @@ variable "serve_webapps_address_space" {
   type = string
 }
 
-variable "local_mode" {
+variable "tf_in_automation" {
   type = bool
 }

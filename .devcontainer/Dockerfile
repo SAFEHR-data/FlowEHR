@@ -62,9 +62,6 @@ RUN export ARCH="$(dpkg --print-architecture)"; \
     wget -qO- "https://github.com/koalaman/shellcheck/releases/download/${SC_VERSION}/shellcheck-${SC_VERSION}.linux.${ARCH}.tar.xz" | tar -xJv \
     && cp "shellcheck-${SC_VERSION}/shellcheck" /usr/local/bin/
 
-ARG PAJV_VERSION="1.2.0"
-RUN npm install -g pajv@${PAJV_VERSION}
-
 ARG PRECOMMIT_VERSION="2.21.0"
 RUN python3 -m pip install pre-commit=="${PRECOMMIT_VERSION}" --no-cache-dir
 

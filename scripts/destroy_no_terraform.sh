@@ -17,12 +17,21 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+# If suffix env var isn't set (i.e. by build agent), use bootstrap output
+SUFFIX=${SUFFIX_OVERRIDE:="$(cd "${SCRIPT_DIR}"/../bootstrap/local && terragrunt output naming_suffix | tr -d '"')"}
+
 az group list -o table | while read -r line ; do
 
-  if echo "$line" | grep -q "${NAMING_SUFFIX}"; then
+  if echo "$line" | grep -q "${SUFFIX}"; then
     rg_name=$(echo "$line" | awk '{print $1;}')
-    echo "Deleting ${rg_name}..."
-    az group delete --resource-group "$rg_name" --yes
+
+    # Skip databricks-managed rgs as these are deleted automatically
+    if [[ "$line" != rg-dbks* ]]; then
+      echo "Deleting ${rg_name}..."
+      az group delete --resource-group "$rg_name" --yes
+    fi
   fi
 
 done
