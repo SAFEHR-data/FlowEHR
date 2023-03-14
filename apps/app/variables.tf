@@ -99,7 +99,7 @@ variable "app_config" {
     name         = string
     description  = string
     owners       = set(string)
-    contributors = set(string)
+    contributors = map(string)
 
     managed_repo = object({
       private               = bool
