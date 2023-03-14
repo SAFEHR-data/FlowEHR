@@ -69,8 +69,6 @@ infrastructure-core: bootstrap ## Deploy core infrastructure
 infrastructure-transform: bootstrap transform-artifacts ## Deploy transform infrastructure
 	$(call terragrunt,apply,infrastructure/transform)
 
-infrastructure-and-test-transform: infrastructure test-transform
-
 transform-artifacts: ## Build transform artifacts
 	${MAKEFILE_DIR}/scripts/pipeline_repo_checkout.sh \
 	&& ${MAKEFILE_DIR}/scripts/build_artifacts.sh

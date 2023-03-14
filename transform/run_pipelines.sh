@@ -19,9 +19,6 @@ set -o nounset
 # Uncomment this line to see each command for debugging (careful: this will show secrets!)
 # set -o xtrace
 
-# TODO: uncomment before merging
-az extension add --name datafactory
-
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 NAME_SUFFIX_SCRIPT="${SCRIPT_DIR}/../scripts/name_suffix.py"
 NAME_SUFFIX=$(python3 "${NAME_SUFFIX_SCRIPT}")
