@@ -20,11 +20,9 @@ set -o nounset
 # set -o xtrace
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-NAME_SUFFIX_SCRIPT="${SCRIPT_DIR}/../scripts/name_suffix.py"
-NAME_SUFFIX=$(python3 "${NAME_SUFFIX_SCRIPT}")
-FACTORY_NAME="adf-${NAME_SUFFIX}"
+FACTORY_NAME=$(cd "${SCRIPT_DIR}"/../infrastructure/transform && terragrunt output adf_name | tr -d '"')
+RESOURCE_GROUP_NAME=$(cd "${SCRIPT_DIR}"/../infrastructure/core && terragrunt output core_rg_name | tr -d '"')
 export FACTORY_NAME
-RESOURCE_GROUP_NAME="rg-${NAME_SUFFIX}"
 export RESOURCE_GROUP_NAME
 
 run_pipeline_and_wait () {
