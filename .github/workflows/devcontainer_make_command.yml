@@ -208,6 +208,7 @@ jobs:
           DEVCONTAINER_IMAGE_IMAGE: flowehr/devcontainer
           DEVCONTAINER_TAG: ${{ needs.make_core.outputs.dc_tag }}
           ORG_GH_TOKEN: ${{ secrets.ORG_GH_TOKEN }}
+          DATA_SOURCE_CONNECTIONS: ${{ (secrets.DATA_SOURCE_CONNECTIONS != '' && secrets.DATA_SOURCE_CONNECTIONS) || '[]' }}
         run: |
           make ${{ needs.make_core.outputs.build_agent_command }}
 

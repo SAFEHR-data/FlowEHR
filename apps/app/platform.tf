@@ -115,6 +115,49 @@ resource "azurerm_cosmosdb_sql_role_assignment" "webapp" {
   scope               = "${data.azurerm_cosmosdb_account.state_store.id}/dbs/${azurerm_cosmosdb_sql_database.app.name}"
 }
 
+resource "azuread_application" "webapp_sp" {
+  count        = local.is_prod ? 1 : 0
+  display_name = "sp-flowehr-app-${replace(var.app_id, "_", "-")}"
+  owners       = [data.azurerm_client_config.current.object_id]
+}
+
+resource "azuread_application_password" "webapp_sp" {
+  count                 = local.is_prod ? 1 : 0
+  application_object_id = azuread_application.webapp_sp[0].object_id
+}
+
+resource "azuread_service_principal" "webapp_sp" {
+  count          = local.is_prod ? 1 : 0
+  application_id = azuread_application.webapp_sp[0].application_id
+  owners         = [data.azurerm_client_config.current.object_id]
+}
+
+resource "azurerm_role_definition" "slot_swap" {
+  count       = local.is_prod ? 1 : 0
+  name        = "role-slot-swap-on-${replace(var.app_id, "_", "-")}"
+  scope       = azurerm_linux_web_app.app.id
+  description = "Slot swap role"
+
+  permissions {
+    actions = [
+      "Microsoft.Web/sites/slots/slotsswap/action",
+      "Microsoft.Web/sites/slots/operationresults/read",
+      "Microsoft.web/sites/slots/operations/read"
+    ]
+  }
+
+  assignable_scopes = [
+    azurerm_linux_web_app.app.id
+  ]
+}
+
+resource "azurerm_role_assignment" "webapp_sp_slot_swap" {
+  count                = local.is_prod ? 1 : 0
+  principal_id         = azuread_service_principal.webapp_sp[0].object_id
+  scope                = azurerm_linux_web_app.app.id
+  role_definition_name = azurerm_role_definition.slot_swap[0].name
+}
+
 resource "azuread_group_member" "web_app_in_app_ad_group" {
   group_object_id  = var.apps_ad_group_principal_id
   member_object_id = azurerm_linux_web_app.app.identity[0].principal_id
