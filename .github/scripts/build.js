@@ -71,47 +71,49 @@ async function getCommandFromComment({ core, context, github }) {
 
     const parts = trimmedFirstLine.split(' ').filter(p => p !== '');
     const commandText = parts[0];
+    let runTests;
+    let message;
+
     switch (commandText) {
       case "/test":
-        {
-          // Don't require the check for whether a SHA needs to be supplied
-          if (!gotNonDocChanges) {
-            command = "test-force-approve";
-            const message = `:white_check_mark: PR only contains docs changes - marking tests as complete`;
-            await addActionComment({ github }, repoOwner, repoName, prNumber, commentUsername, commentLink, message);
-            break;
-          }
-
-          const runTests = await handleTestCommand({ core, github }, parts, "tests", runId, { number: prNumber, authorUsername: prAuthorUsername, repoOwner, repoName, headSha: prHeadSha, refId: prRefId, details: pr }, { username: commentUsername, link: commentLink });
-          if (runTests) {
-            command = "test";
-          }
+        // Don't require the check for whether a SHA needs to be supplied
+        if (!gotNonDocChanges) {
+          command = "test-force-approve";
+          message = `:white_check_mark: PR only contains docs changes - marking tests as complete`;
+          await addActionComment({ github }, repoOwner, repoName, prNumber, commentUsername, commentLink, message);
           break;
         }
+
+        runTests = await handleTestCommand({ core, github }, parts, "tests", runId, { number: prNumber, authorUsername: prAuthorUsername, repoOwner, repoName, headSha: prHeadSha, refId: prRefId, details: pr }, { username: commentUsername, link: commentLink });
+        if (runTests) {
+          command = "test";
+        }
+        break;
+      
+      case "/test-all":
+        runTests = await handleTestCommand({ core, github }, parts, "tests", runId, { number: prNumber, authorUsername: prAuthorUsername, repoOwner, repoName, headSha: prHeadSha, refId: prRefId, details: pr }, { username: commentUsername, link: commentLink });
+        if (runTests) {
+          command = "test-all";
+        }
+        break;
 
       case "/test-force-approve":
-        {
-          command = "test-force-approve";
-          const message = `:white_check_mark: Marking tests as complete (for commit ${prHeadSha})`;
-          await addActionComment({ github }, repoOwner, repoName, prNumber, commentUsername, commentLink, message);
-          break;
-        }
+        command = "test-force-approve";
+        message = `:white_check_mark: Marking tests as complete (for commit ${prHeadSha})`;
+        await addActionComment({ github }, repoOwner, repoName, prNumber, commentUsername, commentLink, message);
+        break;
 
       case "/destroy":
-        {
-          command = "destroy";
-          const message = `Destroying environment (with refid ${prRefId})`;
-          await addActionComment({ github }, repoOwner, repoName, prNumber, commentUsername, commentLink, message);
-          break;
-        }
+        command = "destroy";
+        message = `Destroying environment (with refid ${prRefId})`;
+        await addActionComment({ github }, repoOwner, repoName, prNumber, commentUsername, commentLink, message);
+        break;
 
       case "/destroy-no-terraform":
-        {
-          command = "destroy-no-terraform";
-          const message = `Destroying environment no terraform (with refid ${prRefId}).	:warning: This will leave orphaned resources`;
-          await addActionComment({ github }, repoOwner, repoName, prNumber, commentUsername, commentLink, message);
-          break;
-        }
+        command = "destroy-no-terraform";
+        message = `Destroying environment no terraform (with refid ${prRefId}).	:warning: This will leave orphaned resources`;
+        await addActionComment({ github }, repoOwner, repoName, prNumber, commentUsername, commentLink, message);
+        break;
 
       case "/help":
         showHelp({ github }, repoOwner, repoName, prNumber, commentUsername, commentLink, null);
@@ -233,7 +235,8 @@ async function showHelp({ github }, repoOwner, repoName, prNumber, commentUser, 
   const body = `${leadingContent}
 
 You can use the following commands:
-&nbsp;&nbsp;&nbsp;&nbsp;/test - deply and destroy
+&nbsp;&nbsp;&nbsp;&nbsp;/test - deploy any modified modules and destroy
+&nbsp;&nbsp;&nbsp;&nbsp;/test-all - deploy everything (ignoring path filters) and destroy
 &nbsp;&nbsp;&nbsp;&nbsp;/test-force-approve - force approval of the PR tests (i.e. skip the deployment checks)
 &nbsp;&nbsp;&nbsp;&nbsp;/destroy - delete the PR environment (e.g. to enable testing a deployment from a clean start after previous tests)
 &nbsp;&nbsp;&nbsp;&nbsp;/destroy-no-terraform - delete the PR environment without terraform

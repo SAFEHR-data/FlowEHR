@@ -12,10 +12,18 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-data "azurerm_client_config" "current" {}
+module "naming" {
+  source          = "../shared/naming"
+  flowehr_id      = var.flowehr_id
+  environment     = var.environment
+  suffix_override = var.suffix_override
+}
 
-data "azurerm_container_registry" "devcontainer" {
-  count               = var.tf_in_automation ? 1 : 0
-  name                = var.mgmt_acr
-  resource_group_name = var.mgmt_rg
+# Only deploy management resources locally; otherwise we use existing shared ci resources
+module "management" {
+  count                   = var.tf_in_automation ? 0 : 1
+  source                  = "../shared/management"
+  naming_suffix           = module.naming.suffix
+  naming_suffix_truncated = module.naming.suffix_truncated
+  location                = var.location
 }

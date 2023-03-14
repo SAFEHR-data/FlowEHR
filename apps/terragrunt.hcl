@@ -13,8 +13,33 @@
 #  limitations under the License.
 
 include "root" {
-  path   = find_in_parent_folders()
-  expose = true
+  path = find_in_parent_folders()
+}
+
+locals {
+  providers            = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+  configuration        = read_terragrunt_config("${get_repo_root()}/configuration.hcl")
+  merged_root_config   = local.configuration.locals.merged_root_config
+  apps_config_path     = "${get_terragrunt_dir()}/apps.yaml"
+  apps_config          = fileexists(local.apps_config_path) ? yamldecode(file(local.apps_config_path)) : null
+  apps_env_config_path = "${get_terragrunt_dir()}/apps.${get_env("ENVIRONMENT", "local")}.yaml"
+  apps_env_config      = fileexists(local.apps_env_config_path) ? yamldecode(file(local.apps_env_config_path)) : null
+}
+
+terraform {
+  extra_arguments "auto_approve" {
+    commands  = ["apply"]
+    arguments = ["-auto-approve"]
+  }
+
+  # Export GitHub credentials for use by both TF provider and CLI
+  extra_arguments "set_github_vars" {
+    commands = ["init", "apply", "plan", "destroy", "taint", "untaint", "refresh"]
+    env_vars = {
+      GITHUB_OWNER = local.merged_root_config.serve.github_owner
+      GITHUB_TOKEN = get_env("ORG_GITHUB_TOKEN", local.merged_root_config.serve.github_token)
+    }
+  }
 }
 
 generate "terraform" {
@@ -22,11 +47,25 @@ generate "terraform" {
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
 terraform {
-  required_version = "${include.root.locals.terraform_version}"
+  required_version = "${local.providers.locals.terraform_version}"
 
   required_providers {
-    ${include.root.locals.required_provider_azure}
-    ${include.root.locals.required_provider_github}
+    ${local.providers.locals.required_provider_azure}
+    ${local.providers.locals.required_provider_github}
+  }
+}
+EOF
+}
+
+# Child module also needs GH required provider reference due to provider inheritance bug:
+# https://github.com/integrations/terraform-provider-github/issues/876
+generate "child_terraform" {
+  path      = "app/terraform.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+terraform {
+  required_providers {
+    ${local.providers.locals.required_provider_github}
   }
 }
 EOF
@@ -36,7 +75,7 @@ generate "provider" {
   path      = "provider.tf"
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
-${include.root.locals.azure_provider}
+${local.providers.locals.azure_provider}
 
 provider "github" {}
 EOF
@@ -90,5 +129,6 @@ inputs = {
   serve_cosmos_account_name   = dependency.serve.outputs.cosmos_account_name
   serve_webapps_subnet_id     = dependency.serve.outputs.webapps_subnet_id
 
-  github_owner = get_env("GITHUB_OWNER", "")
+  # Generate app config by merging 
+  apps = merge(local.apps_config, local.apps_env_config)
 }

@@ -17,11 +17,5 @@ include "root" {
 }
 
 inputs = {
-   # Additional variables are required for the build agent deployment
-  devcontainer_acr_name = get_env("DEVCONTAINER_ACR_NAME", "")
-  devcontainer_image_name = get_env("DEVCONTAINER_IMAGE_NAME", "")
-  devcontainer_tag = get_env("DEVCONTAINER_TAG", "")
-  github_runner_name = get_env("GITHUB_RUNNER_NAME", "")
-  github_runner_token = get_env("GITHUB_RUNNER_TOKEN", "")
-  github_repository = get_env("GITHUB_REPOSITORY", "")
+  github_runner_token = get_env("ORG_GITHUB_TOKEN", "")
 }

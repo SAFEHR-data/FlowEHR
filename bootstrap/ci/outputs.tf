@@ -12,10 +12,31 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-data "azurerm_client_config" "current" {}
+output "ARM_CLIENT_ID" {
+  value = azuread_application.ci_app.application_id
+}
 
-data "azurerm_container_registry" "devcontainer" {
-  count               = var.tf_in_automation ? 1 : 0
-  name                = var.mgmt_acr
-  resource_group_name = var.mgmt_rg
+output "ARM_CLIENT_SECRET" {
+  value     = azuread_application_password.ci_app.value
+  sensitive = true
+}
+
+output "ARM_TENANT_ID" {
+  value = data.azurerm_client_config.current.tenant_id
+}
+
+output "ARM_SUBSCRIPTION_ID" {
+  value = data.azurerm_client_config.current.subscription_id
+}
+
+output "CI_RESOURCE_GROUP" {
+  value = module.management.rg
+}
+
+output "CI_STORAGE_ACCOUNT" {
+  value = module.management.storage
+}
+
+output "CI_CONTAINER_REGISTRY" {
+  value = module.management.acr
 }

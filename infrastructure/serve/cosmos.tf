@@ -13,15 +13,15 @@
 #  limitations under the License.
 
 resource "azurerm_cosmosdb_account" "serve" {
-  name                = "cosmos-serve-${var.truncated_naming_suffix}"
+  name                = "cosmos-serve-${var.naming_suffix_truncated}"
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
   offer_type          = "Standard"
   kind                = "GlobalDocumentDB"
   tags                = var.tags
 
-  public_network_access_enabled = var.local_mode
-  local_authentication_disabled = !var.local_mode
+  public_network_access_enabled = !var.tf_in_automation
+  local_authentication_disabled = var.tf_in_automation
 
   capabilities {
     name = "EnableServerless"

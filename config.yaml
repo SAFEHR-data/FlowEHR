@@ -1,0 +1,11 @@
+---
+flowehr_id: flwr
+location: uksouth
+environment: infra-test
+core_address_space: 10.0.0.0/24
+
+transform:
+  spark_version: 3.3.1
+
+serve:
+  github_owner: UCLH-Foundry
