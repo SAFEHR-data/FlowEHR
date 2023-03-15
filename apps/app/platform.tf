@@ -81,7 +81,7 @@ resource "azurerm_linux_web_app_slot" "testing" {
 
   site_config {
     container_registry_use_managed_identity = true
-    remote_debugging_enabled                = var.local_mode
+    remote_debugging_enabled                = !var.tf_in_automation
 
     # Application stack gets populated by GH actions
   }
