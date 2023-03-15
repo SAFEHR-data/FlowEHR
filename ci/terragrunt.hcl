@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 include "root" {
-  path = find_in_parent_folders()
+  path   = find_in_parent_folders()
   expose = true
 }
 
@@ -33,7 +33,7 @@ EOF
 
 remote_state {
   backend = "local"
-  config = {}
+  config  = {}
   generate = {
     path      = "backend.tf"
     if_exists = "overwrite_terragrunt"

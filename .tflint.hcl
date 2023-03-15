@@ -18,9 +18,9 @@ plugin "terraform" {
 }
 
 plugin "azurerm" {
-    enabled = true
-    version = "0.20.0"
-    source  = "github.com/terraform-linters/tflint-ruleset-azurerm"
+  enabled = true
+  version = "0.20.0"
+  source  = "github.com/terraform-linters/tflint-ruleset-azurerm"
 }
 
 # The required version and providers are specified in the top-level directory and
