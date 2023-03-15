@@ -121,6 +121,10 @@ resource "github_branch_protection" "deployment" {
     require_code_owner_reviews      = var.accesses_real_data
     required_approving_review_count = max(var.app_config.branch.num_of_approvals, 1)
   }
+
+  depends_on = [
+    github_repository.app
+  ]
 }
 
 resource "azurerm_container_registry_scope_map" "app_access" {
@@ -284,9 +288,9 @@ resource "github_actions_environment_secret" "webapp_id" {
 }
 
 resource "github_actions_environment_secret" "slot_name" {
-  count           = local.testing_gh_env != null ? 1 : 0
+  for_each        = local.branches_and_envs
   repository      = local.repository_name
-  environment     = local.testing_gh_env
+  environment     = each.value
   secret_name     = "SLOT_NAME"
   plaintext_value = local.testing_slot_name
 
