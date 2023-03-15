@@ -124,8 +124,6 @@ jobs:
 
       - name: Deploy core and build agent
         uses: devcontainers/ci@v0.3
-        env: # Add suffix as step env so it's only passed as an env var if it's not empty
-          SUFFIX_OVERRIDE: ${{ inputs.suffix_override }}
         with:
           imageName: ${{ steps.dc.outputs.image_path }}
           imageTag: ${{ steps.dc.outputs.tag }}
@@ -135,7 +133,6 @@ jobs:
             DOCKER_BUILDKIT=1
             TF_INPUT=0
             TF_IN_AUTOMATION=1
-            SUFFIX_OVERRIDE
             ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}
             ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
             ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
@@ -145,6 +142,7 @@ jobs:
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
             ORG_GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
+            SUFFIX_OVERRIDE=${{ inputs.suffix_override }}
             TF_VAR_devcontainer_image=${{ env.DEVCONTAINER_NAME }}
             TF_VAR_devcontainer_tag=${{ steps.dc.outputs.tag }}
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
@@ -222,8 +220,6 @@ jobs:
 
       - name: Post build agent command
         uses: devcontainers/ci@v0.3
-        env:
-          SUFFIX_OVERRIDE: ${{ inputs.suffix_override }}
         with:
           # The image name cannot be set from the make_core output because it contains a secret
           imageName: ${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DEVCONTAINER_NAME }}
@@ -234,7 +230,6 @@ jobs:
           env: |
             DOCKER_BUILDKIT=1
             TF_IN_AUTOMATION=1
-            SUFFIX_OVERRIDE
             ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}
             ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
             ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
@@ -244,6 +239,7 @@ jobs:
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
             ORG_GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
+            SUFFIX_OVERRIDE=${{ inputs.suffix_override }}
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
 
       - name: Clean up
