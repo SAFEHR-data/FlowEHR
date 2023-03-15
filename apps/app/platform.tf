@@ -158,7 +158,7 @@ resource "azurerm_role_assignment" "webapp_sp_slot_swap" {
   role_definition_name = azurerm_role_definition.slot_swap[0].name
 }
 
-resource "azuread_group_member" "web_app_in_app_ad_group" {
+resource "azuread_group_member" "webapp" {
   group_object_id  = var.apps_ad_group_principal_id
   member_object_id = azurerm_linux_web_app.app.identity[0].principal_id
 }
