@@ -36,11 +36,10 @@ terraform.tf
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
 # example: *tfplan*
 
-# .env and config files
+# local config files
 .env
 *.env
-config.yaml
-apps.yaml
+*.local.yaml
 
 # Mac specific metadata
 .DS_store

@@ -12,30 +12,30 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-include "root" {
-  path = find_in_parent_folders()
-  expose = true
+output "naming_suffix" {
+  value = module.naming.suffix
 }
 
-generate "terraform" {
-  path      = "terraform.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-terraform {
-  required_version = "${include.root.locals.terraform_version}"
-
-  required_providers {
-    ${include.root.locals.required_provider_azuread}
-  }
-}
-EOF
+output "naming_suffix_truncated" {
+  value = module.naming.suffix_truncated
 }
 
-remote_state {
-  backend = "local"
-  config = {}
-  generate = {
-    path      = "backend.tf"
-    if_exists = "overwrite_terragrunt"
-  }
+output "environment" {
+  value = var.environment
+}
+
+output "mgmt_rg" {
+  value = var.tf_in_automation ? "" : module.management[0].rg
+}
+
+output "mgmt_acr" {
+  value = var.tf_in_automation ? "" : module.management[0].acr
+}
+
+output "mgmt_storage" {
+  value = var.tf_in_automation ? "" : module.management[0].storage
+}
+
+output "deployer_ip_address" {
+  value = var.tf_in_automation ? "" : chomp(data.http.local_ip[0].response_body)
 }

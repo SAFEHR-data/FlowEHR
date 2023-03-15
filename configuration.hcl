@@ -13,6 +13,13 @@
 #  limitations under the License.
 
 locals {
-  apps_config = "apps.yaml"
-  apps        = fileexists(local.apps_config) ? yamldecode(file(local.apps_config)) : {}
+  # Root config from config.yaml
+  root_config = yamldecode(file("${get_repo_root()}/config.yaml"))
+
+  # Environment-specific config for current environment with config.{ENVIRONMENT}.yaml format
+  env_config_path = "${get_repo_root()}/config.${get_env("ENVIRONMENT", "local")}.yaml"
+  env_config      = fileexists(local.env_config_path) ? yamldecode(file(local.env_config_path)) : null
+
+  # Merged configuration (with environment-specific config values overwriting root values)
+  merged_root_config = merge(local.root_config, local.env_config)
 }
