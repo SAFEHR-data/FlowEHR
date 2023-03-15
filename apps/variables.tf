@@ -34,6 +34,8 @@ variable "tf_in_automation" {
   type = bool
 }
 
+
+
 variable "core_rg_name" {
   type = string
 }
@@ -75,6 +77,10 @@ variable "serve_webapps_subnet_id" {
 }
 
 # -- FROM CONFIGURATION FILES --------
+variable "accesses_real_data" {
+  type = bool
+}
+
 variable "serve" {
   description = "Serve configuration block (populated from root config file)"
   type = object({
