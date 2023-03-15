@@ -169,4 +169,3 @@ resource "azuread_group_member" "developers" {
   member_object_id = each.value.object_id
 }
 
-// TODO: once Feature Store SQL SPN stuff is in, add connection from App Service here
