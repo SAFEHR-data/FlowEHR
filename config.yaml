@@ -1,5 +1,5 @@
 ---
-flowehr_id: flwr
+flowehr_id: flowehr
 location: uksouth
 environment: infra-test
 accesses_real_data: false
