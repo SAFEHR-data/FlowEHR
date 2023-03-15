@@ -163,7 +163,7 @@ resource "azuread_group_member" "webapp" {
   member_object_id = azurerm_linux_web_app.app.identity[0].principal_id
 }
 
-resource "azuread_group_member" "contributors_in_dev_ad_group" {
+resource "azuread_group_member" "developers" {
   for_each         = data.azuread_user.contributors_ids
   group_object_id  = var.developers_ad_group_principal_id
   member_object_id = each.value.object_id
