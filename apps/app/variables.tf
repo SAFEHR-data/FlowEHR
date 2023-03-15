@@ -98,7 +98,7 @@ variable "app_config" {
   type = object({
     name         = string
     description  = string
-    owners       = set(string)
+    owners       = map(string)
     contributors = map(string)
 
     managed_repo = object({
