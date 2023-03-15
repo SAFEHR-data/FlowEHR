@@ -20,6 +20,7 @@ locals {
   providers        = read_terragrunt_config("${get_repo_root()}/providers.hcl")
   configuration    = read_terragrunt_config("${get_repo_root()}/configuration.hcl")
   tf_in_automation = get_env("TF_IN_AUTOMATION", false)
+  suffix_override  = get_env("SUFFIX_OVERRIDE", "")
 }
 
 terraform {
@@ -51,7 +52,7 @@ remote_state {
     resource_group_name  = local.tf_in_automation ? get_env("CI_RESOURCE_GROUP") : dependency.bootstrap.outputs.mgmt_rg
     storage_account_name = local.tf_in_automation ? get_env("CI_STORAGE_ACCOUNT") : dependency.bootstrap.outputs.mgmt_storage
     container_name       = "tfstate"
-    key                  = "${get_env("SUFFIX_OVERRIDE", dependency.bootstrap.outputs.environment)}/${path_relative_to_include()}/terraform.tfstate"
+    key                  = "${local.suffix_override != "" ? local.suffix_override : dependency.bootstrap.outputs.environment)}/${path_relative_to_include()}/terraform.tfstate"
   }
   generate = {
     path      = "backend.tf"
