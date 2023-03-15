@@ -19,6 +19,8 @@ set -o nounset
 # Uncomment this line to see each command for debugging (careful: this will show secrets!)
 # set -o xtrace
 
+az extension add --name datafactory
+
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 FACTORY_NAME=$(cd "${SCRIPT_DIR}"/../infrastructure/transform && terragrunt output adf_name | tr -d '"')
 [[ "${FACTORY_NAME:?}" ]]
