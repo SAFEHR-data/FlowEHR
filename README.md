@@ -112,7 +112,7 @@ This step will create an AAD Application and Service Principal in the specified 
 
 1. Open this repo in the dev container, and modify the `config.yaml` file as appropriate for all the default values you wish to share across environments.
 
-2. Then, for the environment you wish to deploy (`Infra-Test` in this example), create a config file for that environment in the format `config.{ENVIRONMENT_NAME}.yaml` (so `config.infra-test.yaml`), and populate the relevant settings. Check this into your repo.
+2. Then, for the environment you wish to deploy (`infra-test` in this example, but you can use whatever name you like, just update the GitHub workflow files in `.github/workflows` to use this environment name, wherever you see `infra-test`), create a config file for that environment in the format `config.{ENVIRONMENT_NAME}.yaml` (so `config.infra-test.yaml`), and populate the relevant settings. Check this into your repo.
 
 > Note: if you want to reference secrets in these files (i.e. a data source password), you can use the syntax: `${MY_SECRET}`. In the CICD workflow, matching GitHub secrets will be searched for and, if found, will replace these tokens before running deployment steps.
 
@@ -144,7 +144,7 @@ This step will create an AAD Application and Service Principal in the specified 
 
 5. Create and populate a GitHub environment
 
-    Add an environment called `Infra-Test` with the following environment variables:
+    Add an environment called `infra-test` (or whatever you called your deployment environment earlier) with the following environment variables:
 
     - `CI_RESOURCE_GROUP`: Resource group for shared CI resources (outputted from step 3)
     - `CI_CONTAINER_REGISTRY`: Name of the Azure Container Registry to use for the devcontainer storage (outputted from step 3)
