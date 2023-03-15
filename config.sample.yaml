@@ -1,6 +1,7 @@
 flowehr_id: __CHANGE_ME__
 location: __CHANGE_ME__
 environment: __CHANGE_ME__
+accesses_real_data: false
 
 data_source_connections:
   - example:
