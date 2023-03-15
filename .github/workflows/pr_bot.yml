@@ -85,7 +85,9 @@ jobs:
 
       - id: set_make_command
         run: |
-          if [ ${{ steps.changes.outputs.transform }} = "true" ] && \
+          if [ ${{ steps.check_command.outputs.command }} = "test-all" ]; then
+              make_command="test"
+          elif [ ${{ steps.changes.outputs.transform }} = "true" ] && \
             [ ${{ steps.changes.outputs.serve }} = "true" ]; then
               make_command="test"
           elif [ ${{ steps.changes.outputs.transform }} = "true" ]; then
@@ -100,7 +102,7 @@ jobs:
           echo "makeCommand=${make_command}" >> $GITHUB_OUTPUT
 
       - name: Report check status start
-        if: ${{ steps.check_command.outputs.command == 'test' }}
+        if: ${{ steps.check_command.outputs.command == 'test' || steps.check_command.outputs.command == 'test-all' }}
         uses: LouisBrunner/checks-action@v1.5.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -132,8 +134,8 @@ jobs:
     name: Destroy PR
     uses: ./.github/workflows/devcontainer_make_command.yml
     with:
-      suffix_override: ${{ needs.pr_comment.outputs.prRefId }}
-      environment: Infra-Test
+      suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
+      environment: infra-test
       command: ${{ needs.pr_comment.outputs.command }}
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}
     secrets: inherit
@@ -141,13 +143,13 @@ jobs:
   run_test:
     needs: [pr_comment]
     if: |
-      (needs.pr_comment.outputs.command == 'test') &&
+      (needs.pr_comment.outputs.command == 'test' || needs.pr_comment.outputs.command == 'test-all') &&
       (needs.pr_comment.outputs.makeCommand != 'none')
     name: Deploy PR
     uses: ./.github/workflows/devcontainer_make_command.yml
     with:
-      suffix_override: ${{ needs.pr_comment.outputs.prRefId }}
-      environment: Infra-Test
+      suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
+      environment: infra-test
       command: ${{ needs.pr_comment.outputs.makeCommand }}
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}
     secrets: inherit
@@ -156,7 +158,7 @@ jobs:
     name: Summary
     needs: [pr_comment, run_test]
     runs-on: ubuntu-latest
-    environment: Infra-Test
+    environment: infra-test
     steps:
       # For PR builds triggered from comment builds, the GITHUB_REF is set to main
       # so the checks aren't automatically associated with the PR

@@ -12,30 +12,19 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-include "root" {
-  path   = find_in_parent_folders()
-  expose = true
+variable "flowehr_id" {
+  type = string
 }
 
-generate "terraform" {
-  path      = "terraform.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-terraform {
-  required_version = "${include.root.locals.terraform_version}"
-
-  required_providers {
-    ${include.root.locals.required_provider_azuread}
-  }
-}
-EOF
+variable "location" {
+  type = string
 }
 
-remote_state {
-  backend = "local"
-  config  = {}
-  generate = {
-    path      = "backend.tf"
-    if_exists = "overwrite_terragrunt"
+variable "tf_in_automation" {
+  type = bool
+
+  validation {
+    condition     = !var.tf_in_automation
+    error_message = "CI bootstrapping should be ran locally to create credentials & resources for CI. Please run this from a local machine as a user with rights to assign AD roles."
   }
 }

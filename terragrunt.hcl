@@ -12,6 +12,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+dependency "bootstrap" {
+  config_path = "${get_repo_root()}/bootstrap/local"
+}
+
+locals {
+  providers        = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+  configuration    = read_terragrunt_config("${get_repo_root()}/configuration.hcl")
+  tf_in_automation = get_env("TF_IN_AUTOMATION", false)
+  suffix_override  = get_env("SUFFIX_OVERRIDE", "")
+}
+
 terraform {
   extra_arguments "auto_approve" {
     commands  = ["apply"]
@@ -19,91 +30,17 @@ terraform {
   }
 }
 
-locals {
-  terraform_version = "1.3.7"
-  azure_provider    = <<EOF
-provider "azurerm" {
-  features {
-    resource_group {
-      prevent_deletion_if_contains_resources = false
-    }
-    key_vault {
-      # Don't purge on destroy (this would fail due to purge protection being enabled on keyvault)
-      purge_soft_delete_on_destroy               = false
-      purge_soft_deleted_secrets_on_destroy      = false
-      purge_soft_deleted_certificates_on_destroy = false
-      purge_soft_deleted_keys_on_destroy         = false
-      # When recreating an environment, recover any previously soft deleted secrets - set to true by default
-      recover_soft_deleted_key_vaults   = true
-      recover_soft_deleted_secrets      = true
-      recover_soft_deleted_certificates = true
-      recover_soft_deleted_keys         = true
-    }
-  }
-}
-EOF
-
-  required_provider_azure = <<EOF
-azurerm = {
-  source  = "hashicorp/azurerm"
-  version = ">= 3.32"
-}
-EOF
-
-  required_provider_azuread = <<EOF
-azuread = {
-  source  = "hashicorp/azuread"
-  version = "2.35.0"
-}
-EOF
-
-  required_provider_random = <<EOF
-random = {
-  source = "hashicorp/random"
-  version = "3.4.3"
-}  
-EOF
-
-  required_provider_databricks = <<EOF
- databricks = {
-    source = "databricks/databricks"
-    version = "1.9.1"
-  }
-EOF
-
-  required_provider_external = <<EOF
-  external = {
-    source = "hashicorp/external"
-    version = "2.2.3"
-  }
-EOF
-
-  required_provider_null = <<EOF
-    null = {
-      source = "hashicorp/null"
-      version = "3.2.1"
-    }
-EOF
-
-  required_provider_github = <<EOF
-  github = {
-      source  = "integrations/github"
-      version = "~> 5.0"
-    }
-EOF
-}
-
 generate "terraform" {
   path      = "terraform.tf"
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
 terraform {
-  required_version = "${local.terraform_version}"
+  required_version = "${local.providers.locals.terraform_version}"
 
   required_providers {
-    ${local.required_provider_azure}
-    ${local.required_provider_null}
-    ${local.required_provider_external}
+    ${local.providers.locals.required_provider_azure}
+    ${local.providers.locals.required_provider_null}
+    ${local.providers.locals.required_provider_external}
   }
 }
 EOF
@@ -112,10 +49,10 @@ EOF
 remote_state {
   backend = "azurerm"
   config = {
-    resource_group_name  = get_env("MGMT_RG")
-    storage_account_name = get_env("MGMT_STORAGE")
-    container_name       = get_env("STATE_CONTAINER")
-    key                  = "${path_relative_to_include()}/terraform.tfstate"
+    resource_group_name  = local.tf_in_automation ? get_env("CI_RESOURCE_GROUP") : dependency.bootstrap.outputs.mgmt_rg
+    storage_account_name = local.tf_in_automation ? get_env("CI_STORAGE_ACCOUNT") : dependency.bootstrap.outputs.mgmt_storage
+    container_name       = "tfstate"
+    key                  = "${local.suffix_override != "" ? local.suffix_override : dependency.bootstrap.outputs.environment)}/${path_relative_to_include()}/terraform.tfstate"
   }
   generate = {
     path      = "backend.tf"
@@ -126,19 +63,26 @@ remote_state {
 generate "provider" {
   path      = "provider.tf"
   if_exists = "overwrite_terragrunt"
-  contents  = local.azure_provider
+  contents  = local.providers.locals.azure_provider
 }
 
 # Here we define common variables to be inhereted by each module (as long as they're set in its variables.tf)
-inputs = {
-  location                = get_env("LOCATION")
-  naming_suffix           = get_env("NAMING_SUFFIX")
-  truncated_naming_suffix = get_env("TRUNCATED_NAMING_SUFFIX")
-  environment             = get_env("ENVIRONMENT")
-  deployer_ip_address     = get_env("DEPLOYER_IP_ADDRESS", "") # deployer's IP address is added to resource firewall exceptions IF in local_mode
-  local_mode              = get_env("LOCAL_MODE", false)
-  core_address_space      = get_env("CORE_ADDRESS_SPACE")
+inputs = merge(
+  # Add values from the merged config files (root and environment-specific)
+  local.configuration.locals.merged_root_config, {
+
+  # And values from terraform bootstrapping (& env vars in CI)
+  naming_suffix           = dependency.bootstrap.outputs.naming_suffix
+  naming_suffix_truncated = dependency.bootstrap.outputs.naming_suffix_truncated
+  deployer_ip_address     = dependency.bootstrap.outputs.deployer_ip_address
+  mgmt_rg                 = local.tf_in_automation ? get_env("CI_RESOURCE_GROUP") : dependency.bootstrap.outputs.mgmt_rg
+  mgmt_acr                = local.tf_in_automation ? get_env("CI_CONTAINER_REGISTRY") : dependency.bootstrap.outputs.mgmt_acr
+
+  # And any global env vars that should be made available
+  tf_in_automation = local.tf_in_automation
+
+  # Tags to add to every resource that accepts them
   tags = {
-    environment = get_env("ENVIRONMENT")
+    environment = dependency.bootstrap.outputs.environment
   }
-}
+})

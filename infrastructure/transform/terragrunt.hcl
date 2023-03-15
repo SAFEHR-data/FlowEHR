@@ -14,7 +14,10 @@
 
 include "root" {
   path   = find_in_parent_folders()
-  expose = true
+}
+
+locals {
+  providers = read_terragrunt_config("${get_repo_root()}/providers.hcl")
 }
 
 dependency "core" {
@@ -26,14 +29,14 @@ generate "terraform" {
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
 terraform {
-  required_version = "${include.root.locals.terraform_version}"
+  required_version = "${local.providers.locals.terraform_version}"
 
   required_providers {
-    ${include.root.locals.required_provider_azure}
-    ${include.root.locals.required_provider_azuread}
-    ${include.root.locals.required_provider_random}
-    ${include.root.locals.required_provider_databricks}
-    ${include.root.locals.required_provider_null}
+    ${local.providers.locals.required_provider_azure}
+    ${local.providers.locals.required_provider_azuread}
+    ${local.providers.locals.required_provider_random}
+    ${local.providers.locals.required_provider_databricks}
+    ${local.providers.locals.required_provider_null}
   }
 }
 EOF
@@ -43,7 +46,7 @@ generate "provider" {
   path      = "provider.tf"
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
-${include.root.locals.azure_provider}
+${local.providers.locals.azure_provider}
 
 provider "databricks" {
   azure_workspace_resource_id = azurerm_databricks_workspace.databricks.id
@@ -59,7 +62,6 @@ inputs = {
   core_subnet_id                     = dependency.core.outputs.core_subnet_id
   core_kv_id                         = dependency.core.outputs.core_kv_id
   core_kv_uri                        = dependency.core.outputs.core_kv_uri
-  data_source_connections            = get_env("DATA_SOURCE_CONNECTIONS", "[]")
   databricks_host_address_space      = dependency.core.outputs.databricks_host_address_space
   databricks_container_address_space = dependency.core.outputs.databricks_container_address_space
 }

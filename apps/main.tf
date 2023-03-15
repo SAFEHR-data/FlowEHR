@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 module "app" {
-  for_each                         = local.apps
+  for_each                         = var.apps
   source                           = "./app"
   app_id                           = each.key
   naming_suffix                    = var.naming_suffix

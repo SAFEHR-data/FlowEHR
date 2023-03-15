@@ -12,19 +12,30 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-output "ARM_CLIENT_ID" {
-  value = azuread_application.ci_app.application_id
+output "naming_suffix" {
+  value = module.naming.suffix
 }
 
-output "ARM_CLIENT_SECRET" {
-  value     = azuread_application_password.ci_app.value
-  sensitive = true
+output "naming_suffix_truncated" {
+  value = module.naming.suffix_truncated
 }
 
-output "ARM_TENANT_ID" {
-  value = data.azurerm_client_config.current.tenant_id
+output "environment" {
+  value = var.environment
 }
 
-output "ARM_SUBSCRIPTION_ID" {
-  value = data.azurerm_client_config.current.subscription_id
+output "mgmt_rg" {
+  value = var.tf_in_automation ? "" : module.management[0].rg
+}
+
+output "mgmt_acr" {
+  value = var.tf_in_automation ? "" : module.management[0].acr
+}
+
+output "mgmt_storage" {
+  value = var.tf_in_automation ? "" : module.management[0].storage
+}
+
+output "deployer_ip_address" {
+  value = var.tf_in_automation ? "" : chomp(data.http.local_ip[0].response_body)
 }

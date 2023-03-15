@@ -10,23 +10,20 @@
 #  distributed under the License is distributed on an "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
-# limitations under the License.
----
-name: Deploy Infra-Test
+#  limitations under the License.
 
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+module "naming" {
+  source          = "../shared/naming"
+  flowehr_id      = var.flowehr_id
+  environment     = var.environment
+  suffix_override = var.suffix_override
+}
 
-permissions:
-  pull-requests: read
-
-jobs:
-  deploy:
-    uses: ./.github/workflows/devcontainer_make_command.yml
-    name: Make Infrastructure
-    with:
-      command: infrastructure
-      environment: infra-test
-    secrets: inherit
+# Only deploy management resources locally; otherwise we use existing shared ci resources
+module "management" {
+  count                   = var.tf_in_automation ? 0 : 1
+  source                  = "../shared/management"
+  naming_suffix           = module.naming.suffix
+  naming_suffix_truncated = module.naming.suffix_truncated
+  location                = var.location
+}

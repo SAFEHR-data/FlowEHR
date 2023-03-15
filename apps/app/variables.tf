@@ -12,10 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-variable "local_mode" {
-  type = bool
-}
-
 variable "app_id" {
   type = string
 
@@ -44,6 +40,10 @@ variable "resource_group_name" {
 
 variable "location" {
   type = string
+}
+
+variable "tf_in_automation" {
+  type = bool
 }
 
 variable "webapps_subnet_id" {

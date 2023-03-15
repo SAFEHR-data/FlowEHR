@@ -21,7 +21,7 @@ resource "azurerm_application_insights" "serve" {
 }
 
 resource "azurerm_storage_account" "serve" {
-  name                     = "strgaml${var.truncated_naming_suffix}"
+  name                     = "strgaml${var.naming_suffix_truncated}"
   location                 = var.core_rg_location
   resource_group_name      = var.core_rg_name
   account_tier             = "Standard"
@@ -44,7 +44,7 @@ resource "azurerm_machine_learning_workspace" "serve" {
 }
 
 resource "azurerm_container_registry" "serve" {
-  name                          = "acrserve${var.truncated_naming_suffix}"
+  name                          = "acrserve${var.naming_suffix_truncated}"
   location                      = var.core_rg_location
   resource_group_name           = var.core_rg_name
   sku                           = "Basic"

@@ -18,7 +18,7 @@ resource "azurerm_application_insights" "app" {
   location                   = var.location
   workspace_id               = data.azurerm_log_analytics_workspace.core.id
   application_type           = "web"
-  internet_ingestion_enabled = var.local_mode ? true : false
+  internet_ingestion_enabled = var.tf_in_automation ? false : true
 }
 
 resource "azurerm_linux_web_app" "app" {
@@ -31,7 +31,7 @@ resource "azurerm_linux_web_app" "app" {
 
   site_config {
     container_registry_use_managed_identity = true
-    remote_debugging_enabled                = var.local_mode
+    remote_debugging_enabled                = !var.tf_in_automation
 
     application_stack {
       docker_image     = "${var.acr_name}.azurecr.io/${var.app_id}"

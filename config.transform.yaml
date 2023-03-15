@@ -1,8 +1,0 @@
-# TODO:
-# These values need to be checked in as they are the same for local env and for CI / CD.
-# There is a story to improve this: https://github.com/UCLH-Foundry/FlowEHR/issues/42
-# As part of this story, this file will likely disappear.
----
-spark_version: 3.3.1
-repositories:
- - https://github.com/UCLH-Foundry/FlowEHR-Data-Forge.git
