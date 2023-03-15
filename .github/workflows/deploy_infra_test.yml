@@ -28,5 +28,5 @@ jobs:
     name: Make Infrastructure
     with:
       command: infrastructure
-      environment: Infra-Test
+      environment: infra-test
     secrets: inherit
