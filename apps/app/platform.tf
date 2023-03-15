@@ -164,9 +164,9 @@ resource "azuread_group_member" "web_app_in_app_ad_group" {
 }
 
 resource "azuread_group_member" "contributors_in_dev_ad_group" {
-  for_each         = var.app_config.contributors
+  for_each         = data.azuread_user.contributors_ids
   group_object_id  = var.developers_ad_group_principal_id
-  member_object_id = each.value
+  member_object_id = each.value.object_id
 }
 
 // TODO: once Feature Store SQL SPN stuff is in, add connection from App Service here

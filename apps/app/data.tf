@@ -38,3 +38,8 @@ data "azurerm_mssql_server" "feature_store" {
   name                = var.feature_store_server_name
   resource_group_name = var.resource_group_name
 }
+
+data "azuread_user" "contributors_ids" {
+  for_each            = var.app_config.contributors
+  user_principal_name = each.value
+}
