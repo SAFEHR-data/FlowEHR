@@ -27,7 +27,7 @@ output "apps_ad_group_display_name" {
 }
 
 output "developers_ad_group_display_name" {
-  description = "Apps AD group display name"
+  description = "Developers AD group display name"
   value       = azuread_group.ad_group_developers.display_name
 }
 
