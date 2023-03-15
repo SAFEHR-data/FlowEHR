@@ -98,6 +98,5 @@ inputs = {
   serve_cosmos_account_name   = dependency.serve.outputs.cosmos_account_name
   serve_webapps_subnet_id     = dependency.serve.outputs.webapps_subnet_id
 
-
   github_owner = get_env("GITHUB_OWNER", "")
 }
