@@ -62,9 +62,6 @@ RUN export ARCH="$(dpkg --print-architecture)"; \
     wget -qO- "https://github.com/koalaman/shellcheck/releases/download/${SC_VERSION}/shellcheck-${SC_VERSION}.linux.${ARCH}.tar.xz" | tar -xJv \
     && cp "shellcheck-${SC_VERSION}/shellcheck" /usr/local/bin/
 
-ARG PAJV_VERSION="1.2.0"
-RUN npm install -g pajv@${PAJV_VERSION}
-
 ARG PRECOMMIT_VERSION="2.21.0"
 RUN python3 -m pip install pre-commit=="${PRECOMMIT_VERSION}" --no-cache-dir
 
@@ -94,19 +91,6 @@ RUN python3 -m pip install --no-cache-dir \
     databricks-cli=="${DATABRICKS_CLI_VERSION}" \
     sqlalchemy=="${SQLALCHEMY_VERSION}" \
     pandas=="${PANDAS_VERSION}"
-
-# Get the local Spark installed to be able to run unit tests
-# Borrowed from https://github.com/beandrad/pyspark-sample/blob/main/.devcontainer/Dockerfile#L36
-COPY config.transform.yaml /tmp/config.transform.yaml
-RUN mkdir -p /tmp/docker-downloads \
-   && SPARK_VERSION=$(yq e .spark_version /tmp/config.transform.yaml) \
-   && python3 -m pip install --no-cache-dir pyspark=="${SPARK_VERSION}" \
-   && apt-get update \
-   && apt-get -y install openjdk-11-jdk wget --no-install-recommends \
-   && wget -q https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz -O /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
-   && tar -xvzf /tmp/docker-downloads/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
-   && mv spark-${SPARK_VERSION}-bin-hadoop3 /opt/spark \
-   && rm -rf /tmp/docker-downloads
 
 # Install prerequsites for using this container as a GitHub runner. Assuming an x86 runner
 COPY .devcontainer/library-scripts/start-gh-runner.sh /tmp/library-scripts/

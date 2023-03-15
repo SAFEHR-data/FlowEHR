@@ -12,7 +12,23 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-variable "naming_suffix" {
-  type        = string
-  description = "Suffix used to name resources"
+variable "flowehr_id" {
+  type = string
+}
+
+variable "environment" {
+  type = string
+}
+
+variable "location" {
+  type = string
+}
+
+variable "tf_in_automation" {
+  type = bool
+}
+
+variable "suffix_override" {
+  type    = string
+  default = ""
 }

@@ -24,7 +24,7 @@ on:
       environment:
         type: string
         required: true
-        description: The GitHub environment in which to run
+        description: The environment to deploy e.g. staging (selects the env config file and GitHub environment to use)
       suffix_override:
         type: string
         required: false
@@ -42,22 +42,15 @@ on:
         required: true
       ARM_CLIENT_SECRET:
         required: true
-      DEVCONTAINER_ACR_NAME:
+      ORG_GITHUB_TOKEN:
         required: true
-      SUFFIX:
-        required: true
-      LOCATION:
-        required: true
-      ORG_GH_TOKEN:
-        required: true
-      DATA_SOURCE_CONNECTIONS:
-        required: false
-        # default: "[]"
 
 jobs:
   make_core:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
+    env:
+      DEVCONTAINER_NAME: flowehr/devcontainer
     outputs:
       dc_tag: ${{ steps.dc.outputs.tag }}
       dc_runner_name: ${{ steps.dc.outputs.runner_name }}
@@ -68,8 +61,8 @@ jobs:
       - name: Set devcontainer attributes
         id: dc
         run: |
-          echo "tag=${{ inputs.environment }}" >> $GITHUB_OUTPUT
-          echo "image_path=${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer" >> $GITHUB_OUTPUT
+          echo "tag=${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}" >> $GITHUB_OUTPUT
+          echo "image_path=${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DEVCONTAINER_NAME }}" >> $GITHUB_OUTPUT
           echo "runner_name=dc-${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}" >> $GITHUB_OUTPUT
 
       - name: Set make commands to execute after the core deployment
@@ -80,7 +73,7 @@ jobs:
 
           if echo ${{ inputs.command }} | grep -q "test" ; then
               build_agent_command="${{ inputs.command }}-without-core-destroy"
-              post_build_agent_command="destroy-all"
+              post_build_agent_command="destroy"
           elif echo ${{ inputs.command }} | grep -q "destroy" ; then
               build_agent_command="destroy-non-core"
               post_build_agent_command="${{ inputs.command }}"
@@ -109,47 +102,30 @@ jobs:
 
       - name: ACR Login
         id: acr_login
-        continue-on-error: true  # ACR may not exist yet
-        run: |
-          az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
+        run: az acr login --name "${{ vars.CI_CONTAINER_REGISTRY }}"
 
-      - name: Bootstrap
-        uses: devcontainers/ci@v0.2
-        env:
-          ORG_GH_TOKEN: "${{ secrets.ORG_GH_TOKEN }}"
+      - name: Pre-build devcontainer
+        uses: devcontainers/ci@v0.3
         with:
           imageName: ${{ steps.dc.outputs.image_path }}
           cacheFrom: ${{ steps.dc.outputs.image_path }}
           imageTag: ${{ steps.dc.outputs.tag }}
-          runCmd: make bootstrap
-          # Push is manual otherwise the post step command doesn't execute before core deploy
-          push: never
-          env: |
-            DOCKER_BUILDKIT=1
-            TF_IN_AUTOMATION=1
-            ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}
-            ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
-            ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
-            ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
-            ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
-            SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
-            LOCATION=${{ secrets.LOCATION }}
-            ENVIRONMENT=${{ inputs.environment }}
-            DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
-
-      - name: ACR Login
-        if: steps.acr_login.outcome == 'failure'
-        run: |
-          ./scripts/retry.sh az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
+          push: never  # Happens as a post-step after the job so we need to do this manually
 
       - name: Push devcontainer
-        run: |
-          docker push ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
+        id: devcontainer_push
+        run: docker push ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
+
+      - name: Replace tokens in config files
+        uses: ./.github/actions/config_token_replacement
+        with:
+          environment: ${{ inputs.environment }}
+          secrets: ${{ toJSON(secrets) }}
 
       - name: Deploy core and build agent
-        uses: devcontainers/ci@v0.2
-        env:
-          ORG_GH_TOKEN: "${{ secrets.ORG_GH_TOKEN }}"
+        uses: devcontainers/ci@v0.3
+        env: # Add suffix as step env so it's only passed as an env var if it's not empty
+          SUFFIX_OVERRIDE: ${{ inputs.suffix_override }}
         with:
           imageName: ${{ steps.dc.outputs.image_path }}
           imageTag: ${{ steps.dc.outputs.tag }}
@@ -159,22 +135,21 @@ jobs:
             DOCKER_BUILDKIT=1
             TF_INPUT=0
             TF_IN_AUTOMATION=1
+            SUFFIX_OVERRIDE
             ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}
             ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
             ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
             ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
-            SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
-            LOCATION=${{ secrets.LOCATION }}
             ENVIRONMENT=${{ inputs.environment }}
-            DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
-            DEVCONTAINER_IMAGE_NAME=flowehr/devcontainer
-            DEVCONTAINER_TAG=${{ steps.dc.outputs.tag }}
-            ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
-            DATA_SOURCE_CONNECTIONS=${{ (secrets.DATA_SOURCE_CONNECTIONS != '' && secrets.DATA_SOURCE_CONNECTIONS) || '[]' }}
-            USE_RANDOM_ADDRESS_SPACE=${{ (inputs.suffix_override != '' && '1') || '0' }}
-            GITHUB_RUNNER_NAME=${{ steps.dc.outputs.runner_name }}
-            GITHUB_RUNNER_TOKEN=${{ secrets.GH_RUNNER_CREATE_TOKEN }}
-            GITHUB_REPOSITORY=${{ github.repository }}
+            CI_CONTAINER_REGISTRY=${{ vars.CI_CONTAINER_REGISTRY }}
+            CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
+            CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
+            ORG_GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
+            TF_VAR_devcontainer_image=${{ env.DEVCONTAINER_NAME }}
+            TF_VAR_devcontainer_tag=${{ steps.dc.outputs.tag }}
+            TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
+            TF_VAR_github_runner_name=${{ steps.dc.outputs.runner_name }}
+            TF_VAR_github_repository=${{ github.repository }}
 
   build_agent_make:
     needs: [make_core]
@@ -191,6 +166,12 @@ jobs:
           # then the default checkout will apply
           ref: ${{ inputs.sha }}
 
+      - name: Replace tokens in config files
+        uses: ./.github/actions/config_token_replacement
+        with:
+          environment: ${{ inputs.environment }}
+          secrets: ${{ toJSON(secrets) }}
+
       - name: Deploy
         env:
           DOCKER_BUILDKIT: 1
@@ -200,14 +181,15 @@ jobs:
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-          SUFFIX: ${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
-          LOCATION: ${{ secrets.LOCATION }}
           ENVIRONMENT: ${{ inputs.environment }}
-          USE_RANDOM_ADDRESS_SPACE: ${{ (inputs.suffix_override != '' && '1') || '0' }}
-          DEVCONTAINER_ACR_NAME: ${{ secrets.DEVCONTAINER_ACR_NAME }}
-          DEVCONTAINER_IMAGE_IMAGE: flowehr/devcontainer
-          DEVCONTAINER_TAG: ${{ needs.make_core.outputs.dc_tag }}
-          ORG_GH_TOKEN: ${{ secrets.ORG_GH_TOKEN }}
+          CI_CONTAINER_REGISTRY: ${{ vars.CI_CONTAINER_REGISTRY }}
+          CI_RESOURCE_GROUP: ${{ vars.CI_RESOURCE_GROUP }}
+          CI_STORAGE_ACCOUNT: ${{ vars.CI_STORAGE_ACCOUNT }}
+          ORG_GITHUB_TOKEN: ${{ secrets.ORG_GITHUB_TOKEN }}
+          SUFFIX_OVERRIDE: ${{ inputs.suffix_override }}
+          TF_VAR_use_random_address_space: ${{ (inputs.suffix_override != '' && '1') || '0' }}
+          TF_VAR_devcontainer_image: ${{ env.DEVCONTAINER_NAME }}
+          TF_VAR_devcontainer_tag: ${{ needs.make_core.outputs.dc_tag }}
         run: |
           make ${{ needs.make_core.outputs.build_agent_command }}
 
@@ -230,29 +212,49 @@ jobs:
           creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
 
       - name: ACR Login
-        run: az acr login --name "${{ secrets.DEVCONTAINER_ACR_NAME }}"
+        run: az acr login --name "${{ vars.CI_CONTAINER_REGISTRY }}"
+
+      - name: Replace tokens in config files
+        uses: ./.github/actions/config_token_replacement
+        with:
+          environment: ${{ inputs.environment }}
+          secrets: ${{ toJSON(secrets) }}
 
       - name: Post build agent command
-        uses: devcontainers/ci@v0.2
+        uses: devcontainers/ci@v0.3
         env:
-          ORG_GH_TOKEN: "${{ secrets.ORG_GH_TOKEN }}"
+          SUFFIX_OVERRIDE: ${{ inputs.suffix_override }}
         with:
           # The image name cannot be set from the make_core output because it contains a secret
-          imageName: ${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer
-          cacheFrom: ${{ secrets.DEVCONTAINER_ACR_NAME }}.azurecr.io/flowehr/devcontainer
+          imageName: ${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DEVCONTAINER_NAME }}
+          cacheFrom: ${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DEVCONTAINER_NAME }}
           imageTag: ${{ needs.make_core.outputs.dc_tag }}
           runCmd: make ${{ needs.make_core.outputs.post_build_agent_command }}
           push: never
           env: |
             DOCKER_BUILDKIT=1
             TF_IN_AUTOMATION=1
+            SUFFIX_OVERRIDE
             ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}
             ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
             ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
             ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
-            ORG_GH_TOKEN=${{ secrets.ORG_GH_TOKEN }}
-            SUFFIX=${{ (inputs.suffix_override != '' && inputs.suffix_override) || secrets.SUFFIX }}
-            LOCATION=${{ secrets.LOCATION }}
             ENVIRONMENT=${{ inputs.environment }}
-            DEVCONTAINER_ACR_NAME=${{ secrets.DEVCONTAINER_ACR_NAME }}
-            USE_RANDOM_ADDRESS_SPACE=${{ (inputs.suffix_override != '' && '1') || '0' }}
+            CI_CONTAINER_REGISTRY=${{ vars.CI_CONTAINER_REGISTRY }}
+            CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
+            CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
+            ORG_GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
+            TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
+
+      - name: Clean up
+        if: |
+          (needs.make_core.outputs.post_build_agent_command == 'destroy') ||
+          (needs.make_core.outputs.post_build_agent_command == 'destroy-no-terraform')
+        run: |
+          az acr repository delete \
+            --name ${{ vars.CI_CONTAINER_REGISTRY }} \
+            --image ${{ env.DEVCONTAINER_NAME }}:${{ needs.make_core.outputs.dc_tag }}
+          az storage blob directory delete \
+            -c tfstate \
+            -d ${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }} \
+            --account-name ${{ vars.CI_STORAGE_ACCOUNT }}
