@@ -21,7 +21,9 @@ set -o nounset
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 FACTORY_NAME=$(cd "${SCRIPT_DIR}"/../infrastructure/transform && terragrunt output adf_name | tr -d '"')
+[[ "${FACTORY_NAME:?}" ]]
 RESOURCE_GROUP_NAME=$(cd "${SCRIPT_DIR}"/../infrastructure/core && terragrunt output core_rg_name | tr -d '"')
+[[ "${RESOURCE_GROUP_NAME:?}" ]]
 export FACTORY_NAME
 export RESOURCE_GROUP_NAME
 
