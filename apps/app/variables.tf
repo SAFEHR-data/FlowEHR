@@ -86,7 +86,7 @@ variable "app_config" {
   type = object({
     name             = string
     description      = string
-    add_staging_slot = optional(bool, false)
+    add_testing_slot = optional(bool, false)
 
     managed_repo = optional(object({
       private      = bool

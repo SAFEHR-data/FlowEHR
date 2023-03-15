@@ -34,9 +34,9 @@ resource "azurerm_linux_web_app" "app" {
     container_registry_use_managed_identity = true
     remote_debugging_enabled                = !var.tf_in_automation
 
-    # Only define the docker image to pull if there is not a staging slot
+    # Only define the docker image to pull if there is not a testing slot
     dynamic "application_stack" {
-      for_each = var.app_config.add_staging_slot ? {} : { "${local.acr_repository}" = var.app_id }
+      for_each = var.app_config.add_testing_slot ? {} : { "${local.acr_repository}" = var.app_id }
 
       content {
         docker_image     = "${var.acr_name}.azurecr.io/${var.app_id}"
@@ -49,7 +49,7 @@ resource "azurerm_linux_web_app" "app" {
     APPINSIGHTS_INSTRUMENTATIONKEY             = azurerm_application_insights.app[local.core_gh_env].instrumentation_key
     APPLICATIONINSIGHTS_CONNECTION_STRING      = azurerm_application_insights.app[local.core_gh_env].connection_string
     ApplicationInsightsAgent_EXTENSION_VERSION = "~3"
-    DOCKER_ENABLE_CI                           = var.app_config.add_staging_slot ? false : true
+    DOCKER_ENABLE_CI                           = var.app_config.add_testing_slot ? false : true
     COSMOS_STATE_STORE_ENDPOINT                = data.azurerm_cosmosdb_account.state_store.endpoint
     FEATURE_STORE_CONNECTION_STRING            = local.feature_store_odbc
     ENVIRONMENT                                = local.core_gh_env
@@ -73,9 +73,9 @@ resource "azurerm_linux_web_app" "app" {
   }
 }
 
-resource "azurerm_linux_web_app_slot" "staging" {
-  count          = var.app_config.add_staging_slot ? 1 : 0
-  name           = local.staging_slot_name
+resource "azurerm_linux_web_app_slot" "testing" {
+  count          = var.app_config.add_testing_slot ? 1 : 0
+  name           = local.testing_slot_name
   app_service_id = azurerm_linux_web_app.app.id
   https_only     = true
 
@@ -87,13 +87,13 @@ resource "azurerm_linux_web_app_slot" "staging" {
   }
 
   app_settings = merge(var.app_config.env, {
-    APPINSIGHTS_INSTRUMENTATIONKEY             = azurerm_application_insights.app[local.staging_gh_env].instrumentation_key
-    APPLICATIONINSIGHTS_CONNECTION_STRING      = azurerm_application_insights.app[local.staging_gh_env].connection_string
+    APPINSIGHTS_INSTRUMENTATIONKEY             = azurerm_application_insights.app[local.testing_gh_env].instrumentation_key
+    APPLICATIONINSIGHTS_CONNECTION_STRING      = azurerm_application_insights.app[local.testing_gh_env].connection_string
     ApplicationInsightsAgent_EXTENSION_VERSION = "~3"
     DOCKER_ENABLE_CI                           = true
     COSMOS_STATE_STORE_ENDPOINT                = data.azurerm_cosmosdb_account.state_store.endpoint
     FEATURE_STORE_CONNECTION_STRING            = local.feature_store_odbc
-    ENVIRONMENT                                = local.staging_gh_env
+    ENVIRONMENT                                = local.testing_gh_env
   })
 
   identity {
@@ -120,16 +120,16 @@ resource "azurerm_role_assignment" "webapp_acr" {
   principal_id         = azurerm_linux_web_app.app.identity[0].principal_id
 }
 
-resource "azurerm_role_assignment" "webapp_staging_slot_acr" {
-  count                = var.app_config.add_staging_slot ? 1 : 0
+resource "azurerm_role_assignment" "webapp_testing_slot_acr" {
+  count                = var.app_config.add_testing_slot ? 1 : 0
   role_definition_name = "AcrPull"
   scope                = data.azurerm_container_registry.serve.id
-  principal_id         = azurerm_linux_web_app_slot.staging[0].identity[0].principal_id
+  principal_id         = azurerm_linux_web_app_slot.testing[0].identity[0].principal_id
 }
 
 # Create a web hook that triggers automated deployment of the Docker image
 resource "azurerm_container_registry_webhook" "webhook" {
-  count               = var.app_config.add_staging_slot ? 0 : 1
+  count               = var.app_config.add_testing_slot ? 0 : 1
   name                = "acrwh${replace(replace(var.app_id, "_", ""), "-", "")}"
   resource_group_name = var.resource_group_name
   location            = var.location
@@ -171,24 +171,24 @@ resource "azurerm_cosmosdb_sql_role_assignment" "webapp" {
 }
 
 resource "azuread_application" "webapp_sp" {
-  count        = local.staging_gh_env != null ? 1 : 0
+  count        = local.testing_gh_env != null ? 1 : 0
   display_name = "sp-flowehr-app-${replace(var.app_id, "_", "-")}"
   owners       = [data.azurerm_client_config.current.object_id]
 }
 
 resource "azuread_application_password" "webapp_sp" {
-  count                 = local.staging_gh_env != null ? 1 : 0
+  count                 = local.testing_gh_env != null ? 1 : 0
   application_object_id = azuread_application.webapp_sp[0].object_id
 }
 
 resource "azuread_service_principal" "webapp_sp" {
-  count          = local.staging_gh_env != null ? 1 : 0
+  count          = local.testing_gh_env != null ? 1 : 0
   application_id = azuread_application.webapp_sp[0].application_id
   owners         = [data.azurerm_client_config.current.object_id]
 }
 
 resource "azurerm_role_definition" "slot_swap" {
-  count       = local.staging_gh_env != null ? 1 : 0
+  count       = local.testing_gh_env != null ? 1 : 0
   name        = "role-slot-swap-on-${replace(var.app_id, "_", "-")}"
   scope       = azurerm_linux_web_app.app.id
   description = "Slot swap role"
@@ -211,13 +211,13 @@ resource "azurerm_role_definition" "slot_swap" {
 
   assignable_scopes = [
     azurerm_linux_web_app.app.id,
-    azurerm_linux_web_app_slot.staging[0].id
+    azurerm_linux_web_app_slot.testing[0].id
   ]
 }
 
 resource "azurerm_role_assignment" "webapp_sp_slot_swap" {
-  for_each = var.app_config.add_staging_slot ? {
-    for idx, id in [azurerm_linux_web_app_slot.staging[0].id, azurerm_linux_web_app.app.id] : idx => id
+  for_each = var.app_config.add_testing_slot ? {
+    for idx, id in [azurerm_linux_web_app_slot.testing[0].id, azurerm_linux_web_app.app.id] : idx => id
   } : {}
   principal_id         = azuread_service_principal.webapp_sp[0].object_id
   scope                = each.value

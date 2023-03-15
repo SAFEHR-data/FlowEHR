@@ -2,8 +2,7 @@
 dash_seedling: # unique ID for the app
   name: Dash Seedling
   description: Hello world app for Dash
-  accesses_real_data: false
-  add_staging_slot: false
+  add_testing_slot: false
   managed_repo: # details for created repo
     private: false # repo visibility
     template: UCLH-Foundry/Dash-Seedling

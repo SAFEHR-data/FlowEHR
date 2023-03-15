@@ -116,7 +116,7 @@ resource "github_branch_protection" "deployment" {
   }
 
   required_pull_request_reviews {
-    dismiss_stale_reviews           = var.accesses_real_data
+    dismiss_stale_reviews           = var.accesses_real_data ? true : var.app_config.branch.dismiss_stale_reviews
     restrict_dismissals             = var.accesses_real_data
     require_code_owner_reviews      = var.accesses_real_data
     required_approving_review_count = max(var.app_config.branch.num_of_approvals, 1)
@@ -221,10 +221,10 @@ resource "github_actions_environment_secret" "acr_image_name" {
   ]
 }
 
-# If there is a staging environment defined then the SP is needed to bump the deployed
+# If there is a testing environment defined then the SP is needed to bump the deployed
 # docker version tag and in the production slot to slot swap
 resource "github_actions_environment_secret" "sp_client_id" {
-  for_each        = local.staging_gh_env != null ? local.branches_and_envs : {}
+  for_each        = local.testing_gh_env != null ? local.branches_and_envs : {}
   repository      = local.repository_name
   environment     = each.value
   secret_name     = "ARM_CLIENT_ID"
@@ -236,7 +236,7 @@ resource "github_actions_environment_secret" "sp_client_id" {
 }
 
 resource "github_actions_environment_secret" "sp_client_secret" {
-  for_each        = local.staging_gh_env != null ? local.branches_and_envs : {}
+  for_each        = local.testing_gh_env != null ? local.branches_and_envs : {}
   repository      = local.repository_name
   environment     = each.value
   secret_name     = "ARM_CLIENT_SECRET"
@@ -248,7 +248,7 @@ resource "github_actions_environment_secret" "sp_client_secret" {
 }
 
 resource "github_actions_environment_secret" "tenant_id" {
-  for_each        = local.staging_gh_env != null ? local.branches_and_envs : {}
+  for_each        = local.testing_gh_env != null ? local.branches_and_envs : {}
   repository      = local.repository_name
   environment     = each.value
   secret_name     = "ARM_TENANT_ID"
@@ -260,7 +260,7 @@ resource "github_actions_environment_secret" "tenant_id" {
 }
 
 resource "github_actions_environment_secret" "subscription_id" {
-  for_each        = local.staging_gh_env != null ? local.branches_and_envs : {}
+  for_each        = local.testing_gh_env != null ? local.branches_and_envs : {}
   repository      = local.repository_name
   environment     = each.value
   secret_name     = "ARM_SUBSCRIPTION_ID"
@@ -272,7 +272,7 @@ resource "github_actions_environment_secret" "subscription_id" {
 }
 
 resource "github_actions_environment_secret" "webapp_id" {
-  for_each        = local.staging_gh_env != null ? local.branches_and_envs : {}
+  for_each        = local.testing_gh_env != null ? local.branches_and_envs : {}
   repository      = local.repository_name
   environment     = each.value
   secret_name     = "WEBAPP_ID"
@@ -284,11 +284,11 @@ resource "github_actions_environment_secret" "webapp_id" {
 }
 
 resource "github_actions_environment_secret" "slot_name" {
-  count           = local.staging_gh_env != null ? 1 : 0
+  count           = local.testing_gh_env != null ? 1 : 0
   repository      = local.repository_name
-  environment     = local.staging_gh_env
+  environment     = local.testing_gh_env
   secret_name     = "SLOT_NAME"
-  plaintext_value = local.staging_slot_name
+  plaintext_value = local.testing_slot_name
 
   depends_on = [
     github_repository_environment.all

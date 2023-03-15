@@ -81,7 +81,6 @@ inputs = merge(
   tf_in_automation = local.tf_in_automation
 
   # Tags to add to every resource that accepts them
-  accesses_real_data = get_env("ACCESSES_REAL_DATA")
   tags = {
     environment = dependency.bootstrap.outputs.environment
   }
