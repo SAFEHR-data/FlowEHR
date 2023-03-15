@@ -27,6 +27,7 @@ RESOURCE_GROUP_NAME=$(cd "${SCRIPT_DIR}"/../infrastructure/core && terragrunt ou
 export FACTORY_NAME
 export RESOURCE_GROUP_NAME
 
+
 run_pipeline_and_wait () {
     local pipeline_name="${1}"
     echo "Run pipeline ${pipeline_name}"
@@ -35,7 +36,9 @@ run_pipeline_and_wait () {
     run_id=$(jq -r '.runId' <<< "${run_result}")
 
     echo "Wait for result"
-    while true ; do 
+    sleeps=0
+    SLEEP_DURATION_SECONDS=5
+    while [[ $(( sleeps * SLEEP_DURATION_SECONDS )) -le 3600 ]] ; do 
         run_info=$(az datafactory pipeline-run show --factory-name "${FACTORY_NAME}" --resource-group "${RESOURCE_GROUP_NAME}" --run-id "${run_id}")
         run_status=$(jq -r '.status' <<< "${run_info}")
 
@@ -48,7 +51,7 @@ run_pipeline_and_wait () {
             echo "Run ${run_id} of the pipeline ${pipeline_name} failed with status ${run_status} - please check the logs" 
             return 1
         fi
-        sleep 5
+        sleep "${SLEEP_DURATION_SECONDS}"
     done 
 }
 export -f run_pipeline_and_wait
