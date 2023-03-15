@@ -22,5 +22,5 @@ jobs:
     uses: ./.github/workflows/devcontainer_make_command.yml
     with:
       command: destroy
-      environment: Infra-Test
+      environment: infra-test
     secrets: inherit
