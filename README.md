@@ -179,8 +179,10 @@ This table summarises the various authentication identities involved in the depl
 
 ## Common issues
 
-### Inconsistent dependency lock file
+### Inconsistent dependency lock file / backend state has changed
 
-When deploying locally, you might encounter an error message from Terraform saying you have inconsistent lock files. This is likely due to an update to some of the provider configurations and lock files upstream, that when pulled down to your machine, might not match the cached providers you have locally from a previous deployment.
+When deploying locally, you might encounter an error message from Terraform saying you have inconsistent lock files, or that your backend state has changed. This is likely due to an update to some of the provider configurations, lock files or folder structure upstream, that when pulled down to your machine, might not match the cached providers and state you have locally from a previous deployment.
 
-The easiest fix is to run `make tf-init`, which will re-initialise these caches in all of the Terraform modules to match the lock files.
+The easiest fix is to run `make tf-reinit`, which will re-initialise these caches in all of the Terraform modules to match the lock files. It also passes the `-migrate-state` flag, which if you have mismatched state, you can accept the prompts to try and automatically migrate it.
+
+If you're still having issues, you can run a `make clean` which will clean your local Terraform state, then retry deploying. It will re-initialise your providers and attempt to retrieve the state from remote storage.
