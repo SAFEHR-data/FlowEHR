@@ -58,7 +58,6 @@ for repository in "${repositories[@]}"; do
     eval "${GIT_COMMAND} clone ${url}"
     if [[ $(yq '. | has("sha")' <<< "${repository}") == "true" ]]; then
       sha=$(yq e '.sha' - <<< "${repository}" )
-      echo "SHAAAA ${sha}"
       pushd "${dir_name}"
       git checkout "${sha}"
       popd > /dev/null
