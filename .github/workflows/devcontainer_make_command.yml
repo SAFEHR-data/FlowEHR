@@ -45,12 +45,13 @@ on:
       ORG_GITHUB_TOKEN:
         required: true
 
+env:
+  DEVCONTAINER_NAME: flowehr/devcontainer
+
 jobs:
   make_core:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
-    env:
-      DEVCONTAINER_NAME: flowehr/devcontainer
     outputs:
       dc_tag: ${{ steps.dc.outputs.tag }}
       dc_runner_name: ${{ steps.dc.outputs.runner_name }}
