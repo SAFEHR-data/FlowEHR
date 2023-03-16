@@ -49,7 +49,7 @@ pushd "${PIPELINE_DIR}" > /dev/null
 
 readarray repositories < <(yq e -o=j -I=0 '.transform.repositories[]' "${CONFIG_PATH}" )
 for repository in "${repositories[@]}"; do 
-  url=$(yq e '.url' - <<< "${repository}" )
+  url=$(yq '.url' - <<< "${repository}" )
 
   dir_name=$(basename "${url}" | sed -e 's/\.git$//')
   if [[ -d "${dir_name}" ]]; then
@@ -57,7 +57,7 @@ for repository in "${repositories[@]}"; do
   else
     eval "${GIT_COMMAND} clone ${url}"
     if [[ $(yq '. | has("sha")' <<< "${repository}") == "true" ]]; then
-      sha=$(yq e '.sha' - <<< "${repository}" )
+      sha=$(yq '.sha' - <<< "${repository}" )
       pushd "${dir_name}"
       git checkout "${sha}"
       popd > /dev/null

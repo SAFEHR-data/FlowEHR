@@ -9,7 +9,6 @@ transform:
   spark_version: 3.3.1
   repositories:
     - url: https://github.com/UCLH-Foundry/FlowEHR-Data-Pot
-      sha: ""
     - url: https://github.com/UCLH-Foundry/FlowEHR-Data-Forge
       sha: d7c4600c1c0044fe0905d670d6b8810288b4a670
 
