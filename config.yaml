@@ -10,3 +10,8 @@ transform:
 
 serve:
   github_owner: UCLH-Foundry
+
+transform:
+  spark_version: 3.3.1
+  repositories:
+    - https://github.com/UCLH-Foundry/FlowEHR-Data-Pot
