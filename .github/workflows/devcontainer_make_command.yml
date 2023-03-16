@@ -124,7 +124,9 @@ jobs:
 
       - name: Deploy core and build agent
         uses: devcontainers/ci@v0.3
-        env: # Add suffix as step env so it's only passed as an env var if it's not empty
+        env:
+          # Add suffix as step env so it's only passed as an env var if it's not empty
+          # https://github.com/devcontainers/ci/issues/231
           SUFFIX_OVERRIDE: ${{ inputs.suffix_override }}
         with:
           imageName: ${{ steps.dc.outputs.image_path }}
