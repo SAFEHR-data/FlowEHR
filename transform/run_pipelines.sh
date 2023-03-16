@@ -32,7 +32,6 @@ export RESOURCE_GROUP_NAME
 
 run_pipeline_and_wait () {
     local pipeline_name="${1}"
-    $ [[ "${pipeline_name:-}" ]] || return
     echo "Run pipeline ${pipeline_name}"
 
     run_result=$(az datafactory pipeline create-run --factory-name "${FACTORY_NAME}" --resource-group "${RESOURCE_GROUP_NAME}" --name "${pipeline_name}")
@@ -61,6 +60,8 @@ export -f run_pipeline_and_wait
 
 # shellcheck disable=SC2046
 pipelines=$(jq -c -r '.[].name' <<< $(az datafactory pipeline list --factory-name "${FACTORY_NAME}" --resource-group "${RESOURCE_GROUP_NAME}"))
+if [[ -z "${pipelines}" ]]; then exit; fi
+
 if ! echo "${pipelines}" | parallel run_pipeline_and_wait; then
     echo "One or more pipeline runs have failed - please check the logs"
     exit 1
