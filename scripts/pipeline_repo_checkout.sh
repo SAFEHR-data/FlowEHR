@@ -58,7 +58,6 @@ for repository in "${repositories[@]}"; do
   else
     eval "${GIT_COMMAND} clone ${url}"
     if [ -n "${sha}" ]; then
-      echo "HERE WILL CHECKOUT ${sha}"
       pushd "${dir_name}"
       git checkout "${sha}"
       popd > /dev/null
