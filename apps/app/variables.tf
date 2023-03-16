@@ -46,6 +46,10 @@ variable "tf_in_automation" {
   type = bool
 }
 
+variable "accesses_real_data" {
+  type = bool
+}
+
 variable "webapps_subnet_id" {
   type = string
 }
@@ -96,14 +100,13 @@ variable "developers_ad_group_principal_id" {
 
 variable "app_config" {
   type = object({
-    name         = string
-    description  = string
-    owners       = map(string)
-    contributors = map(string)
+    name             = string
+    description      = string
+    add_testing_slot = optional(bool, false)
+    owners           = map(string)
+    contributors     = map(string)
 
-    managed_repo = object({
-      private               = bool
-      template              = string,
+    branch = object({
       num_of_approvals      = optional(number, 1),
       dismiss_stale_reviews = optional(bool, false)
     })

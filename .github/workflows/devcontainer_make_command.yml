@@ -24,7 +24,7 @@ on:
       environment:
         type: string
         required: true
-        description: The environment to deploy e.g. staging (selects the env config file and GitHub environment to use)
+        description: The environment to deploy e.g. testing (selects the env config file and GitHub environment to use)
       suffix_override:
         type: string
         required: false
@@ -45,12 +45,13 @@ on:
       ORG_GITHUB_TOKEN:
         required: true
 
+env:
+  DEVCONTAINER_NAME: flowehr/devcontainer
+
 jobs:
   make_core:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
-    env:
-      DEVCONTAINER_NAME: flowehr/devcontainer
     outputs:
       dc_tag: ${{ steps.dc.outputs.tag }}
       dc_runner_name: ${{ steps.dc.outputs.runner_name }}
