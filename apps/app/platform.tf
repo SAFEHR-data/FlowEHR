@@ -163,10 +163,20 @@ resource "azuread_group_member" "webapp" {
   member_object_id = azurerm_linux_web_app.app.identity[0].principal_id
 }
 
-resource "azuread_group_member" "developers" {
+resource "azuread_group" "app" {
+  display_name     = "${var.naming_suffix} app"
+  security_enabled = true
+}
+
+resource "azuread_group_member" "app_developers" {
   for_each         = data.azuread_user.contributors_ids
-  group_object_id  = var.developers_ad_group_principal_id
+  group_object_id  = azuread_group.app.id
   member_object_id = each.value.object_id
+}
+
+resource "azuread_group_member" "developers" {
+  group_object_id  = var.developers_ad_group_principal_id
+  member_object_id = azuread_group.app.id
 }
 
 // TODO: once Feature Store SQL SPN stuff is in, add connection from App Service here

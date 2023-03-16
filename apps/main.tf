@@ -16,9 +16,10 @@ module "app" {
   for_each                         = var.apps
   source                           = "./app"
   app_id                           = each.key
+  app_config                       = each.value
   naming_suffix                    = var.naming_suffix
+  tf_in_automation                 = var.tf_in_automation
   environment                      = var.environment
-  local_mode                       = var.local_mode
   webapps_subnet_id                = var.serve_webapps_subnet_id
   resource_group_name              = var.core_rg_name
   location                         = var.core_rg_location
@@ -32,6 +33,5 @@ module "app" {
   developers_ad_group_display_name = var.transform_developers_ad_group_display_name
   apps_ad_group_principal_id       = var.transform_apps_ad_group_principal_id
   developers_ad_group_principal_id = var.transform_developers_ad_group_principal_id
-  github_owner                     = var.github_owner
-  app_config                       = each.value
+  github_owner                     = var.serve.github_owner
 }
