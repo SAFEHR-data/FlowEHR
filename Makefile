@@ -118,7 +118,8 @@ destroy-non-core: az-login ## Destroy non-core
 		--terragrunt-include-external-dependencies \
 		--terragrunt-non-interactive \
 		--terragrunt-exclude-dir ${MAKEFILE_DIR}/infrastructure/core \
-		--terragrunt-exclude-dir ${MAKEFILE_DIR}/bootstrap
+		--terragrunt-exclude-dir ${MAKEFILE_DIR}/bootstrap/ci \
+		--terragrunt-exclude-dir ${MAKEFILE_DIR}/bootstrap/local
 
 destroy-no-terraform: az-login ## Destroy all resource groups associated with this deployment
 	$(call target_title, "Destroy no terraform") \
