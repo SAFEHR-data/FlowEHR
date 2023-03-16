@@ -178,5 +178,3 @@ resource "azuread_group_member" "developers" {
   group_object_id  = var.developers_ad_group_principal_id
   member_object_id = azuread_group.app.id
 }
-
-// TODO: once Feature Store SQL SPN stuff is in, add connection from App Service here
