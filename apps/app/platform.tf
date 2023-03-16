@@ -230,7 +230,7 @@ resource "azuread_group_member" "webapp" {
 }
 
 resource "azuread_group" "app" {
-  display_name     = "${var.naming_suffix} app"
+  display_name     = "${var.app_config.name} app"
   security_enabled = true
 }
 
