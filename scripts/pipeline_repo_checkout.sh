@@ -50,14 +50,15 @@ pushd "${PIPELINE_DIR}" > /dev/null
 readarray repositories < <(yq e -o=j -I=0 '.transform.repositories[]' "${CONFIG_PATH}" )
 for repository in "${repositories[@]}"; do 
   url=$(yq e '.url' - <<< "${repository}" )
-  sha=$(yq e '.sha' - <<< "${repository}" )
 
   dir_name=$(basename "${url}" | sed -e 's/\.git$//')
-  if [ -d "${dir_name}" ]; then
+  if [[ -d "${dir_name}" ]]; then
     echo "Repo already exists, skipping"
   else
     eval "${GIT_COMMAND} clone ${url}"
-    if [ -n "${sha}" ]; then
+    if [[ $(yq '. | has("sha")' <<< "${repository}") == "true" ]]; then
+      sha=$(yq e '.sha' - <<< "${repository}" )
+      echo "SHAAAA ${sha}"
       pushd "${dir_name}"
       git checkout "${sha}"
       popd > /dev/null
