@@ -30,6 +30,7 @@ repos:
     hooks:
       - id: terraform_fmt
       - id: terraform_tflint
+      - id: terragrunt_fmt
         args:
           - --args=--chdir="${PWD}/infrastructure/"
           - --args=--init
