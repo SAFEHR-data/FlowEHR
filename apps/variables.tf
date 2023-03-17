@@ -34,8 +34,6 @@ variable "tf_in_automation" {
   type = bool
 }
 
-
-
 variable "core_rg_name" {
   type = string
 }
@@ -84,8 +82,9 @@ variable "accesses_real_data" {
 variable "serve" {
   description = "Serve configuration block (populated from root config file)"
   type = object({
-    github_owner = string
-    github_token = optional(string)
+    github_owner               = string
+    github_app_id              = string
+    github_app_installation_id = string
   })
 }
 

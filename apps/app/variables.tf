@@ -82,6 +82,10 @@ variable "github_owner" {
   type = string
 }
 
+variable "github_access_token" {
+  type = string
+}
+
 variable "app_config" {
   type = object({
     name             = string

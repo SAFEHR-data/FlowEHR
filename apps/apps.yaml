@@ -1,0 +1,16 @@
+---
+dash_seedling:
+  name: Dash Seedling
+  description: Test of app deployment
+  add_testing_slot: false
+  managed_repo:
+    private: false
+    template: UCLH-Foundry/Dash-Seedling
+    owners:
+      - octocat
+    contributors:
+      - octokitten
+  branch:
+    num_of_approvals: 1
+  env:
+    WEBSITES_PORT: 8000

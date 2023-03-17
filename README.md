@@ -183,6 +183,4 @@ This table summarises the various authentication identities involved in the depl
 
 When deploying locally, you might encounter an error message from Terraform saying you have inconsistent lock files, or that your backend state has changed. This is likely due to an update to some of the provider configurations, lock files or folder structure upstream, that when pulled down to your machine, might not match the cached providers and state you have locally from a previous deployment.
 
-The easiest fix is to run `make tf-reinit`, which will re-initialise these caches in all of the Terraform modules to match the lock files. It also passes the `-migrate-state` flag, which if you have mismatched state, you can accept the prompts to try and automatically migrate it.
-
-If you're still having issues, you can run a `make clean` which will clean your local Terraform state, then retry deploying. It will re-initialise your providers and attempt to retrieve the state from remote storage.
+The easiest fix is to run `make tf-reinit`, which will re-initialise these caches in all of the Terraform modules to match the lock files. It also passes the `-migrate-state` flag, which if you have mismatched state, you can accept the prompts to try and automatically migrate it. If you don't already have an environment deployed, you can instead do a `make clean` to clean up any old local state so you deploy a fresh environment.

@@ -26,25 +26,6 @@ locals {
   apps_env_config      = fileexists(local.apps_env_config_path) ? yamldecode(file(local.apps_env_config_path)) : null
 }
 
-terraform {
-  extra_arguments "auto_approve" {
-    commands  = ["apply"]
-    arguments = ["-auto-approve"]
-  }
-
-  # Export GitHub credentials for use by both TF provider and CLI
-  extra_arguments "set_github_vars" {
-    commands = ["init", "apply", "plan", "destroy", "taint", "untaint", "refresh"]
-    env_vars = {
-      GITHUB_OWNER = local.merged_root_config.serve.github_owner
-      GITHUB_TOKEN = get_env(
-        "ORG_GITHUB_TOKEN",
-        try(local.merged_root_config.serve.github_token, null)
-      )
-    }
-  }
-}
-
 generate "terraform" {
   path      = "terraform.tf"
   if_exists = "overwrite_terragrunt"
@@ -69,6 +50,7 @@ generate "child_terraform" {
 terraform {
   required_providers {
     ${local.providers.locals.required_provider_github}
+    ${local.providers.locals.required_provider_external}
   }
 }
 EOF
@@ -80,7 +62,14 @@ generate "provider" {
   contents  = <<EOF
 ${local.providers.locals.azure_provider}
 
-provider "github" {}
+provider "github" {
+  owner = var.serve.github_owner
+  app_auth {
+    id              = var.serve.github_app_id
+    installation_id = var.serve.github_app_installation_id
+    pem_file        = file("./github.pem")
+  }
+}
 EOF
 }
 
