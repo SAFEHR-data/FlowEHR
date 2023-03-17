@@ -106,6 +106,13 @@ variable "app_config" {
     owners           = map(string)
     contributors     = map(string)
 
+    managed_repo = optional(object({
+      private      = bool
+      template     = string
+      owners       = set(string)
+      contributors = set(string)
+    }))
+
     branch = object({
       num_of_approvals      = optional(number, 1),
       dismiss_stale_reviews = optional(bool, false)

@@ -29,13 +29,13 @@ def create_con_str(db: str) -> str:
 
 
 # Map users
-users_data = json.loads(users_to_create)
+users = json.loads(users_to_create)
 
 # connect to master database to create login
 cnxn = pyodbc.connect(create_con_str("master"))
 cursor = cnxn.cursor()
 
-for user in users_data["users"]:
+for user in users:
     query = f"""
     IF NOT EXISTS(SELECT principal_id FROM sys.server_principals WHERE name = '{user['name']}') BEGIN
         CREATE LOGIN [{user['name']}]
