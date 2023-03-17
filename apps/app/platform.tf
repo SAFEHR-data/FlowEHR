@@ -234,7 +234,7 @@ resource "azuread_group" "developers_of_this_app" {
   security_enabled = true
 }
 
-resource "azuread_group_member" "app_developers" {
+resource "azuread_group_member" "add_each_developer_to_group" {
   for_each         = data.azuread_user.contributors_ids
   group_object_id  = azuread_group.developers_of_this_app.id
   member_object_id = each.value.object_id
