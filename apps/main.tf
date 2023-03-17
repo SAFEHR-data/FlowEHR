@@ -43,5 +43,5 @@ module "app" {
   feature_store_db_name     = var.transform_feature_store_db_name
   feature_store_server_name = var.transform_feature_store_server_name
   github_owner              = var.serve.github_owner
-  github_access_token       = data.external.github_access_token
+  github_access_token       = data.external.github_access_token.result.token
 }

@@ -16,6 +16,7 @@ import jwt
 import time
 import sys
 import requests
+import json
 
 # Get PEM file path, App Id and App Installation Id
 app_id = sys.argv[1]
@@ -39,7 +40,7 @@ payload = {
 jwt_instance = jwt.JWT()
 encoded_jwt = jwt_instance.encode(payload, signing_key, alg="RS256")
 
-# Use JWT to create GH access token
+# Use JWT to get GH access token
 headers = {
     "Accept": "application/vnd.github+json",
     "Authorization": f"Bearer {encoded_jwt}",
@@ -47,5 +48,9 @@ headers = {
 }
 
 url = f"https://api.github.com/app/installations/{installation_id}/access_tokens"
-access_token = requests.post(url, headers=headers)
-print(access_token)
+response = requests.post(url, headers=headers)
+token = response.json()["token"]
+
+# Output JSON string with token for Terraform to use
+output = {"token": token}
+sys.stdout.write(json.dumps(output))

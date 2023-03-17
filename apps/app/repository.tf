@@ -163,7 +163,7 @@ resource "github_repository_environment" "all" {
   # TODO: remove when https://github.com/integrations/terraform-provider-github/pull/1530 is merged
   provisioner "local-exec" {
     command = <<EOF
-curl https://api.github.com/repos/${var.github_owner}/${local.repository_name}/environments/${each.value}/deployment-branch-policies
+curl https://api.github.com/repos/${var.github_owner}/${local.repository_name}/environments/${each.value}/deployment-branch-policies \
   -H "Accept: application/vnd.github+json" \
   -H "X-GitHub-Api-Version: 2022-11-28" \
   -H "Authorization: Bearer ${var.github_access_token}" \
