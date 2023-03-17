@@ -242,5 +242,5 @@ resource "azuread_group_member" "app_developers" {
 
 resource "azuread_group_member" "developers" {
   group_object_id  = var.developers_ad_group_principal_id
-  member_object_id = azuread_group.app.id
+  member_object_id = azuread_group.developers_of_this_app.id
 }
