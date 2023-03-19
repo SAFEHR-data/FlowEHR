@@ -38,17 +38,10 @@ FlowEHR is deployed with Terraform. Terraform maintains a text based state file 
 | | `CIS 3.12`: Ensure storage is encrypted with Customer Managed Keys | | |
 | | `CIS: 3.13`: Ensure Storage Logging is enabled for 'read', 'write' and 'delete' requests | | | 
 | | `CIS 3.15`: Ensure Minimum TLS Version is set to 1.2 | | |
-| Microsoft Defender for Cloud | `CIS 2.1` | N | TODO: Enable MS Defender for Cloud https://github.com/UCLH-Foundry/FlowEHR/issues/174 | 
-| | `CIS 2.1.2`: Ensure Microsoft Defender for App Services is set to 'On' | | |
-| | `CIS 2.1.4`: Ensure Microsoft Defender for Azure SQL Databases is set to 'On' | | |
-| | `CIS 2.1.5`: Ensure Microsoft Defender for Azure SQL Servers is set to 'On' | | https://github.com/UCLH-Foundry/FlowEHR/issues/173 |
-| | `CIS 2.1.7`: Ensure Microsoft Defender for Storage is set to 'On' | | |
-| | `CIS 2.1.8`: Ensure Microsoft Defender for Containers is set to 'On' | | |
-| | `CIS 2.1.9`: Ensure Microsoft Defender for Azure Cosmos DB is set to 'On' | | |
-| | `CIS 2.1.10`: Ensure Microsoft Defender for Key Vault is set to 'On' | | |
 
 
-### FlowEHR Core
+
+### FlowEHR Core & Azure Subscription
 
 This layer deploys the core components required for other layers, including a number of shared components.
 
@@ -60,6 +53,17 @@ This layer deploys the core components required for other layers, including a nu
 | | `CIS 8.6`: Ensure RBAC enabled for Azure Key Vault | Y | | 
 | | `CIS 8.7`: Ensure Private Endpoints are used for Azure Key Vault | Y | Public internet access disabled, PE into VNET |
 | | `CIS 10.1`: Ensure that resource locks are set for critical resources | N | TODO: https://github.com/UCLH-Foundry/FlowEHR/issues/124 |
+| Microsoft Defender for Cloud | `CIS 2.1` | N | TODO: Enable MS Defender for Cloud https://github.com/UCLH-Foundry/FlowEHR/issues/174 | 
+| | `CIS 2.1.2`: Ensure Microsoft Defender for App Services is set to 'On' | | |
+| | `CIS 2.1.4`: Ensure Microsoft Defender for Azure SQL Databases is set to 'On' | | |
+| | `CIS 2.1.5`: Ensure Microsoft Defender for Azure SQL Servers is set to 'On' | | https://github.com/UCLH-Foundry/FlowEHR/issues/173 |
+| | `CIS 2.1.7`: Ensure Microsoft Defender for Storage is set to 'On' | | |
+| | `CIS 2.1.8`: Ensure Microsoft Defender for Containers is set to 'On' | | |
+| | `CIS 2.1.9`: Ensure Microsoft Defender for Azure Cosmos DB is set to 'On' | | |
+| | `CIS 2.1.10`: Ensure Microsoft Defender for Key Vault is set to 'On' | | |
+
+- Azure Subscription: Diagnostic Settings (5)
+
 
 
 ### FlowEHR Data Transformation
@@ -83,6 +87,24 @@ This layer deploys components required to ingest data, transform data, and save 
 
 
 ### FlowEHR App / Model Serving
+
+| Azure Resource | CIS Reference | Adherence | Notes |
+|--|--|--|--|
+| Azure App Service: <br/>`asp-serve-<suffix>` | `CIS 9` | | [app_service.tf](./infrastructure/serve/app_service.tf) |
+| | `CIS 9.1`: Ensure App Service Authentication is set up | N | TODO: https://github.com/UCLH-Foundry/FlowEHR/issues/175 |
+| | `CIS 9.2`: Ensure all HTTP traffic is redirected to HTTPS | | | 
+| | `CIS 9.3`: Ensure web apps are using latest version of TLS | | |
+| | `CIS 9.4`: Ensure web apps have 'Incoming Client Certificates' set to 'On' | N | Choice made not to use client cert auth due to a number of overheads | 
+| | `CIS 9.5`: Ensure that 'Registed with AAD' is 'On' | | |
+| | `CIS 9.10`: Ensure that FTP is disabled | | |
+| | `CIS 9.11`: Ensure Key Vaults are used to store secrets | | |
+| Azure Cosmos DB: <br/>`cosmos-serve-<suffix>` | `CIS 4.5` | | [cosmos.tf](./infrastructure/serve/cosmos.tf) |
+| | `CIS 4.5.1`: Ensure 'Firewalls & Networks' is limited | | |
+| | `CIS 4.5.2`: Ensure Private Endpoints are used where possible | | |
+| | `CIS 4.5.3`: Ensure AAD Client Auth & RBAC are used where possible | | |
+
+
+
 - App Service
 - Cosmos
 
