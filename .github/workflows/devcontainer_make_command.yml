@@ -69,12 +69,15 @@ jobs:
       - name: Set make commands to execute after the core deployment
         id: post_core
         run: |
+          setup_command="infrastructure-core"
           build_agent_command="none"
           post_build_agent_command="none"
 
           if echo ${{ inputs.command }} | grep -q "test" ; then
               build_agent_command="${{ inputs.command }}-without-core-destroy"
               post_build_agent_command="destroy"
+          elif [ ${{ inputs.command }} = "destroy-no-terraform" ] ; then
+              setup_command="destroy-no-terraform"
           elif echo ${{ inputs.command }} | grep -q "destroy" ; then
               build_agent_command="destroy-non-core"
               post_build_agent_command="${{ inputs.command }}"
@@ -82,9 +85,11 @@ jobs:
               build_agent_command="${{ inputs.command }}"
           fi
 
+          echo "Running [${command}] setup"
           echo "Running [${build_agent_command}] on the build agent"
           echo "Running [${post_build_agent_command}] teardown"
 
+          echo "setup_command=${setup_command}" >> $GITHUB_OUTPUT
           echo "build_agent_command=${build_agent_command}" >> $GITHUB_OUTPUT
           echo "post_build_agent_command=${post_build_agent_command}" >> $GITHUB_OUTPUT
 
@@ -130,7 +135,7 @@ jobs:
         with:
           imageName: ${{ steps.dc.outputs.image_path }}
           imageTag: ${{ steps.dc.outputs.tag }}
-          runCmd: make infrastructure-core
+          runCmd: make ${{ steps.post_core.outputs.setup_command }}
           push: never
           env: |
             DOCKER_BUILDKIT=1
