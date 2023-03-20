@@ -1,6 +1,6 @@
 ---
-dash_seedling:
-  name: Dash Seedling
+flowehr_cicd_test:
+  name: FlowEHR CICD Test App
   description: Test of app deployment
   add_testing_slot: false
   managed_repo:
