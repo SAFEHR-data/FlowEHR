@@ -47,6 +47,11 @@ resource "azuread_application" "ci_app" {
         type = "Role"
       }
     }
+
+    resource_access {
+      id   = azuread_service_principal.msgraph.app_role_ids["Group.ReadWrite.All"]
+      type = "Role"
+    }
   }
 }
 
@@ -63,6 +68,12 @@ resource "azuread_service_principal" "ci_app" {
 resource "azuread_app_role_assignment" "grant_consent" {
   for_each            = local.ci_sp_required_graph_permissions
   app_role_id         = azuread_service_principal.msgraph.app_role_ids[each.key]
+  principal_object_id = azuread_service_principal.ci_app.id
+  resource_object_id  = azuread_service_principal.msgraph.object_id
+}
+
+resource "azuread_app_role_assignment" "group_readwrite_all" {
+  app_role_id         = azuread_service_principal.msgraph.app_role_ids["Group.ReadWrite.All"]
   principal_object_id = azuread_service_principal.ci_app.id
   resource_object_id  = azuread_service_principal.msgraph.object_id
 }
