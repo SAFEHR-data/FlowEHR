@@ -122,9 +122,9 @@ This step will create an AAD Application and Service Principal in the specified 
     make ci
     ```
 
-    _NOTE_: CI deployments require a service principal with access to deploy resources in the subscription. See `sp-flowehr-cicd-<naming-suffix>`in the [identities section](#identities) for the roles that are assigned to this.
+    > _NOTE_: CI deployments require a service principal with access to deploy resources in the subscription. See `sp-flowehr-cicd-<naming-suffix>` in the [identities section](#identities) for the roles that are assigned to this.
 
-    - Copy the outputted values to populate in step 5
+    Copy the outputted values to populate in step 5.
 
 4. Create GitHub PATs (access tokens)
 
