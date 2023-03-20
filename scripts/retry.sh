@@ -17,7 +17,7 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-WAIT_TIME="${WAIT_TIME:=30}"  # seconds
+WAIT_TIME="${WAIT_TIME:=30}" # seconds
 NUMBER_OF_RETRYS="${NUMBER_OF_RETRYS:=3}"
 
 for ((i=1; i<="$NUMBER_OF_RETRYS"; i++)); do
