@@ -72,12 +72,6 @@ resource "azuread_app_role_assignment" "grant_consent" {
   resource_object_id  = azuread_service_principal.msgraph.object_id
 }
 
-resource "azuread_app_role_assignment" "group_readwrite_all" {
-  app_role_id         = azuread_service_principal.msgraph.app_role_ids["Group.ReadWrite.All"]
-  principal_object_id = azuread_service_principal.ci_app.id
-  resource_object_id  = azuread_service_principal.msgraph.object_id
-}
-
 # make owner of Azure sub
 resource "azurerm_role_assignment" "ci_app_owner" {
   scope                = data.azurerm_subscription.primary.id

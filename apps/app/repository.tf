@@ -36,7 +36,7 @@ resource "github_team_members" "owners" {
   team_id  = github_team.owners[0].id
 
   members {
-    username = each.value
+    username = each.key
     role     = "maintainer"
   }
 }
@@ -80,7 +80,7 @@ resource "github_team_members" "contributors" {
   team_id  = github_team.contributors[0].id
 
   members {
-    username = each.value
+    username = each.key
     role     = "member"
   }
 }

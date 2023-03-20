@@ -39,6 +39,11 @@ data "azurerm_mssql_server" "feature_store" {
   resource_group_name = var.resource_group_name
 }
 
+data "azuread_user" "contributors_ids" {
+  for_each            = var.app_config.contributors
+  user_principal_name = each.value
+}
+
 data "template_file" "testing_github_workflow" {
   count    = var.app_config.add_testing_slot ? 1 : 0
   template = file("${path.module}/deploy_workflow_template.yaml")
