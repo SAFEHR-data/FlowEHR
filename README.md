@@ -162,7 +162,7 @@ This step will create an AAD Application and Service Principal in the specified 
 
     Trigger a deployment using a workflow dispatch trigger on the `Actions` tab.
 
-## <a name"identities"></a> Identities
+## <a name="identities"></a> Identities
 
 This table summarises the various authentication identities involved in the deployment and operation of FlowEHR:
 
