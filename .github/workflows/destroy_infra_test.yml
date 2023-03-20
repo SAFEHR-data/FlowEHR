@@ -17,6 +17,10 @@ name: Destroy Infra-Test
 on:
   workflow_dispatch:
 
+# Only have a single instance of this workflow running at any time
+concurrency:
+  group: ${{ github.workflow }}
+
 jobs:
   destroy:
     uses: ./.github/workflows/devcontainer_make_command.yml

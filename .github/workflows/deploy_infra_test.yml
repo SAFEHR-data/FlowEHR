@@ -22,6 +22,10 @@ on:
 permissions:
   pull-requests: read
 
+# Only have a single instance of this workflow running at any time
+concurrency:
+  group: ${{ github.workflow }}
+
 jobs:
   deploy:
     uses: ./.github/workflows/devcontainer_make_command.yml
