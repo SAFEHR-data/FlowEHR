@@ -154,7 +154,7 @@ This step will create an AAD Application and Service Principal in the specified 
     - `ARM_TENANT_ID`: Tenant ID containing the Azure subscription to deploy into (outputted from step 3)
     - `ARM_SUBSCRIPTION_ID`: Subscription ID of the Azure subscription to deploy into (outputted from step 3)
     - `ARM_CLIENT_SECRET`: Client secret of the service principal created in step 3
-    - `ORG_GITHUB_TOKEN`: The token you created in the previous step (this may be added as a repository or organisation secret rather than environment secret and be re-used betweeen environments if you prefer)
+    - `GH_PAT`: The token you created in the previous step (this may be added as a repository or organisation secret rather than environment secret and be re-used betweeen environments if you prefer)
 
 > If you used any tokens in your config yaml files, make sure you populate the equivalent GitHub secret with an identical name so that the token replacement step will substitute your secret(s) into the configuration on deploy (e.g. if you put `${SQL_CONN_STRING}` in config.yaml, make sure you have a GitHub secret called `SQL_CONN_STRING` containing the secret value).
 

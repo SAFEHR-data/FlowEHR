@@ -17,5 +17,5 @@ include "root" {
 }
 
 inputs = {
-  github_runner_token = get_env("ORG_GITHUB_TOKEN", "")
+  github_runner_token = get_env("GH_PAT", "")
 }
