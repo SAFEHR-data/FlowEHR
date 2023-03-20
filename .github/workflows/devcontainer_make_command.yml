@@ -72,7 +72,7 @@ jobs:
         id: post_core
         run: |
           setup_command="infrastructure-core"
-          build_agent_command="none"
+          build_agent_command="${{ inputs.command }}"
           post_build_agent_command="none"
 
           if echo ${{ inputs.command }} | grep -q "test" ; then
@@ -80,6 +80,7 @@ jobs:
               post_build_agent_command="destroy"
           elif [ ${{ inputs.command }} = "destroy-no-terraform" ] ; then
               setup_command="destroy-no-terraform"
+              build_agent_command="none"
           elif echo ${{ inputs.command }} | grep -q "destroy" ; then
               build_agent_command="destroy-non-core"
               post_build_agent_command="${{ inputs.command }}"
