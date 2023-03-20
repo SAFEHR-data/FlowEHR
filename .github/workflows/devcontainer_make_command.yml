@@ -85,7 +85,7 @@ jobs:
               build_agent_command="${{ inputs.command }}"
           fi
 
-          echo "Running [${command}] setup"
+          echo "Running [${setup_command}] setup"
           echo "Running [${build_agent_command}] on the build agent"
           echo "Running [${post_build_agent_command}] teardown"
 
