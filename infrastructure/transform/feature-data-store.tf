@@ -133,7 +133,7 @@ resource "null_resource" "create_sql_user" {
       DATABASE        = azurerm_mssql_database.feature_database.name
       CLIENT_ID       = azuread_application.flowehr_sql_owner.application_id
       CLIENT_SECRET   = azuread_application_password.flowehr_sql_owner.value
-      LOGIN_TO_CREATE = local.databricks_app_name
+      USERS_TO_CREATE = jsonencode(local.sql_users_to_create)
       PATH_TO_CSV     = "../../scripts/sql/nhsd-diabetes.csv"
       TABLE_NAME      = "deploy-test-diabetes"
     }
@@ -218,4 +218,22 @@ resource "azurerm_private_endpoint" "sql_server_features_pe" {
     name                 = "private-dns-zone-group-sql-${var.naming_suffix}"
     private_dns_zone_ids = [azurerm_private_dns_zone.sql.id]
   }
+}
+
+resource "azuread_group" "ad_group_apps" {
+  display_name     = "${var.naming_suffix} flowehr-apps"
+  owners           = [data.azurerm_client_config.current.object_id]
+  security_enabled = true
+}
+
+resource "azuread_group" "ad_group_developers" {
+  display_name     = "${var.naming_suffix} flowehr-developers"
+  owners           = [data.azurerm_client_config.current.object_id]
+  security_enabled = true
+}
+
+resource "azuread_group" "ad_group_data_scientists" {
+  display_name     = "${var.naming_suffix} flowehr-data-scientists"
+  owners           = [data.azurerm_client_config.current.object_id]
+  security_enabled = true
 }
