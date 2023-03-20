@@ -38,13 +38,18 @@ resource "azuread_application" "ci_app" {
   required_resource_access {
     resource_app_id = data.azuread_application_published_app_ids.well_known.result.MicrosoftGraph
 
-    resource_access {
-      id   = azuread_service_principal.msgraph.app_role_ids["Application.ReadWrite.All"]
-      type = "Role"
+    dynamic "resource_access" {
+      for_each = local.ci_sp_required_graph_permissions
+      iterator = permission
+
+      content {
+        id   = azuread_service_principal.msgraph.app_role_ids[permission.value]
+        type = "Role"
+      }
     }
 
     resource_access {
-      id   = azuread_service_principal.msgraph.app_role_ids["AppRoleAssignment.ReadWrite.All"]
+      id   = azuread_service_principal.msgraph.app_role_ids["Group.ReadWrite.All"]
       type = "Role"
     }
   }
@@ -60,14 +65,9 @@ resource "azuread_service_principal" "ci_app" {
 }
 
 # app role assignments for service principals to grant admin consent
-resource "azuread_app_role_assignment" "app_readwrite_all" {
-  app_role_id         = azuread_service_principal.msgraph.app_role_ids["Application.ReadWrite.All"]
-  principal_object_id = azuread_service_principal.ci_app.id
-  resource_object_id  = azuread_service_principal.msgraph.object_id
-}
-
-resource "azuread_app_role_assignment" "approleassignment_readwrite_all" {
-  app_role_id         = azuread_service_principal.msgraph.app_role_ids["AppRoleAssignment.ReadWrite.All"]
+resource "azuread_app_role_assignment" "grant_consent" {
+  for_each            = local.ci_sp_required_graph_permissions
+  app_role_id         = azuread_service_principal.msgraph.app_role_ids[each.key]
   principal_object_id = azuread_service_principal.ci_app.id
   resource_object_id  = azuread_service_principal.msgraph.object_id
 }

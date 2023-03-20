@@ -19,6 +19,7 @@ Then, make sure you have enabled the following permissions:
 - `repo`
 - `write:org`
 - `delete_repo`
+- `workflow`
 
 When ready, click `Generate` and copy the token. Paste it into the `github_token` field in your `config.local.yaml`.
 
