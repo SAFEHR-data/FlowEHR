@@ -9,4 +9,4 @@ transform:
   spark_version: 3.3.1
 
 serve:
-  github_owner: UCLH-Foundry
+  github_owner: UCLH-FlowEHR-TestBed

@@ -67,10 +67,6 @@ infrastructure-core: az-login ## Deploy core infrastructure
 infrastructure-transform: az-login transform-artifacts ## Deploy transform infrastructure
 	$(call terragrunt,apply,infrastructure/transform)
 
-transform-artifacts: az-login ## Build transform artifacts
-	${MAKEFILE_DIR}/scripts/pipeline_repo_checkout.sh \
-	&& ${MAKEFILE_DIR}/scripts/build_artifacts.sh
-
 infrastructure-serve: az-login ## Deploy serve infrastructure
 	$(call terragrunt,apply,infrastructure/serve)
 
@@ -85,6 +81,10 @@ test-without-core-destroy: infrastructure apps destroy-non-core ## Test non-core
 test-transform-without-core-destroy: infrastructure-transform destroy-non-core  ## Test transform deploy->destroy destroying core
 
 test-serve-without-core-destroy: infrastructure-serve destroy-non-core  ## Test serve deploy->destroy without destroying core
+
+transform-artifacts: az-login ## Build transform artifacts
+	${MAKEFILE_DIR}/scripts/pipeline_repo_checkout.sh \
+	&& ${MAKEFILE_DIR}/scripts/build_artifacts.sh
 
 apps: az-login ## Deploy FlowEHR apps
 	$(call terragrunt,apply,apps)
