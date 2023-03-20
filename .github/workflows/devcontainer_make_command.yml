@@ -83,8 +83,6 @@ jobs:
           elif echo ${{ inputs.command }} | grep -q "destroy" ; then
               build_agent_command="destroy-non-core"
               post_build_agent_command="${{ inputs.command }}"
-          elif echo ${{ inputs.command }} | grep -q "infrastructure"; then
-              build_agent_command="${{ inputs.command }}"
           fi
 
           echo "Running [${setup_command}] setup"

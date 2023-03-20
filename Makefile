@@ -48,7 +48,7 @@ ci: az-login ## Deploy bootstrap resources for CI builds (management infrastruct
 	$(call target_title, "Creating CI resources") \
 	&& cd ${MAKEFILE_DIR}/bootstrap/ci \
 	&& terragrunt apply \
-	&& printf "\n🌺 Use the below values to create your CI GitHub secrets:\033[36m\n\n" \
+	&& printf "\n🌺 Use the below values to create your CI GitHub vars/secrets:\033[36m\n\n" \
 	&& terraform output -json \
 	  | jq -r 'with_entries(.value |= .value) | to_entries[] | "\(.key +": "+ .value)"'
 
