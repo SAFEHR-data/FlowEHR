@@ -131,7 +131,9 @@ jobs:
           secrets: ${{ toJSON(secrets) }}
 
       - name: Create GitHub App cert
-        run: echo ${{ secrets.GH_APP_CERT }} > apps/github.pem
+        env:
+          CERT: ${{ secrets.GH_APP_CERT }}
+        run: echo "$CERT" > apps/github.pem
 
       - name: Deploy core and build agent
         uses: devcontainers/ci@v0.3
@@ -186,7 +188,9 @@ jobs:
           secrets: ${{ toJSON(secrets) }}
 
       - name: Create GitHub App cert
-        run: echo ${{ secrets.GH_APP_CERT }} > apps/github.pem
+        env:
+          CERT: ${{ secrets.GH_APP_CERT }}
+        run: echo "$CERT" > apps/github.pem
 
       - name: Deploy
         env:
@@ -237,7 +241,9 @@ jobs:
           secrets: ${{ toJSON(secrets) }}
 
       - name: Create GitHub App cert
-        run: echo ${{ secrets.GH_APP_CERT }} > apps/github.pem
+        env:
+          CERT: ${{ secrets.GH_APP_CERT }}
+        run: echo "$CERT" > apps/github.pem
 
       - name: Post build agent command
         uses: devcontainers/ci@v0.3
