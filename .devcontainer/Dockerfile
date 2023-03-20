@@ -49,7 +49,7 @@ CMD [ "sleep", "infinity" ]
 
 # Install additional tools
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends yamllint
+    && apt-get -y install --no-install-recommends yamllint parallel
 
 ARG YQ_VERSION="v4.30.6"
 RUN export ARCH=$(dpkg --print-architecture); curl -L --fail -o /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_${ARCH}" \
@@ -88,6 +88,3 @@ RUN mkdir -p /tmp/actions-runner \
     && curl -o runner.tar.gz -L https://github.com/actions/runner/releases/download/${GH_RUNNER_VERSION}/actions-runner-linux-x64-2.302.1.tar.gz \
     && tar xzf runner.tar.gz -C /tmp/actions-runner \
     && rm runner.tar.gz
-
-ENV SPARK_HOME=/opt/spark
-ENV PATH=$PATH:$SPARK_HOME/bin

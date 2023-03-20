@@ -7,6 +7,8 @@ core_address_space: 10.0.0.0/24
 
 transform:
   spark_version: 3.3.1
+  repositories:
+    - url: https://github.com/UCLH-Foundry/FlowEHR-Data-Pot
 
 serve:
   github_owner: UCLH-FlowEHR-TestBed
