@@ -47,11 +47,6 @@ resource "azuread_application" "ci_app" {
       id   = azuread_service_principal.msgraph.app_role_ids["AppRoleAssignment.ReadWrite.All"]
       type = "Role"
     }
-
-    resource_access {
-      id   = azuread_service_principal.msgraph.app_role_ids["Group.ReadWrite.All"]
-      type = "Role"
-    }
   }
 }
 
@@ -73,12 +68,6 @@ resource "azuread_app_role_assignment" "app_readwrite_all" {
 
 resource "azuread_app_role_assignment" "approleassignment_readwrite_all" {
   app_role_id         = azuread_service_principal.msgraph.app_role_ids["AppRoleAssignment.ReadWrite.All"]
-  principal_object_id = azuread_service_principal.ci_app.id
-  resource_object_id  = azuread_service_principal.msgraph.object_id
-}
-
-resource "azuread_app_role_assignment" "group_readwrite_all" {
-  app_role_id         = azuread_service_principal.msgraph.app_role_ids["Group.ReadWrite.All"]
   principal_object_id = azuread_service_principal.ci_app.id
   resource_object_id  = azuread_service_principal.msgraph.object_id
 }
