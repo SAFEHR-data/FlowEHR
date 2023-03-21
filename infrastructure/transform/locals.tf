@@ -16,26 +16,47 @@ locals {
   sql_server_features_admin_username = "adminuser"
   sql_owner_app_name                 = "flowehr-sql-owner-${lower(var.naming_suffix)}"
   databricks_app_name                = "flowehr-databricks-datawriter-${lower(var.naming_suffix)}"
-  activities_file                    = "activities.json"
+  pipeline_file                      = "pipeline.json"
+  trigger_file                       = "trigger.json"
   artifacts_dir                      = "artifacts"
   adb_linked_service_name            = "ADBLinkedServiceViaMSI"
 
-  all_activities_files = fileset(path.module, "../../transform/pipelines/**/${local.activities_file}")
+  all_pipeline_files = fileset(path.module, "../../transform/pipelines/**/${local.pipeline_file}")
 
   # Example value: [ "../../transform/pipelines/hello-world" ]
   pipeline_dirs = toset([
-    for activity_file in local.all_activities_files : dirname(activity_file)
+    for pipeline_file in local.all_pipeline_files : dirname(pipeline_file)
   ])
+
+  pipelines = [
+    for pipeline_dir in local.pipeline_dirs : {
+      pipeline_dir  = pipeline_dir
+      pipeline_json = jsondecode(file("${pipeline_dir}/${local.pipeline_file}"))
+      pipeline_parameters = { for param_name, param in jsondecode(file("${pipeline_dir}/${local.pipeline_file}")).properties.parameters :
+        param_name => param.type
+      }
+    }
+  ]
 
   # Example value: [ { "artifact_path" = "path/to/entrypoint.py", "pipeline" = "hello-world" } ]
   artifacts = flatten([
-    for pipeline in local.pipeline_dirs : [
-      for artifact in fileset("${pipeline}/${local.artifacts_dir}", "*") : {
-        artifact_path = "${pipeline}/${local.artifacts_dir}/${artifact}"
-        pipeline      = basename(pipeline)
+    for pipeline_dir in local.pipeline_dirs : [
+      for artifact in fileset("${pipeline_dir}/${local.artifacts_dir}", "*") : {
+        artifact_path = "${pipeline_dir}/${local.artifacts_dir}/${artifact}"
+        pipeline      = basename(pipeline_dir)
       }
     ]
   ])
+
+  triggers = flatten([
+    for pipeline_dir in local.pipeline_dirs : [
+      can(jsondecode(file("${pipeline_dir}/${local.trigger_file}"))) ? {
+        pipeline = basename("${pipeline_dir}")
+        trigger  = jsondecode(file("${pipeline_dir}/${local.trigger_file}"))
+      } : null
+    ]
+  ])
+
   storage_account_name = "dbfs${var.naming_suffix_truncated}"
 
   data_source_connections_with_peerings = [
