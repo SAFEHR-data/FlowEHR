@@ -47,17 +47,22 @@ fi
 
 pushd "${PIPELINE_DIR}" > /dev/null
 
-while IFS=$'\n' read -r repo _; do
-  # Name for the directory to check out to,
-  # e.g. git@github.com:UCLH-Foundry/Data-Pipeline.git becomes Data-Pipeline 
-  # If the directory with checked out repo already exists, pull the latest
-  dir_name=$(basename "${repo}" | sed -e 's/\.git$//')
-  if [ -d "${dir_name}" ]; then
+readarray repositories < <(yq e -o=j -I=0 '.transform.repositories[]' "${CONFIG_PATH}" )
+for repository in "${repositories[@]}"; do 
+  url=$(yq '.url' - <<< "${repository}" )
+
+  dir_name=$(basename "${url}" | sed -e 's/\.git$//')
+  if [[ -d "${dir_name}" ]]; then
     echo "Repo already exists, skipping"
   else
-    eval "${GIT_COMMAND} clone ${repo}"
+    eval "${GIT_COMMAND} clone ${url}"
+    if [[ $(yq '. | has("sha")' <<< "${repository}") == "true" ]]; then
+      sha=$(yq '.sha' - <<< "${repository}" )
+      pushd "${dir_name}"
+      git checkout "${sha}"
+      popd > /dev/null
+    fi
   fi
-
-done < <(yq e -I=0 '.transform.repositories[]' "${CONFIG_PATH}")
+done
 
 popd > /dev/null

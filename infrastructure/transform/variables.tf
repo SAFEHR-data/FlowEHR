@@ -74,7 +74,10 @@ variable "transform" {
   description = "Transform configuration block (populated from root config file)"
   type = object({
     spark_version = optional(string, "3.3.1")
-    repositories  = optional(list(string), [])
+    repositories = optional(list(object({
+      url = string,
+      sha = optional(string, "")
+    })), [])
   })
   default = {
     spark_version = "3.3.1"

@@ -34,6 +34,8 @@ variable "tf_in_automation" {
   type = bool
 }
 
+
+
 variable "core_rg_name" {
   type = string
 }
@@ -51,6 +53,22 @@ variable "core_kv_id" {
 }
 
 variable "transform_feature_store_db_name" {
+  type = string
+}
+
+variable "transform_apps_ad_group_display_name" {
+  type = string
+}
+
+variable "transform_developers_ad_group_display_name" {
+  type = string
+}
+
+variable "transform_apps_ad_group_principal_id" {
+  type = string
+}
+
+variable "transform_developers_ad_group_principal_id" {
   type = string
 }
 
@@ -75,6 +93,10 @@ variable "serve_webapps_subnet_id" {
 }
 
 # -- FROM CONFIGURATION FILES --------
+variable "accesses_real_data" {
+  type = bool
+}
+
 variable "serve" {
   description = "Serve configuration block (populated from root config file)"
   type = object({
