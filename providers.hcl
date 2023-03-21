@@ -39,7 +39,7 @@ EOF
   required_provider_azure = <<EOF
 azurerm = {
   source  = "hashicorp/azurerm"
-  version = "3.47.0"
+  version = "3.48.0"
 }
 EOF
 
@@ -82,6 +82,13 @@ EOF
 github = {
   source  = "integrations/github"
   version = "5.18.0"
+}
+EOF
+
+  required_provider_azapi = <<EOF
+azapi = {
+  source = "azure/azapi"
+  version = "1.4.0"
 }
 EOF
 }

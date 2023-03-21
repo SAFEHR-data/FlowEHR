@@ -53,6 +53,7 @@ resource "azurerm_linux_web_app" "app" {
     COSMOS_STATE_STORE_ENDPOINT                = data.azurerm_cosmosdb_account.state_store.endpoint
     FEATURE_STORE_CONNECTION_STRING            = local.feature_store_odbc
     ENVIRONMENT                                = local.core_gh_env
+    MICROSOFT_PROVIDER_AUTHENTICATION_SECRET   = ""
   })
 
   sticky_settings {
@@ -75,26 +76,81 @@ resource "azurerm_linux_web_app" "app" {
       }
     }
   }
+}
 
-  auth_settings_v2 {
-    auth_enabled           = local.require_auth
-    require_authentication = local.require_auth
-    default_provider       = "AzureActiveDirectory"
-    unauthenticated_action = "RedirectToLoginPage"
+# workaround for https://github.com/hashicorp/terraform-provider-azurerm/issues/20820
+resource "azapi_update_resource" "wa_auth_v2_config" {
+  type        = "Microsoft.Web/sites/config@2022-03-01"
+  resource_id = "${azurerm_linux_web_app.app.id}/config/authsettingsV2"
 
-    dynamic "active_directory_v2" {
-      for_each = local.require_auth ? { client_id = azuread_application.webapp[0].application_id } : {}
-      iterator = client_id
-
-      content {
-        tenant_auth_endpoint       = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/v2.0"
-        client_secret_setting_name = "MICROSOFT_PROVIDER_AUTHENTICATION_SECRET"
-        client_id                  = client_id.value
+  body = jsonencode({
+    "location" : "UK South",
+    "name" : "authsettingsV2",
+    "properties" : {
+      "globalValidation" : {
+        "excludedPaths" : [],
+        "redirectToProvider" : "AzureActiveDirectory",
+        "requireAuthentication" : true,
+        "unauthenticatedClientAction" : "RedirectToLoginPage"
+      },
+      "httpSettings" : {
+        "forwardProxy" : {
+          "convention" : "NoProxy"
+        },
+        "requireHttps" : true,
+        "routes" : {
+          "apiPrefix" : "/.auth"
+        }
+      },
+      "identityProviders" : {
+        "azureActiveDirectory" : {
+          "enabled" : true,
+          "login" : {
+            "disableWWWAuthenticate" : false,
+            "loginParameters" : []
+          },
+          "registration" : {
+            "clientId" : "${azuread_application.webapp[0].application_id}"
+            "clientSecretCertificateThumbprint" : "",
+            "clientSecretSettingName" : "MICROSOFT_PROVIDER_AUTHENTICATION_SECRET",
+            "openIdIssuer" : "https://sts.windows.net/${data.azurerm_client_config.current.tenant_id}/v2.0"
+          },
+          "validation" : {
+            "allowedAudiences" : [
+              "api://${local.webapp_name}"
+            ],
+            "defaultAuthorizationPolicy" : {},
+            "jwtClaimChecks" : {}
+          }
+        }
+      },
+      "login" : {
+        "allowedExternalRedirectUrls" : [],
+        "cookieExpiration" : {
+          "convention" : "FixedTime",
+          "timeToExpiration" : "08:00:00"
+        },
+        "nonce" : {
+          "nonceExpirationInterval" : "00:05:00",
+          "validateNonce" : true
+        },
+        "preserveUrlFragmentsForLogins" : false,
+        "routes" : {},
+        "tokenStore" : {
+          "azureBlobStorage" : {},
+          "enabled" : true,
+          "fileSystem" : {},
+          "tokenRefreshExtensionHours" : 72.0
+        }
+      },
+      "platform" : {
+        "enabled" : true,
+        "runtimeVersion" : "~1"
       }
+    },
+    "type" : "Microsoft.Web/sites/config"
     }
-
-    login {}
-  }
+  )
 }
 
 resource "random_uuid" "webapp_oauth2_id" {
@@ -108,7 +164,7 @@ resource "azuread_application" "webapp" {
 
   api {
     oauth2_permission_scope {
-      admin_consent_description  = "Allow the application to access example on behalf of the signed-in user."
+      admin_consent_description  = "Allow the application to access ${local.webapp_name} on behalf of the signed-in user."
       admin_consent_display_name = "Access ${local.webapp_name}"
       enabled                    = true
       id                         = random_uuid.webapp_oauth2_id.result

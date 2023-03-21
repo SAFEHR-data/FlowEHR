@@ -52,6 +52,8 @@ terraform {
   required_providers {
     ${local.providers.locals.required_provider_azure}
     ${local.providers.locals.required_provider_github}
+    ${local.providers.locals.required_provider_random}
+    ${local.providers.locals.required_provider_azapi}
   }
 }
 EOF
@@ -66,7 +68,7 @@ generate "child_terraform" {
 terraform {
   required_providers {
     ${local.providers.locals.required_provider_github}
-    ${local.providers.locals.required_provider_random}
+    ${local.providers.locals.required_provider_azapi}
   }
 }
 EOF
@@ -79,6 +81,7 @@ generate "provider" {
 ${local.providers.locals.azure_provider}
 provider "random" {}
 provider "github" {}
+provider "azapi" {}
 EOF
 }
 
