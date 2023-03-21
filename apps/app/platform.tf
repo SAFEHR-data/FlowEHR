@@ -23,7 +23,7 @@ resource "azurerm_application_insights" "app" {
 }
 
 resource "azurerm_linux_web_app" "app" {
-  name                      = "webapp-${replace(var.app_id, "_", "-")}-${var.naming_suffix}"
+  name                      = local.webapp_name
   resource_group_name       = var.resource_group_name
   location                  = var.location
   service_plan_id           = data.azurerm_service_plan.serve.id
@@ -71,7 +71,61 @@ resource "azurerm_linux_web_app" "app" {
       }
     }
   }
+
+  auth_settings_v2 {
+    auth_enabled           = local.require_auth
+    require_authentication = local.require_auth
+    default_provider       = "AzureActiveDirectory"
+    unauthenticated_action = "RedirectToLoginPage"
+
+    dynamic "active_directory_v2" {
+      for_each = local.require_auth ? { client_id = azuread_application.webapp[0].application_id } : {}
+      iterator = client_id
+
+      content {
+        tenant_auth_endpoint       = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/v2.0"
+        client_secret_setting_name = "MICROSOFT_PROVIDER_AUTHENTICATION_SECRET"
+        client_id                  = client_id.value
+      }
+    }
+
+    login {}
+  }
 }
+
+resource "random_uuid" "webapp_oauth2_id" {
+}
+
+resource "azuread_application" "webapp" {
+  count        = local.require_auth ? 1 : 0
+  display_name = "flowehr-app-${replace(var.app_id, "_", "-")}"
+  owners       = [data.azurerm_client_config.current.object_id]
+
+  api {
+    oauth2_permission_scope {
+      admin_consent_description  = "Allow the application to access example on behalf of the signed-in user."
+      admin_consent_display_name = "Access ${local.webapp_name}"
+      enabled                    = true
+      id                         = random_uuid.webapp_oauth2_id.result
+      type                       = "User"
+      user_consent_description   = "Allow the application to access ${local.webapp_name} on your behalf."
+      user_consent_display_name  = "Access ${local.webapp_name}"
+      value                      = "user_impersonation"
+    }
+  }
+
+  web {
+    homepage_url  = "https://${local.webapp_name}.azurewebsites.net"
+    redirect_uris = ["https://${local.webapp_name}.azurewebsites.net/.auth/login/aad/callback"]
+
+    implicit_grant {
+      access_token_issuance_enabled = true
+      id_token_issuance_enabled     = true
+    }
+  }
+}
+
+## TODO slot auth
 
 resource "azurerm_linux_web_app_slot" "testing" {
   count          = var.app_config.add_testing_slot ? 1 : 0
@@ -112,7 +166,36 @@ resource "azurerm_linux_web_app_slot" "testing" {
       }
     }
   }
+
+  auth_settings_v2 {
+    auth_enabled           = var.accesses_real_data
+    require_authentication = var.accesses_real_data
+    default_provider       = "AzureActiveDirectory"
+    unauthenticated_action = "RedirectToLoginPage"
+
+    dynamic "active_directory_v2" {
+      for_each = local.require_auth ? { client_id = azuread_application.webapp_slot[0].application_id } : {}
+
+      content {
+        tenant_auth_endpoint       = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/v2.0"
+        client_secret_setting_name = "MICROSOFT_PROVIDER_AUTHENTICATION_SECRET"
+        client_id                  = each.value
+      }
+    }
+
+    login {}
+  }
 }
+
+resource "azuread_application" "webapp_slot" {
+  count        = var.app_config.add_testing_slot ? 1 : 0
+  display_name = "flowehr-app-${local.testing_slot_name}-${replace(var.app_id, "_", "-")}"
+  owners       = [data.azurerm_client_config.current.object_id]
+}
+
+
+
+
 
 resource "azurerm_role_assignment" "webapp_acr" {
   role_definition_name = "AcrPull"

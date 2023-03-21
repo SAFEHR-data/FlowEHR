@@ -103,14 +103,13 @@ variable "app_config" {
     name             = string
     description      = string
     add_testing_slot = optional(bool, false)
-    owners           = map(string)
-    contributors     = map(string)
+    require_auth     = optional(bool, false)
 
     managed_repo = optional(object({
       private      = bool
       template     = string
-      owners       = set(string)
-      contributors = set(string)
+      owners       = map(string)
+      contributors = map(string)
     }))
 
     branch = object({

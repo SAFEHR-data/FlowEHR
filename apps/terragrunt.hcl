@@ -66,6 +66,7 @@ generate "child_terraform" {
 terraform {
   required_providers {
     ${local.providers.locals.required_provider_github}
+    ${local.providers.locals.required_provider_random}
   }
 }
 EOF
@@ -76,7 +77,7 @@ generate "provider" {
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
 ${local.providers.locals.azure_provider}
-
+provider "random" {}
 provider "github" {}
 EOF
 }

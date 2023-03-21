@@ -19,6 +19,10 @@ locals {
   acr_repository     = var.app_id
   create_repo        = var.app_config.managed_repo != null
 
+  webapp_name = "webapp-${replace(var.app_id, "_", "-")}-${var.naming_suffix}"
+
+  require_auth = var.app_config.require_auth || var.accesses_real_data
+
   testing_slot_name   = "testing"
   core_gh_env         = var.environment
   core_branch_name    = local.core_gh_env

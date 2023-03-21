@@ -40,7 +40,7 @@ data "azurerm_mssql_server" "feature_store" {
 }
 
 data "azuread_user" "contributors_ids" {
-  for_each            = var.app_config.contributors
+  for_each            = var.app_config.managed_repo != null ? var.app_config.managed_repo.contributors : {}
   user_principal_name = each.value
 }
 

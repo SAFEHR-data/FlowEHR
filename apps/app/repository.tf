@@ -32,7 +32,7 @@ resource "github_team" "owners" {
 }
 
 resource "github_team_members" "owners" {
-  for_each = local.create_repo ? var.app_config.managed_repo.owners : toset([])
+  for_each = local.create_repo ? var.app_config.managed_repo.owners : {}
   team_id  = github_team.owners[0].id
 
   members {
@@ -76,7 +76,7 @@ resource "github_team" "contributors" {
 }
 
 resource "github_team_members" "contributors" {
-  for_each = local.create_repo ? var.app_config.managed_repo.contributors : toset([])
+  for_each = local.create_repo ? var.app_config.managed_repo.contributors : {}
   team_id  = github_team.contributors[0].id
 
   members {
