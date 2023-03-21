@@ -68,7 +68,7 @@ This layer deploys the core components required for other layers, including a nu
 | | `CIS: 3.13`: Ensure Storage Logging is enabled for 'read', 'write' and 'delete' requests | TODO | | 
 | | `CIS 3.15`: Ensure Minimum TLS Version is set to 1.2 | Y | |
 | Azure Key Vault: <br/>`kv-<suffix>` | `CIS 8` | [main.tf](./infrastructure/core/main.tf)  | |
-| | `CIS 8.5`: Ensure the key vault is recoverable | Y  | - Soft delete enabled (7 days) <br/> - Purge protection enabled | 
+| | `CIS 8.5`: Ensure the key vault is recoverable | TODO | - Soft delete enabled (7 days) <br/> - Purge protection: https://github.com/UCLH-Foundry/FlowEHR/issues/190 | 
 | | `CIS 8.6`: Ensure RBAC enabled for Azure Key Vault | Y | | 
 | | `CIS 8.7`: Ensure Private Endpoints are used for Azure Key Vault | Y | Public internet access disabled, PE into VNET |
 | | `CIS 10.1`: Ensure that resource locks are set for critical resources | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/124 |
