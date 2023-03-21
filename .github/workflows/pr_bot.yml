@@ -135,7 +135,7 @@ jobs:
     uses: ./.github/workflows/devcontainer_make_command.yml
     with:
       suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
-      environment: Infra-Test
+      environment: infra-test
       command: ${{ needs.pr_comment.outputs.command }}
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}
     secrets: inherit
@@ -149,7 +149,7 @@ jobs:
     uses: ./.github/workflows/devcontainer_make_command.yml
     with:
       suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
-      environment: Infra-Test
+      environment: infra-test
       command: ${{ needs.pr_comment.outputs.makeCommand }}
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}
     secrets: inherit
@@ -158,7 +158,7 @@ jobs:
     name: Summary
     needs: [pr_comment, run_test]
     runs-on: ubuntu-latest
-    environment: Infra-Test
+    environment: infra-test
     steps:
       # For PR builds triggered from comment builds, the GITHUB_REF is set to main
       # so the checks aren't automatically associated with the PR

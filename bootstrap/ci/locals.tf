@@ -10,23 +10,12 @@
 #  distributed under the License is distributed on an "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
-# limitations under the License.
----
-name: Deploy Infra-Test
+#  limitations under the License.
 
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
-
-permissions:
-  pull-requests: read
-
-jobs:
-  deploy:
-    uses: ./.github/workflows/devcontainer_make_command.yml
-    name: Make Infrastructure
-    with:
-      command: infrastructure
-      environment: infra-test
-    secrets: inherit
+locals {
+  ci_sp_required_graph_permissions = toset([
+    "Application.ReadWrite.All",
+    "AppRoleAssignment.ReadWrite.All",
+    "Group.ReadWrite.All"
+  ])
+}
