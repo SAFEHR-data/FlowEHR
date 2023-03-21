@@ -55,6 +55,10 @@ resource "azurerm_linux_web_app" "app" {
     ENVIRONMENT                                = local.core_gh_env
   })
 
+  sticky_settings {
+    app_setting_names = ["MICROSOFT_PROVIDER_AUTHENTICATION_SECRET"]
+  }
+
   identity {
     type = "SystemAssigned"
   }
@@ -97,9 +101,10 @@ resource "random_uuid" "webapp_oauth2_id" {
 }
 
 resource "azuread_application" "webapp" {
-  count        = local.require_auth ? 1 : 0
-  display_name = "flowehr-app-${replace(var.app_id, "_", "-")}"
-  owners       = [data.azurerm_client_config.current.object_id]
+  count           = local.require_auth ? 1 : 0
+  display_name    = "flowehr-app-${local.webapp_name}"
+  identifier_uris = ["api://${local.webapp_name}"]
+  owners          = [data.azurerm_client_config.current.object_id]
 
   api {
     oauth2_permission_scope {
@@ -111,6 +116,15 @@ resource "azuread_application" "webapp" {
       user_consent_description   = "Allow the application to access ${local.webapp_name} on your behalf."
       user_consent_display_name  = "Access ${local.webapp_name}"
       value                      = "user_impersonation"
+    }
+  }
+
+  required_resource_access {
+    resource_app_id = "00000003-0000-0000-c000-000000000000" # Microsoft Graph
+
+    resource_access {
+      id   = "e1fe6dd8-ba31-4d61-89e7-88639da4683d" # User.Read
+      type = "Scope"
     }
   }
 
