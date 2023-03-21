@@ -21,7 +21,6 @@ on:
     # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issue_comment
 
 permissions:
-  pull-requests: write
   checks: write
 
 jobs:
@@ -48,6 +47,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
+          token: ${{ secrets.FLOWEHR_GITHUB_TOKEN }}
+          fetch-depth: 0  # entire histroy is needed for paths filter
           persist-credentials: false
 
       # Determine whether the comment is a command
@@ -55,6 +56,7 @@ jobs:
         name: Check for a command using GitHub script
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.FLOWEHR_GITHUB_TOKEN }}
           script: |
             const script = require('./.github/scripts/build.js')
             await script.getCommandFromComment({core, context, github});
@@ -71,6 +73,7 @@ jobs:
       - uses: dorny/paths-filter@v2
         id: changes
         with:
+          token: ${{ secrets.FLOWEHR_GITHUB_TOKEN }}
           base: main
           ref: ${{ steps.check_command.outputs.prHeadSha }}
           filters: |
@@ -105,7 +108,7 @@ jobs:
         if: ${{ steps.check_command.outputs.command == 'test' || steps.check_command.outputs.command == 'test-all' }}
         uses: LouisBrunner/checks-action@v1.5.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}  # Needs the auto-generated token
           sha: ${{ steps.check_command.outputs.prHeadSha }}
           name: "Deploy PR"
           status: "in_progress"
@@ -119,7 +122,7 @@ jobs:
           (steps.set_make_command.outputs.makeCommand == 'none')
         uses: LouisBrunner/checks-action@v1.5.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}  # Needs the auto-generated token
           # the name must be identical to the one received by the real job
           sha: ${{ steps.check_command.outputs.prHeadSha }}
           name: "Deploy PR"
@@ -166,7 +169,7 @@ jobs:
       - name: Report check status
         uses: LouisBrunner/checks-action@v1.5.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}  # Needs the auto-generated token
           sha: ${{ needs.pr_comment.outputs.prHeadSha }}
           name: "Deploy PR"
           status: "completed"
