@@ -3,6 +3,11 @@
 This document outlines the adherence of the FlowEHR components to the Microsoft Azure Foundations Benchmark v2.0 - downloadable from the CIS website [here](https://downloads.cisecurity.org/).
 
 
+## What does this document apply to?
+
+This CIS adherence review primarily applies to a production subscription, where sensitive data is held and processed. For FlowEHR, this is the `prod` subscription. The terraform in this repository contains many conditional switches which enable broader internet connectivity, such that a developer deploying a test version of the infrastructure will have an easier experience interacting with the resources. When deploying from GitHub, all these switches are turned off, and this document applies. 
+
+
 ## Note on Maintenance of this Document
 
 This document exists in this repo, and not elsewhere, in order to keep it closer to the resource definitions that it references, and easier to update as resources are added or changed. It is suggested that when a resource is added, this document is updated to reference the new resource and ensure that appropriate security settings have been applied to it.
