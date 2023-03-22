@@ -14,7 +14,7 @@
 
 resource "azurerm_data_factory_pipeline" "pipeline" {
   for_each        = { for pipeline in local.pipelines : pipeline.pipeline_dir => [pipeline.pipeline_json, pipeline.pipeline_parameters] }
-  name            = "databricks-pipeline-${basename(each.key)}-${var.naming_suffix}"
+  name            = each.value[0].name
   data_factory_id = azurerm_data_factory.adf.id
   activities_json = jsonencode(each.value[0].properties.activities)
   parameters      = each.value[1]
@@ -41,28 +41,20 @@ resource "azurerm_data_factory_trigger_tumbling_window" "pipeline_trigger" {
 
   start_time      = each.value.properties.typeProperties.startTime
   end_time        = try(each.value.properties.typeProperties.endTime, null)
-  max_concurrency = 2
-  frequency       = "Minute"
-  interval        = 15
+  delay           = try(each.value.properties.typeProperties.delay, null)
+  max_concurrency = try(each.value.properties.typeProperties.maxConcurrency, null)
+  frequency       = each.value.properties.typeProperties.frequency
+  interval        = each.value.properties.typeProperties.interval
 
   retry {
-    count    = 1
-    interval = 30
+    count    = try(each.value.properties.typeProperties.retryPolicy.count, null)
+    interval = try(each.value.properties.typeProperties.retryPolicy.intervalInSeconds, null)
   }
 
   pipeline {
-    name       = "databricks-pipeline-${each.key}-${var.naming_suffix}"
+    name       = each.value.properties.pipeline.pipelineReference.referenceName
     parameters = each.value.properties.pipeline.parameters
   }
 
-  // Self dependency
-  /* trigger_dependency {
-    size   = "24:00:00"
-    offset = "-24:00:00"
-  } */
-
-  /* additional_properties = {
-    foo = "value1"
-    bar = "value2"
-  } */
+  // Dependencies and additional properties aren't supported
 }
