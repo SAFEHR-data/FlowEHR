@@ -35,15 +35,15 @@ FlowEHR is deployed using Terraform. Terraform maintains a text based state file
 
 | Azure Resource | CIS Reference | Adherence | Notes |
 |--|--|--|--|
-| Azure Storage Account for FlowEHR management: <br/>`stgmgmt<suffix>` | `CIS 3` | [main.tf](./bootstrap/shared/management/main.tf) | Issues summarised https://github.com/UCLH-Foundry/FlowEHR/issues/176 |
+| Azure Storage Account for FlowEHR management: <br/>`stgmgmt<suffix>` | `CIS 3` | [main.tf](./bootstrap/shared/management/main.tf) | Issues summarised https://github.com/UCLH-Foundry/FlowEHR/issues/176 / https://github.com/UCLH-Foundry/FlowEHR/issues/199 |
 | | `CIS 3.1`: Ensure 'Secure Transfer Required' set to 'Enabled' | Y | |
 | | `CIS 3.2`: Ensure 'Enable Infrastructure Encryption' set to 'Enabled' | TODO |  |
 | | `CIS 3.3`: Enable key rotation reminders for each storage account | N | Storage keys are not used for authentication |
 | | `CIS 3.4`: Ensure that Storage Account Access keys are periodically regenerated | N | Storage keys are not used for authentication |
-| | `CIS 3.7`: Ensure 'Public Access Level' is disabled | Discuss | |
-| | `CIS 3.8`: Ensure Default Network Access Rule is set to 'Deny' | Discuss |  |
-| | `CIS 3.9`: Ensure 'Trusted Azure Services' can access the storage account | Discuss |  |
-| | `CIS 3.10`: Ensure Private Endpoints are used to access storage accounts | Discuss |  |
+| | `CIS 3.7`: Ensure 'Public Access Level' is disabled | TODO | |
+| | `CIS 3.8`: Ensure Default Network Access Rule is set to 'Deny' | TODO |  |
+| | `CIS 3.9`: Ensure 'Trusted Azure Services' can access the storage account | TODO |  |
+| | `CIS 3.10`: Ensure Private Endpoints are used to access storage accounts | TODO |  |
 | | `CIS 3.11`: Ensure Soft Delete is enabled | TODO |  |
 | | `CIS 3.12`: Ensure storage is encrypted with Customer Managed Keys | N | Will use Microsoft Managed Keys to reduce management overhead |
 | | `CIS: 3.13`: Ensure Storage Logging is enabled for 'read', 'write' and 'delete' requests | TODO | | 
@@ -77,19 +77,19 @@ This layer deploys the core components required for other layers, including a nu
 | | `CIS 8.6`: Ensure RBAC enabled for Azure Key Vault | Y | | 
 | | `CIS 8.7`: Ensure Private Endpoints are used for Azure Key Vault | Y | Public internet access disabled, PE into VNET |
 | | `CIS 10.1`: Ensure that resource locks are set for critical resources | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/124 |
-| Microsoft Defender for Cloud | `CIS 2.1` | N | TODO: Enable MS Defender for Cloud https://github.com/UCLH-Foundry/FlowEHR/issues/174 | 
-| | `CIS 2.1.2`: Ensure Microsoft Defender for App Services is set to 'On' | TODO | |
-| | `CIS 2.1.4`: Ensure Microsoft Defender for Azure SQL Databases is set to 'On' | TODO | |
-| | `CIS 2.1.5`: Ensure Microsoft Defender for Azure SQL Servers is set to 'On' | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/173 |
-| | `CIS 2.1.7`: Ensure Microsoft Defender for Storage is set to 'On' | TODO | |
-| | `CIS 2.1.8`: Ensure Microsoft Defender for Containers is set to 'On' | TODO | |
-| | `CIS 2.1.9`: Ensure Microsoft Defender for Azure Cosmos DB is set to 'On' | TODO | |
-| | `CIS 2.1.10`: Ensure Microsoft Defender for Key Vault is set to 'On' | TODO | |
+| Microsoft Defender for Cloud | `CIS 2.1` | N | TODO: Enable MS Defender for Cloud for the Prod subscription: https://github.com/UCLH-Foundry/FlowEHR/issues/174 . This is an 'org' level feature, and should be applied and managed at a subscription / management group level, by Subscription Owners. | 
+| | `CIS 2.1.2`: Ensure Microsoft Defender for App Services is set to 'On' | n/a | Set at org level |
+| | `CIS 2.1.4`: Ensure Microsoft Defender for Azure SQL Databases is set to 'On' | n/a | Set at org level |
+| | `CIS 2.1.5`: Ensure Microsoft Defender for Azure SQL Servers is set to 'On' | n/a | Set at org level |
+| | `CIS 2.1.7`: Ensure Microsoft Defender for Storage is set to 'On' | n/a | Set at org level |
+| | `CIS 2.1.8`: Ensure Microsoft Defender for Containers is set to 'On' | n/a | Set at org level |
+| | `CIS 2.1.9`: Ensure Microsoft Defender for Azure Cosmos DB is set to 'On' | n/a | Set at org level |
+| | `CIS 2.1.10`: Ensure Microsoft Defender for Key Vault is set to 'On' | n/a | Set at org level |
 | Azure Log Analytics: <br/>`log-<suffix>` | `CIS 5` | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/187 |
 | | `CIS 5.1.1`: Ensure Diagnostic setting exists (per resource) | TODO | |
 | | `CIS 5.1.2`: Ensure Diagnostic setting captures appropriate categories | TODO | |
 | | `CIS 5.1.4`: Ensure Diagnostic log storage container is encrypted with Customer Managed Key | N | System managed keys chosen to reduce management burden |
-| | `CIS 5.2`: Activity Log Alerts | TODO | Discuss: https://github.com/UCLH-Foundry/FlowEHR/issues/188 |
+| | `CIS 5.2`: Activity Log Alerts | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/188 |
 
 
 ### FlowEHR Data Transformation
@@ -105,10 +105,13 @@ This layer deploys components required to ingest data, transform data, and save 
 | | `CIS 4.1.4`: Ensure AAD admin is configured | Y | Owner is an auto-created Service Principal account, with credentials saved in key vault | 
 | | `CIS 4.1.5`: Ensure 'Data encryption' is set to 'on' | Y | Service Managed Key |
 | | `CIS 4.1.6`: Ensure that 'Auditing Retention' is set to 'Greater than 90 days' | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/172 |
-| | `CIS 4.2.1`: Ensure Microsoft Defender for SQL is set to 'on' | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/173 |
+| | `CIS 4.2.1`: Ensure Microsoft Defender for SQL is set to 'on' | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/174 |
 | | `CIS 4.2.2 -> CIS 4.2.5`: Ensure Vulnerability Assessment is enabled by setting a storage account | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/173 | 
 | Azure Key Vault Secrets | | [secrets.tf](./infrastructure/transform/secrets.tf) |
-| | `CIS 8.3`: Ensure expiration is set for all secrets in RBAC vaults | Discuss | No automated secret rotation in place as of yet. To discuss. | 
+| | `CIS 8.3`: Ensure expiration is set for all secrets in RBAC vaults | N | No automated secret rotation in place as of yet. Will be taken care of as a manual background task. | 
+| Azure Databricks | Databricks is not referenced in the CIS benchmark | | Below are some relevant security settings |
+| | Network Isolation | Partial | - Databricks nodes are network isolated <br/>- Databricks control plane is internet accessible. This can and should be switched off when internal routing is in place: https://github.com/UCLH-Foundry/FlowEHR/issues/201 |
+| | Secret management | Y | Secrets are stored in Databricks private secret scopes. Due to API limitation, it was not possible to use Key Vault backed vaults |
 
 
 ### FlowEHR App / Model Serving
