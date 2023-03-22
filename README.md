@@ -138,6 +138,7 @@ This step will create an AAD Application and Service Principal in the specified 
 
     `Repository Permissions`
     - `Contents`: `Read-only` - required to clone transformation pipeline repos for deployment
+    - `Pull Requests`: `Read and write` - required for the PR Bot to work in private forks
 
     Once done, generate it and copy it for the next step.
 
@@ -164,6 +165,10 @@ This step will create an AAD Application and Service Principal in the specified 
 6. Run `Deploy Infra-Test`
 
     Trigger a deployment using a workflow dispatch trigger on the `Actions` tab.
+
+Next steps:
+    - Deploy a data transformation pipeline (TODO)
+    - [Configure and deploy a FlowEHR app](./apps/README.md)
 
 ## <a name="identities"></a> Identities
 
