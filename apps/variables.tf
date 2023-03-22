@@ -90,13 +90,19 @@ variable "serve_webapps_subnet_id" {
   type = string
 }
 
+variable "github_app_cert" {
+  description = "GitHub App Private Key PEM file contents as string"
+  type        = string
+  sensitive   = true
+}
+
 # -- FROM CONFIGURATION FILES --------
 variable "accesses_real_data" {
   type = bool
 }
 
 variable "serve" {
-  description = "Serve configuration block (populated from root config file)"
+  description = "Serve configuration block (populated from root config file(s))"
   type = object({
     github_owner               = string
     github_app_id              = string

@@ -20,7 +20,7 @@ data "external" "github_access_token" {
     "${path.module}/generate_gh_token.py",
     var.serve.github_app_id,
     var.serve.github_app_installation_id,
-    "${path.module}/github.pem"
+    var.github_app_cert
   ]
 }
 

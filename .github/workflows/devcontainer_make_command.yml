@@ -129,11 +129,6 @@ jobs:
           environment: ${{ inputs.environment }}
           secrets: ${{ toJSON(secrets) }}
 
-      - name: Create GitHub App cert
-        env:
-          CERT: ${{ secrets.GH_APP_CERT }}
-        run: echo "$CERT" > apps/github.pem
-
       - name: Deploy core and build agent
         uses: devcontainers/ci@v0.3
         env:
@@ -159,6 +154,7 @@ jobs:
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
             FLOWEHR_GITHUB_TOKEN=${{ secrets.FLOWEHR_GITHUB_TOKEN }}
+            GH_APP_CERT=${{ secrets.GH_APP_CERT }}
             TF_VAR_devcontainer_image=${{ env.DEVCONTAINER_NAME }}
             TF_VAR_devcontainer_tag=${{ steps.dc.outputs.tag }}
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
@@ -186,11 +182,6 @@ jobs:
           environment: ${{ inputs.environment }}
           secrets: ${{ toJSON(secrets) }}
 
-      - name: Create GitHub App cert
-        env:
-          CERT: ${{ secrets.GH_APP_CERT }}
-        run: echo "$CERT" > apps/github.pem
-
       - name: Deploy
         env:
           DOCKER_BUILDKIT: 1
@@ -205,6 +196,7 @@ jobs:
           CI_RESOURCE_GROUP: ${{ vars.CI_RESOURCE_GROUP }}
           CI_STORAGE_ACCOUNT: ${{ vars.CI_STORAGE_ACCOUNT }}
           FLOWEHR_GITHUB_TOKEN: ${{ secrets.FLOWEHR_GITHUB_TOKEN }}
+          GH_APP_CERT: ${{ secrets.GH_APP_CERT }}
           SUFFIX_OVERRIDE: ${{ inputs.suffix_override }}
           TF_VAR_use_random_address_space: ${{ (inputs.suffix_override != '' && '1') || '0' }}
           TF_VAR_devcontainer_image: ${{ env.DEVCONTAINER_NAME }}
@@ -239,11 +231,6 @@ jobs:
           environment: ${{ inputs.environment }}
           secrets: ${{ toJSON(secrets) }}
 
-      - name: Create GitHub App cert
-        env:
-          CERT: ${{ secrets.GH_APP_CERT }}
-        run: echo "$CERT" > apps/github.pem
-
       - name: Post build agent command
         uses: devcontainers/ci@v0.3
         env:
@@ -268,6 +255,7 @@ jobs:
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
             FLOWEHR_GITHUB_TOKEN=${{ secrets.FLOWEHR_GITHUB_TOKEN }}
+            GH_APP_CERT=${{ secrets.GH_APP_CERT }}
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
 
       - name: Clean up

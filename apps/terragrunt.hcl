@@ -17,9 +17,13 @@ include "root" {
 }
 
 locals {
-  providers          = read_terragrunt_config("${get_repo_root()}/providers.hcl")
-  configuration      = read_terragrunt_config("${get_repo_root()}/configuration.hcl")
-  merged_root_config = local.configuration.locals.merged_root_config
+  providers            = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+  configuration        = read_terragrunt_config("${get_repo_root()}/configuration.hcl")
+  merged_root_config   = local.configuration.locals.merged_root_config
+
+  # Get GitHub App PEM cert as string - first try local file otherwise look for env var
+  github_app_cert_path = "${get_terragrunt_dir()}/github.pem"
+  github_app_cert      = fileexists(local.github_app_cert_path) ? file(local.github_app_cert_path) : get_env("GH_APP_CERT", null)
 
   # Get app configuration from apps.yaml and app.{ENVIRONMENT}.yaml
   apps_config_path     = "${get_terragrunt_dir()}/apps.yaml"
@@ -77,7 +81,7 @@ provider "github" {
   app_auth {
     id              = var.serve.github_app_id
     installation_id = var.serve.github_app_installation_id
-    pem_file        = file("./github.pem")
+    pem_file        = var.github_app_cert
   }
 }
 EOF
@@ -139,5 +143,6 @@ inputs = {
   serve_cosmos_account_name   = dependency.serve.outputs.cosmos_account_name
   serve_webapps_subnet_id     = dependency.serve.outputs.webapps_subnet_id
 
-  apps = local.merged_apps_config
+  github_app_cert = local.github_app_cert
+  apps            = local.merged_apps_config
 }

@@ -18,14 +18,14 @@ import sys
 import requests
 import json
 
-# Get PEM file path, App Id and App Installation Id
+# Get PEM string, App Id and App Installation Id
 app_id = sys.argv[1]
 installation_id = sys.argv[2]
-pem = sys.argv[3]
+pem_string = sys.argv[3]
 
-# Open PEM
-with open(pem, "rb") as pem_file:
-    signing_key = jwt.jwk_from_pem(pem_file.read())
+# Create JWK
+pem_bytes = bytes(pem_string, "ascii")
+signing_key = jwt.jwk_from_pem(pem_bytes)
 
 payload = {
     # Issued at time
