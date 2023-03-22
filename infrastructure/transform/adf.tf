@@ -10,7 +10,7 @@
 #  distributed under the License is distributed on an "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
-# Get all directories that have activities.json in them and say that they are pipeline directories
+#  limitations under the License.
 
 
 resource "azurerm_data_factory" "adf" {
