@@ -76,12 +76,19 @@ resource "azurerm_linux_web_app" "app" {
       }
     }
   }
+
+  lifecycle {
+    ignore_changes = [
+      auth_settings_v2
+    ]
+  }
 }
 
 # workaround for https://github.com/hashicorp/terraform-provider-azurerm/issues/20820
 resource "azapi_update_resource" "wa_auth_v2_config" {
-  type        = "Microsoft.Web/sites/config@2022-03-01"
-  resource_id = "${azurerm_linux_web_app.app.id}/config/authsettingsV2"
+  for_each    = local.webapp_names_and_data
+  type        = "Microsoft.Web/${each.value.type}/config@2022-03-01"
+  resource_id = "${each.value.id}/config/authsettingsV2"
 
   body = jsonencode({
     "location" : "UK South",
@@ -110,14 +117,14 @@ resource "azapi_update_resource" "wa_auth_v2_config" {
             "loginParameters" : []
           },
           "registration" : {
-            "clientId" : "${azuread_application.webapp[0].application_id}"
+            "clientId" : "${azuread_application.webapp[each.key].application_id}"
             "clientSecretCertificateThumbprint" : "",
             "clientSecretSettingName" : "MICROSOFT_PROVIDER_AUTHENTICATION_SECRET",
             "openIdIssuer" : "https://sts.windows.net/${data.azurerm_client_config.current.tenant_id}/v2.0"
           },
           "validation" : {
             "allowedAudiences" : [
-              "api://${local.webapp_name}"
+              "api://${each.key}"
             ],
             "defaultAuthorizationPolicy" : {},
             "jwtClaimChecks" : {}
@@ -147,30 +154,30 @@ resource "azapi_update_resource" "wa_auth_v2_config" {
         "enabled" : true,
         "runtimeVersion" : "~1"
       }
-    },
-    "type" : "Microsoft.Web/sites/config"
     }
-  )
+  })
 }
 
 resource "random_uuid" "webapp_oauth2_id" {
+  for_each = local.webapp_names_requiring_auth
 }
 
 resource "azuread_application" "webapp" {
-  count           = local.require_auth ? 1 : 0
-  display_name    = "flowehr-app-${local.webapp_name}"
-  identifier_uris = ["api://${local.webapp_name}"]
+  for_each = local.webapp_names_requiring_auth
+
+  display_name    = "flowehr-app-${each.key}"
+  identifier_uris = ["api://${each.key}"]
   owners          = [data.azurerm_client_config.current.object_id]
 
   api {
     oauth2_permission_scope {
-      admin_consent_description  = "Allow the application to access ${local.webapp_name} on behalf of the signed-in user."
-      admin_consent_display_name = "Access ${local.webapp_name}"
+      admin_consent_description  = "Allow the application to access ${each.key} on behalf of the signed-in user."
+      admin_consent_display_name = "Access ${each.key}"
       enabled                    = true
-      id                         = random_uuid.webapp_oauth2_id.result
+      id                         = random_uuid.webapp_oauth2_id[each.key].result
       type                       = "User"
-      user_consent_description   = "Allow the application to access ${local.webapp_name} on your behalf."
-      user_consent_display_name  = "Access ${local.webapp_name}"
+      user_consent_description   = "Allow the application to access ${each.key} on your behalf."
+      user_consent_display_name  = "Access ${each.key}"
       value                      = "user_impersonation"
     }
   }
@@ -185,8 +192,8 @@ resource "azuread_application" "webapp" {
   }
 
   web {
-    homepage_url  = "https://${local.webapp_name}.azurewebsites.net"
-    redirect_uris = ["https://${local.webapp_name}.azurewebsites.net/.auth/login/aad/callback"]
+    homepage_url  = "https://${each.key}.azurewebsites.net"
+    redirect_uris = ["https://${each.key}.azurewebsites.net/.auth/login/aad/callback"]
 
     implicit_grant {
       access_token_issuance_enabled = true
@@ -194,8 +201,6 @@ resource "azuread_application" "webapp" {
     }
   }
 }
-
-## TODO slot auth
 
 resource "azurerm_linux_web_app_slot" "testing" {
   count          = var.app_config.add_testing_slot ? 1 : 0
@@ -237,35 +242,12 @@ resource "azurerm_linux_web_app_slot" "testing" {
     }
   }
 
-  auth_settings_v2 {
-    auth_enabled           = var.accesses_real_data
-    require_authentication = var.accesses_real_data
-    default_provider       = "AzureActiveDirectory"
-    unauthenticated_action = "RedirectToLoginPage"
-
-    dynamic "active_directory_v2" {
-      for_each = local.require_auth ? { client_id = azuread_application.webapp_slot[0].application_id } : {}
-
-      content {
-        tenant_auth_endpoint       = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/v2.0"
-        client_secret_setting_name = "MICROSOFT_PROVIDER_AUTHENTICATION_SECRET"
-        client_id                  = each.value
-      }
-    }
-
-    login {}
+  lifecycle {
+    ignore_changes = [
+      auth_settings_v2
+    ]
   }
 }
-
-resource "azuread_application" "webapp_slot" {
-  count        = var.app_config.add_testing_slot ? 1 : 0
-  display_name = "flowehr-app-${local.testing_slot_name}-${replace(var.app_id, "_", "-")}"
-  owners       = [data.azurerm_client_config.current.object_id]
-}
-
-
-
-
 
 resource "azurerm_role_assignment" "webapp_acr" {
   role_definition_name = "AcrPull"

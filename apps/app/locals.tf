@@ -19,11 +19,33 @@ locals {
   acr_repository     = var.app_id
   create_repo        = var.app_config.managed_repo != null
 
-  webapp_name = "webapp-${replace(var.app_id, "_", "-")}-${var.naming_suffix}"
-
   require_auth = var.app_config.require_auth || var.accesses_real_data
 
-  testing_slot_name   = "testing"
+  webapp_name       = "webapp-${replace(var.app_id, "_", "-")}-${var.naming_suffix}"
+  testing_slot_name = "testing"
+  slot_webapp_name  = "${local.webapp_name}-${local.testing_slot_name}"
+
+  webapp_names_requiring_auth = (
+    !local.require_auth ?
+    toset([]) :
+    var.app_config.add_testing_slot ?
+    toset([local.webapp_name, local.slot_webapp_name]) : toset([local.webapp_name])
+  )
+
+  webapp_names_and_data = var.app_config.add_testing_slot ? {
+    "${local.webapp_name}" = {
+      id   = azurerm_linux_web_app.app.id
+      type = "sites"
+    }
+    "${local.slot_webapp_name}" = {
+      id   = azurerm_linux_web_app_slot.testing[0].id
+      type = "sites/slots"
+    }
+    } : { "${local.webapp_name}" = {
+      id   = azurerm_linux_web_app.app.id
+      type = "sites"
+  } }
+
   core_gh_env         = var.environment
   core_branch_name    = local.core_gh_env
   testing_gh_env      = var.app_config.add_testing_slot ? "${var.environment}-testing_slot" : null

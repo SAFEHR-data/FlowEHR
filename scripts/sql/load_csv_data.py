@@ -24,6 +24,7 @@ client_secret = os.environ.get("CLIENT_SECRET")
 path_to_csv = os.environ.get("PATH_TO_CSV")
 table_name = os.environ.get("TABLE_NAME")
 
+exit()
 
 def create_con_str(db: str) -> str:
     driver = "{ODBC Driver 18 for SQL Server}"
