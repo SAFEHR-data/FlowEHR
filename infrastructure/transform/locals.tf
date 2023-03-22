@@ -47,7 +47,7 @@ locals {
 
   triggers = flatten([
     for pipeline_dir in local.pipeline_dirs : [
-      can(jsondecode(file("${pipeline_dir}/${local.trigger_file}"))) ? {
+      fileexists("${pipeline_dir}/${local.trigger_file}") ? {
         pipeline = basename("${pipeline_dir}")
         trigger  = jsondecode(file("${pipeline_dir}/${local.trigger_file}"))
       } : null
