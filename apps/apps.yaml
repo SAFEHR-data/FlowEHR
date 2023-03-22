@@ -3,9 +3,9 @@ flowehr_cicd_test:
   name: FlowEHR CICD Test App
   description: Test of app deployment
   owners:
-    - octocat
+    flowehr-testing-app-owner: FlowEHR-testing-app-owner@uclhdif.onmicrosoft.com
   contributors:
-    - octokitten
+    flowehr-testing-app-contributor: FlowEHR-testing-app-contributor@uclhdif.onmicrosoft.com
   branch:
     num_of_approvals: 1
   env:

@@ -4,9 +4,9 @@ dash_seedling: # unique ID for the app
   description: Hello world app for Dash # short description
   add_testing_slot: false # Whether to add a testing slot in addition to main slot
   owners: # Owners to add to repo (for reviews) in format GH_USERNAME: AAD_EMAIL
-    - octocat: an_aad_user@mycompany.com
+    octocat: an_aad_user@mycompany.com
   contributors: # contributors to add to repo in format GH_USERNAME: AAD_EMAIL
-    - octokitten: an_aad_user@mycompany.com
+    octokitten: an_aad_user@mycompany.com
   managed_repo: # details for repo to create/manage
     private: false # repo visibility
     template: UCLH-Foundry/Dash-Seedling # template to use in format GH_ORG/TEMPLATE_NAME

@@ -25,6 +25,7 @@ override.tf.json
 backend.tf
 provider.tf
 terraform.tf
+terragrunt-debug.tfvars.json
 
 # Ignore plan output
 .tfplan

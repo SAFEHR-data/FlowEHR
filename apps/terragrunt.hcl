@@ -17,13 +17,23 @@ include "root" {
 }
 
 locals {
-  providers            = read_terragrunt_config("${get_repo_root()}/providers.hcl")
-  configuration        = read_terragrunt_config("${get_repo_root()}/configuration.hcl")
-  merged_root_config   = local.configuration.locals.merged_root_config
+  providers          = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+  configuration      = read_terragrunt_config("${get_repo_root()}/configuration.hcl")
+  merged_root_config = local.configuration.locals.merged_root_config
+
+  # Get app configuration from apps.yaml and app.{ENVIRONMENT}.yaml
   apps_config_path     = "${get_terragrunt_dir()}/apps.yaml"
   apps_config          = fileexists(local.apps_config_path) ? yamldecode(file(local.apps_config_path)) : null
   apps_env_config_path = "${get_terragrunt_dir()}/apps.${get_env("ENVIRONMENT", "local")}.yaml"
   apps_env_config      = fileexists(local.apps_env_config_path) ? yamldecode(file(local.apps_env_config_path)) : null
+
+  merged_apps_config = {
+    # As it's a map, we need to iterate as direct merge() would overwrite each key's value entirely
+    for app_id, app_config in local.apps_env_config : app_id =>
+      # And we don't want apps defined in apps.yaml but not in current {ENVIRONMENT} file to be deployed,
+      # so only merge if key exists with env-specific config taking precedence
+      merge(local.apps_config[app_id], app_config)
+  }
 }
 
 generate "terraform" {
@@ -129,6 +139,5 @@ inputs = {
   serve_cosmos_account_name   = dependency.serve.outputs.cosmos_account_name
   serve_webapps_subnet_id     = dependency.serve.outputs.webapps_subnet_id
 
-  # Generate app config by merging 
-  apps = merge(local.apps_config, local.apps_env_config)
+  apps = local.merged_apps_config
 }
