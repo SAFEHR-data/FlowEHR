@@ -70,13 +70,3 @@ resource "databricks_secret" "flowehr_databricks_sql_database" {
   string_value = azurerm_mssql_database.feature_database.name
   scope        = databricks_secret_scope.secrets.id
 }
-resource "databricks_secret" "flowehr_databricks_adls_spn_app_id" {
-  key          = "flowehr-dbks-adls-app-id"
-  string_value = azuread_service_principal.flowehr_databricks_adls.application_id
-  scope        = databricks_secret_scope.secrets.id
-}
-resource "databricks_secret" "flowehr_databricks_adls_spn_app_secret" {
-  key          = "flowehr-dbks-adls-app-secret"
-  string_value = azuread_application_password.flowehr_databricks_adls.value
-  scope        = databricks_secret_scope.secrets.id
-}

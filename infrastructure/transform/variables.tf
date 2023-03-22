@@ -74,6 +74,16 @@ variable "transform" {
   description = "Transform configuration block (populated from root config file)"
   type = object({
     spark_version = optional(string, "3.3.1")
+    datalake = object({
+      enabled = bool
+      zones = optional(list(object({
+        name = string
+        containers = optional(list(object({
+          name = string
+        })), [])
+        })
+      ), [])
+    })
     repositories = optional(list(object({
       url = string,
       sha = optional(string, "")
@@ -81,7 +91,11 @@ variable "transform" {
   })
   default = {
     spark_version = "3.3.1"
-    repositories  = []
+    datalake : {
+      enabled = false
+      zones   = []
+    }
+    repositories = []
   }
 }
 

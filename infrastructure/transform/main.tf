@@ -12,6 +12,24 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+module "datalake" {
+  count                         = var.transform.datalake.enabled ? 1 : 0
+  source                        = "./datalake"
+  core_rg_name                  = var.core_rg_name
+  core_rg_location              = var.core_rg_location
+  core_vnet_name                = var.core_vnet_name
+  core_subnet_id                = var.core_subnet_id
+  core_kv_id                    = var.core_kv_id
+  databricks_identity_object_id = azuread_service_principal.flowehr_databricks_adls[0].object_id
+  adf_identity_object_id        = azurerm_data_factory.adf.identity[0].principal_id
+  zones                         = var.transform.datalake.zones
+  tf_in_automation              = var.tf_in_automation
+  deployer_ip_address           = var.deployer_ip_address
+  naming_suffix                 = var.naming_suffix
+  tags                          = var.tags
+
+}
+
 resource "azurerm_databricks_workspace" "databricks" {
   name                                  = "dbks-${var.naming_suffix}"
   resource_group_name                   = var.core_rg_name
@@ -166,9 +184,86 @@ resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
   existing_cluster_id = databricks_cluster.fixed_single_node.cluster_id
 }
 
+
+resource "azurerm_data_factory_linked_service_data_lake_storage_gen2" "msi_linked" {
+  count                = var.transform.datalake.enabled ? 1 : 0
+  name                 = "ADLSLinkedServiceViaMSI"
+  data_factory_id      = azurerm_data_factory.adf.id
+  description          = "ADLS Gen2"
+  use_managed_identity = true
+  url                  = "https://${module.datalake[0].storage_account_name}.dfs.core.windows.net"
+}
+
 resource "azurerm_data_factory_linked_service_key_vault" "msi_linked" {
   name            = "KVLinkedServiceViaMSI"
   data_factory_id = azurerm_data_factory.adf.id
   description     = "Key Vault linked service via MSI"
   key_vault_id    = var.core_kv_id
+}
+
+
+# AAD App + SPN for Databricks -> ADLS Access
+resource "azuread_application" "flowehr_databricks_adls" {
+  count        = var.transform.datalake.enabled ? 1 : 0
+  display_name = local.databricks_app_name
+  owners       = [data.azurerm_client_config.current.object_id]
+}
+
+resource "azuread_application_password" "flowehr_databricks_adls" {
+  count                 = var.transform.datalake.enabled ? 1 : 0
+  application_object_id = azuread_application.flowehr_databricks_adls[0].object_id
+}
+
+resource "azuread_service_principal" "flowehr_databricks_adls" {
+  count          = var.transform.datalake.enabled ? 1 : 0
+  application_id = azuread_application.flowehr_databricks_adls[0].application_id
+  owners         = [data.azurerm_client_config.current.object_id]
+}
+
+resource "azurerm_key_vault_secret" "flowehr_databricks_adls_spn_app_id" {
+  count        = var.transform.datalake.enabled ? 1 : 0
+  name         = "flowehr-dbks-adls-app-id"
+  value        = azuread_service_principal.flowehr_databricks_adls[0].application_id
+  key_vault_id = var.core_kv_id
+}
+
+resource "azurerm_key_vault_secret" "flowehr_databricks_adls_spn_app_secret" {
+  count        = var.transform.datalake.enabled ? 1 : 0
+  name         = "flowehr-dbks-adls-app-secret"
+  value        = azuread_application_password.flowehr_databricks_adls[0].value
+  key_vault_id = var.core_kv_id
+}
+
+resource "databricks_secret" "flowehr_databricks_adls_spn_app_id" {
+  count        = var.transform.datalake.enabled ? 1 : 0
+  key          = "flowehr-dbks-adls-app-id"
+  string_value = azuread_service_principal.flowehr_databricks_adls[0].application_id
+  scope        = databricks_secret_scope.secrets.id
+}
+
+resource "databricks_secret" "flowehr_databricks_adls_spn_app_secret" {
+  count        = var.transform.datalake.enabled ? 1 : 0
+  key          = "flowehr-dbks-adls-app-secret"
+  string_value = azuread_application_password.flowehr_databricks_adls[0].value
+  scope        = databricks_secret_scope.secrets.id
+}
+
+
+resource "databricks_mount" "adls_bronze" {
+  for_each   = { for zone in var.transform.datalake.zones : zone.name => zone }
+  name       = "adls-data-lake-${lower(each.value.name)}"
+  uri        = "abfss://${lower(each.value.name)}@${module.datalake[0].storage_account_name}.dfs.core.windows.net/"
+  cluster_id = databricks_cluster.fixed_single_node.cluster_id
+  extra_configs = {
+    "fs.azure.account.auth.type" : "OAuth",
+    "fs.azure.account.oauth.provider.type" : "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider",
+    "fs.azure.account.oauth2.client.id" : azuread_application.flowehr_databricks_adls[0].application_id,
+    "fs.azure.account.oauth2.client.secret" : "{{secrets/${databricks_secret_scope.secrets.name}/${azurerm_key_vault_secret.flowehr_databricks_adls_spn_app_secret[0].name}}}",
+    "fs.azure.account.oauth2.client.endpoint" : "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/oauth2/token",
+    "fs.azure.createRemoteFileSystemDuringInitialization" : "false",
+  }
+
+  depends_on = [
+    module.datalake
+  ]
 }

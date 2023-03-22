@@ -1,3 +1,4 @@
+---
 flowehr_id: __CHANGE_ME__
 location: __CHANGE_ME__
 environment: __CHANGE_ME__
@@ -6,7 +7,7 @@ accesses_real_data: false
 data_source_connections:
   - example:
     name: __CHANGE_ME__
-    peering: # Optional
+    peering:  # Optional
       virtual_network_name: __CHANGE_ME__
       resource_group_name: __CHANGE_ME__
       dns_zones:
@@ -18,6 +19,18 @@ data_source_connections:
 
 transform:
   spark_version: 3.3.1
+  datalake:
+    enabled: true
+    zones:  # Optional
+      - name: "Bronze"
+        containers:
+          - name: "Raw"
+      - name: "Silver"
+        containers:
+          - name: "Transformed"
+      - name: "Gold"
+        containers:
+          - name: "Curated"
   repositories:
     - url: https://github.com/MY_TRANSFORM_CODE_REPO.git
     - url: https://github.com/MY_OTHER_TRANSFORM_CODE_REPO.git
