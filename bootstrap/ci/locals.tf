@@ -16,6 +16,7 @@ locals {
   ci_sp_required_graph_permissions = toset([
     "Application.ReadWrite.All",
     "AppRoleAssignment.ReadWrite.All",
-    "Group.ReadWrite.All"
+    "Group.ReadWrite.All",
+    "Directory.Read.All"
   ])
 }

@@ -39,7 +39,8 @@ Once you've created it, specify the following values:
 
 - `serve` (optional)
     - `github_owner` - the GitHub organisation to deploy FlowEHR app repositories to
-    - `github_token` (local only) - a GitHub PAT for authenticating to GitHub. See the [apps README](./apps/README.md) for details.
+    - `github_app_id` - a [GitHub App](https://docs.github.com/en/apps/creating-github-apps/creating-github-apps/about-apps) id used for authenticating app artifact creation in GitHub. See [the apps set-up guide](./apps/README.md) for details.
+    - `github_app_installation_id` - a GitHub App installation id for the installation of the above GH app. See [the apps set-up guide](./apps/README.md) for details.
 
 - `data_source_connections` (optional) - list of data source objects for configuring in data pipelines. See below for schema:
 
@@ -73,31 +74,27 @@ Once you've created it, specify the following values:
     az account set -s SUB_NAME_OR_ID
     ```
 
-3. Run `make infrastructure`
+3. Run `make all`
 
-    To bootstrap Terraform, and deploy all infrastructure, run
+    To bootstrap Terraform, and deploy all infrastructure, and any configured pipelines and apps, run:
+
+    ```bash
+    make all
+    ```
+
+    > For more info on configuring and deploying apps, see the [README](./apps/README.md)
+
+    Alternatively, if you just want to deploy the infrastructure:
 
     ```bash
     make infrastructure
     ```
 
-    Alternatively, if you just want to deploy transform infrastructure but not serve:
-
-    ```bash
-    make infrastructure-transform
-    ```
-
-    You can also deploy other individual infrastructure modules, as well as destroy and other operations. To see all options:
+    You can also deploy individual infrastructure modules, apps, as well as destroy and other operations. To see all options:
 
     ```bash
     make help
     ```
-
-4. (Optional) Deploy FlowEHR apps
-
-    You can run `make apps` to deploy any configured apps to the FlowEHR infrastructure.
-
-    > For more info on configuring and deploying apps, see the [README](./apps/README.md)
 
 
 ### <a name="ci"></a>CI (GitHub Actions)
@@ -126,19 +123,25 @@ This step will create an AAD Application and Service Principal in the specified 
 
     Copy the outputted values to populate in step 5.
 
-4. Create GitHub PATs (access tokens)
+4. Create a GitHub PAT (access token)
 
-    We require a GitHub [Classic PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#personal-access-tokens-classic) with scopes to clone any transform repositories defined in `config.infra-test.yaml`, as well as scopes to create and manage repositories within your org for deploying FlowEHR applications, and to deploy GitHub runners for executing CI deployments.
+    We require a GitHub [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#fine-grained-personal-access-tokens) with scopes to clone any transform repositories defined in `config.infra-test.yaml` (or `config.yaml` if you haven't defined env-specific repositories), as well as permissions to deploy GitHub runners for executing CI deployments.
 
-    Follow the instructions [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#personal-access-tokens-classic) to create a classic token (fine-grained tokens don't currently support the GitHub GraphQL API which we require).
+    Follow the instructions [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#fine-grained-personal-access-tokens) to create a token, set a sensible expiration time (you'll need to manually repeat these steps to create a new one after expiry) and set the `Resource Owner` as the organisation containing your FlowEHR fork and any transform pipeline repositories.
 
-    Then, make sure you have enabled the following permissions:
+    Then provide it repository access to either `All Repositories` (within that org), or `Selected Repositories` and ensure you select the FlowEHR fork as well as any transform repos that will be cloned during deployments.
 
-    - `repo` - read/write repositories
-    - `admin:org` - manage team memberships and runners
-    - `delete_repo` - delete repositories
+    Finally, give it the following scopes:
 
-    Finally, generate it and copy it for the next step.
+    `Organization Permissions`
+    - `Administration`: `Read and write` - required for GitHub Runner registration
+
+    `Repository Permissions`
+    - `Contents`: `Read-only` - required to clone transformation pipeline repos for deployment
+
+    Once done, generate it and copy it for the next step.
+
+    > Note: if you're not an owner of the Organization you defined as Resource Owner for the token, your token won't be active until approved by an owner.
 
 5. Create and populate a GitHub environment
 
@@ -154,7 +157,7 @@ This step will create an AAD Application and Service Principal in the specified 
     - `ARM_TENANT_ID`: Tenant ID containing the Azure subscription to deploy into (outputted from step 3)
     - `ARM_SUBSCRIPTION_ID`: Subscription ID of the Azure subscription to deploy into (outputted from step 3)
     - `ARM_CLIENT_SECRET`: Client secret of the service principal created in step 3
-    - `GH_PAT`: The token you created in the previous step (this may be added as a repository or organisation secret rather than environment secret and be re-used betweeen environments if you prefer)
+    - `FLOWEHR_GITHUB_TOKEN`: The token you created in the previous step (this may be added as a repository or organisation secret rather than environment secret and be re-used betweeen environments if you prefer)
 
 > If you used any tokens in your config yaml files, make sure you populate the equivalent GitHub secret with an identical name so that the token replacement step will substitute your secret(s) into the configuration on deploy (e.g. if you put `${SQL_CONN_STRING}` in config.yaml, make sure you have a GitHub secret called `SQL_CONN_STRING` containing the secret value).
 
