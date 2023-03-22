@@ -10,14 +10,17 @@
 #  distributed under the License is distributed on an "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
-# Get all directories that have pipeline.json in them and say that they are pipeline directories
+#  limitations under the License.
 
 resource "azurerm_data_factory_pipeline" "pipeline" {
-  for_each        = { for pipeline in local.pipelines : pipeline.pipeline_dir => [pipeline.pipeline_json, pipeline.pipeline_parameters] }
-  name            = each.value[0].name
+  for_each        = { for pipeline in local.pipelines : pipeline.pipeline_dir => pipeline.pipeline_json }
+  name            = each.value.name
   data_factory_id = azurerm_data_factory.adf.id
-  activities_json = jsonencode(each.value[0].properties.activities)
-  parameters      = each.value[1]
+  activities_json = jsonencode(each.value.properties.activities)
+  parameters = { for param_name, param in each.value.properties.parameters : param_name => {
+    "type"         = param.type
+    "defaultValue" = param.defaultValue
+  } }
 
   depends_on = [
     azurerm_data_factory_linked_service_azure_databricks.msi_linked
@@ -56,5 +59,5 @@ resource "azurerm_data_factory_trigger_tumbling_window" "pipeline_trigger" {
     parameters = each.value.properties.pipeline.parameters
   }
 
-  // Dependencies and additional properties aren't supported
+  // Trigger dependencies and additional properties aren't supported
 }

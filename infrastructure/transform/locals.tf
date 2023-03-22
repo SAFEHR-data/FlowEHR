@@ -32,9 +32,6 @@ locals {
     for pipeline_dir in local.pipeline_dirs : {
       pipeline_dir  = pipeline_dir
       pipeline_json = jsondecode(file("${pipeline_dir}/${local.pipeline_file}"))
-      pipeline_parameters = { for param_name, param in jsondecode(file("${pipeline_dir}/${local.pipeline_file}")).properties.parameters :
-        param_name => param.type
-      }
     }
   ]
 
