@@ -50,7 +50,7 @@ cnxn = pyodbc.connect(create_con_str(database))
 cursor = cnxn.cursor()
 
 for user in users:
-    # connect to target feature database to create user + assign as dbo
+    # connect to target feature database to create user + assign given role
     query = f"""
     IF NOT EXISTS(SELECT principal_id FROM sys.database_principals WHERE name = '{user['name']}') BEGIN
         CREATE USER [{user['name']}] FROM EXTERNAL PROVIDER
