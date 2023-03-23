@@ -1,0 +1,6 @@
+---
+flowehr_cicd_test:
+  add_testing_slot: false
+  managed_repo:
+    private: false
+    template: UCLH-Foundry/Dash-Seedling

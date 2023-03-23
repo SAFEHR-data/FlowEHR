@@ -29,8 +29,8 @@ concurrency:
 jobs:
   deploy:
     uses: ./.github/workflows/devcontainer_make_command.yml
-    name: Make Infrastructure
+    name: Make All
     with:
-      command: infrastructure
+      command: all
       environment: infra-test
     secrets: inherit

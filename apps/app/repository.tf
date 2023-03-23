@@ -32,7 +32,7 @@ resource "github_team" "owners" {
 }
 
 resource "github_team_members" "owners" {
-  for_each = local.create_repo ? var.app_config.managed_repo.owners : toset([])
+  for_each = local.create_repo ? var.app_config.owners : null
   team_id  = github_team.owners[0].id
 
   members {
@@ -76,7 +76,7 @@ resource "github_team" "contributors" {
 }
 
 resource "github_team_members" "contributors" {
-  for_each = local.create_repo ? var.app_config.managed_repo.contributors : toset([])
+  for_each = local.create_repo ? var.app_config.contributors : null
   team_id  = github_team.contributors[0].id
 
   members {
@@ -163,12 +163,11 @@ resource "github_repository_environment" "all" {
   # TODO: remove when https://github.com/integrations/terraform-provider-github/pull/1530 is merged
   provisioner "local-exec" {
     command = <<EOF
-gh api \
-  --method POST \
+curl https://api.github.com/repos/${var.github_owner}/${local.repository_name}/environments/${each.value}/deployment-branch-policies \
   -H "Accept: application/vnd.github+json" \
   -H "X-GitHub-Api-Version: 2022-11-28" \
-  /repos/${var.github_owner}/${local.repository_name}/environments/${each.value}/deployment-branch-policies \
-  -f name='${each.key}'
+  -H "Authorization: Bearer ${var.github_access_token}" \
+  -d '{"name":"${each.key}"}'
 EOF
   }
 

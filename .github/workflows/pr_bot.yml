@@ -80,6 +80,8 @@ jobs:
               - 'infrastructure/transform/**'
             serve:
               - 'infrastructure/serve/**'
+            apps:
+              - 'apps/**'
             devcontainer:
               - '.devcontainer/**'
 
@@ -94,6 +96,8 @@ jobs:
               make_command="test-transform"
           elif [ ${{ steps.changes.outputs.serve }} = "true" ]; then
               make_command="test-serve"
+          elif [ ${{ steps.changes.outputs.apps }} = "true" ]; then
+              make_command="test-apps"
           elif [ ${{ steps.changes.outputs.devcontainer }} = "true" ]; then
               make_command="test"
           else

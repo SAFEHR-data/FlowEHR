@@ -11,4 +11,6 @@ transform:
     - url: https://github.com/UCLH-Foundry/FlowEHR-Data-Pot
 
 serve:
-  github_owner: UCLH-Foundry
+  github_owner: UCLH-FlowEHR-TestBed
+  github_app_id: 309047
+  github_app_installation_id: 35581991

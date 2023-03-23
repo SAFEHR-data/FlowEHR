@@ -20,25 +20,23 @@ locals {
   providers            = read_terragrunt_config("${get_repo_root()}/providers.hcl")
   configuration        = read_terragrunt_config("${get_repo_root()}/configuration.hcl")
   merged_root_config   = local.configuration.locals.merged_root_config
+
+  # Get GitHub App PEM cert as string - first try local file otherwise look for env var
+  github_app_cert_path = "${get_terragrunt_dir()}/github.pem"
+  github_app_cert      = fileexists(local.github_app_cert_path) ? file(local.github_app_cert_path) : get_env("GH_APP_CERT", null)
+
+  # Get app configuration from apps.yaml and app.{ENVIRONMENT}.yaml
   apps_config_path     = "${get_terragrunt_dir()}/apps.yaml"
   apps_config          = fileexists(local.apps_config_path) ? yamldecode(file(local.apps_config_path)) : null
   apps_env_config_path = "${get_terragrunt_dir()}/apps.${get_env("ENVIRONMENT", "local")}.yaml"
   apps_env_config      = fileexists(local.apps_env_config_path) ? yamldecode(file(local.apps_env_config_path)) : null
-}
 
-terraform {
-  extra_arguments "auto_approve" {
-    commands  = ["apply"]
-    arguments = ["-auto-approve"]
-  }
-
-  # Export GitHub credentials for use by both TF provider and CLI
-  extra_arguments "set_github_vars" {
-    commands = ["init", "apply", "plan", "destroy", "taint", "untaint", "refresh"]
-    env_vars = {
-      GITHUB_OWNER = local.merged_root_config.serve.github_owner
-      GITHUB_TOKEN = get_env("ORG_GITHUB_TOKEN", local.merged_root_config.serve.github_token)
-    }
+  merged_apps_config = {
+    # As it's a map, we need to iterate as direct merge() would overwrite each key's value entirely
+    for app_id, app_config in local.apps_env_config : app_id =>
+      # And we don't want apps defined in apps.yaml but not in current {ENVIRONMENT} file to be deployed,
+      # so only merge if key exists with env-specific config taking precedence
+      merge(local.apps_config[app_id], app_config)
   }
 }
 
@@ -66,6 +64,7 @@ generate "child_terraform" {
 terraform {
   required_providers {
     ${local.providers.locals.required_provider_github}
+    ${local.providers.locals.required_provider_external}
   }
 }
 EOF
@@ -77,7 +76,14 @@ generate "provider" {
   contents  = <<EOF
 ${local.providers.locals.azure_provider}
 
-provider "github" {}
+provider "github" {
+  owner = var.serve.github_owner
+  app_auth {
+    id              = var.serve.github_app_id
+    installation_id = var.serve.github_app_installation_id
+    pem_file        = var.github_app_cert
+  }
+}
 EOF
 }
 
@@ -137,6 +143,6 @@ inputs = {
   serve_cosmos_account_name   = dependency.serve.outputs.cosmos_account_name
   serve_webapps_subnet_id     = dependency.serve.outputs.webapps_subnet_id
 
-  # Generate app config by merging 
-  apps = merge(local.apps_config, local.apps_env_config)
+  github_app_cert = local.github_app_cert
+  apps            = local.merged_apps_config
 }
