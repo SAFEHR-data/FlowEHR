@@ -12,3 +12,5 @@ transform:
 
 serve:
   github_owner: UCLH-FlowEHR-TestBed
+  github_app_id: 309047
+  github_app_installation_id: 35581991

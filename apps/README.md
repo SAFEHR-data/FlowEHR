@@ -12,10 +12,11 @@ We recommend creating a new GitHub Organization for containing all of the FlowEH
 
 #### Create GH app
 
-Once you've done (or not done) that, follow [these instructions](https://docs.github.com/en/apps/creating-github-apps/creating-github-apps/creating-a-github-app) to create a new GitHub App within the organization you wish to host your new FlowEHR apps, with the following properties:
+Once you've done (or not done) that, follow [these instructions](https://docs.github.com/en/apps/creating-github-apps/creating-github-apps/creating-a-github-app) to create a new GitHub App within the organization you wish to host your new FlowEHR apps, with the following properties (leave everything else blank/default):
 
-- `Name`: `FlowEHR` or something similar (this will be shown in GitHub activity logs)
+- `Name`: `{YOUR_ORG}-FlowEHR` or something similar (needs to be globally unique)
 - `Homepage URL`: `https://flowehr.io`
+- `Webhook`: uncheck the Active checkbox
 - `Permissions`
     - `Repository Permissions`
         - `Administration`: `Read and write`
