@@ -48,7 +48,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.FLOWEHR_GITHUB_TOKEN }}
-          fetch-depth: 0  # entire histroy is needed for paths filter
+          fetch-depth: 0  # entire history is needed for paths filter
           persist-credentials: false
 
       # Determine whether the comment is a command
