@@ -3,7 +3,7 @@ dash_seedling: # unique ID for the app
   name: Dash Seedling
   description: Hello world app for Dash
   add_testing_slot: false
-  require_auth: false # Should azure active directory authorisation be required?
+  require_auth: false # Should Azure Active Directory authentication be required?
   managed_repo: # details for created repo
     private: false # repo visibility
     template: UCLH-Foundry/Dash-Seedling
