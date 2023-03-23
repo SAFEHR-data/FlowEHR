@@ -12,6 +12,10 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+# This is only required while we have to call the GH API manually
+# It can be removed when we can apply branch policies via Terraform following merge of
+# https://github.com/integrations/terraform-provider-github/pull/1530
+
 import jwt
 import time
 import sys
