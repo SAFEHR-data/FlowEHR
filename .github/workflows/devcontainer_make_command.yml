@@ -45,7 +45,7 @@ on:
       FLOWEHR_GITHUB_TOKEN:
         required: true
       GH_APP_CERT:
-        required: true
+        required: false
 
 env:
   DEVCONTAINER_NAME: flowehr/devcontainer
@@ -132,9 +132,10 @@ jobs:
       - name: Deploy core and build agent
         uses: devcontainers/ci@v0.3
         env:
-          # Add suffix as step env so it's only passed as an env var if it's not empty
+          # Add optionals as step envs so only passed as env vars if not empty
           # https://github.com/devcontainers/ci/issues/231
           SUFFIX_OVERRIDE: ${{ inputs.suffix_override }}
+          GH_APP_CERT: ${{ secrets.GH_APP_CERT }}
         with:
           imageName: ${{ steps.dc.outputs.image_path }}
           imageTag: ${{ steps.dc.outputs.tag }}
@@ -154,7 +155,7 @@ jobs:
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
             FLOWEHR_GITHUB_TOKEN=${{ secrets.FLOWEHR_GITHUB_TOKEN }}
-            GH_APP_CERT=${{ secrets.GH_APP_CERT }}
+            GH_APP_CERT
             TF_VAR_devcontainer_image=${{ env.DEVCONTAINER_NAME }}
             TF_VAR_devcontainer_tag=${{ steps.dc.outputs.tag }}
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
@@ -196,7 +197,7 @@ jobs:
           CI_RESOURCE_GROUP: ${{ vars.CI_RESOURCE_GROUP }}
           CI_STORAGE_ACCOUNT: ${{ vars.CI_STORAGE_ACCOUNT }}
           FLOWEHR_GITHUB_TOKEN: ${{ secrets.FLOWEHR_GITHUB_TOKEN }}
-          GH_APP_CERT: ${{ secrets.GH_APP_CERT }}
+          GH_APP_CERT: "${{ secrets.GH_APP_CERT }}"
           SUFFIX_OVERRIDE: ${{ inputs.suffix_override }}
           TF_VAR_use_random_address_space: ${{ (inputs.suffix_override != '' && '1') || '0' }}
           TF_VAR_devcontainer_image: ${{ env.DEVCONTAINER_NAME }}
@@ -235,6 +236,7 @@ jobs:
         uses: devcontainers/ci@v0.3
         env:
           SUFFIX_OVERRIDE: ${{ inputs.suffix_override }}
+          GH_APP_CERT: ${{ secrets.GH_APP_CERT }}
         with:
           # The image name cannot be set from the make_core output because it contains a secret
           imageName: ${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DEVCONTAINER_NAME }}
@@ -255,7 +257,7 @@ jobs:
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
             FLOWEHR_GITHUB_TOKEN=${{ secrets.FLOWEHR_GITHUB_TOKEN }}
-            GH_APP_CERT=${{ secrets.GH_APP_CERT }}
+            GH_APP_CERT
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
 
       - name: Clean up
