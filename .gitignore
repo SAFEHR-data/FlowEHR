@@ -25,6 +25,7 @@ override.tf.json
 backend.tf
 provider.tf
 terraform.tf
+terragrunt-debug.tfvars.json
 
 # Ignore plan output
 .tfplan
@@ -36,10 +37,13 @@ terraform.tf
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
 # example: *tfplan*
 
-# local config files
+# Local config files
 .env
 *.env
 *.local.yaml
+
+# Certs
+*.pem
 
 # Mac specific metadata
 .DS_store

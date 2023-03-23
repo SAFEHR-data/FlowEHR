@@ -16,8 +16,8 @@ variable "app_id" {
   type = string
 
   validation {
-    condition     = length(var.app_id) < 15
-    error_message = "app_id must be less than 15 chars"
+    condition     = length(var.app_id) <= 20
+    error_message = "app_id must be 20 chars or less"
   }
 
   validation {
@@ -43,6 +43,10 @@ variable "location" {
 }
 
 variable "tf_in_automation" {
+  type = bool
+}
+
+variable "accesses_real_data" {
   type = bool
 }
 
@@ -78,18 +82,46 @@ variable "github_owner" {
   type = string
 }
 
+variable "github_access_token" {
+  type      = string
+  sensitive = true
+}
+
+variable "developers_ad_group_display_name" {
+  type = string
+}
+
+variable "apps_ad_group_display_name" {
+  type = string
+}
+
+variable "apps_ad_group_principal_id" {
+  type = string
+}
+
+variable "developers_ad_group_principal_id" {
+  type = string
+}
+
 variable "app_config" {
   type = object({
-    name         = string
-    description  = string
-    owners       = set(string)
-    contributors = set(string)
+    name             = string
+    description      = optional(string, "Created by FlowEHR")
+    add_testing_slot = optional(bool, false)
+    owners           = map(string)
+    contributors     = map(string)
 
-    managed_repo = object({
-      private               = bool
-      template              = string,
+    managed_repo = optional(object({
+      private  = bool
+      template = string
+    }))
+
+    branch = optional(object({
       num_of_approvals      = optional(number, 1),
       dismiss_stale_reviews = optional(bool, false)
+      }), {
+      num_of_approvals      = 1
+      dismiss_stale_reviews = false
     })
 
     env = optional(map(string))

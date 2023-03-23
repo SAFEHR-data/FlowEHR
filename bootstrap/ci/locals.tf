@@ -12,23 +12,11 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-plugin "terraform" {
-  enabled = true
-  preset  = "recommended"
-}
-
-plugin "azurerm" {
-  enabled = true
-  version = "0.20.0"
-  source  = "github.com/terraform-linters/tflint-ruleset-azurerm"
-}
-
-# The required version and providers are specified in the top-level directory and
-# injected by terragrunt so these rules can be safely ignored
-rule "terraform_required_version" {
-  enabled = false
-}
-
-rule "terraform_required_providers" {
-  enabled = false
+locals {
+  ci_sp_required_graph_permissions = toset([
+    "Application.ReadWrite.All",
+    "AppRoleAssignment.ReadWrite.All",
+    "Group.ReadWrite.All",
+    "Directory.Read.All"
+  ])
 }

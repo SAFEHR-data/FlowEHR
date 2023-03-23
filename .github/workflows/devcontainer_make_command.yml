@@ -24,7 +24,7 @@ on:
       environment:
         type: string
         required: true
-        description: The environment to deploy e.g. staging (selects the env config file and GitHub environment to use)
+        description: The environment to deploy e.g. testing (selects the env config file and GitHub environment to use)
       suffix_override:
         type: string
         required: false
@@ -42,15 +42,18 @@ on:
         required: true
       ARM_CLIENT_SECRET:
         required: true
-      ORG_GITHUB_TOKEN:
+      FLOWEHR_GITHUB_TOKEN:
         required: true
+      GH_APP_CERT:
+        required: true
+
+env:
+  DEVCONTAINER_NAME: flowehr/devcontainer
 
 jobs:
   make_core:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
-    env:
-      DEVCONTAINER_NAME: flowehr/devcontainer
     outputs:
       dc_tag: ${{ steps.dc.outputs.tag }}
       dc_runner_name: ${{ steps.dc.outputs.runner_name }}
@@ -68,22 +71,26 @@ jobs:
       - name: Set make commands to execute after the core deployment
         id: post_core
         run: |
-          build_agent_command="none"
+          setup_command="infrastructure-core"
+          build_agent_command="${{ inputs.command }}"
           post_build_agent_command="none"
 
           if echo ${{ inputs.command }} | grep -q "test" ; then
               build_agent_command="${{ inputs.command }}-without-core-destroy"
               post_build_agent_command="destroy"
+          elif [ ${{ inputs.command }} = "destroy-no-terraform" ] ; then
+              setup_command="destroy-no-terraform"
+              build_agent_command="none"
           elif echo ${{ inputs.command }} | grep -q "destroy" ; then
               build_agent_command="destroy-non-core"
               post_build_agent_command="${{ inputs.command }}"
-          elif echo ${{ inputs.command }} | grep -q "infrastructure"; then
-              build_agent_command="${{ inputs.command }}"
           fi
 
+          echo "Running [${setup_command}] setup"
           echo "Running [${build_agent_command}] on the build agent"
           echo "Running [${post_build_agent_command}] teardown"
 
+          echo "setup_command=${setup_command}" >> $GITHUB_OUTPUT
           echo "build_agent_command=${build_agent_command}" >> $GITHUB_OUTPUT
           echo "post_build_agent_command=${post_build_agent_command}" >> $GITHUB_OUTPUT
 
@@ -124,12 +131,14 @@ jobs:
 
       - name: Deploy core and build agent
         uses: devcontainers/ci@v0.3
-        env: # Add suffix as step env so it's only passed as an env var if it's not empty
+        env:
+          # Add suffix as step env so it's only passed as an env var if it's not empty
+          # https://github.com/devcontainers/ci/issues/231
           SUFFIX_OVERRIDE: ${{ inputs.suffix_override }}
         with:
           imageName: ${{ steps.dc.outputs.image_path }}
           imageTag: ${{ steps.dc.outputs.tag }}
-          runCmd: make infrastructure-core
+          runCmd: make ${{ steps.post_core.outputs.setup_command }}
           push: never
           env: |
             DOCKER_BUILDKIT=1
@@ -144,7 +153,8 @@ jobs:
             CI_CONTAINER_REGISTRY=${{ vars.CI_CONTAINER_REGISTRY }}
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
-            ORG_GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
+            FLOWEHR_GITHUB_TOKEN=${{ secrets.FLOWEHR_GITHUB_TOKEN }}
+            GH_APP_CERT=${{ secrets.GH_APP_CERT }}
             TF_VAR_devcontainer_image=${{ env.DEVCONTAINER_NAME }}
             TF_VAR_devcontainer_tag=${{ steps.dc.outputs.tag }}
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
@@ -185,7 +195,8 @@ jobs:
           CI_CONTAINER_REGISTRY: ${{ vars.CI_CONTAINER_REGISTRY }}
           CI_RESOURCE_GROUP: ${{ vars.CI_RESOURCE_GROUP }}
           CI_STORAGE_ACCOUNT: ${{ vars.CI_STORAGE_ACCOUNT }}
-          ORG_GITHUB_TOKEN: ${{ secrets.ORG_GITHUB_TOKEN }}
+          FLOWEHR_GITHUB_TOKEN: ${{ secrets.FLOWEHR_GITHUB_TOKEN }}
+          GH_APP_CERT: ${{ secrets.GH_APP_CERT }}
           SUFFIX_OVERRIDE: ${{ inputs.suffix_override }}
           TF_VAR_use_random_address_space: ${{ (inputs.suffix_override != '' && '1') || '0' }}
           TF_VAR_devcontainer_image: ${{ env.DEVCONTAINER_NAME }}
@@ -243,7 +254,8 @@ jobs:
             CI_CONTAINER_REGISTRY=${{ vars.CI_CONTAINER_REGISTRY }}
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
-            ORG_GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
+            FLOWEHR_GITHUB_TOKEN=${{ secrets.FLOWEHR_GITHUB_TOKEN }}
+            GH_APP_CERT=${{ secrets.GH_APP_CERT }}
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
 
       - name: Clean up

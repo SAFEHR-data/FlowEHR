@@ -12,6 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+
 resource "azurerm_databricks_workspace" "databricks" {
   name                                  = "dbks-${var.naming_suffix}"
   resource_group_name                   = var.core_rg_name
@@ -62,25 +63,25 @@ resource "databricks_cluster" "fixed_single_node" {
       // Secrets for Feature store
       // Formatted according to syntax for referencing secrets in Spark config:
       // https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secrets
-      "spark.secret.feature_store_app_id"     = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_spn_app_id.key}}}"
-      "spark.secret.feature_store_app_secret" = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_spn_app_secret.key}}}"
-      "spark.secret.feature_store_fqdn"       = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_fqdn.key}}}"
-      "spark.secret.feature_store_database"   = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_database.key}}}"
+      "spark.secret.feature-store-app-id"     = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_spn_app_id.key}}}"
+      "spark.secret.feature-store-app-secret" = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_spn_app_secret.key}}}"
+      "spark.secret.feature-store-fqdn"       = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_fqdn.key}}}"
+      "spark.secret.feature-store-database"   = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_database.key}}}"
     }),
     // Secrets for each data source
     // Formatted according to syntax for referencing secrets in Spark config:
     // https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secrets
     tomap({ for connection in var.data_source_connections :
-      "spark.secret.${connection.name}_fqdn" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-fqdn}}"
+      "spark.secret.${connection.name}-fqdn" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-fqdn}}"
     }),
     tomap({ for connection in var.data_source_connections :
-      "spark.secret.${connection.name}_database" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-database}}"
+      "spark.secret.${connection.name}-database" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-database}}"
     }),
     tomap({ for connection in var.data_source_connections :
-      "spark.secret.${connection.name}_username" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-username}}"
+      "spark.secret.${connection.name}-username" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-username}}"
     }),
     tomap({ for connection in var.data_source_connections :
-      "spark.secret.${connection.name}_password" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-password}}"
+      "spark.secret.${connection.name}-password" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-password}}"
     })
   )
 
@@ -99,76 +100,4 @@ resource "databricks_cluster" "fixed_single_node" {
 # https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secret-scopes#--create-an-azure-key-vault-backed-secret-scope-using-the-databricks-cli 
 resource "databricks_secret_scope" "secrets" {
   name = "flowehr-secrets"
-}
-
-resource "azurerm_data_factory" "adf" {
-  name                = "adf-${var.naming_suffix}"
-  location            = var.core_rg_location
-  resource_group_name = var.core_rg_name
-
-  managed_virtual_network_enabled = true
-
-  identity {
-    type = "SystemAssigned"
-  }
-}
-
-resource "azurerm_role_assignment" "adf_can_create_clusters" {
-  scope                = azurerm_databricks_workspace.databricks.id
-  role_definition_name = "Contributor"
-  principal_id         = azurerm_data_factory.adf.identity[0].principal_id
-}
-
-resource "azurerm_data_factory_integration_runtime_azure" "ir" {
-  name                    = "FlowEHRIntegrationRuntime"
-  data_factory_id         = azurerm_data_factory.adf.id
-  location                = var.core_rg_location
-  virtual_network_enabled = true
-  description             = "Integration runtime in managed vnet"
-  time_to_live_min        = 5
-}
-
-resource "azurerm_role_assignment" "adf_can_access_kv_secrets" {
-  scope                = azurerm_databricks_workspace.databricks.id
-  role_definition_name = "Key Vault Secrets User"
-  principal_id         = azurerm_data_factory.adf.identity[0].principal_id
-}
-
-# Get all directories that have activities.json in them and say that they are pipeline directories
-resource "azurerm_data_factory_pipeline" "pipeline" {
-  for_each        = local.pipeline_dirs
-  name            = "databricks-pipeline-${basename(each.value)}-${var.naming_suffix}"
-  data_factory_id = azurerm_data_factory.adf.id
-  activities_json = file("${each.value}/${local.activities_file}")
-
-  depends_on = [
-    azurerm_data_factory_linked_service_azure_databricks.msi_linked
-  ]
-}
-
-# Assuming that all artifacts will be built
-resource "databricks_dbfs_file" "dbfs_artifact_upload" {
-  for_each = { for artifact in local.artifacts : artifact.artifact_path => artifact.pipeline }
-  # Source path on local filesystem
-  source = each.key
-  # Path on DBFS
-  path = "/pipelines/${each.value}/${local.artifacts_dir}/${basename(each.key)}"
-}
-
-resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
-  name            = local.adb_linked_service_name
-  data_factory_id = azurerm_data_factory.adf.id
-  description     = "Azure Databricks linked service via MSI"
-  adb_domain      = "https://${azurerm_databricks_workspace.databricks.workspace_url}"
-
-  msi_work_space_resource_id = azurerm_databricks_workspace.databricks.id
-
-  existing_cluster_id = databricks_cluster.fixed_single_node.cluster_id
-}
-
-resource "azurerm_data_factory_linked_service_key_vault" "msi_linked" {
-  name            = "KVLinkedServiceViaMSI"
-  data_factory_id = azurerm_data_factory.adf.id
-  description     = "Key Vault linked service via MSI"
-  key_vault_id    = var.core_kv_id
 }
