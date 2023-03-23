@@ -116,8 +116,9 @@ resource "null_resource" "create_sql_user" {
   ]
 
   triggers = {
-    app_name      = azuread_application.flowehr_databricks_sql.display_name
-    database_name = azurerm_mssql_database.feature_database.name
+    app_name        = azuread_application.flowehr_databricks_sql.display_name
+    database_name   = azurerm_mssql_database.feature_database.name
+    users_to_create = jsonencode(local.sql_users_to_create)
   }
 
   # set the databricks 'user' app as dbo on the flowehr database
@@ -134,7 +135,7 @@ resource "null_resource" "create_sql_user" {
       CLIENT_ID       = azuread_application.flowehr_sql_owner.application_id
       CLIENT_SECRET   = azuread_application_password.flowehr_sql_owner.value
       USERS_TO_CREATE = jsonencode(local.sql_users_to_create)
-      PATH_TO_CSV     = "../../scripts/sql/nhsd-diabetes.csv"
+      PATH_TO_CSV     = "../../scripts/sql/nhsd-diabetes-test.csv"
       TABLE_NAME      = "deploy-test-diabetes"
     }
   }
