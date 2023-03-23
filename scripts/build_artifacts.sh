@@ -24,9 +24,9 @@ PIPELINE_DIR="${SCRIPT_DIR}/../transform/pipelines"
 shopt -s globstar nullglob
 
 # Walk through files in /transform/pipelines
-# For each directory where activities.json has been found
-for activity_json_file in "${PIPELINE_DIR}"/**/activities.json; do 
-    pipeline_dir=$(dirname "${activity_json_file}")
+# For each directory where pipeline.json has been found
+for pipeline_json_file in "${PIPELINE_DIR}"/**/pipeline.json; do 
+    pipeline_dir=$(dirname "${pipeline_json_file}")
     pushd "${pipeline_dir}"
     make artifacts
     popd
