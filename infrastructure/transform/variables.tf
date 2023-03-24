@@ -64,6 +64,10 @@ variable "tf_in_automation" {
   type = bool
 }
 
+variable "p0_action_group_id" {
+  type = string
+}
+
 variable "access_databricks_management_publicly" {
   type        = bool
   description = "Whether to allow access to the Databricks workspace management plane via a public network"

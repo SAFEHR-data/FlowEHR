@@ -98,3 +98,12 @@ variable "accesses_real_data" {
   type        = bool
   description = "Does this deployment access real data thus exist as a production-like environment?"
 }
+
+variable "alert_recipeients" {
+  description = "List of recipients to recieve alerts"
+  type = list(object({
+    name     = string
+    email    = string
+  }))
+  default = []
+}

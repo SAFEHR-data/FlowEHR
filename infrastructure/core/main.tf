@@ -87,3 +87,44 @@ resource "azurerm_log_analytics_workspace" "core" {
   retention_in_days          = 30
   tags                       = var.tags
 }
+
+resource "azurerm_monitor_action_group" "p0" {
+  name                = "log-critical-action-group-${var.naming_suffix}"
+  resource_group_name = azurerm_resource_group.core.name
+  short_name          = "p0action"
+
+  dynamic "email_receiver" {
+    for_each = toset(var.alert_recipeients)
+    content {
+      name                    = email_receiver.value.name
+      email_address           = email_receiver.value.email
+      use_common_alert_schema = true
+    }
+  }
+
+  lifecycle {
+    precondition {
+      condition     = !var.accesses_real_data || length(var.alert_recipeients) > 0
+      error_message = "If this deployment accesses real data then there must be at least one recipient of alterts"
+    }
+  }
+}
+
+resource "azurerm_monitor_activity_log_alert" "keyvault" {
+  name                = "activity-log-alert-kv-${var.naming_suffix}"
+  resource_group_name = azurerm_resource_group.core.name
+  scopes              = [azurerm_resource_group.core.id]
+  description         = "Monitor security updates to the keyvault"
+
+  criteria {
+    resource_id    = azurerm_key_vault.core.id
+    operation_name = "Microsoft.KeyVault/vaults/write"
+    # This level is required to get updates when IP exceptions are added
+    category       = "Administrative"
+    level          = "Informational"
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.core.id
+  }
+}

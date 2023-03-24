@@ -238,3 +238,21 @@ resource "azuread_group" "ad_group_data_scientists" {
   owners           = [data.azurerm_client_config.current.object_id]
   security_enabled = true
 }
+
+resource "azurerm_monitor_activity_log_alert" "feature_database_firewall_update" {
+  name                = "activity-log-alert-sql-fw-${var.naming_suffix}"
+  resource_group_name = var.core_rg_name
+  scopes              = [azurerm_resource_group.core.id]
+  description         = "Monitor security updates to the MSSQL server"
+
+  criteria {
+    resource_id    = azurerm_mssql_server.sql_server_features.id
+    operation_name = # TODO "Microsoft.KeyVault/vaults/write"
+    category       = # TODO "Administrative"
+    level          = # TODO "Informational"
+  }
+
+  action {
+    action_group_id = var.p0_action_group_id
+  }
+}

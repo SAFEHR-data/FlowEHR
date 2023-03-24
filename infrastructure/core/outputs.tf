@@ -55,3 +55,7 @@ output "serve_webapps_address_space" {
 output "core_log_analytics_name" {
   value = azurerm_log_analytics_workspace.core.name
 }
+
+output "p0_action_group_id" {
+  value = azurerm_monitor_action_group.p0.id
+}

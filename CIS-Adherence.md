@@ -89,7 +89,7 @@ This layer deploys the core components required for other layers, including a nu
 | | `CIS 5.1.1`: Ensure Diagnostic setting exists (per resource) | TODO | |
 | | `CIS 5.1.2`: Ensure Diagnostic setting captures appropriate categories | TODO | |
 | | `CIS 5.1.4`: Ensure Diagnostic log storage container is encrypted with Customer Managed Key | N | System managed keys chosen to reduce management burden |
-| | `CIS 5.2`: Activity Log Alerts | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/188 |
+| | `CIS 5.2`: Activity Log Alerts | Y | SQL firewall change |
 
 
 ### FlowEHR Data Transformation

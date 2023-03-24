@@ -27,3 +27,8 @@ serve:
   github_owner: __CHANGE_ME__
   github_app_id: __CHANGE_ME__
   github_app_installation_id: __CHANGE_ME__
+
+alert_recipeients:  # Optional
+  - firstperson:
+    name: __CHANGE_ME__
+    email: __CHANGE_ME__@company.com
