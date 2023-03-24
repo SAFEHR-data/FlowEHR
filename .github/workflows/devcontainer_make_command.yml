@@ -47,6 +47,7 @@ on:
       GH_APP_CERT:
         required: false
 
+
 env:
   DEVCONTAINER_NAME: flowehr/devcontainer
 
@@ -97,6 +98,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           persist-credentials: false
+          token: ${{ secrets.FLOWEHR_GITHUB_TOKEN }}
           # if the following values are missing (i.e. not triggered via comment workflow)
           # then the default checkout will apply
           ref: ${{ inputs.sha }}
@@ -171,6 +173,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
+          token: ${{ secrets.FLOWEHR_GITHUB_TOKEN }}
           persist-credentials: false
           # if the following values are missing (i.e. not triggered via comment workflow)
           # then the default checkout will apply
@@ -214,6 +217,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
+          token: ${{ secrets.FLOWEHR_GITHUB_TOKEN }}
           persist-credentials: false
           ref: ${{ inputs.sha }}
 
