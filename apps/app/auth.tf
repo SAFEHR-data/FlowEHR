@@ -20,7 +20,7 @@ resource "azuread_service_principal" "msgraph" {
 resource "random_uuid" "webapp_oauth2_id" {}
 
 resource "azuread_application" "webapp_auth" {
-  for_each        = local.webapp_names
+  for_each        = local.auth_webapp_names
   display_name    = "flowehr-app-${each.value}"
   owners          = [data.azurerm_client_config.current.object_id]
   identifier_uris = ["api://${each.value}"]
@@ -29,7 +29,7 @@ resource "azuread_application" "webapp_auth" {
     resource_app_id = data.azuread_application_published_app_ids.well_known.result.MicrosoftGraph
 
     resource_access {
-      id   = azuread_service_principal.msgraph.app_role_ids["User.Read"]
+      id   = azuread_service_principal.msgraph.app_role_ids["User.Read.All"]
       type = "Scope"
     }
   }
@@ -56,4 +56,15 @@ resource "azuread_application" "webapp_auth" {
       id_token_issuance_enabled     = true
     }
   }
+}
+
+resource "azuread_service_principal" "webapp_auth" {
+  for_each       = local.auth_webapp_names
+  application_id = azuread_application.webapp_auth[each.value].application_id
+  use_existing   = true
+}
+
+resource "azuread_application_password" "webapp_auth" {
+  for_each              = local.auth_webapp_names
+  application_object_id = azuread_application.webapp_auth[each.value].object_id
 }

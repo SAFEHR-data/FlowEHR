@@ -60,13 +60,14 @@ resource "azurerm_linux_web_app" "app" {
   }
 
   dynamic "auth_settings" {
-    count = var.app_config.require_auth ? 1 : 0
+    for_each = contains(local.auth_webapp_names, local.webapp_name) ? [1] : []
 
     content {
       enabled = true
 
       active_directory {
-        client_id = azuread_application.webapp_auth[local.webapp_name].application_id
+        client_id     = azuread_application.webapp_auth[local.webapp_name].application_id
+        client_secret = azuread_application_password.webapp_auth[local.webapp_name].value
       }
     }
   }
@@ -87,7 +88,7 @@ resource "azurerm_linux_web_app" "app" {
 
 resource "azurerm_linux_web_app_slot" "testing" {
   count          = var.app_config.add_testing_slot ? 1 : 0
-  name           = "testing"
+  name           = local.testing_slot_name
   app_service_id = azurerm_linux_web_app.app.id
   https_only     = true
 
@@ -113,13 +114,14 @@ resource "azurerm_linux_web_app_slot" "testing" {
   }
 
   dynamic "auth_settings" {
-    count = var.app_config.require_auth ? 1 : 0
+    for_each = contains(local.auth_webapp_names, local.testing_slot_webapp_name) ? [1] : []
 
     content {
       enabled = true
 
       active_directory {
-        client_id = azuread_application.webapp_auth[local.testing_slot_webapp_name].application_id
+        client_id     = azuread_application.webapp_auth[local.testing_slot_webapp_name].application_id
+        client_secret = azuread_application_password.webapp_auth[local.testing_slot_webapp_name].value
       }
     }
   }

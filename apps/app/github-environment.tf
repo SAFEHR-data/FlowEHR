@@ -184,11 +184,11 @@ resource "github_actions_environment_secret" "webapp_id" {
 }
 
 resource "github_actions_environment_secret" "slot_name" {
-  for_each        = local.branches_and_envs
+  for_each        = local.testing_gh_env != null ? local.branches_and_envs : {}
   repository      = local.github_repository_name
   environment     = each.value
   secret_name     = "SLOT_NAME"
-  plaintext_value = azurerm_linux_web_app_slot.testing.name
+  plaintext_value = local.testing_slot_name
 
   depends_on = [
     github_repository_environment.all

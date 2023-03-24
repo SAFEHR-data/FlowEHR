@@ -25,14 +25,21 @@ locals {
   testing_branch_name = local.testing_gh_env
 
   webapp_name              = "webapp-${replace(var.app_id, "_", "-")}-${var.naming_suffix}"
-  testing_slot_webapp_name = "${local.webapp_name}-testing"
+  testing_slot_name        = "testing"
+  testing_slot_webapp_name = "${local.webapp_name}-${local.testing_slot_name}"
 
-  webapp_names = (
-    var.app_config.add_testing_slot
-    ? toset([local.webapp_name, local.testing_slot_webapp_name])
-    : toset([local.webapp_name])
+  # List webapp names (main and slots) that require auth to be enabled
+  auth_webapp_names = (
+    var.app_config.require_auth
+    ? (
+      var.app_config.add_testing_slot
+      ? toset([local.webapp_name, local.testing_slot_webapp_name])
+      : toset([local.webapp_name])
+    )
+    : null
   )
 
+  # Map deployment branch and github environment names for main & testing slot (if enabled)
   branches_and_envs = var.app_config.add_testing_slot ? {
     "${local.core_branch_name}"    = local.core_gh_env
     "${local.testing_branch_name}" = local.testing_gh_env
@@ -41,6 +48,7 @@ locals {
   acr_deploy_reusable_workflow_filename = "acr_deploy_reusable.yml"
   slot_swap_reusable_workflow_filename  = "slot_swap_reusable.yml"
 
+  # Map GitHub/FlowEHR environments and corresponding GH workflow files to deploy to them
   envs_and_workflow_templates = var.app_config.add_testing_slot ? {
     "${local.core_gh_env}"    = data.template_file.core_github_workflow
     "${local.testing_gh_env}" = data.template_file.testing_github_workflow[0]
