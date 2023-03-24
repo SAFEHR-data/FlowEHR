@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 locals {
-  repository_name = var.app_id
+  github_repository_name = var.app_id
 
   feature_store_odbc = "Driver={ODBC Driver 18 for SQL Server};Server=tcp:${data.azurerm_mssql_server.feature_store.fully_qualified_domain_name},1433;Database=${var.feature_store_db_name};Authentication=ActiveDirectoryMsi;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
   acr_repository     = var.app_id

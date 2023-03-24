@@ -44,13 +44,13 @@ resource "github_team_members" "owners" {
 resource "github_team_repository" "owners_repo_permissions" {
   count      = local.create_repo ? 1 : 0
   team_id    = github_team.owners[0].id
-  repository = local.repository_name
+  repository = local.github_repository_name
   permission = "push"
 }
 
 resource "github_repository_file" "codeowners" {
   count               = local.create_repo ? 1 : 0
-  repository          = local.repository_name
+  repository          = local.github_repository_name
   branch              = "main"
   file                = "CODEOWNERS"
   content             = <<EOF
@@ -88,6 +88,6 @@ resource "github_team_members" "contributors" {
 resource "github_team_repository" "contributors_repo_permissions" {
   count      = local.create_repo ? 1 : 0
   team_id    = github_team.contributors[0].id
-  repository = local.repository_name
+  repository = local.github_repository_name
   permission = "push"
 }
