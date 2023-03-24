@@ -66,8 +66,7 @@ resource "azurerm_linux_web_app" "app" {
       enabled = true
 
       active_directory {
-        client_id     = azuread_application.webapp_auth[local.webapp_name].application_id
-        client_secret = azuread_application_password.webapp_auth[local.webapp_name].value
+        client_id = azuread_application.webapp_auth[local.webapp_name].application_id
       }
     }
   }
@@ -120,8 +119,7 @@ resource "azurerm_linux_web_app_slot" "testing" {
       enabled = true
 
       active_directory {
-        client_id     = azuread_application.webapp_auth[local.testing_slot_webapp_name].application_id
-        client_secret = azuread_application_password.webapp_auth[local.testing_slot_webapp_name].value
+        client_id = azuread_application.webapp_auth[local.testing_slot_webapp_name].application_id
       }
     }
   }

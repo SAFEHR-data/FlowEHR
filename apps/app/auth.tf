@@ -57,14 +57,3 @@ resource "azuread_application" "webapp_auth" {
     }
   }
 }
-
-resource "azuread_service_principal" "webapp_auth" {
-  for_each       = local.auth_webapp_names
-  application_id = azuread_application.webapp_auth[each.value].application_id
-  use_existing   = true
-}
-
-resource "azuread_application_password" "webapp_auth" {
-  for_each              = local.auth_webapp_names
-  application_object_id = azuread_application.webapp_auth[each.value].object_id
-}
