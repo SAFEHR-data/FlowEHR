@@ -31,13 +31,13 @@ locals {
   apps_env_config_path = "${get_terragrunt_dir()}/apps.${get_env("ENVIRONMENT", "local")}.yaml"
   apps_env_config      = fileexists(local.apps_env_config_path) ? yamldecode(file(local.apps_env_config_path)) : null
 
-  merged_apps_config = {
+  merged_apps_config = local.apps_env_config != null ? {
     # As it's a map, we need to iterate as direct merge() would overwrite each key's value entirely
     for app_id, app_config in local.apps_env_config : app_id =>
       # And we don't want apps defined in apps.yaml but not in current {ENVIRONMENT} file to be deployed,
       # so only merge if key exists with env-specific config taking precedence
       merge(local.apps_config[app_id], app_config)
-  }
+  } : local.apps_config
 }
 
 generate "terraform" {
