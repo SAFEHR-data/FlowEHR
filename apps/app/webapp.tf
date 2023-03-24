@@ -64,6 +64,7 @@ resource "azurerm_linux_web_app" "app" {
 
     content {
       enabled = true
+      issuer  = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/v2.0"
 
       active_directory {
         client_id = azuread_application.webapp_auth[local.webapp_name].application_id
@@ -117,6 +118,7 @@ resource "azurerm_linux_web_app_slot" "testing" {
 
     content {
       enabled = true
+      issuer  = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/v2.0"
 
       active_directory {
         client_id = azuread_application.webapp_auth[local.testing_slot_webapp_name].application_id

@@ -21,7 +21,7 @@ resource "random_uuid" "webapp_oauth2_id" {}
 
 resource "azuread_application" "webapp_auth" {
   for_each        = local.auth_webapp_names
-  display_name    = "flowehr-app-${each.value}"
+  display_name    = "flowehr-${each.value}"
   owners          = [data.azurerm_client_config.current.object_id]
   identifier_uris = ["api://${each.value}"]
 
@@ -29,7 +29,7 @@ resource "azuread_application" "webapp_auth" {
     resource_app_id = data.azuread_application_published_app_ids.well_known.result.MicrosoftGraph
 
     resource_access {
-      id   = azuread_service_principal.msgraph.app_role_ids["User.Read.All"]
+      id   = azuread_service_principal.msgraph.oauth2_permission_scope_ids["User.Read"]
       type = "Scope"
     }
   }
