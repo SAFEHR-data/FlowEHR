@@ -14,6 +14,13 @@
 
 dependency "bootstrap" {
   config_path = "${get_repo_root()}/bootstrap/local"
+
+  mock_outputs = {
+    naming_suffix           = "naming_suffix"
+    naming_suffix_truncated = "naming_suffix_truncated"
+    deployer_ip_address     = "deployer_ip_address"
+  }
+  mock_outputs_allowed_terraform_commands = ["destroy"]
 }
 
 locals {
