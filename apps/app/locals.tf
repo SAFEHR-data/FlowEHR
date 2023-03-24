@@ -24,6 +24,12 @@ locals {
   testing_gh_env      = var.app_config.add_testing_slot ? "${var.environment}-testing_slot" : null
   testing_branch_name = local.testing_gh_env
 
+  webapp_names = (
+    var.app_config.add_testing_slot
+    ? toset([azurerm_linux_web_app.app.name, azurerm_linux_web_app_slot.testing.name])
+    : toset([azurerm_linux_web_app.app.name])
+  )
+
   branches_and_envs = var.app_config.add_testing_slot ? {
     "${local.core_branch_name}"    = local.core_gh_env
     "${local.testing_branch_name}" = local.testing_gh_env
