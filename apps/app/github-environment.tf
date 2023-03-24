@@ -12,86 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-resource "github_repository" "app" {
-  count       = local.create_repo ? 1 : 0
-  name        = var.app_id
-  description = var.app_config.description
-  visibility  = var.app_config.managed_repo.private ? "private" : "public"
-
-  template {
-    owner      = split("/", var.app_config.managed_repo.template)[0]
-    repository = split("/", var.app_config.managed_repo.template)[1]
-  }
-}
-
-resource "github_team" "owners" {
-  count       = local.create_repo ? 1 : 0
-  name        = "${var.app_id} - owners"
-  description = "Owners of the ${var.app_id} FlowEHR app with push and PR/deployment approval permissions."
-  privacy     = "closed"
-}
-
-resource "github_team_members" "owners" {
-  for_each = local.create_repo ? var.app_config.owners : null
-  team_id  = github_team.owners[0].id
-
-  members {
-    username = each.key
-    role     = "maintainer"
-  }
-}
-
-resource "github_team_repository" "owners_repo_permissions" {
-  count      = local.create_repo ? 1 : 0
-  team_id    = github_team.owners[0].id
-  repository = local.repository_name
-  permission = "push"
-}
-
-resource "github_repository_file" "codeowners" {
-  count               = local.create_repo ? 1 : 0
-  repository          = local.repository_name
-  branch              = "main"
-  file                = "CODEOWNERS"
-  content             = <<EOF
-# Owners for branch protection
-# Users within this team are required reviewers for this deployment branch
-*       @${var.github_owner}/${github_team.owners[0].slug}
-EOF
-  commit_message      = "Add codeowners (managed by Terraform)"
-  commit_author       = "Terraform"
-  commit_email        = "terraform@flowehr.io"
-  overwrite_on_create = true
-
-  depends_on = [
-    github_repository.app
-  ]
-}
-
-resource "github_team" "contributors" {
-  count       = local.create_repo ? 1 : 0
-  name        = "${var.app_id} - contributors"
-  description = "Contributors to the ${var.app_id} FlowEHR app with push permissions."
-  privacy     = "closed"
-}
-
-resource "github_team_members" "contributors" {
-  for_each = local.create_repo ? var.app_config.contributors : null
-  team_id  = github_team.contributors[0].id
-
-  members {
-    username = each.key
-    role     = "member"
-  }
-}
-
-resource "github_team_repository" "contributors_repo_permissions" {
-  count      = local.create_repo ? 1 : 0
-  team_id    = github_team.contributors[0].id
-  repository = local.repository_name
-  permission = "push"
-}
-
 resource "github_branch" "all" {
   for_each   = local.branches_and_envs
   repository = local.repository_name
@@ -125,29 +45,6 @@ resource "github_branch_protection" "deployment" {
   depends_on = [
     github_repository.app
   ]
-}
-
-resource "azurerm_container_registry_scope_map" "app_access" {
-  name                    = "acr-scopes-${replace(var.app_id, "_", "")}"
-  container_registry_name = data.azurerm_container_registry.serve.name
-  resource_group_name     = var.resource_group_name
-
-  actions = [
-    "repositories/${var.app_id}/content/read",
-    "repositories/${var.app_id}/content/write"
-  ]
-}
-
-resource "azurerm_container_registry_token" "app_access" {
-  name                    = replace(replace(var.app_id, "_", ""), "-", "")
-  container_registry_name = data.azurerm_container_registry.serve.name
-  resource_group_name     = var.resource_group_name
-  scope_map_id            = azurerm_container_registry_scope_map.app_access.id
-}
-
-resource "azurerm_container_registry_token_password" "app_access" {
-  container_registry_token_id = azurerm_container_registry_token.app_access.id
-  password1 {}
 }
 
 resource "github_repository_environment" "all" {
@@ -291,7 +188,7 @@ resource "github_actions_environment_secret" "slot_name" {
   repository      = local.repository_name
   environment     = each.value
   secret_name     = "SLOT_NAME"
-  plaintext_value = local.testing_slot_name
+  plaintext_value = azurerm_linux_web_app_slot.testing.name
 
   depends_on = [
     github_repository_environment.all

@@ -19,7 +19,6 @@ locals {
   acr_repository     = var.app_id
   create_repo        = var.app_config.managed_repo != null
 
-  testing_slot_name   = "testing"
   core_gh_env         = var.environment
   core_branch_name    = local.core_gh_env
   testing_gh_env      = var.app_config.add_testing_slot ? "${var.environment}-testing_slot" : null
@@ -38,7 +37,6 @@ locals {
     "${local.testing_gh_env}" = data.template_file.testing_github_workflow[0]
   } : { "${local.core_gh_env}" = data.template_file.core_github_workflow }
 
-  webapp_name_in_webhook   = lower(azurerm_linux_web_app.app.name)
   site_credential_name     = azurerm_linux_web_app.app.site_credential[0].name
   site_credential_password = azurerm_linux_web_app.app.site_credential[0].password
 }
