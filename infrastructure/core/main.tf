@@ -38,9 +38,10 @@ resource "azurerm_key_vault" "core" {
   resource_group_name           = azurerm_resource_group.core.name
   tenant_id                     = data.azurerm_client_config.current.tenant_id
   soft_delete_retention_days    = 7
-  purge_protection_enabled      = false
+  purge_protection_enabled      = var.accesses_real_data
   enable_rbac_authorization     = true
-  public_network_access_enabled = var.tf_in_automation ? false : true
+  enabled_for_disk_encryption   = true
+  public_network_access_enabled = (var.tf_in_automation || var.accesses_real_data) ? false : true
   sku_name                      = "standard"
   tags                          = var.tags
 

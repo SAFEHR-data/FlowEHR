@@ -93,3 +93,8 @@ variable "github_repository" {
   description = "Github repository in which to create the build agent. e.g. UCLH-Foundry/FlowEHR"
   default     = ""
 }
+
+variable "accesses_real_data" {
+  type        = bool
+  description = "Does this deployment access real data thus exist as a production-like environment?"
+}
