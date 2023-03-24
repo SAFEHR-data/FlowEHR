@@ -23,7 +23,7 @@ resource "azurerm_application_insights" "app" {
 }
 
 resource "azurerm_linux_web_app" "app" {
-  name                      = "webapp-${replace(var.app_id, "_", "-")}-${var.naming_suffix}"
+  name                      = local.webapp_name
   resource_group_name       = var.resource_group_name
   location                  = var.location
   service_plan_id           = data.azurerm_service_plan.serve.id
@@ -57,6 +57,18 @@ resource "azurerm_linux_web_app" "app" {
 
   identity {
     type = "SystemAssigned"
+  }
+
+  dynamic "auth_settings" {
+    count = var.app_config.require_auth ? 1 : 0
+
+    content {
+      enabled = true
+
+      active_directory {
+        client_id = azuread_application.webapp_auth[local.webapp_name].application_id
+      }
+    }
   }
 
   logs {
@@ -98,6 +110,18 @@ resource "azurerm_linux_web_app_slot" "testing" {
 
   identity {
     type = "SystemAssigned"
+  }
+
+  dynamic "auth_settings" {
+    count = var.app_config.require_auth ? 1 : 0
+
+    content {
+      enabled = true
+
+      active_directory {
+        client_id = azuread_application.webapp_auth[local.testing_slot_webapp_name].application_id
+      }
+    }
   }
 
   logs {
