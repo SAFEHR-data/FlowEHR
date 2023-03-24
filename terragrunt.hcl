@@ -19,6 +19,9 @@ dependency "bootstrap" {
     naming_suffix           = "naming_suffix"
     naming_suffix_truncated = "naming_suffix_truncated"
     deployer_ip_address     = "deployer_ip_address"
+    environment             = "environment"
+    mgmt_rg                 = "mgmt_rg"
+    mgmt_acr                = "mgmt_acr"
   }
   mock_outputs_allowed_terraform_commands = ["destroy"]
 }
