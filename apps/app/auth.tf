@@ -17,7 +17,9 @@ resource "azuread_service_principal" "msgraph" {
   use_existing   = true
 }
 
-resource "random_uuid" "webapp_oauth2_id" {}
+resource "random_uuid" "webapp_oauth2_id" {
+  for_each = local.auth_webapp_names
+}
 
 resource "azuread_application" "webapp_auth" {
   for_each        = local.auth_webapp_names
@@ -39,7 +41,7 @@ resource "azuread_application" "webapp_auth" {
       admin_consent_description  = "Allow the application to access ${each.value} on behalf of the signed-in user."
       admin_consent_display_name = "Access ${each.value}"
       enabled                    = true
-      id                         = random_uuid.webapp_oauth2_id.result
+      id                         = random_uuid.webapp_oauth2_id[each.value].result
       type                       = "User"
       user_consent_description   = "Allow the application to access ${each.value} on your behalf."
       user_consent_display_name  = "Access ${each.value}"
@@ -52,8 +54,12 @@ resource "azuread_application" "webapp_auth" {
     redirect_uris = ["https://${each.value}.azurewebsites.net/.auth/login/aad/callback"]
 
     implicit_grant {
-      access_token_issuance_enabled = true
-      id_token_issuance_enabled     = true
+      id_token_issuance_enabled = true
     }
   }
+}
+
+resource "azuread_application_password" "webapp_auth" {
+  for_each              = local.auth_webapp_names
+  application_object_id = azuread_application.webapp_auth[each.value].object_id
 }
