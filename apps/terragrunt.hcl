@@ -145,4 +145,5 @@ inputs = {
 
   github_app_cert = local.github_app_cert
   apps            = local.merged_apps_config
+  suffix_override = get_env("SUFFIX_OVERRIDE", "")
 }
