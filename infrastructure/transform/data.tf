@@ -12,6 +12,10 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+data "azurerm_resource_group" "core" {
+  name = var.core_rg_name
+}
+
 data "azurerm_virtual_network" "core" {
   name                = var.core_vnet_name
   resource_group_name = var.core_rg_name

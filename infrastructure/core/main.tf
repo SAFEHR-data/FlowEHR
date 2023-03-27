@@ -125,6 +125,6 @@ resource "azurerm_monitor_activity_log_alert" "keyvault" {
   }
 
   action {
-    action_group_id = azurerm_monitor_action_group.core.id
+    action_group_id = azurerm_monitor_action_group.p0.id
   }
 }
