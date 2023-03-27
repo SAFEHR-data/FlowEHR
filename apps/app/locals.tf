@@ -13,18 +13,33 @@
 #  limitations under the License.
 
 locals {
-  repository_name = var.app_id
+  github_repository_name = var.app_id
 
   feature_store_odbc = "Driver={ODBC Driver 18 for SQL Server};Server=tcp:${data.azurerm_mssql_server.feature_store.fully_qualified_domain_name},1433;Database=${var.feature_store_db_name};Authentication=ActiveDirectoryMsi;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
   acr_repository     = var.app_id
   create_repo        = var.app_config.managed_repo != null
 
-  testing_slot_name   = "testing"
   core_gh_env         = var.environment
   core_branch_name    = local.core_gh_env
   testing_gh_env      = var.app_config.add_testing_slot ? "${var.environment}-testing_slot" : null
   testing_branch_name = local.testing_gh_env
 
+  webapp_name              = "webapp-${replace(var.app_id, "_", "-")}-${var.naming_suffix}"
+  testing_slot_name        = "testing"
+  testing_slot_webapp_name = "${local.webapp_name}-${local.testing_slot_name}"
+
+  # List webapp names (main and slots) that require auth to be enabled
+  auth_webapp_names = (
+    var.app_config.require_auth
+    ? (
+      var.app_config.add_testing_slot
+      ? toset([local.webapp_name, local.testing_slot_webapp_name])
+      : toset([local.webapp_name])
+    )
+    : toset([])
+  )
+
+  # Map deployment branch and github environment names for main & testing slot (if enabled)
   branches_and_envs = var.app_config.add_testing_slot ? {
     "${local.core_branch_name}"    = local.core_gh_env
     "${local.testing_branch_name}" = local.testing_gh_env
@@ -33,12 +48,12 @@ locals {
   acr_deploy_reusable_workflow_filename = "acr_deploy_reusable.yml"
   slot_swap_reusable_workflow_filename  = "slot_swap_reusable.yml"
 
+  # Map GitHub/FlowEHR environments and corresponding GH workflow files to deploy to them
   envs_and_workflow_templates = var.app_config.add_testing_slot ? {
     "${local.core_gh_env}"    = data.template_file.core_github_workflow
     "${local.testing_gh_env}" = data.template_file.testing_github_workflow[0]
   } : { "${local.core_gh_env}" = data.template_file.core_github_workflow }
 
-  webapp_name_in_webhook   = lower(azurerm_linux_web_app.app.name)
   site_credential_name     = azurerm_linux_web_app.app.site_credential[0].name
   site_credential_password = azurerm_linux_web_app.app.site_credential[0].password
 }

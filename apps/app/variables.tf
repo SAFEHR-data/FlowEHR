@@ -108,6 +108,7 @@ variable "app_config" {
     name             = string
     description      = optional(string, "Created by FlowEHR")
     add_testing_slot = optional(bool, false)
+    require_auth     = optional(bool, true)
     owners           = map(string)
     contributors     = map(string)
 
