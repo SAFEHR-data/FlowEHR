@@ -88,7 +88,7 @@ test-transform-without-core-destroy: infrastructure-transform test-pipelines des
 
 test-serve-without-core-destroy: infrastructure-serve destroy-non-core  ## Test serve deploy->destroy without destroying core
 
-test-apps-without-core-destroy: infrastructure-serve destroy-non-core  ## Test apps deploy->destroy without destroying core
+test-apps-without-core-destroy: apps destroy-non-core  ## Test apps deploy->destroy without destroying core
 
 transform-artifacts: az-login ## Build transform artifacts
 	${MAKEFILE_DIR}/scripts/pipeline_repo_checkout.sh \

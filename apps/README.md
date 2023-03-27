@@ -78,6 +78,8 @@ Similar to the behaviour of the root FlowEHR config, if the `$ENVIRONMENT` env v
 
 These config files consist of a map of `app_id` and the config values for that app. It will also look for a matching `app_id` in the `apps.yaml` shared config file, and will merge properties of the two, with environment-specific properties taking precedence. This means you can define common values of an app (like the `owners` and `contributors`) that are common across environments, and only override relevant settings per environment (i.e. `num_of_approvers`).
 
+> Note: FlowEHR will only deploy apps defined in the environment file matching the currently selected environment. If a file doesn't exist for your current environment (i.e. if you're working locally and don't have an `apps.local.yaml`) or is empty, even if there are apps configured in the shared `apps.yaml`, FlowEHR will treat this as there being no apps to deploy. This ensures no apps are deployed accidentally to environment they shouldn't be without it being explicitly set for that environment.
+
 For local deployments, create your config as follows:
 
 1. In this directory (`/apps`), copy the `apps.sample.yaml` to a new `apps.local.yaml` file:
