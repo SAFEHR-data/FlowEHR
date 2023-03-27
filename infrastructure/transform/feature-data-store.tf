@@ -61,7 +61,7 @@ resource "azuread_service_principal" "msgraph" {
 }
 
 resource "azuread_app_role_assignment" "sql_user_read_all" {
-  for_each = toset(local.sql_msi_ad_role_names)
+  for_each            = toset(local.sql_msi_ad_role_names)
   app_role_id         = azuread_service_principal.msgraph.app_role_ids[each.value]
   principal_object_id = azurerm_mssql_server.sql_server_features.identity[0].principal_id
   resource_object_id  = azuread_service_principal.msgraph.object_id
@@ -69,7 +69,7 @@ resource "azuread_app_role_assignment" "sql_user_read_all" {
 
 # Role required for sql serve to write audit logs
 resource "azurerm_role_assignment" "sql_can_use_storage" {
-  scope                =  # TODO
+  scope                = data.azurerm_storage_account.core.id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_mssql_server.sql_server_features.identity[0].principal_id
 }
@@ -259,7 +259,7 @@ resource "azurerm_mssql_server_extended_auditing_policy" "sql_server_features" {
   storage_endpoint       = data.azurerm_storage_account.core.primary_blob_endpoint
   server_id              = azurerm_mssql_server.sql_server_features.id
   retention_in_days      = 7
-  log_monitoring_enabled = false  # true if posting logs to azure monitor, but requires eventhub
+  log_monitoring_enabled = false # true if posting logs to azure monitor, but requires eventhub
 
   storage_account_subscription_id = data.azurerm_client_config.current.subscription_id
 

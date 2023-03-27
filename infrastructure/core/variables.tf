@@ -100,10 +100,10 @@ variable "accesses_real_data" {
 }
 
 variable "alert_recipients" {
-  description = "List of recipients to recieve alerts"
+  description = "List of recipients to receive alerts"
   type = list(object({
-    name     = string
-    email    = string
+    name  = string
+    email = string
   }))
   default = []
 }

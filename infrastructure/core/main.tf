@@ -120,8 +120,8 @@ resource "azurerm_monitor_activity_log_alert" "keyvault" {
     resource_id    = azurerm_key_vault.core.id
     operation_name = "Microsoft.KeyVault/vaults/write"
     # This level is required to get updates when IP exceptions are added
-    category       = "Administrative"
-    level          = "Informational"
+    category = "Administrative"
+    level    = "Informational"
   }
 
   action {
