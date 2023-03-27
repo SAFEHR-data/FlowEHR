@@ -36,7 +36,7 @@ locals {
       ? toset([local.webapp_name, local.testing_slot_webapp_name])
       : toset([local.webapp_name])
     )
-    : null
+    : toset([])
   )
 
   # Map deployment branch and github environment names for main & testing slot (if enabled)
