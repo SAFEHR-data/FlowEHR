@@ -28,7 +28,7 @@ resource "azurerm_role_assignment" "webapp_testing_slot_acr" {
 # Create a web hook that triggers automated deployment of the Docker image
 resource "azurerm_container_registry_webhook" "webhook" {
   count               = var.app_config.add_testing_slot ? 0 : 1
-  name                = "acrwh${replace(replace(var.app_id, "_", ""), "-", "")}"
+  name                = "acrwh${var.app_id_truncated}"
   resource_group_name = var.resource_group_name
   location            = var.location
   registry_name       = data.azurerm_container_registry.serve.name
@@ -45,18 +45,18 @@ resource "azurerm_container_registry_webhook" "webhook" {
 
 # Create ACR repository token for app to use in cicd to push images
 resource "azurerm_container_registry_scope_map" "app_access" {
-  name                    = "acr-scopes-${replace(var.app_id, "_", "")}"
+  name                    = "acr-scopes-${var.app_id_truncated}"
   container_registry_name = data.azurerm_container_registry.serve.name
   resource_group_name     = var.resource_group_name
 
   actions = [
-    "repositories/${var.app_id}/content/read",
-    "repositories/${var.app_id}/content/write"
+    "repositories/${local.acr_repository}/content/read",
+    "repositories/${local.acr_repository}/content/write"
   ]
 }
 
 resource "azurerm_container_registry_token" "app_access" {
-  name                    = replace(replace(var.app_id, "_", ""), "-", "")
+  name                    = var.app_id_truncated
   container_registry_name = data.azurerm_container_registry.serve.name
   resource_group_name     = var.resource_group_name
   scope_map_id            = azurerm_container_registry_scope_map.app_access.id
