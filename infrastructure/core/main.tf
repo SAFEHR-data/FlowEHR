@@ -105,7 +105,7 @@ resource "azurerm_monitor_action_group" "p0" {
   lifecycle {
     precondition {
       condition     = !var.accesses_real_data || length(var.alert_recipients) > 0
-      error_message = "If this deployment accesses real data then there must be at least one recipient of alterts"
+      error_message = "If this deployment accesses real data then there must be at least one recipient of alerts"
     }
   }
 }

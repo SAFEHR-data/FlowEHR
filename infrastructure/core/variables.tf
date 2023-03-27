@@ -96,7 +96,7 @@ variable "github_repository" {
 
 variable "accesses_real_data" {
   type        = bool
-  description = "Does this deployment access real data thus exist as a production-like environment?"
+  description = "Does this deployment access real data? I.e. is this a staging/production environment?"
 }
 
 variable "alert_recipients" {
