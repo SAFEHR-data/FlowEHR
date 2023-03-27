@@ -29,7 +29,10 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "git config --global --add safe.directory '*' && pre-commit install --hook-type pre-push && ./scripts/pipeline_repo_checkout.sh",
+	"postCreateCommand": "pre-commit install && ./scripts/pipeline_repo_checkout.sh",
+
+	// Ensure working directory is trusted by Git (needs to be post start so we pick up host's git configuration first)
+	"postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
 
 	// Set `remoteUser` to `root` to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode",

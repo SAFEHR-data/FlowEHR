@@ -12,6 +12,18 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+# TODO: remove when https://github.com/integrations/terraform-provider-github/pull/1530 is merged
+# Needed for manual POST to GitHub APIs and redundant when able to create branch policies in TF
+data "external" "github_access_token" {
+  program = [
+    "python",
+    "${path.module}/generate_gh_token.py",
+    var.serve.github_app_id,
+    var.serve.github_app_installation_id,
+    var.github_app_cert
+  ]
+}
+
 module "app" {
   for_each                         = var.apps
   source                           = "./app"
@@ -35,4 +47,5 @@ module "app" {
   apps_ad_group_principal_id       = var.transform_apps_ad_group_principal_id
   developers_ad_group_principal_id = var.transform_developers_ad_group_principal_id
   github_owner                     = var.serve.github_owner
+  github_access_token              = data.external.github_access_token.result.token
 }

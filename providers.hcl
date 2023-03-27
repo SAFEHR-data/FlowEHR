@@ -67,7 +67,7 @@ EOF
   required_provider_external = <<EOF
 external = {
   source = "hashicorp/external"
-  version = "2.2.3"
+  version = "2.3.1"
 }
 EOF
 
@@ -81,7 +81,7 @@ EOF
   required_provider_github = <<EOF
 github = {
   source  = "integrations/github"
-  version = "5.18.0"
+  version = "5.18.3"
 }
 EOF
 }

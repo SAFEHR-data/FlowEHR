@@ -47,11 +47,6 @@ resource "azuread_application" "ci_app" {
         type = "Role"
       }
     }
-
-    resource_access {
-      id   = azuread_service_principal.msgraph.app_role_ids["Group.ReadWrite.All"]
-      type = "Role"
-    }
   }
 }
 
