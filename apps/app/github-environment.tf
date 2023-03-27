@@ -39,7 +39,7 @@ resource "github_branch_protection" "deployment" {
     dismiss_stale_reviews           = var.accesses_real_data ? true : var.app_config.branch.dismiss_stale_reviews
     restrict_dismissals             = var.accesses_real_data
     require_code_owner_reviews      = var.accesses_real_data
-    required_approving_review_count = var.app_config.branch.num_of_approvals
+    required_approving_review_count = var.accesses_real_data ? max(var.app_config.branch.num_of_approvals, 1) : var.num_of_approvals
   }
 
   depends_on = [
