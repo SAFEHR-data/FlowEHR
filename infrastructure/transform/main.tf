@@ -27,5 +27,4 @@ module "datalake" {
   deployer_ip_address           = var.deployer_ip_address
   naming_suffix                 = var.naming_suffix
   tags                          = var.tags
-
 }
