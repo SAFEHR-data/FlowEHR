@@ -59,3 +59,7 @@ output "core_log_analytics_name" {
 output "p0_action_group_id" {
   value = azurerm_monitor_action_group.p0.id
 }
+
+output "storage_account_name" {
+  value = azurerm_storage_account.core.name
+}

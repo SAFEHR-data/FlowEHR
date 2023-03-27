@@ -99,7 +99,7 @@ variable "accesses_real_data" {
   description = "Does this deployment access real data thus exist as a production-like environment?"
 }
 
-variable "alert_recipeients" {
+variable "alert_recipients" {
   description = "List of recipients to recieve alerts"
   type = list(object({
     name     = string

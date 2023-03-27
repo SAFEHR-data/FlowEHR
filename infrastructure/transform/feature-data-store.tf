@@ -61,19 +61,17 @@ resource "azuread_service_principal" "msgraph" {
 }
 
 resource "azuread_app_role_assignment" "sql_user_read_all" {
-  app_role_id         = azuread_service_principal.msgraph.app_role_ids["User.Read.All"]
+  for_each = toset(local.sql_msi_ad_role_names)
+  app_role_id         = azuread_service_principal.msgraph.app_role_ids[each.value]
   principal_object_id = azurerm_mssql_server.sql_server_features.identity[0].principal_id
   resource_object_id  = azuread_service_principal.msgraph.object_id
 }
-resource "azuread_app_role_assignment" "sql_groupmember_read_all" {
-  app_role_id         = azuread_service_principal.msgraph.app_role_ids["GroupMember.Read.All"]
-  principal_object_id = azurerm_mssql_server.sql_server_features.identity[0].principal_id
-  resource_object_id  = azuread_service_principal.msgraph.object_id
-}
-resource "azuread_app_role_assignment" "sql_application_read_all" {
-  app_role_id         = azuread_service_principal.msgraph.app_role_ids["Application.Read.All"]
-  principal_object_id = azurerm_mssql_server.sql_server_features.identity[0].principal_id
-  resource_object_id  = azuread_service_principal.msgraph.object_id
+
+# Role required for sql serve to write audit logs
+resource "azurerm_role_assignment" "sql_can_use_storage" {
+  scope                =  # TODO
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_mssql_server.sql_server_features.identity[0].principal_id
 }
 
 # optional firewall rule when running locally
@@ -247,12 +245,25 @@ resource "azurerm_monitor_activity_log_alert" "feature_database_firewall_update"
 
   criteria {
     resource_id    = azurerm_mssql_server.sql_server_features.id
-    operation_name = # TODO "Microsoft.KeyVault/vaults/write"
-    category       = # TODO "Administrative"
-    level          = # TODO "Informational"
+    operation_name = "Microsoft.Sql/servers/firewallRules/write"
+    category       = "Administrative"
+    level          = "Informational"
   }
 
   action {
     action_group_id = var.p0_action_group_id
   }
+}
+
+resource "azurerm_mssql_server_extended_auditing_policy" "sql_server_features" {
+  storage_endpoint       = data.azurerm_storage_account.core.primary_blob_endpoint
+  server_id              = azurerm_mssql_server.sql_server_features.id
+  retention_in_days      = 7
+  log_monitoring_enabled = false  # true if posting logs to azure monitor, but requires eventhub
+
+  storage_account_subscription_id = data.azurerm_client_config.current.subscription_id
+
+  depends_on = [
+    azurerm_role_assignment.sql_can_use_storage
+  ]
 }

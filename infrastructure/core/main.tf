@@ -94,7 +94,7 @@ resource "azurerm_monitor_action_group" "p0" {
   short_name          = "p0action"
 
   dynamic "email_receiver" {
-    for_each = toset(var.alert_recipeients)
+    for_each = toset(var.alert_recipients)
     content {
       name                    = email_receiver.value.name
       email_address           = email_receiver.value.email
@@ -104,7 +104,7 @@ resource "azurerm_monitor_action_group" "p0" {
 
   lifecycle {
     precondition {
-      condition     = !var.accesses_real_data || length(var.alert_recipeients) > 0
+      condition     = !var.accesses_real_data || length(var.alert_recipients) > 0
       error_message = "If this deployment accesses real data then there must be at least one recipient of alterts"
     }
   }

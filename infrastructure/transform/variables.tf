@@ -68,6 +68,10 @@ variable "p0_action_group_id" {
   type = string
 }
 
+variable "core_storage_account_name" {
+  type = string
+}
+
 variable "access_databricks_management_publicly" {
   type        = bool
   description = "Whether to allow access to the Databricks workspace management plane via a public network"

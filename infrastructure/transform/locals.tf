@@ -87,4 +87,6 @@ locals {
     { "name" : "${azuread_group.ad_group_developers.display_name}", "role" : "db_reader" },
     { "name" : "${azuread_group.ad_group_data_scientists.display_name}", "role" : "db_reader" },
   ]
+
+  sql_msi_ad_role_names = ["User.Read.All", "GroupMember.Read.All", "Application.Read.All"]
 }

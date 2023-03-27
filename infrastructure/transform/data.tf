@@ -32,3 +32,8 @@ data "azurerm_virtual_network" "peered_data_source_networks" {
   name                = each.value.virtual_network_name
   resource_group_name = each.value.resource_group_name
 }
+
+data "azurerm_storage_account" "core" {
+  name                = var.core_storage_account_name
+  resource_group_name = var.core_rg_name
+}
