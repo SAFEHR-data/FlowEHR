@@ -36,7 +36,7 @@ locals {
     for app_id, app_config in local.apps_env_config : app_id =>
       # And we don't want apps defined in apps.yaml but not in current {ENVIRONMENT} file to be deployed,
       # so only merge if key exists with env-specific config taking precedence
-      merge(local.apps_config[app_id], app_config)
+      merge(try(local.apps_config[app_id], null), app_config)
   }
 }
 
