@@ -69,6 +69,50 @@ resource "azurerm_subnet_network_security_group_association" "databricks_host" {
   network_security_group_id = azurerm_network_security_group.databricks.id
 }
 
+# Add UDRs to ensure correct routing for Databricks traffic
+# See https://learn.microsoft.com/en-gb/azure/databricks/administration-guide/cloud-configurations/azure/udr?WT.mc_id=Portal-Microsoft_Azure_Support#--configure-user-defined-routes-with-azure-service-tags
+resource "azurerm_route_table" "databricks_udrs" {
+  name                          = "rt-dbks-${var.naming_suffix}"
+  location                      = var.core_rg_location
+  resource_group_name           = var.core_rg_name
+  disable_bgp_route_propagation = false
+  tags                          = var.tags
+
+  route {
+    name           = "adb-servicetag"
+    address_prefix = "AzureDatabricks"
+    next_hop_type  = "Internet"
+  }
+
+  route {
+    name           = "adb-metastore"
+    address_prefix = "Sql"
+    next_hop_type  = "Internet"
+  }
+
+  route {
+    name           = "adb-storage"
+    address_prefix = "Storage"
+    next_hop_type  = "Internet"
+  }
+
+  route {
+    name           = "adb-eventhub"
+    address_prefix = "EventHub"
+    next_hop_type  = "Internet"
+  }
+}
+
+resource "azurerm_subnet_route_table_association" "databricks_container" {
+  subnet_id      = azurerm_subnet.databricks_container.id
+  route_table_id = azurerm_route_table.databricks_udrs.id
+}
+
+resource "azurerm_subnet_route_table_association" "databricks_host" {
+  subnet_id      = azurerm_subnet.databricks_host.id
+  route_table_id = azurerm_route_table.databricks_udrs.id
+}
+
 resource "azurerm_private_dns_zone" "databricks" {
   name                = "privatelink.azuredatabricks.net"
   resource_group_name = var.core_rg_name
