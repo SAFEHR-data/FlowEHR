@@ -39,7 +39,7 @@ resource "azurerm_linux_web_app" "app" {
       for_each = var.app_config.add_testing_slot ? {} : { "${local.acr_repository}" = var.app_id }
 
       content {
-        docker_image     = "${var.acr_name}.azurecr.io/${var.app_id}"
+        docker_image     = "${var.acr_name}.azurecr.io/${local.acr_repository}"
         docker_image_tag = "latest"
       }
     }
