@@ -18,6 +18,16 @@ include "root" {
 
 dependency "core" {
   config_path = "../core"
+
+  mock_outputs = {
+    core_rg_name                = "core_rg_name"
+    core_rg_location            = "core_rg_location"
+    core_kv_id                  = "core_kv_id"
+    core_vnet_name              = "core_vnet_name"
+    core_subnet_id              = "core_subnet_id"
+    serve_webapps_address_space = "serve_webapps_address_space"
+  }
+  mock_outputs_allowed_terraform_commands = ["destroy"]
 }
 
 inputs = {

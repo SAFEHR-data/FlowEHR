@@ -16,8 +16,8 @@ variable "app_id" {
   type = string
 
   validation {
-    condition     = length(var.app_id) <= 20
-    error_message = "app_id must be 20 chars or less"
+    condition     = length(var.app_id) <= 35
+    error_message = "app_id must be 35 chars or less"
   }
 
   validation {

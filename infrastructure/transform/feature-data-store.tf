@@ -60,20 +60,18 @@ resource "azuread_service_principal" "msgraph" {
   use_existing   = true
 }
 
-resource "azuread_app_role_assignment" "sql_user_read_all" {
-  app_role_id         = azuread_service_principal.msgraph.app_role_ids["User.Read.All"]
+resource "azuread_app_role_assignment" "ad_roles" {
+  for_each            = toset(["User.Read.All", "GroupMember.Read.All", "Application.Read.All"])
+  app_role_id         = azuread_service_principal.msgraph.app_role_ids[each.value]
   principal_object_id = azurerm_mssql_server.sql_server_features.identity[0].principal_id
   resource_object_id  = azuread_service_principal.msgraph.object_id
 }
-resource "azuread_app_role_assignment" "sql_groupmember_read_all" {
-  app_role_id         = azuread_service_principal.msgraph.app_role_ids["GroupMember.Read.All"]
-  principal_object_id = azurerm_mssql_server.sql_server_features.identity[0].principal_id
-  resource_object_id  = azuread_service_principal.msgraph.object_id
-}
-resource "azuread_app_role_assignment" "sql_application_read_all" {
-  app_role_id         = azuread_service_principal.msgraph.app_role_ids["Application.Read.All"]
-  principal_object_id = azurerm_mssql_server.sql_server_features.identity[0].principal_id
-  resource_object_id  = azuread_service_principal.msgraph.object_id
+
+# Role required for sql serve to write audit logs
+resource "azurerm_role_assignment" "sql_can_use_storage" {
+  scope                = data.azurerm_storage_account.core.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_mssql_server.sql_server_features.identity[0].principal_id
 }
 
 # optional firewall rule when running locally
@@ -83,6 +81,12 @@ resource "azurerm_mssql_firewall_rule" "deployer_ip_exception" {
   server_id        = azurerm_mssql_server.sql_server_features.id
   start_ip_address = var.deployer_ip_address
   end_ip_address   = var.deployer_ip_address
+}
+
+# Required for the sql database to access the storage
+resource "azurerm_mssql_outbound_firewall_rule" "allow_storage" {
+  name      = "${data.azurerm_storage_account.core.name}.blob.core.windows.net"
+  server_id = azurerm_mssql_server.sql_server_features.id
 }
 
 # Enable Transparent Data Encryption (TDE) with a Service Managed Key
@@ -109,9 +113,7 @@ resource "null_resource" "create_sql_user" {
   depends_on = [
     azuread_application_password.flowehr_sql_owner,
     azuread_application.flowehr_databricks_sql,
-    azuread_app_role_assignment.sql_user_read_all,
-    azuread_app_role_assignment.sql_groupmember_read_all,
-    azuread_app_role_assignment.sql_application_read_all,
+    azuread_app_role_assignment.ad_roles,
     azurerm_private_endpoint.sql_server_features_pe
   ]
 
@@ -237,4 +239,36 @@ resource "azuread_group" "ad_group_data_scientists" {
   display_name     = "${var.naming_suffix} flowehr-data-scientists"
   owners           = [data.azurerm_client_config.current.object_id]
   security_enabled = true
+}
+
+resource "azurerm_monitor_activity_log_alert" "feature_database_firewall_update" {
+  name                = "activity-log-alert-sql-fw-${var.naming_suffix}"
+  resource_group_name = var.core_rg_name
+  scopes              = [data.azurerm_resource_group.core.id]
+  description         = "Monitor security updates to the MSSQL server firewall"
+
+  criteria {
+    resource_id    = azurerm_mssql_server.sql_server_features.id
+    operation_name = "Microsoft.Sql/servers/firewallRules/write"
+    category       = "Administrative"
+    level          = "Informational"
+  }
+
+  action {
+    action_group_id = var.p0_action_group_id
+  }
+}
+
+resource "azurerm_mssql_server_extended_auditing_policy" "sql_server_features" {
+  storage_endpoint       = data.azurerm_storage_account.core.primary_blob_endpoint
+  server_id              = azurerm_mssql_server.sql_server_features.id
+  retention_in_days      = 90
+  log_monitoring_enabled = false # true if posting logs to azure monitor, but requires eventhub
+
+  storage_account_subscription_id = data.azurerm_client_config.current.subscription_id
+
+  depends_on = [
+    azurerm_role_assignment.sql_can_use_storage,
+    azurerm_mssql_outbound_firewall_rule.allow_storage
+  ]
 }

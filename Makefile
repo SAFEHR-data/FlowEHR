@@ -88,7 +88,7 @@ test-transform-without-core-destroy: infrastructure-transform test-pipelines des
 
 test-serve-without-core-destroy: infrastructure-serve destroy-non-core  ## Test serve deploy->destroy without destroying core
 
-test-apps-without-core-destroy: infrastructure-serve destroy-non-core  ## Test apps deploy->destroy without destroying core
+test-apps-without-core-destroy: apps destroy-non-core  ## Test apps deploy->destroy without destroying core
 
 transform-artifacts: az-login ## Build transform artifacts
 	${MAKEFILE_DIR}/scripts/pipeline_repo_checkout.sh \
@@ -123,8 +123,7 @@ destroy-non-core: az-login ## Destroy non-core
 		--terragrunt-non-interactive \
 		--terragrunt-exclude-dir ${MAKEFILE_DIR}/infrastructure/core \
 		--terragrunt-exclude-dir ${MAKEFILE_DIR}/bootstrap/ci \
-		--terragrunt-exclude-dir ${MAKEFILE_DIR}/bootstrap/local \
-		--terragrunt-exclude-dir ${MAKEFILE_DIR}/apps
+		--terragrunt-exclude-dir ${MAKEFILE_DIR}/bootstrap/local
 
 destroy-no-terraform: az-login ## Destroy all resource groups associated with this deployment
 	$(call target_title, "Destroy no terraform") \
