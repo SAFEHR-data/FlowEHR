@@ -87,6 +87,15 @@ resource "azurerm_route" "databricks_service_tags" {
   next_hop_type       = "Internet"
 }
 
+resource "azurerm_route" "databricks_extinfra_ips" {
+  for_each            = try(toset(local.databricks_udr_ips[var.core_rg_location].extinfra), toset([]))
+  name                = "extinfra-${index(local.databricks_udr_ips[var.core_rg_location].extinfra, each.value)}"
+  resource_group_name = var.core_rg_name
+  route_table_name    = azurerm_route_table.databricks_udrs.name
+  address_prefix      = each.value
+  next_hop_type       = "Internet"
+}
+
 resource "azurerm_subnet_route_table_association" "databricks_container" {
   subnet_id      = azurerm_subnet.databricks_container.id
   route_table_id = azurerm_route_table.databricks_udrs.id
