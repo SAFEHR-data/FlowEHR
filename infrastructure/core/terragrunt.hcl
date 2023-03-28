@@ -15,7 +15,3 @@
 include "root" {
   path = find_in_parent_folders()
 }
-
-inputs = {
-  github_runner_token = get_env("FLOWEHR_GITHUB_TOKEN", "")
-}

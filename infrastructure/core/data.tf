@@ -13,9 +13,3 @@
 #  limitations under the License.
 
 data "azurerm_client_config" "current" {}
-
-data "azurerm_container_registry" "devcontainer" {
-  count               = var.tf_in_automation ? 1 : 0
-  name                = var.mgmt_acr
-  resource_group_name = var.mgmt_rg
-}
