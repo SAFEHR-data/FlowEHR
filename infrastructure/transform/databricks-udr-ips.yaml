@@ -1,0 +1,107 @@
+---
+australiacentral:
+  extinfra:
+    - 20.53.145.128/28
+australiacentral2:
+  extinfra:
+    - 20.53.145.128/28
+australiaeast:
+  extinfra:
+    - 20.53.145.128/28
+brazilsouth:
+  extinfra:
+    - 20.197.222.144/28
+canadacentral:
+  extinfra:
+    - 52.139.4.160/28
+canadaeast:
+  extinfra:
+    - 52.139.4.160/28
+centralindia:
+  extinfra:
+    - 20.193.246.208/28
+centralus:
+  extinfra:
+    - 20.57.106.0/28
+eastasia:
+  extinfra:
+    - 20.195.104.64/28
+    - 20.239.100.80/28
+eastus:
+  extinfra:
+    - 20.57.106.0/28
+eastus2:
+  extinfra:
+    - 20.57.106.0/28
+francecentral:
+  extinfra:
+    - 20.74.69.128/28
+germanywestcentral:
+  extinfra:
+    - 20.52.93.40/29
+japaneast:
+  extinfra:
+    - 20.78.226.176/28
+japanwest:
+  extinfra:
+    - 20.78.226.176/28
+koreacentral:
+  extinfra:
+    - 20.194.107.48/28
+northcentralus:
+  extinfra:
+    - 20.57.106.0/28
+northeurope:
+  extinfra:
+    - 20.73.215.48/28
+norwayeast:
+  extinfra:
+    - 51.13.86.224/28
+southafricanorth:
+  extinfra:
+    - 102.133.192.48/28
+southcentralus:
+  extinfra:
+    - 13.91.84.96/28
+southindia:
+  extinfra:
+    - 20.193.246.208/28
+southeastasia:
+  extinfra:
+    - 20.195.104.64/28
+swedencentral:
+  extinfra:
+    - 20.91.164.16/28
+switzerlandnorth:
+  extinfra:
+    - 51.103.172.176/28
+switzerlandwest:
+  extinfra:
+    - 51.107.233.80/28
+uaenorth:
+  extinfra:
+    - 40.120.89.0/28
+uksouth:
+  extinfra:
+    - 51.141.64.128/28
+ukwest:
+  extinfra:
+    - 51.141.64.128/28
+westcentralus:
+  extinfra:
+    - 52.161.34.0/28
+westeurope:
+  extinfra:
+    - 20.73.215.48/28
+westindia:
+  extinfra:
+    - 20.193.246.208/28
+westus:
+  extinfra:
+    - 13.91.84.96/28
+westus2:
+  extinfra:
+    - 13.91.84.96/28
+westus3:
+  extinfra:
+    - 20.125.82.0/28

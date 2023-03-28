@@ -72,35 +72,19 @@ resource "azurerm_subnet_network_security_group_association" "databricks_host" {
 # Add UDRs to ensure correct routing for Databricks traffic
 # See https://learn.microsoft.com/en-gb/azure/databricks/administration-guide/cloud-configurations/azure/udr?WT.mc_id=Portal-Microsoft_Azure_Support#--configure-user-defined-routes-with-azure-service-tags
 resource "azurerm_route_table" "databricks_udrs" {
-  name                          = "rt-dbks-${var.naming_suffix}"
-  location                      = var.core_rg_location
-  resource_group_name           = var.core_rg_name
-  disable_bgp_route_propagation = false
-  tags                          = var.tags
+  name                = "rt-dbks-${var.naming_suffix}"
+  location            = var.core_rg_location
+  resource_group_name = var.core_rg_name
+  tags                = var.tags
+}
 
-  route {
-    name           = "adb-servicetag"
-    address_prefix = "AzureDatabricks"
-    next_hop_type  = "Internet"
-  }
-
-  route {
-    name           = "adb-metastore"
-    address_prefix = "Sql"
-    next_hop_type  = "Internet"
-  }
-
-  route {
-    name           = "adb-storage"
-    address_prefix = "Storage"
-    next_hop_type  = "Internet"
-  }
-
-  route {
-    name           = "adb-eventhub"
-    address_prefix = "EventHub"
-    next_hop_type  = "Internet"
-  }
+resource "azurerm_route" "databricks_service_tags" {
+  for_each            = local.databricks_service_tags
+  name                = each.key
+  resource_group_name = var.core_rg_name
+  route_table_name    = azurerm_route_table.databricks_udrs.name
+  address_prefix      = each.value
+  next_hop_type       = "Internet"
 }
 
 resource "azurerm_subnet_route_table_association" "databricks_container" {
@@ -119,26 +103,10 @@ resource "azurerm_private_dns_zone" "databricks" {
   tags                = var.tags
 }
 
-# Need for proper DNS resolution between Databricks & platform services
-# https://learn.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
-resource "azurerm_private_dns_zone" "azure_platform" {
-  name                = "168.63.129.16"
-  resource_group_name = var.core_rg_name
-  tags                = var.tags
-}
-
 resource "azurerm_private_dns_zone_virtual_network_link" "databricks" {
   name                  = "vnl-dbks-${var.naming_suffix}"
   resource_group_name   = var.core_rg_name
   private_dns_zone_name = azurerm_private_dns_zone.databricks.name
-  virtual_network_id    = data.azurerm_virtual_network.core.id
-  tags                  = var.tags
-}
-
-resource "azurerm_private_dns_zone_virtual_network_link" "azure_platform" {
-  name                  = "vnl-azplatform-${var.naming_suffix}"
-  resource_group_name   = var.core_rg_name
-  private_dns_zone_name = azurerm_private_dns_zone.azure_platform.name
   virtual_network_id    = data.azurerm_virtual_network.core.id
   tags                  = var.tags
 }
@@ -158,11 +126,8 @@ resource "azurerm_private_endpoint" "databricks_control_plane" {
   }
 
   private_dns_zone_group {
-    name = "private-dns-zone-group-databricks-control-plane-${var.naming_suffix}"
-    private_dns_zone_ids = [
-      azurerm_private_dns_zone.databricks.id,
-      azurerm_private_dns_zone.azure_platform.id
-    ]
+    name                 = "private-dns-zone-group-databricks-control-plane-${var.naming_suffix}"
+    private_dns_zone_ids = [azurerm_private_dns_zone.databricks.id]
   }
 }
 
