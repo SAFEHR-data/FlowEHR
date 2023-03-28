@@ -158,8 +158,11 @@ resource "azurerm_private_endpoint" "databricks_control_plane" {
   }
 
   private_dns_zone_group {
-    name                 = "private-dns-zone-group-databricks-control-plane-${var.naming_suffix}"
-    private_dns_zone_ids = [azurerm_private_dns_zone.databricks.id]
+    name = "private-dns-zone-group-databricks-control-plane-${var.naming_suffix}"
+    private_dns_zone_ids = [
+      azurerm_private_dns_zone.databricks.id,
+      azurerm_private_dns_zone.azure_platform.id
+    ]
   }
 }
 

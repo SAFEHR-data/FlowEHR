@@ -38,7 +38,9 @@ resource "azurerm_databricks_workspace" "databricks" {
     azurerm_subnet_network_security_group_association.databricks_host,
     azurerm_subnet_network_security_group_association.databricks_container,
     azurerm_subnet_route_table_association.databricks_host,
-    azurerm_subnet_route_table_association.databricks_container
+    azurerm_subnet_route_table_association.databricks_container,
+    azurerm_private_dns_zone_virtual_network_link.databricks,
+    azurerm_private_dns_zone_virtual_network_link.azure_platform
   ]
 }
 
