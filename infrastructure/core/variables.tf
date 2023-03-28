@@ -99,11 +99,21 @@ variable "accesses_real_data" {
   description = "Does this deployment access real data? I.e. is this a staging/production environment?"
 }
 
-variable "alert_recipients" {
-  description = "List of recipients to receive alerts"
-  type = list(object({
-    name  = string
-    email = string
-  }))
-  default = []
+variable "monitoring" {
+  description = "Monitoring block"
+  type = object({
+    alert_recipients = list(object({ # List of recipients to receive alerts
+      name  = string
+      email = string
+    }))
+    network_watcher = object({ # Network watcher to monitor the NSGs
+      name                = string
+      resource_group_name = string
+    })
+  })
+
+  default = {
+    alert_recipients = []
+    network_watcher  = null
+  }
 }

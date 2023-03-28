@@ -97,10 +97,12 @@ resource "azurerm_network_security_group" "core" {
   }
 }
 
+# Network watcher must be added in real-data scenarios, thus will fail if network_watcher is undefined
 resource "azurerm_network_watcher_flow_log" "data_sources" {
+  count                     = (var.monitoring.network_watcher != null) || var.accesses_real_data ? 1 : 0
   name                      = "nw-log-${var.naming_suffix}"
-  resource_group_name       = var.network_watcher_resource_group_name
-  network_watcher_name      = var.network_watcher_name
+  resource_group_name       = var.monitoring.network_watcher.resource_group_name
+  network_watcher_name      = var.monitoring.network_watcher.name
   network_security_group_id = azurerm_network_security_group.core.id
   storage_account_id        = azurerm_storage_account.core.id
   enabled                   = true
