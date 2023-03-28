@@ -269,6 +269,7 @@ jobs:
           (needs.make_core.outputs.post_build_agent_command == 'destroy-no-terraform')
         run: |
           az acr repository delete \
+            --yes \
             --name ${{ vars.CI_CONTAINER_REGISTRY }} \
             --image ${{ env.DEVCONTAINER_NAME }}:${{ needs.make_core.outputs.dc_tag }}
           az storage blob directory delete \
