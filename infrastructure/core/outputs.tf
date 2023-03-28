@@ -12,6 +12,14 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+output "naming_suffix" {
+  value = local.naming_suffix
+}
+
+output "naming_suffix_truncated" {
+  value = local.naming_suffix_truncated
+}
+
 output "core_rg_name" {
   value = azurerm_resource_group.core.name
 }

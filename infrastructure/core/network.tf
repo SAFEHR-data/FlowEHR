@@ -17,12 +17,12 @@ resource "random_integer" "ip" {
   min   = 0
   max   = 255
   keepers = {
-    suffix = var.naming_suffix
+    suffix = local.naming_suffix
   }
 }
 
 resource "azurerm_virtual_network" "core" {
-  name                = "vnet-${var.naming_suffix}"
+  name                = "vnet-${local.naming_suffix}"
   resource_group_name = azurerm_resource_group.core.name
   location            = azurerm_resource_group.core.location
   tags                = var.tags
@@ -35,7 +35,7 @@ resource "azurerm_virtual_network" "core" {
 }
 
 resource "azurerm_subnet" "core_shared" {
-  name                 = "subnet-core-shared-${var.naming_suffix}"
+  name                 = "subnet-core-shared-${local.naming_suffix}"
   resource_group_name  = azurerm_resource_group.core.name
   virtual_network_name = azurerm_virtual_network.core.name
   address_prefixes     = [local.core_shared_address_space]
@@ -43,13 +43,13 @@ resource "azurerm_subnet" "core_shared" {
 }
 
 resource "azurerm_subnet" "core_container" {
-  name                 = "subnet-core-containers-${var.naming_suffix}"
+  name                 = "subnet-core-containers-${local.naming_suffix}"
   resource_group_name  = azurerm_resource_group.core.name
   virtual_network_name = azurerm_virtual_network.core.name
   address_prefixes     = [local.core_container_address_space]
 
   delegation {
-    name = "delegation-core-containers-${var.naming_suffix}"
+    name = "delegation-core-containers-${local.naming_suffix}"
 
     service_delegation {
       name    = "Microsoft.ContainerInstance/containerGroups"
@@ -67,7 +67,7 @@ resource "azurerm_private_dns_zone" "all" {
 
 resource "azurerm_private_dns_zone_virtual_network_link" "all" {
   for_each              = local.private_dns_zones
-  name                  = "vnl-${each.key}-${var.naming_suffix}"
+  name                  = "vnl-${each.key}-${local.naming_suffix}"
   resource_group_name   = azurerm_resource_group.core.name
   private_dns_zone_name = each.value
   virtual_network_id    = azurerm_virtual_network.core.id

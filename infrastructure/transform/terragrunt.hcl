@@ -56,6 +56,8 @@ EOF
 }
 
 inputs = {
+  naming_suffix                      = dependency.core.outputs.naming_suffix
+  naming_suffix_truncated            = dependency.core.outputs.naming_suffix_truncated
   core_rg_name                       = dependency.core.outputs.core_rg_name
   core_rg_location                   = dependency.core.outputs.core_rg_location
   core_vnet_name                     = dependency.core.outputs.core_vnet_name

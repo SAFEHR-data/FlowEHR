@@ -12,19 +12,45 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-variable "naming_suffix" {
+variable "flowehr_id" {
+  description = "Unique value for differentiating FlowEHR deployments across organisations/projects"
   type        = string
-  description = "Suffix used to name resources"
+
+  validation {
+    condition     = length(var.flowehr_id) <= 12
+    error_message = "Must be 12 chars or less"
+  }
+
+  validation {
+    condition     = can(regex("^[a-z0-9\\_-]*$", var.flowehr_id))
+    error_message = "Cannot contain spaces, uppercase or special characters except '-' and '_'"
+  }
 }
 
-variable "naming_suffix_truncated" {
+variable "environment" {
+  description = "Environment name for differentiating deployment environments"
   type        = string
-  description = "Truncated (max 20 chars, no hyphens etc.) suffix to name e.g storage accounts"
+
+  validation {
+    condition     = length(var.environment) <= 12
+    error_message = "Must be 12 chars or less"
+  }
+
+  validation {
+    condition     = can(regex("^[a-z0-9\\_-]*$", var.environment))
+    error_message = "Cannot contain spaces, uppercase or special characters except '-' and '_'"
+  }
 }
 
-variable "location" {
+variable "suffix_override" {
+  description = "Override the suffix that would be generated from id + environment. Useful for transient PR environments"
   type        = string
-  description = "The location to deploy resources"
+  default     = ""
+
+  validation {
+    condition     = can(regex("^[a-z0-9\\_-]*$", var.suffix_override))
+    error_message = "Cannot contain spaces, uppercase or special characters except '-' and '_'"
+  }
 }
 
 variable "tags" {

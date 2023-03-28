@@ -13,13 +13,13 @@
 #  limitations under the License.
 
 resource "azurerm_resource_group" "core" {
-  name     = "rg-${var.naming_suffix}"
+  name     = "rg-${local.naming_suffix}"
   location = var.location
   tags     = var.tags
 }
 
 resource "azurerm_storage_account" "core" {
-  name                     = "strg${var.naming_suffix_truncated}"
+  name                     = "strg${local.naming_suffix_truncated}"
   resource_group_name      = azurerm_resource_group.core.name
   location                 = azurerm_resource_group.core.location
   account_tier             = "Standard"
@@ -33,7 +33,7 @@ resource "azurerm_storage_account" "core" {
 }
 
 resource "azurerm_key_vault" "core" {
-  name                          = "kv-${var.naming_suffix_truncated}"
+  name                          = "kv-${local.naming_suffix_truncated}"
   location                      = azurerm_resource_group.core.location
   resource_group_name           = azurerm_resource_group.core.name
   tenant_id                     = data.azurerm_client_config.current.tenant_id
@@ -59,18 +59,18 @@ resource "azurerm_role_assignment" "deployer_can_administrate_kv" {
 }
 
 resource "azurerm_private_endpoint" "flowehr_keyvault" {
-  name                = "pe-kv-${var.naming_suffix}"
+  name                = "pe-kv-${local.naming_suffix}"
   location            = azurerm_resource_group.core.location
   resource_group_name = azurerm_resource_group.core.name
   subnet_id           = azurerm_subnet.core_shared.id
 
   private_dns_zone_group {
-    name                 = "private-dns-zone-group-kv-${var.naming_suffix}"
+    name                 = "private-dns-zone-group-kv-${local.naming_suffix}"
     private_dns_zone_ids = [azurerm_private_dns_zone.all["keyvault"].id]
   }
 
   private_service_connection {
-    name                           = "private-service-connection-kv-${var.naming_suffix}"
+    name                           = "private-service-connection-kv-${local.naming_suffix}"
     is_manual_connection           = false
     private_connection_resource_id = azurerm_key_vault.core.id
     subresource_names              = ["Vault"]
@@ -78,7 +78,7 @@ resource "azurerm_private_endpoint" "flowehr_keyvault" {
 }
 
 resource "azurerm_log_analytics_workspace" "core" {
-  name                       = "log-${var.naming_suffix}"
+  name                       = "log-${local.naming_suffix}"
   location                   = azurerm_resource_group.core.location
   resource_group_name        = azurerm_resource_group.core.name
   internet_ingestion_enabled = var.tf_in_automation ? false : true

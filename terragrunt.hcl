@@ -71,17 +71,11 @@ inputs = merge(
   # Add values from the merged config files (root and environment-specific)
   local.configuration.locals.merged_root_config, {
 
-  # And values from terraform bootstrapping (& env vars in CI)
-  naming_suffix           = dependency.bootstrap.outputs.naming_suffix
-  naming_suffix_truncated = dependency.bootstrap.outputs.naming_suffix_truncated
-  mgmt_rg                 = local.tf_in_automation ? get_env("CI_RESOURCE_GROUP") : dependency.bootstrap.outputs.mgmt_rg
-  mgmt_acr                = local.tf_in_automation ? get_env("CI_CONTAINER_REGISTRY") : dependency.bootstrap.outputs.mgmt_acr
-
   # And any global env vars that should be made available
   tf_in_automation = local.tf_in_automation
 
   # Tags to add to every resource that accepts them
   tags = {
-    environment = dependency.bootstrap.outputs.environment
+    environment = local.configuration.locals.merged_root_config.environment
   }
 })
