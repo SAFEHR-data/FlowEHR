@@ -25,4 +25,5 @@ transform:
 
 serve:
   github_owner: __CHANGE_ME__
-  github_token: __CHANGE_ME__
+  github_app_id: __CHANGE_ME__
+  github_app_installation_id: __CHANGE_ME__

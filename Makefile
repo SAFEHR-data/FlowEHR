@@ -48,7 +48,7 @@ ci: az-login ## Deploy bootstrap resources for CI builds (management infrastruct
 	$(call target_title, "Creating CI resources") \
 	&& cd ${MAKEFILE_DIR}/bootstrap/ci \
 	&& terragrunt apply \
-	&& printf "\n🌺 Use the below values to create your CI GitHub secrets:\033[36m\n\n" \
+	&& printf "\n🌺 Use the below values to create your CI GitHub vars/secrets:\033[36m\n\n" \
 	&& terraform output -json \
 	  | jq -r 'with_entries(.value |= .value) | to_entries[] | "\(.key +": "+ .value)"'
 
@@ -67,14 +67,10 @@ infrastructure-core: az-login ## Deploy core infrastructure
 infrastructure-transform: az-login transform-artifacts ## Deploy transform infrastructure
 	$(call terragrunt,apply,infrastructure/transform)
 
-transform-artifacts: az-login ## Build transform artifacts
-	${MAKEFILE_DIR}/scripts/pipeline_repo_checkout.sh \
-	&& ${MAKEFILE_DIR}/scripts/build_artifacts.sh
-
 infrastructure-serve: az-login ## Deploy serve infrastructure
 	$(call terragrunt,apply,infrastructure/serve)
 
-test: infrastructure test-pipelines destroy  ## Test by deploy->destroy
+test: infrastructure test-pipelines apps destroy  ## Test by deploy->destroy
 
 test-pipelines:
 	$(call target_title, "Test Transform Pipelines") \
@@ -82,13 +78,21 @@ test-pipelines:
 
 test-transform: infrastructure-transform test-pipelines destroy  ## Test transform deploy->destroy
 
-test-serve: infrastructure-serve destroy  ## Test transform deploy->destroy
+test-serve: infrastructure-serve destroy  ## Test serve deploy->destroy
 
-test-without-core-destroy: infrastructure test-pipelines destroy-non-core ## Test non-core deploy->destroy destroying core
+test-apps: apps destroy  ## Test apps deploy->destroy
+
+test-without-core-destroy: infrastructure test-pipelines apps destroy-non-core ## Test non-core deploy->destroy destroying core
 
 test-transform-without-core-destroy: infrastructure-transform test-pipelines destroy-non-core  ## Test transform deploy->destroy destroying core
 
 test-serve-without-core-destroy: infrastructure-serve destroy-non-core  ## Test serve deploy->destroy without destroying core
+
+test-apps-without-core-destroy: apps destroy-non-core  ## Test apps deploy->destroy without destroying core
+
+transform-artifacts: az-login ## Build transform artifacts
+	${MAKEFILE_DIR}/scripts/pipeline_repo_checkout.sh \
+	&& ${MAKEFILE_DIR}/scripts/build_artifacts.sh
 
 apps: az-login ## Deploy FlowEHR apps
 	$(call terragrunt,apply,apps)

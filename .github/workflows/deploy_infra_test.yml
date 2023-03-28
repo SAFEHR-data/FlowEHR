@@ -19,9 +19,6 @@ on:
     branches: [main]
   workflow_dispatch:
 
-permissions:
-  pull-requests: read
-
 # Only have a single instance of this workflow running at any time
 concurrency:
   group: ${{ github.workflow }}
@@ -29,8 +26,8 @@ concurrency:
 jobs:
   deploy:
     uses: ./.github/workflows/devcontainer_make_command.yml
-    name: Make Infrastructure
+    name: Make All
     with:
-      command: infrastructure
+      command: all
       environment: infra-test
     secrets: inherit

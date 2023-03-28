@@ -78,17 +78,10 @@ RUN sudo apt-get update \
     && sudo apt-get update && sudo apt-get install -y unixodbc unixodbc-dev
 
 # Install Python dependencies
-ARG PANDAS_VERSION="1.5.3"
-ARG SQLALCHEMY_VERSION="2.0.4"
-ARG PYODBC_VERSION="4.0.35"
-ARG PYTHON_BUILD_VERSION="0.10.0"
-RUN python3 -m pip install --no-cache-dir \
-    pyodbc=="${PYODBC_VERSION}" \
-    build=="${PYTHON_BUILD_VERSION}" \
-    sqlalchemy=="${SQLALCHEMY_VERSION}" \
-    pandas=="${PANDAS_VERSION}"
+COPY .devcontainer/requirements.txt /tmp/requirements.txt
+RUN python3 -m pip install --no-cache-dir -r /tmp/requirements.txt
 
-# Install prerequsites for using this container as a GitHub runner. Assuming an x86 runner
+# Install prerequisites for using this container as a GitHub runner. Assuming an x86 runner
 COPY .devcontainer/library-scripts/start-gh-runner.sh /tmp/library-scripts/
 ARG GH_RUNNER_VERSION="v2.302.1"
 RUN mkdir -p /tmp/actions-runner \
