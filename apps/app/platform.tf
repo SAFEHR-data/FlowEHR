@@ -244,3 +244,19 @@ resource "azuread_group_member" "developers" {
   group_object_id  = var.developers_ad_group_principal_id
   member_object_id = azuread_group.developers_of_this_app.id
 }
+
+resource "azurerm_cosmosdb_sql_role_assignment" "data_scientists" {
+  resource_group_name = var.resource_group_name
+  account_name        = var.cosmos_account_name
+  role_definition_id  = azurerm_cosmosdb_sql_role_definition.webapp.id
+  principal_id        = var.data_scientists_ad_group_principal_id
+  scope               = "${data.azurerm_cosmosdb_account.state_store.id}/dbs/${azurerm_cosmosdb_sql_database.app.name}"
+}
+
+resource "azurerm_cosmosdb_sql_role_assignment" "developers" {
+  resource_group_name = var.resource_group_name
+  account_name        = var.cosmos_account_name
+  role_definition_id  = azurerm_cosmosdb_sql_role_definition.webapp.id
+  principal_id        = var.developers_ad_group_principal_id
+  scope               = "${data.azurerm_cosmosdb_account.state_store.id}/dbs/${azurerm_cosmosdb_sql_database.app.name}"
+}

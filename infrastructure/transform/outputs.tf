@@ -41,6 +41,11 @@ output "developers_ad_group_principal_id" {
   value       = azuread_group.ad_group_developers.object_id
 }
 
+output "data_scientists_ad_group_principal_id" {
+  description = "Developers AD group principal id"
+  value       = azuread_group.ad_group_data_scientists.object_id
+}
+
 output "adf_name" {
   value = azurerm_data_factory.adf.name
 }

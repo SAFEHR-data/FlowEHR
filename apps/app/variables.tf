@@ -98,6 +98,10 @@ variable "developers_ad_group_principal_id" {
   type = string
 }
 
+variable "data_scientists_ad_group_principal_id" {
+  type = string
+}
+
 variable "app_config" {
   type = object({
     name             = string

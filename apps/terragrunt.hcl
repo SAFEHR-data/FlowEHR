@@ -97,12 +97,13 @@ dependency "transform" {
   config_path = "${get_repo_root()}/infrastructure/transform"
 
   mock_outputs = {
-    feature_store_server_name        = "transform_feature_store_server_name"
-    feature_store_db_name            = "transform_feature_store_db_name"
-    apps_ad_group_display_name       = "transform_apps_ad_group_display_name"
-    developers_ad_group_display_name = "transform_developers_ad_group_display_name"
-    apps_ad_group_principal_id       = "transform_apps_ad_group_principal_id"
-    developers_ad_group_principal_id = "transform_developers_ad_group_principal_id"
+    feature_store_server_name             = "transform_feature_store_server_name"
+    feature_store_db_name                 = "transform_feature_store_db_name"
+    apps_ad_group_display_name            = "transform_apps_ad_group_display_name"
+    developers_ad_group_display_name      = "transform_developers_ad_group_display_name"
+    apps_ad_group_principal_id            = "transform_apps_ad_group_principal_id"
+    developers_ad_group_principal_id      = "transform_developers_ad_group_principal_id"
+    data_scientists_ad_group_principal_id = "transform_data_scientists_ad_group_principal_id"
   }
   mock_outputs_allowed_terraform_commands = ["destroy"]
 }
@@ -131,6 +132,7 @@ inputs = {
   transform_developers_ad_group_display_name = dependency.transform.outputs.developers_ad_group_display_name
   transform_apps_ad_group_principal_id       = dependency.transform.outputs.apps_ad_group_principal_id
   transform_developers_ad_group_principal_id = dependency.transform.outputs.developers_ad_group_principal_id
+  transform_data_scientists_ad_group_principal_id = dependency.transform.outputs.data_scientists_ad_group_principal_id
 
   serve_app_service_plan_name = dependency.serve.outputs.app_service_plan_name
   serve_acr_name              = dependency.serve.outputs.acr_name

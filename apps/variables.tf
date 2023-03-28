@@ -72,6 +72,10 @@ variable "transform_developers_ad_group_principal_id" {
   type = string
 }
 
+variable "transform_data_scientists_ad_group_principal_id" {
+  type = string
+}
+
 variable "transform_feature_store_server_name" {
   type = string
 }
