@@ -23,7 +23,7 @@ resource "azurerm_application_insights" "app" {
 }
 
 resource "azurerm_linux_web_app" "app" {
-  name                      = "webapp-${replace(var.app_id, "_", "-")}-${var.naming_suffix}"
+  name                      = local.webapp_name
   resource_group_name       = var.resource_group_name
   location                  = var.location
   service_plan_id           = data.azurerm_service_plan.serve.id
@@ -39,7 +39,7 @@ resource "azurerm_linux_web_app" "app" {
       for_each = var.app_config.add_testing_slot ? {} : { "${local.acr_repository}" = var.app_id }
 
       content {
-        docker_image     = "${var.acr_name}.azurecr.io/${var.app_id}"
+        docker_image     = "${var.acr_name}.azurecr.io/${local.acr_repository}"
         docker_image_tag = "latest"
       }
     }
@@ -57,6 +57,20 @@ resource "azurerm_linux_web_app" "app" {
 
   identity {
     type = "SystemAssigned"
+  }
+
+  dynamic "auth_settings" {
+    for_each = contains(local.auth_webapp_names, local.webapp_name) ? [1] : []
+
+    content {
+      enabled = true
+      issuer  = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/v2.0"
+
+      active_directory {
+        client_id     = azuread_application.webapp_auth[local.webapp_name].application_id
+        client_secret = azuread_application_password.webapp_auth[local.webapp_name].value
+      }
+    }
   }
 
   logs {
@@ -100,6 +114,20 @@ resource "azurerm_linux_web_app_slot" "testing" {
     type = "SystemAssigned"
   }
 
+  dynamic "auth_settings" {
+    for_each = contains(local.auth_webapp_names, local.testing_slot_webapp_name) ? [1] : []
+
+    content {
+      enabled = true
+      issuer  = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/v2.0"
+
+      active_directory {
+        client_id     = azuread_application.webapp_auth[local.testing_slot_webapp_name].application_id
+        client_secret = azuread_application_password.webapp_auth[local.testing_slot_webapp_name].value
+      }
+    }
+  }
+
   logs {
     application_logs {
       file_system_level = "Information"
@@ -112,62 +140,6 @@ resource "azurerm_linux_web_app_slot" "testing" {
       }
     }
   }
-}
-
-resource "azurerm_role_assignment" "webapp_acr" {
-  role_definition_name = "AcrPull"
-  scope                = data.azurerm_container_registry.serve.id
-  principal_id         = azurerm_linux_web_app.app.identity[0].principal_id
-}
-
-resource "azurerm_role_assignment" "webapp_testing_slot_acr" {
-  count                = var.app_config.add_testing_slot ? 1 : 0
-  role_definition_name = "AcrPull"
-  scope                = data.azurerm_container_registry.serve.id
-  principal_id         = azurerm_linux_web_app_slot.testing[0].identity[0].principal_id
-}
-
-# Create a web hook that triggers automated deployment of the Docker image
-resource "azurerm_container_registry_webhook" "webhook" {
-  count               = var.app_config.add_testing_slot ? 0 : 1
-  name                = "acrwh${replace(replace(var.app_id, "_", ""), "-", "")}"
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  registry_name       = data.azurerm_container_registry.serve.name
-
-  service_uri = "https://${local.site_credential_name}:${local.site_credential_password}@${local.webapp_name_in_webhook}.scm.azurewebsites.net/api/registry/webhook"
-  status      = "enabled"
-  scope       = "${local.acr_repository}:latest"
-  actions     = ["push"]
-
-  custom_headers = {
-    "Content-Type" = "application/json"
-  }
-}
-
-resource "azurerm_cosmosdb_sql_database" "app" {
-  name                = "${var.app_id}-state"
-  resource_group_name = var.resource_group_name
-  account_name        = var.cosmos_account_name
-}
-
-resource "azurerm_cosmosdb_sql_role_definition" "webapp" {
-  name                = "${var.app_id}-AccessCosmosSingleDB"
-  resource_group_name = var.resource_group_name
-  account_name        = var.cosmos_account_name
-  assignable_scopes   = ["${data.azurerm_cosmosdb_account.state_store.id}/dbs/${azurerm_cosmosdb_sql_database.app.name}"]
-
-  permissions {
-    data_actions = ["Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/*"]
-  }
-}
-
-resource "azurerm_cosmosdb_sql_role_assignment" "webapp" {
-  resource_group_name = var.resource_group_name
-  account_name        = var.cosmos_account_name
-  role_definition_id  = azurerm_cosmosdb_sql_role_definition.webapp.id
-  principal_id        = azurerm_linux_web_app.app.identity[0].principal_id
-  scope               = "${data.azurerm_cosmosdb_account.state_store.id}/dbs/${azurerm_cosmosdb_sql_database.app.name}"
 }
 
 resource "azuread_application" "webapp_sp" {

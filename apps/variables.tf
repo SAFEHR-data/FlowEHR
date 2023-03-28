@@ -26,6 +26,10 @@ variable "environment" {
   type = string
 }
 
+variable "suffix_override" {
+  type = string
+}
+
 variable "tags" {
   type = map(any)
 }
