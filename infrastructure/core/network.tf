@@ -77,3 +77,44 @@ resource "azurerm_private_dns_zone_virtual_network_link" "all" {
     azurerm_private_dns_zone.all
   ]
 }
+
+resource "azurerm_network_security_group" "core" {
+  name                = "nsg-default-${var.naming_suffix}"
+  location            = azurerm_resource_group.core.location
+  resource_group_name = azurerm_resource_group.core.name
+
+  security_rule {
+    name                       = "deny-internet-outbound-override"
+    description                = "Blocks outbound internet traffic unless an explicit outbound-allow rule exists. Overrides the default rule 65001"
+    priority                   = 2000
+    access                     = "Deny"
+    protocol                   = "*"
+    direction                  = "Outbound"
+    destination_address_prefix = "Internet"
+    destination_port_range     = 443
+    source_address_prefix      = "*"
+    source_port_range          = "*"
+  }
+}
+
+resource "azurerm_network_watcher_flow_log" "data_sources" {
+  name                      = "nw-log-${var.naming_suffix}"
+  resource_group_name       = var.network_watcher_resource_group_name
+  network_watcher_name      = var.network_watcher_name
+  network_security_group_id = azurerm_network_security_group.core.id
+  storage_account_id        = azurerm_storage_account.core.id
+  enabled                   = true
+
+  retention_policy {
+    enabled = true
+    days    = 7
+  }
+
+  traffic_analytics {
+    enabled               = true
+    workspace_id          = azurerm_log_analytics_workspace.core.workspace_id
+    workspace_region      = azurerm_log_analytics_workspace.core.location
+    workspace_resource_id = azurerm_log_analytics_workspace.core.id
+    interval_in_minutes   = 10
+  }
+}
