@@ -119,10 +119,26 @@ resource "azurerm_private_dns_zone" "databricks" {
   tags                = var.tags
 }
 
+# Need for proper DNS resolution between Databricks & platform services
+# https://learn.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
+resource "azurerm_private_dns_zone" "azure_platform" {
+  name                = "168.63.129.16"
+  resource_group_name = var.core_rg_name
+  tags                = var.tags
+}
+
 resource "azurerm_private_dns_zone_virtual_network_link" "databricks" {
   name                  = "vnl-dbks-${var.naming_suffix}"
   resource_group_name   = var.core_rg_name
   private_dns_zone_name = azurerm_private_dns_zone.databricks.name
+  virtual_network_id    = data.azurerm_virtual_network.core.id
+  tags                  = var.tags
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "azure_platform" {
+  name                  = "vnl-azplatform-${var.naming_suffix}"
+  resource_group_name   = var.core_rg_name
+  private_dns_zone_name = azurerm_private_dns_zone.azure_platform.name
   virtual_network_id    = data.azurerm_virtual_network.core.id
   tags                  = var.tags
 }
