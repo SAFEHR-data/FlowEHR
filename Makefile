@@ -44,11 +44,11 @@ az-login: ## Check logged in/log into azure with a service principal
 	$(call target_title, "Log-in to Azure") \
 	&& cd ${MAKEFILE_DIR}/scripts && ./az_login.sh
 
-ci: az-login ## Deploy bootstrap resources for CI builds (management infrastructure and AAD app with deployment permissions)
-	$(call target_title, "Creating CI resources") \
-	&& cd ${MAKEFILE_DIR}/bootstrap/ci \
+auth: az-login ## Create auth app for deployments
+	$(call target_title, "Creating auth app") \
+	&& cd ${MAKEFILE_DIR}/auth \
 	&& terragrunt apply \
-	&& printf "\n🌺 Use the below values to create your CI GitHub vars/secrets:\033[36m\n\n" \
+	&& printf "\n🌺 Below are the credentials for your auth app:\033[36m\n\n" \
 	&& terraform output -json \
 	  | jq -r 'with_entries(.value |= .value) | to_entries[] | "\(.key +": "+ .value)"'
 

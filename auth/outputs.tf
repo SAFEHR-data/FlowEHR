@@ -12,15 +12,19 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-locals {
-  naming_suffix           = var.suffix_override == "" ? "${var.flowehr_id}-${var.environment}" : var.suffix_override
-  naming_suffix_truncated = substr(replace(replace(local.naming_suffix, "-", ""), "_", ""), 0, 17)
+output "ARM_CLIENT_ID" {
+  value = azuread_application.ci_app.application_id
 }
 
-output "suffix" {
-  value = local.naming_suffix
+output "ARM_CLIENT_SECRET" {
+  value     = azuread_application_password.ci_app.value
+  sensitive = true
 }
 
-output "suffix_truncated" {
-  value = local.naming_suffix_truncated
+output "ARM_TENANT_ID" {
+  value = data.azurerm_client_config.current.tenant_id
+}
+
+output "ARM_SUBSCRIPTION_ID" {
+  value = data.azurerm_client_config.current.subscription_id
 }

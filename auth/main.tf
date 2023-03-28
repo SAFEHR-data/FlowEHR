@@ -12,19 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-module "naming" {
-  source      = "../shared/naming"
-  flowehr_id  = var.flowehr_id
-  environment = "ci"
-}
-
-module "management" {
-  source                  = "../shared/management"
-  naming_suffix           = module.naming.suffix
-  naming_suffix_truncated = module.naming.suffix_truncated
-  location                = var.location
-}
-
 # Get the MS Graph app 
 resource "azuread_service_principal" "msgraph" {
   application_id = data.azuread_application_published_app_ids.well_known.result.MicrosoftGraph
@@ -32,7 +19,7 @@ resource "azuread_service_principal" "msgraph" {
 }
 
 resource "azuread_application" "ci_app" {
-  display_name = "sp-flowehr-cicd-${lower(module.naming.suffix)}"
+  display_name = "sp-flowehr-cicd-${var.flowehr_id}-${var.environment}"
   owners       = [data.azurerm_client_config.current.object_id]
 
   required_resource_access {
