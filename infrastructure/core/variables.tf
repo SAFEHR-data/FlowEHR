@@ -93,3 +93,17 @@ variable "github_repository" {
   description = "Github repository in which to create the build agent. e.g. UCLH-Foundry/FlowEHR"
   default     = ""
 }
+
+variable "accesses_real_data" {
+  type        = bool
+  description = "Does this deployment access real data? I.e. is this a staging/production environment?"
+}
+
+variable "alert_recipients" {
+  description = "List of recipients to receive alerts"
+  type = list(object({
+    name  = string
+    email = string
+  }))
+  default = []
+}
