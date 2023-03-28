@@ -62,6 +62,8 @@ inputs = {
   core_subnet_id                     = dependency.core.outputs.core_subnet_id
   core_kv_id                         = dependency.core.outputs.core_kv_id
   core_kv_uri                        = dependency.core.outputs.core_kv_uri
+  p0_action_group_id                 = dependency.core.outputs.p0_action_group_id
+  core_storage_account_name          = dependency.core.outputs.storage_account_name
   databricks_host_address_space      = dependency.core.outputs.databricks_host_address_space
   databricks_container_address_space = dependency.core.outputs.databricks_container_address_space
 }

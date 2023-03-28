@@ -12,6 +12,10 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+data "azurerm_resource_group" "core" {
+  name = var.core_rg_name
+}
+
 data "azurerm_virtual_network" "core" {
   name                = var.core_vnet_name
   resource_group_name = var.core_rg_name
@@ -31,4 +35,9 @@ data "azurerm_virtual_network" "peered_data_source_networks" {
   for_each            = local.peerings
   name                = each.value.virtual_network_name
   resource_group_name = each.value.resource_group_name
+}
+
+data "azurerm_storage_account" "core" {
+  name                = var.core_storage_account_name
+  resource_group_name = var.core_rg_name
 }
