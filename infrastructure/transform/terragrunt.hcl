@@ -64,4 +64,5 @@ inputs = {
   core_kv_uri                        = dependency.core.outputs.core_kv_uri
   databricks_host_address_space      = dependency.core.outputs.databricks_host_address_space
   databricks_container_address_space = dependency.core.outputs.databricks_container_address_space
+  deployer_ip                        = dependency.core.outputs.deployer_ip
 }

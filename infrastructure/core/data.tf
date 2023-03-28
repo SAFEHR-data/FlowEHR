@@ -13,3 +13,8 @@
 #  limitations under the License.
 
 data "azurerm_client_config" "current" {}
+
+data "http" "local_ip" {
+  count = var.tf_in_automation ? 0 : 1
+  url   = "https://api64.ipify.org"
+}

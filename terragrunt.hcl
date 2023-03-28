@@ -74,7 +74,6 @@ inputs = merge(
   # And values from terraform bootstrapping (& env vars in CI)
   naming_suffix           = dependency.bootstrap.outputs.naming_suffix
   naming_suffix_truncated = dependency.bootstrap.outputs.naming_suffix_truncated
-  deployer_ip_address     = dependency.bootstrap.outputs.deployer_ip_address
   mgmt_rg                 = local.tf_in_automation ? get_env("CI_RESOURCE_GROUP") : dependency.bootstrap.outputs.mgmt_rg
   mgmt_acr                = local.tf_in_automation ? get_env("CI_CONTAINER_REGISTRY") : dependency.bootstrap.outputs.mgmt_acr
 

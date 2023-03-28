@@ -46,11 +46,6 @@ EOF
   default     = false
 }
 
-variable "deployer_ip_address" {
-  type    = string
-  default = ""
-}
-
 variable "tf_in_automation" {
   type = bool
 }
