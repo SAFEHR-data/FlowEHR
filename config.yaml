@@ -3,7 +3,7 @@ flowehr_id: flowehr
 location: uksouth
 environment: infra-test
 accesses_real_data: false
-core_address_space: 10.0.0.0/24
+core_address_space: 10.64.0.0/22
 
 transform:
   spark_version: 3.3.1
