@@ -119,7 +119,7 @@ This layer deploys components required to ingest data, transform data, and save 
 | Azure Resource | CIS Reference | Adherence | Notes |
 |--|--|--|--|
 | Azure App Service: <br/>`asp-serve-<suffix>` | `CIS 9` | | [app_service.tf](./infrastructure/serve/app_service.tf) / [platform.tf](./apps/app/platform.tf) |
-| | `CIS 9.1`: Ensure App Service Authentication is set up | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/175 |
+| | `CIS 9.1`: Ensure App Service Authentication is set up | Y | |
 | | `CIS 9.2`: Ensure all HTTP traffic is redirected to HTTPS | Y | | 
 | | `CIS 9.3`: Ensure web apps are using latest version of TLS | Y | |
 | | `CIS 9.4`: Ensure web apps have 'Incoming Client Certificates' set to 'On' | N | Choice made not to use client cert auth due to a number of overheads |

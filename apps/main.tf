@@ -27,7 +27,7 @@ data "external" "github_access_token" {
 module "app" {
   for_each                         = var.apps
   source                           = "./app"
-  app_id                           = each.key
+  app_id                           = "${each.key}${var.suffix_override}" # Ensure uniqueness for PR envs
   app_config                       = each.value
   naming_suffix                    = var.naming_suffix
   tf_in_automation                 = var.tf_in_automation
