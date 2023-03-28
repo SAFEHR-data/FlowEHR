@@ -83,8 +83,8 @@ locals {
 
   sql_users_to_create = [
     { "name" : "${local.databricks_app_name}", "role" : "db_owner" },
-    { "name" : "${azuread_group.ad_group_apps.display_name}", "role" : "db_reader" },
-    { "name" : "${azuread_group.ad_group_developers.display_name}", "role" : "db_reader" },
-    { "name" : "${azuread_group.ad_group_data_scientists.display_name}", "role" : "db_reader" },
+    { "name" : "${azuread_group.ad_group_apps.display_name}", "role" : "db_datareader" },
+    { "name" : "${azuread_group.ad_group_developers.display_name}", "role" : "db_datareader" },
+    { "name" : "${azuread_group.ad_group_data_scientists.display_name}", "role" : "db_datareader" },
   ]
 }
