@@ -19,7 +19,7 @@ resource "azurerm_cosmosdb_sql_database" "app" {
 }
 
 resource "azurerm_cosmosdb_sql_role_definition" "webapp" {
-  name                = "${var.app_id}-AccessCosmosSingleDB"
+  name                = "${var.app_id}-CosmosSingleDB-ReadWrite"
   resource_group_name = var.resource_group_name
   account_name        = var.cosmos_account_name
   assignable_scopes   = ["${data.azurerm_cosmosdb_account.state_store.id}/dbs/${azurerm_cosmosdb_sql_database.app.name}"]
