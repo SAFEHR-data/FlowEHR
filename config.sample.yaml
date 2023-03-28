@@ -30,4 +30,4 @@ serve:
 
 alert_recipients:  # Optional
   - name: __CHANGE_ME__
-    email: __CHANGE_ME__@company.com
+    email: __CHANGE_ME__  # e.g. employee@example.com
