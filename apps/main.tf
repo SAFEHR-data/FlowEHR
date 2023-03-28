@@ -40,12 +40,13 @@ module "app" {
   app_service_plan_name                 = var.serve_app_service_plan_name
   acr_name                              = var.serve_acr_name
   cosmos_account_name                   = var.serve_cosmos_account_name
+  feature_store_db_name                 = var.transform_feature_store_db_name
   feature_store_server_name             = var.transform_feature_store_server_name
   apps_ad_group_display_name            = var.transform_apps_ad_group_display_name
   developers_ad_group_display_name      = var.transform_developers_ad_group_display_name
   apps_ad_group_principal_id            = var.transform_apps_ad_group_principal_id
   developers_ad_group_principal_id      = var.transform_developers_ad_group_principal_id
-  data_scientists_ad_group_principal_id = var.transform_data_scientists_ad_group_principal_id
   github_owner                          = var.serve.github_owner
   github_access_token                   = data.external.github_access_token.result.token
+  data_scientists_ad_group_principal_id = var.transform_data_scientists_ad_group_principal_id
 }
