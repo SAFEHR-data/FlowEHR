@@ -52,7 +52,7 @@ This layer deploys the core components required for other layers, including a nu
 | | `CIS: 3.13`: Ensure Storage Logging is enabled for 'read', 'write' and 'delete' requests | TODO | | 
 | | `CIS 3.15`: Ensure Minimum TLS Version is set to 1.2 | Y | |
 | Azure Key Vault: <br/>`kv-<suffix>` | `CIS 8` | [main.tf](./infrastructure/core/main.tf)  | |
-| | `CIS 8.5`: Ensure the key vault is recoverable | TODO | - Soft delete enabled (7 days) <br/> - Purge protection: https://github.com/UCLH-Foundry/FlowEHR/issues/190 | 
+| | `CIS 8.5`: Ensure the key vault is recoverable | Y | | 
 | | `CIS 8.6`: Ensure RBAC enabled for Azure Key Vault | Y | | 
 | | `CIS 8.7`: Ensure Private Endpoints are used for Azure Key Vault | Y | Public internet access disabled, PE into VNET |
 | | `CIS 10.1`: Ensure that resource locks are set for critical resources | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/124 |
@@ -68,7 +68,7 @@ This layer deploys the core components required for other layers, including a nu
 | | `CIS 5.1.1`: Ensure Diagnostic setting exists (per resource) | TODO | |
 | | `CIS 5.1.2`: Ensure Diagnostic setting captures appropriate categories | TODO | |
 | | `CIS 5.1.4`: Ensure Diagnostic log storage container is encrypted with Customer Managed Key | N | System managed keys chosen to reduce management burden |
-| | `CIS 5.2`: Activity Log Alerts | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/188 |
+| | `CIS 5.2`: Activity Log Alerts | Y | SQL firewall change |
 
 
 ### FlowEHR Data Transformation
