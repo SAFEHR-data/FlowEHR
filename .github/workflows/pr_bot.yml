@@ -147,6 +147,14 @@ jobs:
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}
     secrets: inherit
 
+  destroy_cleanup: # Clean up state and dev container if destroy successful
+    needs: [destroy_pr_env]
+    name: Clean-up
+    uses: ./.github/workflows/clean_state.yml
+    with:
+      suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
+      environment: infra-test
+
   run_test:
     needs: [pr_comment]
     if: |
@@ -160,6 +168,14 @@ jobs:
       command: ${{ needs.pr_comment.outputs.makeCommand }}
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}
     secrets: inherit
+
+  test_cleanup: # Clean up state and dev container if test successful
+    needs: [run_test]
+    name: Clean-up
+    uses: ./.github/workflows/clean_state.yml
+    with:
+      suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
+      environment: infra-test
 
   summary:
     name: Summary
