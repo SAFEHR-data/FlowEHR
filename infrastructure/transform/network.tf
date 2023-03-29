@@ -69,6 +69,43 @@ resource "azurerm_subnet_network_security_group_association" "databricks_host" {
   network_security_group_id = azurerm_network_security_group.databricks.id
 }
 
+# Add UDRs to ensure correct routing for Databricks traffic
+# See https://learn.microsoft.com/en-gb/azure/databricks/administration-guide/cloud-configurations/azure/udr?WT.mc_id=Portal-Microsoft_Azure_Support#--configure-user-defined-routes-with-azure-service-tags
+resource "azurerm_route_table" "databricks_udrs" {
+  name                = "rt-dbks-${var.naming_suffix}"
+  location            = var.core_rg_location
+  resource_group_name = var.core_rg_name
+  tags                = var.tags
+}
+
+resource "azurerm_route" "databricks_service_tags" {
+  for_each            = local.databricks_service_tags
+  name                = each.key
+  resource_group_name = var.core_rg_name
+  route_table_name    = azurerm_route_table.databricks_udrs.name
+  address_prefix      = each.value
+  next_hop_type       = "Internet"
+}
+
+resource "azurerm_route" "databricks_extinfra_ips" {
+  for_each            = try(toset(local.databricks_udr_ips[var.core_rg_location].extinfra), toset([]))
+  name                = "extinfra-${index(local.databricks_udr_ips[var.core_rg_location].extinfra, each.value)}"
+  resource_group_name = var.core_rg_name
+  route_table_name    = azurerm_route_table.databricks_udrs.name
+  address_prefix      = each.value
+  next_hop_type       = "Internet"
+}
+
+resource "azurerm_subnet_route_table_association" "databricks_container" {
+  subnet_id      = azurerm_subnet.databricks_container.id
+  route_table_id = azurerm_route_table.databricks_udrs.id
+}
+
+resource "azurerm_subnet_route_table_association" "databricks_host" {
+  subnet_id      = azurerm_subnet.databricks_host.id
+  route_table_id = azurerm_route_table.databricks_udrs.id
+}
+
 resource "azurerm_private_dns_zone" "databricks" {
   name                = "privatelink.azuredatabricks.net"
   resource_group_name = var.core_rg_name
