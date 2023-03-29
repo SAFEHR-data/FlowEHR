@@ -97,7 +97,6 @@ resource "azurerm_network_security_group" "core" {
   }
 }
 
-# Network watcher must be added in real-data scenarios, thus will fail if network_watcher is undefined
 resource "azurerm_network_watcher_flow_log" "data_sources" {
   count                     = (var.monitoring.network_watcher != null) || var.accesses_real_data ? 1 : 0
   name                      = "nw-log-${var.naming_suffix}"
@@ -118,5 +117,12 @@ resource "azurerm_network_watcher_flow_log" "data_sources" {
     workspace_region      = azurerm_log_analytics_workspace.core.location
     workspace_resource_id = azurerm_log_analytics_workspace.core.id
     interval_in_minutes   = 10
+  }
+
+  lifecycle {
+    precondition {
+      condition     = !var.accesses_real_data || var.monitoring.network_watcher != null
+      error_message = "Network watcher flow logs must be enabled with when accesses_real_data"
+    }
   }
 }

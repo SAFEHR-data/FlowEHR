@@ -102,14 +102,18 @@ variable "accesses_real_data" {
 variable "monitoring" {
   description = "Monitoring block"
   type = object({
-    alert_recipients = list(object({ # List of recipients to receive alerts
-      name  = string
-      email = string
-    }))
-    network_watcher = object({ # Network watcher to monitor the NSGs
-      name                = string
-      resource_group_name = string
-    })
+    alert_recipients = optional(
+      list(object({ # List of recipients to receive alerts
+        name  = string
+        email = string
+      })),
+    [])
+    network_watcher = optional(
+      object({ # Network watcher to monitor the NSGs
+        name                = string
+        resource_group_name = string
+      })
+    , null)
   })
 
   default = {
