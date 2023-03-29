@@ -89,7 +89,7 @@ resource "azurerm_log_analytics_workspace" "core" {
 }
 
 resource "azurerm_monitor_action_group" "p0" {
-  name                = "log-critical-action-group-${var.naming_suffix}"
+  name                = "log-critical-action-group-${local.naming_suffix}"
   resource_group_name = azurerm_resource_group.core.name
   short_name          = "p0action"
 
@@ -111,7 +111,7 @@ resource "azurerm_monitor_action_group" "p0" {
 }
 
 resource "azurerm_monitor_activity_log_alert" "keyvault" {
-  name                = "activity-log-alert-kv-${var.naming_suffix}"
+  name                = "activity-log-alert-kv-${local.naming_suffix}"
   resource_group_name = azurerm_resource_group.core.name
   scopes              = [azurerm_resource_group.core.id]
   description         = "Monitor security updates to the keyvault"
