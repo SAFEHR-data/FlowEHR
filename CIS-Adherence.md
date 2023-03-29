@@ -29,27 +29,6 @@ FlowEHR is composed of a number of deployment 'layers': `Core`, `Transform` and 
 All Azure services are deployed either into a private Virtual Network (VNET) owned by FlowEHR, or have internet access disabled with communication made possible via Private Endpoints (PE) into the FlowEHR VNET. This ensures that no data is accessible over the public internet, even if the user has valid credentials.
 
 
-### FlowEHR 'bootstrap'
-
-FlowEHR is deployed using Terraform. Terraform maintains a text based state file in Azure Storage, which contains a number of keys and secrets, and should be treated as such. 
-
-| Azure Resource | CIS Reference | Adherence | Notes |
-|--|--|--|--|
-| Azure Storage Account for FlowEHR management: <br/>`stgmgmt<suffix>` | `CIS 3` | [main.tf](./bootstrap/shared/management/main.tf) | Issues summarised https://github.com/UCLH-Foundry/FlowEHR/issues/176 / https://github.com/UCLH-Foundry/FlowEHR/issues/199 |
-| | `CIS 3.1`: Ensure 'Secure Transfer Required' set to 'Enabled' | Y | |
-| | `CIS 3.2`: Ensure 'Enable Infrastructure Encryption' set to 'Enabled' | TODO |  |
-| | `CIS 3.3`: Enable key rotation reminders for each storage account | N | Storage keys are not used for authentication |
-| | `CIS 3.4`: Ensure that Storage Account Access keys are periodically regenerated | N | Storage keys are not used for authentication |
-| | `CIS 3.7`: Ensure 'Public Access Level' is disabled | TODO | |
-| | `CIS 3.8`: Ensure Default Network Access Rule is set to 'Deny' | TODO |  |
-| | `CIS 3.9`: Ensure 'Trusted Azure Services' can access the storage account | TODO |  |
-| | `CIS 3.10`: Ensure Private Endpoints are used to access storage accounts | TODO |  |
-| | `CIS 3.11`: Ensure Soft Delete is enabled | TODO |  |
-| | `CIS 3.12`: Ensure storage is encrypted with Customer Managed Keys | N | Will use Microsoft Managed Keys to reduce management overhead |
-| | `CIS: 3.13`: Ensure Storage Logging is enabled for 'read', 'write' and 'delete' requests | TODO | | 
-| | `CIS 3.15`: Ensure Minimum TLS Version is set to 1.2 | Y | |
-
-
 ### FlowEHR Core & Azure Subscription
 
 This layer deploys the core components required for other layers, including a number of shared components.
