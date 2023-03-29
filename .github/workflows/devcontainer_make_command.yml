@@ -20,7 +20,7 @@ on:
       command:
         type: string
         required: true
-        description: Make command to run e.g bootstrap
+        description: Make command to run e.g infrastructure
       environment:
         type: string
         required: true

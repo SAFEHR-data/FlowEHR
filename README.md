@@ -76,7 +76,7 @@ Once you've created it, specify the following values:
 
 3. Run `make all`
 
-    To bootstrap Terraform, and deploy all infrastructure, and any configured pipelines and apps, run:
+    To deploy all infrastructure, and any configured pipelines and apps, run:
 
     ```bash
     make all

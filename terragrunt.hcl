@@ -12,10 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-dependency "bootstrap" {
-  config_path = "${get_repo_root()}/bootstrap/local"
-}
-
 locals {
   providers        = read_terragrunt_config("${get_repo_root()}/providers.hcl")
   configuration    = read_terragrunt_config("${get_repo_root()}/configuration.hcl")
@@ -47,13 +43,13 @@ EOF
 }
 
 remote_state {
-  backend = "azurerm"
-  config = {
-    resource_group_name  = local.tf_in_automation ? get_env("CI_RESOURCE_GROUP") : dependency.bootstrap.outputs.mgmt_rg
-    storage_account_name = local.tf_in_automation ? get_env("CI_STORAGE_ACCOUNT") : dependency.bootstrap.outputs.mgmt_storage
+  backend = local.tf_in_automation ? "azurerm" : "local"
+  config = local.tf_in_automation ? {
+    resource_group_name  = local.configuration.locals.merged_root_config.ci.resource_group_name
+    storage_account_name = local.configuration.locals.merged_root_config.ci.storage_account_name
     container_name       = "tfstate"
-    key                  = "${local.suffix_override != "" ? local.suffix_override : dependency.bootstrap.outputs.environment}/${path_relative_to_include()}/terraform.tfstate"
-  }
+    key                  = "${local.suffix_override != "" ? local.suffix_override : local.configuration.locals.merged_root_config.environment}/${path_relative_to_include()}/terraform.tfstate"
+  } : {}
   generate = {
     path      = "backend.tf"
     if_exists = "overwrite_terragrunt"
