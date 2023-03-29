@@ -23,7 +23,7 @@ define terragrunt  # Arguments: <command>, <folder name>
     $(call target_title, "Running: terragrunt $(1) on $(2)") \
 	&& cd ${MAKEFILE_DIR}/$(2) \
 	&& terragrunt run-all $(1) --terragrunt-include-external-dependencies \
-		--terragrunt-non-interactive --terragrunt-exclude-dir ${MAKEFILE_DIR}/bootstrap/ci
+		--terragrunt-non-interactive --terragrunt-exclude-dir ${MAKEFILE_DIR}/auth
 endef
 
 all: az-login ## Deploy everything
@@ -52,12 +52,6 @@ auth: az-login ## Create auth app for deployments
 	&& terraform output -json \
 	  | jq -r 'with_entries(.value |= .value) | to_entries[] | "\(.key +": "+ .value)"'
 
-bootstrap: az-login ## Boostrap Terraform backend
-	$(call terragrunt,apply,bootstrap/local)
-
-bootstrap-destroy: az-login ## Destroy boostrap rg
-	$(call terragrunt,destroy,bootstrap/local)
-
 infrastructure: az-login transform-artifacts ## Deploy all infrastructure
 	$(call terragrunt,apply,infrastructure)
 
@@ -81,14 +75,6 @@ test-transform: infrastructure-transform test-pipelines destroy  ## Test transfo
 test-serve: infrastructure-serve destroy  ## Test serve deploy->destroy
 
 test-apps: apps destroy  ## Test apps deploy->destroy
-
-test-without-core-destroy: infrastructure test-pipelines apps destroy-non-core ## Test non-core deploy->destroy destroying core
-
-test-transform-without-core-destroy: infrastructure-transform test-pipelines destroy-non-core  ## Test transform deploy->destroy destroying core
-
-test-serve-without-core-destroy: infrastructure-serve destroy-non-core  ## Test serve deploy->destroy without destroying core
-
-test-apps-without-core-destroy: apps destroy-non-core  ## Test apps deploy->destroy without destroying core
 
 transform-artifacts: az-login ## Build transform artifacts
 	${MAKEFILE_DIR}/scripts/pipeline_repo_checkout.sh \
@@ -114,17 +100,6 @@ destroy-transform: az-login ## Destroy transform infrastructure
 
 destroy-serve: az-login ## Destroy serve infrastructure
 	$(call terragrunt,destroy,infrastructure/serve)
-
-destroy-non-core: az-login ## Destroy non-core 
-	$(call target_title, "Destroying non-core infrastructure") \
-	&& cd ${MAKEFILE_DIR} \
-	&& terragrunt run-all destroy \
-		--terragrunt-include-external-dependencies \
-		--terragrunt-non-interactive \
-		--terragrunt-exclude-dir ${MAKEFILE_DIR}/infrastructure/core \
-		--terragrunt-exclude-dir ${MAKEFILE_DIR}/bootstrap/ci \
-		--terragrunt-exclude-dir ${MAKEFILE_DIR}/bootstrap/local \
-		--terragrunt-exclude-dir ${MAKEFILE_DIR}/apps
 
 destroy-no-terraform: az-login ## Destroy all resource groups associated with this deployment
 	$(call target_title, "Destroy no terraform") \
