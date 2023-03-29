@@ -81,8 +81,8 @@ resource "azurerm_mssql_firewall_rule" "deployer_ip_exception" {
   count            = var.tf_in_automation ? 0 : 1
   name             = "DeployerIP"
   server_id        = azurerm_mssql_server.sql_server_features.id
-  start_ip_address = var.deployer_ip_address
-  end_ip_address   = var.deployer_ip_address
+  start_ip_address = var.deployer_ip
+  end_ip_address   = var.deployer_ip
 }
 
 # Enable Transparent Data Encryption (TDE) with a Service Managed Key

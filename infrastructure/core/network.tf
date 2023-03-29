@@ -95,8 +95,8 @@ resource "azurerm_virtual_network_peering" "flowehr_to_bootstrap" {
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "bootstrap" {
-  for_each              = local.private_dns_zones
-  name                  = "vnl-${each.key}-flwr-${local.naming_suffix}"
+  for_each              = var.tf_in_automation ? local.private_dns_zones : {}
+  name                  = "vnl-${each.key}-bootstrap-flwr-${local.naming_suffix}"
   private_dns_zone_name = each.value
   virtual_network_id    = azurerm_virtual_network.core.id
   resource_group_name   = azurerm_resource_group.core.name
