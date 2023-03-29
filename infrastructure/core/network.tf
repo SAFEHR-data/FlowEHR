@@ -77,3 +77,27 @@ resource "azurerm_private_dns_zone_virtual_network_link" "all" {
     azurerm_private_dns_zone.all
   ]
 }
+
+resource "azurerm_virtual_network_peering" "bootstrap_to_flowehr" {
+  count                     = var.tf_in_automation ? 1 : 0
+  name                      = "peer-bootstrap-to-flwr-${var.naming_suffix}"
+  resource_group_name       = var.core_rg_name
+  virtual_network_name      = var.ci_peering_vnet
+  remote_virtual_network_id = azurerm_virtual_network.core.name
+}
+
+resource "azurerm_virtual_network_peering" "flowehr_to_bootstrap" {
+  count                     = var.tf_in_automation ? 1 : 0
+  name                      = "peer-flwr-${var.naming_suffix}-to-bootstrap"
+  resource_group_name       = var.core_rg_name
+  virtual_network_name      = azurerm_virtual_network.core.name
+  remote_virtual_network_id = var.ci_peering_vnet
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "bootstrap" {
+  for_each              = local.private_dns_zones
+  name                  = "vnl-${each.key}-flwr-${var.naming_suffix}"
+  private_dns_zone_name = each.value
+  virtual_network_id    = data.azurerm_virtual_network.core.id
+  resource_group_name   = var.core_rg_name
+}

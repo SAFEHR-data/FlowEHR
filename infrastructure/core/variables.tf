@@ -72,6 +72,11 @@ EOF
   default     = false
 }
 
+variable "ci_peering_vnet" {
+  description = "Name of the CI bootstrapping vnet to peer with for deployment of data-plane resources"
+  type        = string
+}
+
 variable "tf_in_automation" {
   type = bool
 }
