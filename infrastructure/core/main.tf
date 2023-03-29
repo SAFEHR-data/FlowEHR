@@ -48,7 +48,7 @@ resource "azurerm_key_vault" "core" {
     bypass                     = "AzureServices"
     default_action             = "Deny"
     virtual_network_subnet_ids = [azurerm_subnet.core_shared.id]
-    ip_rules                   = var.tf_in_automation ? [] : [data.local_ip]
+    ip_rules                   = var.tf_in_automation ? [] : [data.http.local_ip[0].response_body]
   }
 }
 

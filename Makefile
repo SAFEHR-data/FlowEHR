@@ -22,8 +22,10 @@ target_title = @echo -e "\n\e[34m»»» 🌺 \e[96m$(1)\e[0m..."
 define terragrunt  # Arguments: <command>, <folder name>
     $(call target_title, "Running: terragrunt $(1) on $(2)") \
 	&& cd ${MAKEFILE_DIR}/$(2) \
-	&& terragrunt run-all $(1) --terragrunt-include-external-dependencies \
-		--terragrunt-non-interactive --terragrunt-exclude-dir ${MAKEFILE_DIR}/auth
+	&& terragrunt run-all $(1) \
+		--terragrunt-include-external-dependencies \
+		--terragrunt-non-interactive \
+		--terragrunt-exclude-dir ${MAKEFILE_DIR}/auth
 endef
 
 all: az-login ## Deploy everything

@@ -12,8 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-include "root" {
-  path = find_in_parent_folders()
+include "shared" {
+  path = "${get_repo_root()}/shared.hcl"
 }
 
 dependency "core" {

@@ -65,5 +65,5 @@ output "core_log_analytics_name" {
 }
 
 output "deployer_ip" {
-  value = data.http.local_ip
+  value = data.http.local_ip[0].response_body
 }

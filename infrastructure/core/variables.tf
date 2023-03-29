@@ -42,6 +42,16 @@ variable "environment" {
   }
 }
 
+variable "location" {
+  description = "The location to deploy resources"
+  type        = string
+
+  validation {
+    condition     = can(regex("[a-z]+", var.location))
+    error_message = "Only lowercase letters allowed"
+  }
+}
+
 variable "suffix_override" {
   description = "Override the suffix that would be generated from id + environment. Useful for transient PR environments"
   type        = string
