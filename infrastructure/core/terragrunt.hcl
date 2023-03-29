@@ -15,3 +15,7 @@
 include "root" {
   path = find_in_parent_folders()
 }
+
+inputs {
+  ci_peering_vnet = get_env("CI_PEERING_VNET", "")
+}

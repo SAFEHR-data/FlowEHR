@@ -155,13 +155,10 @@ jobs:
             CI_CONTAINER_REGISTRY=${{ vars.CI_CONTAINER_REGISTRY }}
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
+            CI_PEERING_VNET=${{ vars.CI_PEERING_VNET }}
             FLOWEHR_GITHUB_TOKEN=${{ secrets.FLOWEHR_GITHUB_TOKEN }}
             GH_APP_CERT
-            TF_VAR_devcontainer_image=${{ env.DEVCONTAINER_NAME }}
-            TF_VAR_devcontainer_tag=${{ steps.dc.outputs.tag }}
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
-            TF_VAR_github_runner_name=${{ steps.dc.outputs.runner_name }}
-            TF_VAR_github_repository=${{ github.repository }}
 
   build_agent_make:
     needs: [make_core]
@@ -198,12 +195,11 @@ jobs:
           CI_CONTAINER_REGISTRY: ${{ vars.CI_CONTAINER_REGISTRY }}
           CI_RESOURCE_GROUP: ${{ vars.CI_RESOURCE_GROUP }}
           CI_STORAGE_ACCOUNT: ${{ vars.CI_STORAGE_ACCOUNT }}
+          CI_PEERING_VNET: ${{ vars.CI_PEERING_VNET }}
           FLOWEHR_GITHUB_TOKEN: ${{ secrets.FLOWEHR_GITHUB_TOKEN }}
           GH_APP_CERT: ${{ secrets.GH_APP_CERT }}
           SUFFIX_OVERRIDE: ${{ inputs.suffix_override }}
           TF_VAR_use_random_address_space: ${{ (inputs.suffix_override != '' && '1') || '0' }}
-          TF_VAR_devcontainer_image: ${{ env.DEVCONTAINER_NAME }}
-          TF_VAR_devcontainer_tag: ${{ needs.make_core.outputs.dc_tag }}
         run: |
           make ${{ needs.make_core.outputs.build_agent_command }}
 
@@ -259,6 +255,7 @@ jobs:
             CI_CONTAINER_REGISTRY=${{ vars.CI_CONTAINER_REGISTRY }}
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
+            CI_PEERING_VNET=${{ vars.CI_PEERING_VNET }}
             FLOWEHR_GITHUB_TOKEN=${{ secrets.FLOWEHR_GITHUB_TOKEN }}
             GH_APP_CERT
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}

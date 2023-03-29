@@ -45,10 +45,10 @@ EOF
 remote_state {
   backend = local.tf_in_automation ? "azurerm" : "local"
   config = local.tf_in_automation ? {
-    resource_group_name  = local.configuration.locals.merged_root_config.ci.resource_group_name
-    storage_account_name = local.configuration.locals.merged_root_config.ci.storage_account_name
+    resource_group_name  = get_env("CI_RESOURCE_GROUP")
+    storage_account_name = get_env("CI_STORAGE_ACCOUNT")
     container_name       = "tfstate"
-    key                  = "${local.suffix_override != "" ? local.suffix_override : local.configuration.locals.merged_root_config.environment}/${path_relative_to_include()}/terraform.tfstate"
+    key                  = local.suffix_override != "" ? local.suffix_override : "${get_env("ENVIRONMENT")}/${path_relative_to_include()}/terraform.tfstate"
   } : {}
   generate = {
     path      = "backend.tf"
