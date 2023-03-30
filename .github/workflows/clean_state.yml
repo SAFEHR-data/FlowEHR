@@ -33,23 +33,24 @@ on:
     secrets: inherit
 
 jobs:
-  runs-on: ${{ vars.CI_GITHUB_RUNNER_NAME }}
-  environment: ${{ inputs.environment }}
-  steps:
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-        creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
-    - name: Clean
-      run: |
-        az config set extension.use_dynamic_install=yes_without_prompt
-        az acr repository delete \
-          --name ${{ vars.CI_CONTAINER_REGISTRY }} \
-          --image ${{ inputs.devcontainer_name }}:${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }} \
-          --yes
-        az storage blob directory delete \
-          -c tfstate \
-          -d ${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }} \
-          --account-name ${{ vars.CI_STORAGE_ACCOUNT }} \
-          --auth-mode login \
-          --recursive
+  clean:
+    runs-on: ${{ vars.CI_GITHUB_RUNNER_LABEL }}
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
+      - name: Clean
+        run: |
+          az config set extension.use_dynamic_install=yes_without_prompt
+          az acr repository delete \
+            --name ${{ vars.CI_CONTAINER_REGISTRY }} \
+            --image ${{ inputs.devcontainer_name }}:${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }} \
+            --yes
+          az storage blob directory delete \
+            -c tfstate \
+            -d ${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }} \
+            --account-name ${{ vars.CI_STORAGE_ACCOUNT }} \
+            --auth-mode login \
+            --recursive
