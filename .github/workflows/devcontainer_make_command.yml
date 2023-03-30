@@ -33,6 +33,11 @@ on:
         type: string
         required: false
         description: Commit SHA to override the default GitHub checkout
+      devcontainer_name:
+        type: string
+        required: true
+        description: The devcontainer image name
+        default: flowehr/devcontainer
     secrets:
       ARM_SUBSCRIPTION_ID:
         required: true
@@ -47,9 +52,6 @@ on:
       GH_APP_CERT:
         required: false
 
-env:
-  DEVCONTAINER_NAME: flowehr/devcontainer
-
 jobs:
   make:
     runs-on: ${{ var.CI_GITHUB_RUNNER_LABEL }}
@@ -60,7 +62,7 @@ jobs:
         id: dc
         run: |
           echo "tag=${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}" >> $GITHUB_OUTPUT
-          echo "image_path=${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DEVCONTAINER_NAME }}" >> $GITHUB_OUTPUT
+          echo "image_path=${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ inputs.devcontainer_name }}" >> $GITHUB_OUTPUT
 
       - name: Checkout
         uses: actions/checkout@v3

@@ -21,7 +21,7 @@ on:
         type: string
         required: true
         description: The environment where resources have been deployed to
-      devcontainer_image:
+      devcontainer_name:
         type: string
         required: true
         description: The devcontainer image name to delete from ACR
@@ -45,7 +45,7 @@ jobs:
         az config set extension.use_dynamic_install=yes_without_prompt
         az acr repository delete \
           --name ${{ vars.CI_CONTAINER_REGISTRY }} \
-          --image ${{ inputs.devcontainer_image }}:${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }} \
+          --image ${{ inputs.devcontainer_name }}:${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }} \
           --yes
         az storage blob directory delete \
           -c tfstate \
