@@ -17,6 +17,7 @@ name: Deploy Infra-Test
 on:
   push:
     branches: [main]
+    workflow_dispatch:
 
 # Only have a single instance of this workflow running at any time
 concurrency:
