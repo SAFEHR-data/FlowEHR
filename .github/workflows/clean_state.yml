@@ -33,7 +33,7 @@ on:
     secrets: inherit
 
 jobs:
-  runs-on: ${{ var.CI_GITHUB_RUNNER_NAME }}
+  runs-on: ${{ vars.CI_GITHUB_RUNNER_NAME }}
   environment: ${{ inputs.environment }}
   steps:
     - name: Azure Login
