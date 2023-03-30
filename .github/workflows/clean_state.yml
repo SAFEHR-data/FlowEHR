@@ -23,7 +23,7 @@ on:
         description: The environment where resources have been deployed to
       devcontainer_name:
         type: string
-        required: true
+        required: false
         description: The devcontainer image name to delete from ACR
         default: flowehr/devcontainer
       suffix_override:
