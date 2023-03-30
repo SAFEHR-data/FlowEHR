@@ -54,7 +54,7 @@ on:
 
 jobs:
   make:
-    runs-on: ${{ var.CI_GITHUB_RUNNER_LABEL }}
+    runs-on: ${{ vars.CI_GITHUB_RUNNER_LABEL }}
     environment: ${{ inputs.environment }}
 
     steps:
