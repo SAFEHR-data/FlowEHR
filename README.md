@@ -125,16 +125,13 @@ This step will create an AAD Application and Service Principal in the specified 
 
 4. Create a GitHub PAT (access token)
 
-    We require a GitHub [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#fine-grained-personal-access-tokens) with scopes to clone any transform repositories defined in `config.infra-test.yaml` (or `config.yaml` if you haven't defined env-specific repositories), as well as permissions to deploy GitHub runners for executing CI deployments.
+    We require a GitHub [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#fine-grained-personal-access-tokens) with scopes to clone any transform repositories defined in `config.infra-test.yaml` (or `config.yaml` if you haven't defined env-specific repositories).
 
     Follow the instructions [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#fine-grained-personal-access-tokens) to create a token, set a sensible expiration time (you'll need to manually repeat these steps to create a new one after expiry) and set the `Resource Owner` as the organisation containing your FlowEHR fork and any transform pipeline repositories.
 
     Then provide it repository access to either `All Repositories` (within that org), or `Selected Repositories` and ensure you select the FlowEHR fork as well as any transform repos that will be cloned during deployments.
 
     Finally, give it the following scopes:
-
-    `Organization Permissions`
-    - `Administration`: `Read and write` - required for GitHub Runner registration
 
     `Repository Permissions`
     - `Contents`: `Read-only` - required to clone transformation pipeline repos for deployment
