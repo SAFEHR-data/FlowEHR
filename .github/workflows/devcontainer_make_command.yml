@@ -47,7 +47,7 @@ on:
         required: true
       ARM_CLIENT_SECRET:
         required: true
-      FLOWEHR_GITHUB_TOKEN:
+      FLOWEHR_REPOSITORIES_GH_TOKEN:
         required: true
       GH_APP_CERT:
         required: false
@@ -68,7 +68,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           persist-credentials: false
-          token: ${{ secrets.FLOWEHR_GITHUB_TOKEN }}
+          token: ${{ secrets.FLOWEHR_REPOSITORIES_GH_TOKEN }}
           # if the following values are missing (i.e. not triggered via comment workflow)
           # then the default checkout will apply
           ref: ${{ inputs.sha }}
@@ -126,6 +126,6 @@ jobs:
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
             CI_PEERING_VNET=${{ vars.CI_PEERING_VNET }}
-            FLOWEHR_GITHUB_TOKEN=${{ secrets.FLOWEHR_GITHUB_TOKEN }}
+            FLOWEHR_REPOSITORIES_GH_TOKEN=${{ secrets.FLOWEHR_REPOSITORIES_GH_TOKEN }}
             GH_APP_CERT
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
