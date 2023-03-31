@@ -12,19 +12,55 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-variable "naming_suffix" {
+variable "flowehr_id" {
+  description = "Unique value for differentiating FlowEHR deployments across organisations/projects"
   type        = string
-  description = "Suffix used to name resources"
+
+  validation {
+    condition     = length(var.flowehr_id) <= 12
+    error_message = "Must be 12 chars or less"
+  }
+
+  validation {
+    condition     = can(regex("^[a-z0-9\\_-]*$", var.flowehr_id))
+    error_message = "Cannot contain spaces, uppercase or special characters except '-' and '_'"
+  }
 }
 
-variable "naming_suffix_truncated" {
+variable "environment" {
+  description = "Environment name for differentiating deployment environments"
   type        = string
-  description = "Truncated (max 20 chars, no hyphens etc.) suffix to name e.g storage accounts"
+
+  validation {
+    condition     = length(var.environment) <= 12
+    error_message = "Must be 12 chars or less"
+  }
+
+  validation {
+    condition     = can(regex("^[a-z0-9\\_-]*$", var.environment))
+    error_message = "Cannot contain spaces, uppercase or special characters except '-' and '_'"
+  }
 }
 
 variable "location" {
-  type        = string
   description = "The location to deploy resources"
+  type        = string
+
+  validation {
+    condition     = can(regex("[a-z]+", var.location))
+    error_message = "Only lowercase letters allowed"
+  }
+}
+
+variable "suffix_override" {
+  description = "Override the suffix that would be generated from id + environment. Useful for transient PR environments"
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = can(regex("^[a-z0-9\\_-]*$", var.suffix_override))
+    error_message = "Cannot contain spaces, uppercase or special characters except '-' and '_'"
+  }
 }
 
 variable "tags" {
@@ -46,52 +82,13 @@ EOF
   default     = false
 }
 
-variable "deployer_ip_address" {
-  type    = string
-  default = ""
+variable "ci_peering_vnet" {
+  description = "Name of the CI bootstrapping vnet to peer with for deployment of data-plane resources"
+  type        = string
 }
 
 variable "tf_in_automation" {
   type = bool
-}
-
-variable "mgmt_acr" {
-  type        = string
-  description = "Name of the management azure container registry (created by bootstrap)"
-}
-
-variable "mgmt_rg" {
-  type        = string
-  description = "Management resource group name (created by bootstrap)"
-}
-
-variable "devcontainer_tag" {
-  type        = string
-  description = "Tag for the devcontainer image"
-  default     = ""
-}
-
-variable "devcontainer_image" {
-  type        = string
-  description = "Name of the devcontainer image i.e. aregistry.azurecr.io/<image-name>:tag"
-  default     = ""
-}
-
-variable "github_runner_name" {
-  type        = string
-  description = "Name of the GitHub runner that will be created"
-  default     = ""
-}
-
-variable "github_runner_token" {
-  type        = string
-  description = "GitHub token with permissions to register a runner on this repository"
-}
-
-variable "github_repository" {
-  type        = string
-  description = "Github repository in which to create the build agent. e.g. UCLH-Foundry/FlowEHR"
-  default     = ""
 }
 
 variable "accesses_real_data" {

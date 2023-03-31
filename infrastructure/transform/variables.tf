@@ -56,7 +56,7 @@ variable "core_kv_uri" {
   type = string
 }
 
-variable "deployer_ip_address" {
+variable "deployer_ip" {
   type = string
 }
 

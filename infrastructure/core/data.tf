@@ -14,8 +14,7 @@
 
 data "azurerm_client_config" "current" {}
 
-data "azurerm_container_registry" "devcontainer" {
-  count               = var.tf_in_automation ? 1 : 0
-  name                = var.mgmt_acr
-  resource_group_name = var.mgmt_rg
+data "http" "local_ip" {
+  count = var.tf_in_automation ? 0 : 1
+  url   = "https://api64.ipify.org"
 }

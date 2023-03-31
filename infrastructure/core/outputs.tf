@@ -12,6 +12,14 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+output "naming_suffix" {
+  value = local.naming_suffix
+}
+
+output "naming_suffix_truncated" {
+  value = local.naming_suffix_truncated
+}
+
 output "core_rg_name" {
   value = azurerm_resource_group.core.name
 }
@@ -54,6 +62,10 @@ output "serve_webapps_address_space" {
 
 output "core_log_analytics_name" {
   value = azurerm_log_analytics_workspace.core.name
+}
+
+output "deployer_ip" {
+  value = data.http.local_ip[0].response_body
 }
 
 output "p0_action_group_id" {

@@ -12,20 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-dependency "bootstrap" {
-  config_path = "${get_repo_root()}/bootstrap/local"
-
-  mock_outputs = {
-    naming_suffix           = "naming-suffix"
-    naming_suffix_truncated = "suffix"
-    deployer_ip_address     = "0.0.0.0"
-    environment             = "environment"
-    mgmt_rg                 = "mgmt_rg"
-    mgmt_acr                = "mgmt_acr"
-  }
-  mock_outputs_allowed_terraform_commands = ["destroy"]
-}
-
 locals {
   providers        = read_terragrunt_config("${get_repo_root()}/providers.hcl")
   configuration    = read_terragrunt_config("${get_repo_root()}/configuration.hcl")
@@ -57,13 +43,13 @@ EOF
 }
 
 remote_state {
-  backend = "azurerm"
-  config = {
-    resource_group_name  = local.tf_in_automation ? get_env("CI_RESOURCE_GROUP") : dependency.bootstrap.outputs.mgmt_rg
-    storage_account_name = local.tf_in_automation ? get_env("CI_STORAGE_ACCOUNT") : dependency.bootstrap.outputs.mgmt_storage
+  backend = local.tf_in_automation ? "azurerm" : "local"
+  config = local.tf_in_automation ? {
+    resource_group_name  = get_env("CI_RESOURCE_GROUP")
+    storage_account_name = get_env("CI_STORAGE_ACCOUNT")
     container_name       = "tfstate"
-    key                  = "${local.suffix_override != "" ? local.suffix_override : dependency.bootstrap.outputs.environment}/${path_relative_to_include()}/terraform.tfstate"
-  }
+    key                  = local.suffix_override != "" ? local.suffix_override : "${get_env("ENVIRONMENT")}/${path_relative_to_include()}/terraform.tfstate"
+  } : {}
   generate = {
     path      = "backend.tf"
     if_exists = "overwrite_terragrunt"
@@ -81,18 +67,11 @@ inputs = merge(
   # Add values from the merged config files (root and environment-specific)
   local.configuration.locals.merged_root_config, {
 
-  # And values from terraform bootstrapping (& env vars in CI)
-  naming_suffix           = dependency.bootstrap.outputs.naming_suffix
-  naming_suffix_truncated = dependency.bootstrap.outputs.naming_suffix_truncated
-  deployer_ip_address     = dependency.bootstrap.outputs.deployer_ip_address
-  mgmt_rg                 = local.tf_in_automation ? get_env("CI_RESOURCE_GROUP") : dependency.bootstrap.outputs.mgmt_rg
-  mgmt_acr                = local.tf_in_automation ? get_env("CI_CONTAINER_REGISTRY") : dependency.bootstrap.outputs.mgmt_acr
-
   # And any global env vars that should be made available
   tf_in_automation = local.tf_in_automation
 
   # Tags to add to every resource that accepts them
   tags = {
-    environment = dependency.bootstrap.outputs.environment
+    environment = local.configuration.locals.merged_root_config.environment
   }
 })

@@ -12,30 +12,23 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-output "naming_suffix" {
-  value = module.naming.suffix
+variable "flowehr_id" {
+  type = string
 }
 
-output "naming_suffix_truncated" {
-  value = module.naming.suffix_truncated
+variable "environment" {
+  type = string
 }
 
-output "environment" {
-  value = var.environment
+variable "location" {
+  type = string
 }
 
-output "mgmt_rg" {
-  value = var.tf_in_automation ? "" : module.management[0].rg
-}
+variable "tf_in_automation" {
+  type = bool
 
-output "mgmt_acr" {
-  value = var.tf_in_automation ? "" : module.management[0].acr
-}
-
-output "mgmt_storage" {
-  value = var.tf_in_automation ? "" : module.management[0].storage
-}
-
-output "deployer_ip_address" {
-  value = var.tf_in_automation ? "" : chomp(data.http.local_ip[0].response_body)
+  validation {
+    condition     = !var.tf_in_automation
+    error_message = "Auth should be ran locally to create credentials for CI. Please run this from a local machine as a user with rights to assign AD roles."
+  }
 }

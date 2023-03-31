@@ -13,13 +13,13 @@
 #  limitations under the License.
 
 resource "azurerm_resource_group" "core" {
-  name     = "rg-${var.naming_suffix}"
+  name     = "rg-${local.naming_suffix}"
   location = var.location
   tags     = var.tags
 }
 
 resource "azurerm_storage_account" "core" {
-  name                     = "strg${var.naming_suffix_truncated}"
+  name                     = "strg${local.naming_suffix_truncated}"
   resource_group_name      = azurerm_resource_group.core.name
   location                 = azurerm_resource_group.core.location
   account_tier             = "Standard"
@@ -33,7 +33,7 @@ resource "azurerm_storage_account" "core" {
 }
 
 resource "azurerm_key_vault" "core" {
-  name                          = "kv-${var.naming_suffix_truncated}"
+  name                          = "kv-${local.naming_suffix_truncated}"
   location                      = azurerm_resource_group.core.location
   resource_group_name           = azurerm_resource_group.core.name
   tenant_id                     = data.azurerm_client_config.current.tenant_id
@@ -49,7 +49,7 @@ resource "azurerm_key_vault" "core" {
     bypass                     = "AzureServices"
     default_action             = "Deny"
     virtual_network_subnet_ids = [azurerm_subnet.core_shared.id]
-    ip_rules                   = var.tf_in_automation ? [] : [var.deployer_ip_address]
+    ip_rules                   = var.tf_in_automation ? [] : [data.http.local_ip[0].response_body]
   }
 }
 
@@ -60,18 +60,18 @@ resource "azurerm_role_assignment" "deployer_can_administrate_kv" {
 }
 
 resource "azurerm_private_endpoint" "flowehr_keyvault" {
-  name                = "pe-kv-${var.naming_suffix}"
+  name                = "pe-kv-${local.naming_suffix}"
   location            = azurerm_resource_group.core.location
   resource_group_name = azurerm_resource_group.core.name
   subnet_id           = azurerm_subnet.core_shared.id
 
   private_dns_zone_group {
-    name                 = "private-dns-zone-group-kv-${var.naming_suffix}"
+    name                 = "private-dns-zone-group-kv-${local.naming_suffix}"
     private_dns_zone_ids = [azurerm_private_dns_zone.all["keyvault"].id]
   }
 
   private_service_connection {
-    name                           = "private-service-connection-kv-${var.naming_suffix}"
+    name                           = "private-service-connection-kv-${local.naming_suffix}"
     is_manual_connection           = false
     private_connection_resource_id = azurerm_key_vault.core.id
     subresource_names              = ["Vault"]
@@ -79,7 +79,7 @@ resource "azurerm_private_endpoint" "flowehr_keyvault" {
 }
 
 resource "azurerm_log_analytics_workspace" "core" {
-  name                       = "log-${var.naming_suffix}"
+  name                       = "log-${local.naming_suffix}"
   location                   = azurerm_resource_group.core.location
   resource_group_name        = azurerm_resource_group.core.name
   internet_ingestion_enabled = var.tf_in_automation ? false : true
@@ -89,7 +89,7 @@ resource "azurerm_log_analytics_workspace" "core" {
 }
 
 resource "azurerm_monitor_action_group" "p0" {
-  name                = "log-critical-action-group-${var.naming_suffix}"
+  name                = "log-critical-action-group-${local.naming_suffix}"
   resource_group_name = azurerm_resource_group.core.name
   short_name          = "p0action"
 
@@ -111,7 +111,7 @@ resource "azurerm_monitor_action_group" "p0" {
 }
 
 resource "azurerm_monitor_activity_log_alert" "keyvault" {
-  name                = "activity-log-alert-kv-${var.naming_suffix}"
+  name                = "activity-log-alert-kv-${local.naming_suffix}"
   resource_group_name = azurerm_resource_group.core.name
   scopes              = [azurerm_resource_group.core.id]
   description         = "Monitor security updates to the keyvault"

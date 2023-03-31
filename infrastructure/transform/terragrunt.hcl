@@ -12,8 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-include "root" {
-  path   = find_in_parent_folders()
+include "shared" {
+  path = "${get_repo_root()}/shared.hcl"
 }
 
 locals {
@@ -68,6 +68,8 @@ EOF
 }
 
 inputs = {
+  naming_suffix                      = dependency.core.outputs.naming_suffix
+  naming_suffix_truncated            = dependency.core.outputs.naming_suffix_truncated
   core_rg_name                       = dependency.core.outputs.core_rg_name
   core_rg_location                   = dependency.core.outputs.core_rg_location
   core_vnet_name                     = dependency.core.outputs.core_vnet_name
@@ -78,4 +80,5 @@ inputs = {
   core_storage_account_name          = dependency.core.outputs.storage_account_name
   databricks_host_address_space      = dependency.core.outputs.databricks_host_address_space
   databricks_container_address_space = dependency.core.outputs.databricks_container_address_space
+  deployer_ip                        = dependency.core.outputs.deployer_ip
 }
