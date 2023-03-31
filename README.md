@@ -113,10 +113,10 @@ This step will create an AAD Application and Service Principal in the specified 
 
 > Note: if you want to reference secrets in these files (i.e. a data source password), you can use the syntax: `${MY_SECRET}`. In the CICD workflow, matching GitHub secrets will be searched for and, if found, will replace these tokens before running deployment steps.
 
-3. Create the CI resources and service principal with required AAD permissions: 
+3. Create a deployer identity (AAD App Registration/Service Principal) with required AAD permissions: 
 
     ```bash
-    make ci
+    make auth
     ```
 
     > _NOTE_: CI deployments require a service principal with access to deploy resources in the subscription. See `sp-flowehr-cicd-<naming-suffix>` in the [identities section](#identities) for the roles that are assigned to this.
