@@ -268,7 +268,9 @@ jobs:
           (needs.make_core.outputs.post_build_agent_command == 'destroy') ||
           (needs.make_core.outputs.post_build_agent_command == 'destroy-no-terraform')
         run: |
+          az config set extension.use_dynamic_install=yes_without_prompt
           az acr repository delete \
+            --yes \
             --name ${{ vars.CI_CONTAINER_REGISTRY }} \
             --image ${{ env.DEVCONTAINER_NAME }}:${{ needs.make_core.outputs.dc_tag }}
           az storage blob directory delete \
