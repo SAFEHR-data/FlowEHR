@@ -101,7 +101,7 @@ resource "azurerm_log_analytics_workspace" "core" {
   internet_ingestion_enabled = var.tf_in_automation ? false : true
   sku                        = "PerGB2018"
   retention_in_days          = 90
-  internet_query_enabled     = false
+  internet_query_enabled     = var.accesses_real_data ? false : true
   tags                       = var.tags
 }
 
