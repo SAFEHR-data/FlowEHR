@@ -82,8 +82,13 @@ EOF
   default     = false
 }
 
-variable "ci_peering_vnet" {
+variable "ci_vnet_name" {
   description = "Name of the CI bootstrapping vnet to peer with for deployment of data-plane resources"
+  type        = string
+}
+
+variable "ci_rg_name" {
+  description = "Name of the CI bootstrapping resource group"
   type        = string
 }
 

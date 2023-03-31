@@ -18,3 +18,9 @@ data "http" "local_ip" {
   count = var.tf_in_automation ? 0 : 1
   url   = "https://api64.ipify.org"
 }
+
+data "azurerm_virtual_network" "ci" {
+  count               = var.tf_in_automation ? 1 : 0
+  name                = var.ci_vnet_name
+  resource_group_name = var.ci_rg_name
+}
