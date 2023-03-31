@@ -279,20 +279,19 @@ resource "azurerm_storage_container" "mssql_vulnerability_assessment" {
   container_access_type = "private"
 }
 
-resource "azurerm_mssql_server_security_alert_policy" "example" {
+resource "azurerm_mssql_server_security_alert_policy" "sql_server_features" {
   resource_group_name = var.core_rg_name
   server_name         = azurerm_mssql_server.sql_server_features.name
   state               = "Enabled"
 }
 
-resource "azurerm_mssql_server_vulnerability_assessment" "example" {
-  server_security_alert_policy_id = azurerm_mssql_server_security_alert_policy.example.id
+resource "azurerm_mssql_server_vulnerability_assessment" "sql_server_features" {
+  server_security_alert_policy_id = azurerm_mssql_server_security_alert_policy.sql_server_features.id
   storage_container_path          = "${data.azurerm_storage_account.core.primary_blob_endpoint}${azurerm_storage_container.mssql_vulnerability_assessment.name}/"
-  storage_account_access_key      = data.azurerm_storage_account.core.primary_access_key
 
   recurring_scans {
     enabled                   = true
     email_subscription_admins = true
-    emails = [for person in var.monitoring.alert_recipients : "${person.email}" ]
+    emails                    = [for person in var.monitoring.alert_recipients : "${person.email}"]
   }
 }

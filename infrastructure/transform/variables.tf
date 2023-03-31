@@ -114,7 +114,7 @@ variable "data_source_connections" {
 
 variable "monitoring" {
   description = "Monitoring block"
-  type = any # Type validated in core
+  type        = any # Type validated in core
   default = {
     alert_recipients = []
   }

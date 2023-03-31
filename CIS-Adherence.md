@@ -99,7 +99,7 @@ This layer deploys components required to ingest data, transform data, and save 
 | Azure Resource | CIS Reference | Adherence | Notes |
 |--|--|--|--|
 | Azure SQL Server:<br/> `sql-server-features-suffix` | [feature-data-store.tf](./infrastructure/core/feature-data-store.tf) | |
-| | `CIS 4.1.1`: Ensure auditing is set to 'on' | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/172 |
+| | `CIS 4.1.1`: Ensure auditing is set to 'on' | Y | https://github.com/UCLH-Foundry/FlowEHR/issues/172 |
 | | `CIS 4.1.2`: Ensure no SQL databases allow ingress from 0.0.0.0/0 (any IP) | Y | All public access disabled |
 | | `CIS 4.1.3`: Ensure SQL uses Transparent Data Encryption with customer managed key | N | Decision was made to use Service Managed Key to decrease management overhead |
 | | `CIS 4.1.4`: Ensure AAD admin is configured | Y | Owner is an auto-created Service Principal account, with credentials saved in key vault | 
