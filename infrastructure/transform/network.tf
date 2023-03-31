@@ -85,7 +85,7 @@ resource "azurerm_network_security_group" "databricks" {
   }
 
   security_rule {
-    name                       = "Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-control-plane"
+    name                       = "Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-webapp"
     description                = "Required for workers communication with Databricks Webapp."
     priority                   = 104
     direction                  = "Outbound"
