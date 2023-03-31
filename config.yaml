@@ -1,5 +1,5 @@
 ---
-flowehr_id: flowehr
+flowehr_id: flwrgriff
 location: uksouth
 environment: infra-test
 accesses_real_data: false
@@ -11,6 +11,6 @@ transform:
     - url: https://github.com/UCLH-Foundry/FlowEHR-Data-Pot
 
 serve:
-  github_owner: UCLH-FlowEHR-TestBed
-  github_app_id: 309047
-  github_app_installation_id: 35581991
+  github_owner: Griff-Labs
+  github_app_id: 309106
+  github_app_installation_id: 35587759
