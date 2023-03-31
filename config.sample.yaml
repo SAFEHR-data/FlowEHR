@@ -28,6 +28,10 @@ serve:
   github_app_id: __CHANGE_ME__
   github_app_installation_id: __CHANGE_ME__
 
-alert_recipients:  # Optional
-  - name: __CHANGE_ME__
-    email: __CHANGE_ME__  # e.g. employee@example.com
+monitoring:
+  alert_recipients:  # Optional
+    - name: __CHANGE_ME__
+      email: __CHANGE_ME__  # e.g. employee@example.com
+  network_watcher:  # Optional, required if accesses_real_data
+    name: __CHANGE_ME__  # e.g. NetworkWatcher_location
+    resource_group_name: __CHANGE_ME__  # e.g. NetworkWatcherRG
