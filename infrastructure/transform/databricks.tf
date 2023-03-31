@@ -93,8 +93,7 @@ resource "databricks_cluster" "fixed_single_node" {
   depends_on = [
     azurerm_databricks_workspace.databricks,
     azurerm_private_endpoint.databricks_control_plane,
-    azurerm_private_endpoint.databricks_filesystem,
-    azurerm_private_dns_zone_virtual_network_link.databricks
+    azurerm_private_endpoint.databricks_filesystem
   ]
 }
 

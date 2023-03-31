@@ -126,20 +126,6 @@ resource "azurerm_subnet_route_table_association" "shared" {
   ]
 }
 
-resource "azurerm_private_dns_zone" "databricks" {
-  name                = "privatelink.azuredatabricks.net"
-  resource_group_name = var.core_rg_name
-  tags                = var.tags
-}
-
-resource "azurerm_private_dns_zone_virtual_network_link" "databricks" {
-  name                  = "vnl-dbks-${var.naming_suffix}"
-  resource_group_name   = var.core_rg_name
-  private_dns_zone_name = azurerm_private_dns_zone.databricks.name
-  virtual_network_id    = data.azurerm_virtual_network.core.id
-  tags                  = var.tags
-}
-
 resource "azurerm_private_endpoint" "databricks_control_plane" {
   name                = "pe-dbks-cp-${var.naming_suffix}"
   resource_group_name = var.core_rg_name
@@ -156,7 +142,7 @@ resource "azurerm_private_endpoint" "databricks_control_plane" {
 
   private_dns_zone_group {
     name                 = "private-dns-zone-group-databricks-control-plane-${var.naming_suffix}"
-    private_dns_zone_ids = [azurerm_private_dns_zone.databricks.id]
+    private_dns_zone_ids = [data.azurerm_private_dns_zone.databricks.id]
   }
 }
 

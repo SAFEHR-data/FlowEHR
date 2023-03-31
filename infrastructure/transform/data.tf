@@ -26,6 +26,11 @@ data "azurerm_private_dns_zone" "blobcore" {
   resource_group_name = var.core_rg_name
 }
 
+data "azurerm_private_dns_zone" "databricks" {
+  name                = "privatelink.azuredatabricks.net"
+  resource_group_name = var.core_rg_name
+}
+
 data "azurerm_client_config" "current" {}
 
 # get the MSGraph app

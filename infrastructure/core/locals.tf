@@ -23,7 +23,8 @@ locals {
   serve_webapps_address_space        = local.subnet_address_spaces[4]
 
   private_dns_zones = {
-    blob     = "privatelink.blob.core.windows.net"
-    keyvault = "privatelink.vaultcore.azure.net"
+    blob       = "privatelink.blob.core.windows.net"
+    keyvault   = "privatelink.vaultcore.azure.net"
+    databricks = "privatelink.azuredatabricks.net"
   }
 }
