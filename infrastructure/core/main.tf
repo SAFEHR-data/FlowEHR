@@ -100,8 +100,18 @@ resource "azurerm_log_analytics_workspace" "core" {
   resource_group_name        = azurerm_resource_group.core.name
   internet_ingestion_enabled = var.tf_in_automation ? false : true
   sku                        = "PerGB2018"
-  retention_in_days          = 30
+  retention_in_days          = 90
+  internet_query_enabled     = var.accesses_real_data ? false : true
   tags                       = var.tags
+}
+
+# Use the private storage account for logs
+resource "azurerm_log_analytics_linked_storage_account" "core" {
+  for_each              = toset(["CustomLogs", "AzureWatson", "Query", "Ingestion", "Alerts"])
+  data_source_type      = each.value
+  resource_group_name   = azurerm_resource_group.core.name
+  workspace_resource_id = azurerm_log_analytics_workspace.core.id
+  storage_account_ids   = [azurerm_storage_account.core.id]
 }
 
 resource "azurerm_monitor_action_group" "p0" {
@@ -110,7 +120,7 @@ resource "azurerm_monitor_action_group" "p0" {
   short_name          = "p0action"
 
   dynamic "email_receiver" {
-    for_each = toset(var.alert_recipients)
+    for_each = toset(var.monitoring.alert_recipients)
     content {
       name                    = email_receiver.value.name
       email_address           = email_receiver.value.email
@@ -120,7 +130,7 @@ resource "azurerm_monitor_action_group" "p0" {
 
   lifecycle {
     precondition {
-      condition     = !var.accesses_real_data || length(var.alert_recipients) > 0
+      condition     = !var.accesses_real_data || length(var.monitoring.alert_recipients) > 0
       error_message = "If this deployment accesses real data then there must be at least one recipient of alerts"
     }
   }
