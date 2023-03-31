@@ -34,7 +34,7 @@ on:
 
 jobs:
   clean:
-    runs-on: ${{ vars.CI_GITHUB_RUNNER_LABEL }}
+    runs-on: [self-hosted, "${{ vars.CI_GITHUB_RUNNER_LABEL }}"]
     environment: ${{ inputs.environment }}
     steps:
       - name: Azure Login
