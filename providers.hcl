@@ -60,7 +60,7 @@ EOF
   required_provider_databricks = <<EOF
 databricks = {
   source = "databricks/databricks"
-  version = "1.9.1"
+  version = "1.14.0"
 }
 EOF
 
