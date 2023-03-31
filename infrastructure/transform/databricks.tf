@@ -37,7 +37,7 @@ resource "azurerm_databricks_workspace" "databricks" {
   depends_on = [
     azurerm_subnet_route_table_association.databricks_host,
     azurerm_subnet_route_table_association.databricks_container,
-    azurerm_private_dns_zone_virtual_network_link.databricks
+    azurerm_subnet_route_table_association.shared
   ]
 }
 
@@ -93,7 +93,8 @@ resource "databricks_cluster" "fixed_single_node" {
   depends_on = [
     azurerm_databricks_workspace.databricks,
     azurerm_private_endpoint.databricks_control_plane,
-    azurerm_private_endpoint.databricks_filesystem
+    azurerm_private_endpoint.databricks_filesystem,
+    azurerm_private_dns_zone_virtual_network_link.databricks
   ]
 }
 

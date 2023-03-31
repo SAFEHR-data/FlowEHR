@@ -99,16 +99,31 @@ resource "azurerm_route" "databricks_extinfra_ips" {
 resource "azurerm_subnet_route_table_association" "databricks_container" {
   subnet_id      = azurerm_subnet.databricks_container.id
   route_table_id = azurerm_route_table.databricks_udrs.id
+
+  depends_on = [
+    azurerm_route.databricks_service_tags,
+    azurerm_route.databricks_extinfra_ips
+  ]
 }
 
 resource "azurerm_subnet_route_table_association" "databricks_host" {
   subnet_id      = azurerm_subnet.databricks_host.id
   route_table_id = azurerm_route_table.databricks_udrs.id
+
+  depends_on = [
+    azurerm_route.databricks_service_tags,
+    azurerm_route.databricks_extinfra_ips
+  ]
 }
 
 resource "azurerm_subnet_route_table_association" "shared" {
   subnet_id      = var.core_subnet_id
   route_table_id = azurerm_route_table.databricks_udrs.id
+
+  depends_on = [
+    azurerm_route.databricks_service_tags,
+    azurerm_route.databricks_extinfra_ips
+  ]
 }
 
 resource "azurerm_private_dns_zone" "databricks" {
