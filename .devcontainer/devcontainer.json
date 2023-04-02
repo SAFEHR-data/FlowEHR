@@ -1,6 +1,7 @@
 {
 	"name": "FlowEHR",
 	"image": "mcr.microsoft.com/devcontainers/python:0-3.10-bullseye",
+	"containerUser": "vscode",
 
 	// Configure VS Code properties & extensions
 	"customizations": {
