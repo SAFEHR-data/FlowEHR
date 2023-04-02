@@ -19,13 +19,6 @@ locals {
   suffix_override  = get_env("SUFFIX_OVERRIDE", "")
 }
 
-terraform {
-  extra_arguments "auto_approve" {
-    commands  = ["apply"]
-    arguments = ["-auto-approve"]
-  }
-}
-
 generate "terraform" {
   path      = "terraform.tf"
   if_exists = "overwrite_terragrunt"
