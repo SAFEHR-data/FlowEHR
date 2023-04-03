@@ -81,7 +81,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "all" {
 resource "azurerm_virtual_network_peering" "ci_to_flowehr" {
   count                     = var.tf_in_automation ? 1 : 0
   name                      = "peer-ci-to-flwr-${local.naming_suffix}"
-  resource_group_name       = azurerm_resource_group.core.name
+  resource_group_name       = var.ci_rg_name
   virtual_network_name      = var.ci_vnet_name
   remote_virtual_network_id = azurerm_virtual_network.core.id
 }
@@ -92,12 +92,4 @@ resource "azurerm_virtual_network_peering" "flowehr_to_ci" {
   resource_group_name       = azurerm_resource_group.core.name
   virtual_network_name      = azurerm_virtual_network.core.name
   remote_virtual_network_id = data.azurerm_virtual_network.ci[0].id
-}
-
-resource "azurerm_private_dns_zone_virtual_network_link" "ci" {
-  for_each              = var.tf_in_automation ? local.private_dns_zones : {}
-  name                  = "vnl-${each.key}-ci-flwr-${local.naming_suffix}"
-  private_dns_zone_name = each.value
-  virtual_network_id    = data.azurerm_virtual_network.ci[0].id
-  resource_group_name   = azurerm_resource_group.core.name
 }
