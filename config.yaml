@@ -4,6 +4,7 @@ location: uksouth
 environment: infra-test
 accesses_real_data: false
 core_address_space: 10.64.0.0/22
+create_dns_zones: false
 
 transform:
   spark_version: 3.3.1
