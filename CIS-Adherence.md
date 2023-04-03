@@ -105,7 +105,7 @@ This layer deploys components required to ingest data, transform data, and save 
 | | `CIS 4.1.4`: Ensure AAD admin is configured | Y | Owner is an auto-created Service Principal account, with credentials saved in key vault | 
 | | `CIS 4.1.5`: Ensure 'Data encryption' is set to 'on' | Y | Service Managed Key |
 | | `CIS 4.1.6`: Ensure that 'Auditing Retention' is set to 'Greater than 90 days' | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/172 |
-| | `CIS 4.2.1`: Ensure Microsoft Defender for SQL is set to 'on' | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/174 |
+| | `CIS 4.2.1`: Ensure Microsoft Defender for SQL is set to 'on' | n/a | Set at org level |
 | | `CIS 4.2.2 -> CIS 4.2.5`: Ensure Vulnerability Assessment is enabled by setting a storage account | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/173 | 
 | Azure Key Vault Secrets | | [secrets.tf](./infrastructure/transform/secrets.tf) |
 | | `CIS 8.3`: Ensure expiration is set for all secrets in RBAC vaults | N | No automated secret rotation in place as of yet. Will be taken care of as a manual background task. | 
