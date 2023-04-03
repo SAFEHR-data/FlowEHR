@@ -32,6 +32,8 @@ dependency "core" {
     core_kv_uri                        = "core_kv_uri"
     databricks_host_address_space      = "databricks_host_address_space"
     databricks_container_address_space = "databricks_container_address_space"
+    deployer_ip                        = "deployer_ip"
+    private_dns_zones                  = "private_dns_zones"
   }
   mock_outputs_allowed_terraform_commands = ["destroy"]
 }
@@ -81,4 +83,5 @@ inputs = {
   databricks_host_address_space      = dependency.core.outputs.databricks_host_address_space
   databricks_container_address_space = dependency.core.outputs.databricks_container_address_space
   deployer_ip                        = dependency.core.outputs.deployer_ip
+  private_dns_zones                  = dependency.core.outputs.private_dns_zones
 }

@@ -24,3 +24,8 @@ data "azurerm_virtual_network" "ci" {
   name                = var.ci_vnet_name
   resource_group_name = var.ci_rg_name
 }
+
+data "azurerm_private_dns_zone" "existing_zones" {
+  for_each = var.create_dns_zones ? {} : local.required_private_dns_zones
+  name     = each.value
+}

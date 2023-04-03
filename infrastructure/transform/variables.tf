@@ -72,6 +72,10 @@ variable "core_storage_account_name" {
   type = string
 }
 
+variable "private_dns_zones" {
+  type = map(any)
+}
+
 variable "access_databricks_management_publicly" {
   type        = bool
   description = "Whether to allow access to the Databricks workspace management plane via a public network"

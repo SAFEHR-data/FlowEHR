@@ -26,6 +26,7 @@ dependency "core" {
     core_vnet_name              = "core_vnet_name"
     core_subnet_id              = "core_subnet_id"
     serve_webapps_address_space = "serve_webapps_address_space"
+    private_dns_zones           = "private_dns_zones"
   }
   mock_outputs_allowed_terraform_commands = ["destroy"]
 }
@@ -39,4 +40,5 @@ inputs = {
   core_vnet_name              = dependency.core.outputs.core_vnet_name
   core_subnet_id              = dependency.core.outputs.core_subnet_id
   serve_webapps_address_space = dependency.core.outputs.serve_webapps_address_space
+  private_dns_zones           = dependency.core.outputs.private_dns_zones
 }

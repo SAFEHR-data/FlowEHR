@@ -101,6 +101,16 @@ variable "accesses_real_data" {
   description = "Does this deployment access real data? I.e. is this a staging/production environment?"
 }
 
+variable "create_dns_zones" {
+  description = <<EOF
+Should FlowEHR create private DNS zones required by private links? Set to false if FlowEHR will be peered to a
+vnet that already contains the required zones, in which case it will establish a virtual network link to these
+existing zones instead.
+EOF
+  type        = bool
+  default     = true
+}
+
 variable "alert_recipients" {
   description = "List of recipients to receive alerts"
   type = list(object({

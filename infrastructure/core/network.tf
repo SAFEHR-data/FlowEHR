@@ -58,15 +58,16 @@ resource "azurerm_subnet" "core_container" {
   }
 }
 
-resource "azurerm_private_dns_zone" "all" {
-  for_each            = local.private_dns_zones
+resource "azurerm_private_dns_zone" "created_zones" {
+  for_each            = var.create_dns_zones ? local.required_private_dns_zones : {}
   name                = each.value
   resource_group_name = azurerm_resource_group.core.name
   tags                = var.tags
 }
 
+# If create_dns_zones is true, we link to the created zones, otherwise link to pre-existing zones
 resource "azurerm_private_dns_zone_virtual_network_link" "flowehr" {
-  for_each              = azurerm_private_dns_zone.all
+  for_each              = var.create_dns_zones ? azurerm_private_dns_zone.created_zones : data.azurerm_private_dns_zone.existing_zones
   name                  = "vnl-${each.value.name}-flwr-${local.naming_suffix}"
   resource_group_name   = azurerm_resource_group.core.name
   private_dns_zone_name = each.value.name
@@ -88,13 +89,4 @@ resource "azurerm_virtual_network_peering" "flowehr_to_ci" {
   resource_group_name       = azurerm_resource_group.core.name
   virtual_network_name      = azurerm_virtual_network.core.name
   remote_virtual_network_id = data.azurerm_virtual_network.ci[0].id
-}
-
-resource "azurerm_private_dns_zone_virtual_network_link" "ci" {
-  for_each              = var.tf_in_automation ? azurerm_private_dns_zone.all : {}
-  name                  = "vnl-${each.value.name}-ci-${local.naming_suffix}"
-  resource_group_name   = var.ci_rg_name
-  private_dns_zone_name = each.value.name
-  virtual_network_id    = data.azurerm_virtual_network.ci.id
-  tags                  = var.tags
 }

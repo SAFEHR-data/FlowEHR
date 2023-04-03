@@ -51,3 +51,7 @@ variable "serve_webapps_address_space" {
 variable "tf_in_automation" {
   type = bool
 }
+
+variable "private_dns_zones" {
+  type = map(any)
+}
