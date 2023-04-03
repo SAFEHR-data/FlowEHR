@@ -56,7 +56,6 @@ jobs:
   make:
     runs-on: [self-hosted, "${{ vars.CI_GITHUB_RUNNER_LABEL }}"]
     environment: ${{ inputs.environment }}
-
     steps:
       - name: Set devcontainer attributes
         id: dc
