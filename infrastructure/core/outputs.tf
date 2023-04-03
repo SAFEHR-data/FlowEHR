@@ -65,7 +65,7 @@ output "core_log_analytics_name" {
 }
 
 output "deployer_ip" {
-  value = data.http.local_ip[0].response_body
+  value = var.tf_in_automation ? "" : data.http.local_ip[0].response_body
 }
 
 output "p0_action_group_id" {

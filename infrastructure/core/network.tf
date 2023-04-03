@@ -93,3 +93,11 @@ resource "azurerm_virtual_network_peering" "flowehr_to_ci" {
   virtual_network_name      = azurerm_virtual_network.core.name
   remote_virtual_network_id = data.azurerm_virtual_network.ci[0].id
 }
+
+resource "azurerm_private_dns_zone_virtual_network_link" "ci_kv" {
+  count                 = var.tf_in_automation ? 1 : 0
+  name                  = "vnldz-kv-ci-flwr-${local.naming_suffix}"
+  private_dns_zone_name = "privatelink.vaultcore.azure.net"
+  virtual_network_id    = data.azurerm_virtual_network.ci[0].id
+  resource_group_name   = var.ci_rg_name
+}
