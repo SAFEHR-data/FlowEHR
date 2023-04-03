@@ -65,17 +65,13 @@ resource "azurerm_private_dns_zone" "all" {
   tags                = var.tags
 }
 
-resource "azurerm_private_dns_zone_virtual_network_link" "all" {
-  for_each              = local.private_dns_zones
-  name                  = "vnl-${each.key}-${local.naming_suffix}"
+resource "azurerm_private_dns_zone_virtual_network_link" "flowehr" {
+  for_each              = azurerm_private_dns_zone.all
+  name                  = "vnl-${each.value.name}-flwr-${local.naming_suffix}"
   resource_group_name   = azurerm_resource_group.core.name
-  private_dns_zone_name = each.value
+  private_dns_zone_name = each.value.name
   virtual_network_id    = azurerm_virtual_network.core.id
   tags                  = var.tags
-
-  depends_on = [
-    azurerm_private_dns_zone.all
-  ]
 }
 
 resource "azurerm_virtual_network_peering" "ci_to_flowehr" {
@@ -92,4 +88,13 @@ resource "azurerm_virtual_network_peering" "flowehr_to_ci" {
   resource_group_name       = azurerm_resource_group.core.name
   virtual_network_name      = azurerm_virtual_network.core.name
   remote_virtual_network_id = data.azurerm_virtual_network.ci[0].id
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "ci" {
+  for_each              = var.tf_in_automation ? azurerm_private_dns_zone.all : {}
+  name                  = "vnl-${each.value.name}-ci-${local.naming_suffix}"
+  resource_group_name   = var.ci_rg_name
+  private_dns_zone_name = each.value.name
+  virtual_network_id    = data.azurerm_virtual_network.ci.id
+  tags                  = var.tags
 }
