@@ -47,18 +47,6 @@ resource "azurerm_storage_account" "core" {
 
     change_feed_enabled = true
   }
-
-  blob_properties {
-    container_delete_retention_policy {
-      days = 7
-    }
-
-    delete_retention_policy {
-      days = 7
-    }
-
-    change_feed_enabled = true
-  }
 }
 
 resource "azurerm_key_vault" "core" {
