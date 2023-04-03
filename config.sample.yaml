@@ -19,8 +19,19 @@ data_source_connections:
 transform:
   spark_version: 3.3.1
   repositories:
-    - https://github.com/MY_TRANSFORM_CODE_REPO.git
+    - url: https://github.com/MY_TRANSFORM_CODE_REPO.git
+    - url: https://github.com/MY_OTHER_TRANSFORM_CODE_REPO.git
+      sha: abcd01abcd01abcd01abcd01abcd01abcd01abcd
 
 serve:
   github_owner: __CHANGE_ME__
-  github_token: __CHANGE_ME__
+  github_app_id: __CHANGE_ME__
+  github_app_installation_id: __CHANGE_ME__
+
+monitoring:
+  alert_recipients:  # Optional
+    - name: __CHANGE_ME__
+      email: __CHANGE_ME__  # e.g. employee@example.com
+  network_watcher:  # Optional, required if accesses_real_data
+    name: __CHANGE_ME__  # e.g. NetworkWatcher_location
+    resource_group_name: __CHANGE_ME__  # e.g. NetworkWatcherRG

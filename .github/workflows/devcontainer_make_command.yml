@@ -10,7 +10,7 @@
 #  distributed under the License is distributed on an "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
-# limitations under the License.
+#  limitations under the License.
 ---
 name: Make command
 
@@ -42,15 +42,19 @@ on:
         required: true
       ARM_CLIENT_SECRET:
         required: true
-      ORG_GITHUB_TOKEN:
+      FLOWEHR_GITHUB_TOKEN:
         required: true
+      GH_APP_CERT:
+        required: false
+
+
+env:
+  DEVCONTAINER_NAME: flowehr/devcontainer
 
 jobs:
   make_core:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
-    env:
-      DEVCONTAINER_NAME: flowehr/devcontainer
     outputs:
       dc_tag: ${{ steps.dc.outputs.tag }}
       dc_runner_name: ${{ steps.dc.outputs.runner_name }}
@@ -68,22 +72,25 @@ jobs:
       - name: Set make commands to execute after the core deployment
         id: post_core
         run: |
-          build_agent_command="none"
+          setup_command="infrastructure-core"
+          build_agent_command="${{ inputs.command }}"
           post_build_agent_command="none"
 
           if echo ${{ inputs.command }} | grep -q "test" ; then
               build_agent_command="${{ inputs.command }}-without-core-destroy"
               post_build_agent_command="destroy"
+          elif [ ${{ inputs.command }} = "destroy-no-terraform" ] ; then
+              setup_command="destroy-no-terraform"
+              build_agent_command="none"
           elif echo ${{ inputs.command }} | grep -q "destroy" ; then
               build_agent_command="destroy-non-core"
               post_build_agent_command="${{ inputs.command }}"
-          elif echo ${{ inputs.command }} | grep -q "infrastructure"; then
-              build_agent_command="${{ inputs.command }}"
           fi
 
+          echo "Running [${setup_command}] setup"
           echo "Running [${build_agent_command}] on the build agent"
           echo "Running [${post_build_agent_command}] teardown"
-
+          echo "setup_command=${setup_command}" >> $GITHUB_OUTPUT
           echo "build_agent_command=${build_agent_command}" >> $GITHUB_OUTPUT
           echo "post_build_agent_command=${post_build_agent_command}" >> $GITHUB_OUTPUT
 
@@ -91,6 +98,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           persist-credentials: false
+          token: ${{ secrets.FLOWEHR_GITHUB_TOKEN }}
           # if the following values are missing (i.e. not triggered via comment workflow)
           # then the default checkout will apply
           ref: ${{ inputs.sha }}
@@ -124,12 +132,15 @@ jobs:
 
       - name: Deploy core and build agent
         uses: devcontainers/ci@v0.3
-        env: # Add suffix as step env so it's only passed as an env var if it's not empty
+        env:
+          # Add optionals as step envs so only passed as env vars if not empty
+          # https://github.com/devcontainers/ci/issues/231
           SUFFIX_OVERRIDE: ${{ inputs.suffix_override }}
+          GH_APP_CERT: ${{ secrets.GH_APP_CERT }}
         with:
           imageName: ${{ steps.dc.outputs.image_path }}
           imageTag: ${{ steps.dc.outputs.tag }}
-          runCmd: make infrastructure-core
+          runCmd: make ${{ steps.post_core.outputs.setup_command }}
           push: never
           env: |
             DOCKER_BUILDKIT=1
@@ -144,7 +155,8 @@ jobs:
             CI_CONTAINER_REGISTRY=${{ vars.CI_CONTAINER_REGISTRY }}
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
-            ORG_GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
+            FLOWEHR_GITHUB_TOKEN=${{ secrets.FLOWEHR_GITHUB_TOKEN }}
+            GH_APP_CERT
             TF_VAR_devcontainer_image=${{ env.DEVCONTAINER_NAME }}
             TF_VAR_devcontainer_tag=${{ steps.dc.outputs.tag }}
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
@@ -161,6 +173,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
+          token: ${{ secrets.FLOWEHR_GITHUB_TOKEN }}
           persist-credentials: false
           # if the following values are missing (i.e. not triggered via comment workflow)
           # then the default checkout will apply
@@ -185,7 +198,8 @@ jobs:
           CI_CONTAINER_REGISTRY: ${{ vars.CI_CONTAINER_REGISTRY }}
           CI_RESOURCE_GROUP: ${{ vars.CI_RESOURCE_GROUP }}
           CI_STORAGE_ACCOUNT: ${{ vars.CI_STORAGE_ACCOUNT }}
-          ORG_GITHUB_TOKEN: ${{ secrets.ORG_GITHUB_TOKEN }}
+          FLOWEHR_GITHUB_TOKEN: ${{ secrets.FLOWEHR_GITHUB_TOKEN }}
+          GH_APP_CERT: ${{ secrets.GH_APP_CERT }}
           SUFFIX_OVERRIDE: ${{ inputs.suffix_override }}
           TF_VAR_use_random_address_space: ${{ (inputs.suffix_override != '' && '1') || '0' }}
           TF_VAR_devcontainer_image: ${{ env.DEVCONTAINER_NAME }}
@@ -203,6 +217,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
+          token: ${{ secrets.FLOWEHR_GITHUB_TOKEN }}
           persist-credentials: false
           ref: ${{ inputs.sha }}
 
@@ -224,6 +239,7 @@ jobs:
         uses: devcontainers/ci@v0.3
         env:
           SUFFIX_OVERRIDE: ${{ inputs.suffix_override }}
+          GH_APP_CERT: ${{ secrets.GH_APP_CERT }}
         with:
           # The image name cannot be set from the make_core output because it contains a secret
           imageName: ${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DEVCONTAINER_NAME }}
@@ -243,7 +259,8 @@ jobs:
             CI_CONTAINER_REGISTRY=${{ vars.CI_CONTAINER_REGISTRY }}
             CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
             CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
-            ORG_GITHUB_TOKEN=${{ secrets.ORG_GITHUB_TOKEN }}
+            FLOWEHR_GITHUB_TOKEN=${{ secrets.FLOWEHR_GITHUB_TOKEN }}
+            GH_APP_CERT
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
 
       - name: Clean up
@@ -251,7 +268,9 @@ jobs:
           (needs.make_core.outputs.post_build_agent_command == 'destroy') ||
           (needs.make_core.outputs.post_build_agent_command == 'destroy-no-terraform')
         run: |
+          az config set extension.use_dynamic_install=yes_without_prompt
           az acr repository delete \
+            --yes \
             --name ${{ vars.CI_CONTAINER_REGISTRY }} \
             --image ${{ env.DEVCONTAINER_NAME }}:${{ needs.make_core.outputs.dc_tag }}
           az storage blob directory delete \

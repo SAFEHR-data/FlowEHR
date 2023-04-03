@@ -17,28 +17,24 @@ include "root" {
 }
 
 locals {
-  providers            = read_terragrunt_config("${get_repo_root()}/providers.hcl")
-  configuration        = read_terragrunt_config("${get_repo_root()}/configuration.hcl")
-  merged_root_config   = local.configuration.locals.merged_root_config
-  apps_config_path     = "${get_terragrunt_dir()}/apps.yaml"
-  apps_config          = fileexists(local.apps_config_path) ? yamldecode(file(local.apps_config_path)) : null
-  apps_env_config_path = "${get_terragrunt_dir()}/apps.${get_env("ENVIRONMENT", "local")}.yaml"
-  apps_env_config      = fileexists(local.apps_env_config_path) ? yamldecode(file(local.apps_env_config_path)) : null
-}
+  providers = read_terragrunt_config("${get_repo_root()}/providers.hcl")
 
-terraform {
-  extra_arguments "auto_approve" {
-    commands  = ["apply"]
-    arguments = ["-auto-approve"]
-  }
+  # Get GitHub App PEM cert as string - first try local file otherwise look for env var
+  github_app_cert_path = "${get_terragrunt_dir()}/github.pem"
+  github_app_cert      = fileexists(local.github_app_cert_path) ? file(local.github_app_cert_path) : get_env("GH_APP_CERT", "")
 
-  # Export GitHub credentials for use by both TF provider and CLI
-  extra_arguments "set_github_vars" {
-    commands = ["init", "apply", "plan", "destroy", "taint", "untaint", "refresh"]
-    env_vars = {
-      GITHUB_OWNER = local.merged_root_config.serve.github_owner
-      GITHUB_TOKEN = get_env("ORG_GITHUB_TOKEN", local.merged_root_config.serve.github_token)
-    }
+  # Get shared app configuration (apps.yaml) and environment-specific config (app.{ENVIRONMENT}.yaml)
+  shared_apps_config_path = "${get_terragrunt_dir()}/apps.yaml"
+  env_apps_config_path    = "${get_terragrunt_dir()}/apps.${get_env("ENVIRONMENT", "local")}.yaml"
+  shared_apps_config      = fileexists(local.shared_apps_config_path) ? yamldecode(file(local.shared_apps_config_path)) : tomap({})
+  env_apps_config         = fileexists(local.env_apps_config_path) ? yamldecode(file(local.env_apps_config_path)) : tomap({})
+
+  merged_apps_config = {
+    # As it's a map, we need to iterate as direct merge() would overwrite each key's value entirely
+    for app_id, env_app_config in local.env_apps_config : app_id =>
+      # And we don't want apps defined in apps.yaml but not in current {ENVIRONMENT} file to be deployed,
+      # so only merge if key exists with env-specific config taking precedence
+      merge(try(local.shared_apps_config[app_id], null), env_app_config)
   }
 }
 
@@ -66,6 +62,7 @@ generate "child_terraform" {
 terraform {
   required_providers {
     ${local.providers.locals.required_provider_github}
+    ${local.providers.locals.required_provider_external}
   }
 }
 EOF
@@ -77,7 +74,14 @@ generate "provider" {
   contents  = <<EOF
 ${local.providers.locals.azure_provider}
 
-provider "github" {}
+provider "github" {
+  owner = var.serve.github_owner
+  app_auth {
+    id              = var.serve.github_app_id
+    installation_id = var.serve.github_app_installation_id
+    pem_file        = var.github_app_cert
+  }
+}
 EOF
 }
 
@@ -97,8 +101,12 @@ dependency "transform" {
   config_path = "${get_repo_root()}/infrastructure/transform"
 
   mock_outputs = {
-    feature_store_server_name = "transform_feature_store_server_name"
-    feature_store_db_name     = "transform_feature_store_db_name"
+    feature_store_server_name        = "transform_feature_store_server_name"
+    feature_store_db_name            = "transform_feature_store_db_name"
+    apps_ad_group_display_name       = "transform_apps_ad_group_display_name"
+    developers_ad_group_display_name = "transform_developers_ad_group_display_name"
+    apps_ad_group_principal_id       = "transform_apps_ad_group_principal_id"
+    developers_ad_group_principal_id = "transform_developers_ad_group_principal_id"
   }
   mock_outputs_allowed_terraform_commands = ["destroy"]
 }
@@ -121,14 +129,19 @@ inputs = {
   core_kv_id              = dependency.core.outputs.core_kv_id
   core_log_analytics_name = dependency.core.outputs.core_log_analytics_name
 
-  transform_feature_store_server_name = dependency.transform.outputs.feature_store_server_name
-  transform_feature_store_db_name     = dependency.transform.outputs.feature_store_db_name
+  transform_feature_store_server_name        = dependency.transform.outputs.feature_store_server_name
+  transform_feature_store_db_name            = dependency.transform.outputs.feature_store_db_name
+  transform_apps_ad_group_display_name       = dependency.transform.outputs.apps_ad_group_display_name
+  transform_developers_ad_group_display_name = dependency.transform.outputs.developers_ad_group_display_name
+  transform_apps_ad_group_principal_id       = dependency.transform.outputs.apps_ad_group_principal_id
+  transform_developers_ad_group_principal_id = dependency.transform.outputs.developers_ad_group_principal_id
 
   serve_app_service_plan_name = dependency.serve.outputs.app_service_plan_name
   serve_acr_name              = dependency.serve.outputs.acr_name
   serve_cosmos_account_name   = dependency.serve.outputs.cosmos_account_name
   serve_webapps_subnet_id     = dependency.serve.outputs.webapps_subnet_id
 
-  # Generate app config by merging 
-  apps = merge(local.apps_config, local.apps_env_config)
+  github_app_cert = local.github_app_cert
+  apps            = local.merged_apps_config
+  suffix_override = get_env("SUFFIX_OVERRIDE", "")
 }

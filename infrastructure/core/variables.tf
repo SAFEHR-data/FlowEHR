@@ -93,3 +93,31 @@ variable "github_repository" {
   description = "Github repository in which to create the build agent. e.g. UCLH-Foundry/FlowEHR"
   default     = ""
 }
+
+variable "accesses_real_data" {
+  type        = bool
+  description = "Does this deployment access real data? I.e. is this a staging/production environment?"
+}
+
+variable "monitoring" {
+  description = "Monitoring block"
+  type = object({
+    alert_recipients = optional(
+      list(object({ # List of recipients to receive alerts
+        name  = string
+        email = string
+      })),
+    [])
+    network_watcher = optional(
+      object({ # Network watcher to monitor the NSGs
+        name                = string
+        resource_group_name = string
+      })
+    , null)
+  })
+
+  default = {
+    alert_recipients = []
+    network_watcher  = null
+  }
+}

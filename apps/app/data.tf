@@ -14,6 +14,8 @@
 
 data "azurerm_client_config" "current" {}
 
+data "azuread_application_published_app_ids" "well_known" {}
+
 data "azurerm_log_analytics_workspace" "core" {
   name                = var.log_analytics_name
   resource_group_name = var.resource_group_name
@@ -37,6 +39,11 @@ data "azurerm_cosmosdb_account" "state_store" {
 data "azurerm_mssql_server" "feature_store" {
   name                = var.feature_store_server_name
   resource_group_name = var.resource_group_name
+}
+
+data "azuread_user" "contributors_ids" {
+  for_each            = var.app_config.contributors
+  user_principal_name = each.value
 }
 
 data "template_file" "testing_github_workflow" {

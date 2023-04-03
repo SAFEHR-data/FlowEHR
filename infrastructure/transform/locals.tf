@@ -16,26 +16,55 @@ locals {
   sql_server_features_admin_username = "adminuser"
   sql_owner_app_name                 = "flowehr-sql-owner-${lower(var.naming_suffix)}"
   databricks_app_name                = "flowehr-databricks-datawriter-${lower(var.naming_suffix)}"
-  activities_file                    = "activities.json"
+  pipeline_file                      = "pipeline.json"
+  trigger_file                       = "trigger.json"
   artifacts_dir                      = "artifacts"
   adb_linked_service_name            = "ADBLinkedServiceViaMSI"
 
-  all_activities_files = fileset(path.module, "../../transform/pipelines/**/${local.activities_file}")
+  # IPs required for Databricks UDRs 
+  # Built from https://learn.microsoft.com/en-us/azure/databricks/resources/supported-regions#--control-plane-nat-webapp-and-extended-infrastructure-ip-addresses-and-domains
+  databricks_udr_ips   = yamldecode(file("${path.module}/databricks-udr-ips.yaml"))
+  title_cased_location = title(var.core_rg_location)
+  databricks_service_tags = {
+    "databricks" : "AzureDatabricks",
+    "sql" : "Sql.${local.title_cased_location}",
+    "storage" : "Storage.${local.title_cased_location}",
+    "eventhub" : "EventHub.${local.title_cased_location}"
+  }
+
+  all_pipeline_files = fileset(path.module, "../../transform/pipelines/**/${local.pipeline_file}")
 
   # Example value: [ "../../transform/pipelines/hello-world" ]
   pipeline_dirs = toset([
-    for activity_file in local.all_activities_files : dirname(activity_file)
+    for pipeline_file in local.all_pipeline_files : dirname(pipeline_file)
   ])
+
+  pipelines = [
+    for pipeline_dir in local.pipeline_dirs : {
+      pipeline_dir  = pipeline_dir
+      pipeline_json = jsondecode(file("${pipeline_dir}/${local.pipeline_file}"))
+    }
+  ]
 
   # Example value: [ { "artifact_path" = "path/to/entrypoint.py", "pipeline" = "hello-world" } ]
   artifacts = flatten([
-    for pipeline in local.pipeline_dirs : [
-      for artifact in fileset("${pipeline}/${local.artifacts_dir}", "*") : {
-        artifact_path = "${pipeline}/${local.artifacts_dir}/${artifact}"
-        pipeline      = basename(pipeline)
+    for pipeline_dir in local.pipeline_dirs : [
+      for artifact in fileset("${pipeline_dir}/${local.artifacts_dir}", "*") : {
+        artifact_path = "${pipeline_dir}/${local.artifacts_dir}/${artifact}"
+        pipeline      = basename(pipeline_dir)
       }
     ]
   ])
+
+  triggers = flatten([
+    for pipeline_dir in local.pipeline_dirs : [
+      fileexists("${pipeline_dir}/${local.trigger_file}") ? {
+        pipeline = basename("${pipeline_dir}")
+        trigger  = jsondecode(file("${pipeline_dir}/${local.trigger_file}"))
+      } : null
+    ]
+  ])
+
   storage_account_name = "dbfs${var.naming_suffix_truncated}"
 
   data_source_connections_with_peerings = [
@@ -62,4 +91,11 @@ locals {
       }
     ]
   ]))
+
+  sql_users_to_create = [
+    { "name" : "${local.databricks_app_name}", "role" : "db_owner" },
+    { "name" : "${azuread_group.ad_group_apps.display_name}", "role" : "db_datareader" },
+    { "name" : "${azuread_group.ad_group_developers.display_name}", "role" : "db_datareader" },
+    { "name" : "${azuread_group.ad_group_data_scientists.display_name}", "role" : "db_datareader" },
+  ]
 }
