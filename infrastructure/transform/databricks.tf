@@ -12,7 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-
 resource "azurerm_databricks_workspace" "databricks" {
   name                                  = "dbks-${var.naming_suffix}"
   resource_group_name                   = var.core_rg_name
@@ -36,8 +35,7 @@ resource "azurerm_databricks_workspace" "databricks" {
 
   depends_on = [
     azurerm_subnet_route_table_association.databricks_host,
-    azurerm_subnet_route_table_association.databricks_container,
-    azurerm_private_dns_zone_virtual_network_link.databricks
+    azurerm_subnet_route_table_association.databricks_container
   ]
 }
 

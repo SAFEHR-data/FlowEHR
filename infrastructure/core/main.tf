@@ -67,7 +67,7 @@ resource "azurerm_private_endpoint" "flowehr_keyvault" {
 
   private_dns_zone_group {
     name                 = "private-dns-zone-group-kv-${local.naming_suffix}"
-    private_dns_zone_ids = [azurerm_private_dns_zone.all["keyvault"].id]
+    private_dns_zone_ids = [azurerm_private_dns_zone.created_zones["keyvault"].id]
   }
 
   private_service_connection {

@@ -75,3 +75,7 @@ output "p0_action_group_id" {
 output "storage_account_name" {
   value = azurerm_storage_account.core.name
 }
+
+output "private_dns_zones" {
+  value = var.create_dns_zones ? azurerm_private_dns_zone.created_zones : data.azurerm_private_dns_zone.existing_zones
+}
