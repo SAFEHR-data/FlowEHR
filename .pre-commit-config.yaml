@@ -25,16 +25,13 @@ repos:
     hooks:
       - id: black
 
-  - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.77.0
+  - repo: https://github.com/gruntwork-io/pre-commit
+    rev: v0.1.20
     hooks:
-      - id: terraform_fmt
-      - id: terraform_tflint
-      - id: terragrunt_fmt
-        args:
-          - --args=--chdir="${PWD}/infrastructure/"
-          - --args=--init
-          - --args=--module
+      - id: terraform-fmt
+      - id: terraform-validate
+      - id: tflint
+      - id: terragrunt-hclfmt
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.9.0.2
