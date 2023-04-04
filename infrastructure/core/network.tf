@@ -96,6 +96,7 @@ resource "azurerm_private_endpoint" "keyvault" {
   location            = azurerm_resource_group.core.location
   resource_group_name = azurerm_resource_group.core.name
   subnet_id           = azurerm_subnet.core_shared.id
+  tags                = var.tags
 
   private_dns_zone_group {
     name = "private-dns-zone-group-kv-${local.naming_suffix}"
