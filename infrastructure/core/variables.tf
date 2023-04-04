@@ -111,6 +111,15 @@ EOF
   default     = true
 }
 
+variable "dns_zones_rg" {
+  description = <<EOF
+If create_dns_zones is false, which resource group to look for existing zones in (if not specified,
+FlowEHR will search your subscription and fail if there's more than one of the same zone).
+EOF
+  type        = string
+  default     = ""
+}
+
 variable "alert_recipients" {
   description = "List of recipients to receive alerts"
   type = list(object({
