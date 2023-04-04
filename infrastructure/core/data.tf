@@ -25,6 +25,12 @@ data "azurerm_virtual_network" "ci" {
   resource_group_name = var.ci_rg_name
 }
 
+data "azurerm_subnet" "ci_default" {
+  count               = var.tf_in_automation ? 1 : 0
+  name                = data.azurerm_virtual_network.ci.subnets[0]
+  resource_group_name = var.ci_rg_name
+}
+
 data "azurerm_private_dns_zone" "existing_zones" {
   for_each            = var.private_dns_zones_rg != null ? local.required_private_dns_zones : {}
   name                = each.value
