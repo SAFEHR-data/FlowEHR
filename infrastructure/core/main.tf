@@ -50,10 +50,9 @@ resource "azurerm_key_vault" "core" {
     default_action = "Deny"
     ip_rules       = var.tf_in_automation ? [] : [data.http.local_ip[0].response_body]
 
-    virtual_network_subnet_ids = concat(
-      [azurerm_subnet.core_shared.id],
-      # Add CI default subnet if in automation so deployer can access KV
-      var.tf_in_automation ? [data.azurerm_subnet.ci_default[0].id] : []
+    virtual_network_subnet_ids = concat([azurerm_subnet.core_shared.id],
+      # Add CI subnets if any so deployer can access KV in automation
+      [for subnet in data.azurerm_subnet.ci : subnet.id]
     )
   }
 
