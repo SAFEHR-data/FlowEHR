@@ -4,8 +4,7 @@ location: uksouth
 environment: infra-test
 accesses_real_data: false
 core_address_space: 10.64.0.0/22
-create_dns_zones: false
-dns_zones_rg: rg-bootstrap-griffdev
+private_dns_zones_rg: rg-bootstrap-griffdev
 
 transform:
   spark_version: 3.3.1
