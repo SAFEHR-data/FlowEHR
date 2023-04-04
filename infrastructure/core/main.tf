@@ -40,7 +40,6 @@ resource "azurerm_key_vault" "core" {
   soft_delete_retention_days    = 7
   purge_protection_enabled      = var.accesses_real_data
   enable_rbac_authorization     = true
-  enabled_for_disk_encryption   = true
   public_network_access_enabled = (var.tf_in_automation || var.accesses_real_data) ? false : true
   sku_name                      = "standard"
   tags                          = var.tags
