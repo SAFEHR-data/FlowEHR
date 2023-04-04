@@ -40,7 +40,6 @@ resource "azurerm_key_vault" "core" {
   soft_delete_retention_days    = 7
   purge_protection_enabled      = var.accesses_real_data
   enable_rbac_authorization     = true
-  enabled_for_disk_encryption   = true
   public_network_access_enabled = (var.tf_in_automation || var.accesses_real_data) ? false : true
   sku_name                      = "standard"
   tags                          = var.tags
@@ -48,12 +47,7 @@ resource "azurerm_key_vault" "core" {
   network_acls {
     bypass         = "AzureServices"
     default_action = "Deny"
-    ip_rules       = var.tf_in_automation ? [] : [data.http.local_ip[0].response_body]
-
-    virtual_network_subnet_ids = concat([azurerm_subnet.core_shared.id],
-      # Add CI subnets if any so deployer can access KV in automation
-      [for subnet in data.azurerm_subnet.ci : subnet.id]
-    )
+    ip_rules       = var.tf_in_automation ? null : [data.http.local_ip[0].response_body]
   }
 
   depends_on = [
