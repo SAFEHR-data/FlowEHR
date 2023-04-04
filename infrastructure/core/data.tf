@@ -26,7 +26,7 @@ data "azurerm_virtual_network" "ci" {
 }
 
 data "azurerm_subnet" "ci" {
-  for_each             = var.tf_in_automation ? data.azurerm_virtual_network.ci[0].subnets : {}
+  for_each             = var.tf_in_automation ? data.azurerm_virtual_network.ci[0].subnets : toset([])
   name                 = each.value
   virtual_network_name = var.ci_vnet_name
   resource_group_name  = var.ci_rg_name
