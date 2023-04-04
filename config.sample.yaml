@@ -2,8 +2,7 @@ flowehr_id: sample
 location: uksouth
 environment: sample
 accesses_real_data: false  # Optional
-create_dns_zones: false  # Optional
-dns_zones_rg: sample-rg-name  # Optional
+private_dns_zones_rg: sample-rg-name  # Optional
 
 data_source_connections:  # Optional
   - example:

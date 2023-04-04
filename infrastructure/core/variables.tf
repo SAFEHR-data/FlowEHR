@@ -101,20 +101,12 @@ variable "accesses_real_data" {
   description = "Does this deployment access real data? I.e. is this a staging/production environment?"
 }
 
-variable "create_dns_zones" {
+variable "private_dns_zones_rg" {
   description = <<EOF
-Should FlowEHR create private DNS zones required by private links? Set to false if FlowEHR will be peered to a
-vnet that already contains the required zones, in which case it will establish a virtual network link to these
-existing zones instead.
-EOF
-  type        = bool
-  default     = true
-}
-
-variable "dns_zones_rg" {
-  description = <<EOF
-If create_dns_zones is false, which resource group to look for existing zones in (if not specified,
-FlowEHR will search your subscription and fail if there's more than one of the same zone).
+The resource group name containing existing private DNS zones to link to for private links. If FlowEHR will be
+peered to a vnet that already contains the required zones (defined in locals.tf), specify its rg name and FlowEHR 
+will establish a virtual network link to these existing zones to avoid namespace conflicts. If left unspecified,
+FlowEHR will create the required DNS zones itself.
 EOF
   type        = string
   default     = null

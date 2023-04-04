@@ -26,7 +26,7 @@ data "azurerm_virtual_network" "ci" {
 }
 
 data "azurerm_private_dns_zone" "existing_zones" {
-  for_each            = var.create_dns_zones ? {} : local.required_private_dns_zones
+  for_each            = var.private_dns_zones_rg != null ? local.required_private_dns_zones : {}
   name                = each.value
-  resource_group_name = var.dns_zones_rg # If null the data source will search the subscription
+  resource_group_name = var.private_dns_zones_rg
 }
