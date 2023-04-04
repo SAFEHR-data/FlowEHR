@@ -51,31 +51,18 @@ resource "azurerm_key_vault" "core" {
     virtual_network_subnet_ids = [azurerm_subnet.core_shared.id]
     ip_rules                   = var.tf_in_automation ? [] : [data.http.local_ip[0].response_body]
   }
+
+  depends_on = [
+    azurerm_virtual_network_peering.flowehr_to_ci,
+    azurerm_virtual_network_peering.ci_to_flowehr,
+    azurerm_private_dns_zone_virtual_network_link.flowehr
+  ]
 }
 
 resource "azurerm_role_assignment" "deployer_can_administrate_kv" {
   scope                = azurerm_key_vault.core.id
   role_definition_name = "Key Vault Administrator"
   principal_id         = data.azurerm_client_config.current.object_id
-}
-
-resource "azurerm_private_endpoint" "flowehr_keyvault" {
-  name                = "pe-kv-${local.naming_suffix}"
-  location            = azurerm_resource_group.core.location
-  resource_group_name = azurerm_resource_group.core.name
-  subnet_id           = azurerm_subnet.core_shared.id
-
-  private_dns_zone_group {
-    name                 = "private-dns-zone-group-kv-${local.naming_suffix}"
-    private_dns_zone_ids = [azurerm_private_dns_zone.created_zones["keyvault"].id]
-  }
-
-  private_service_connection {
-    name                           = "private-service-connection-kv-${local.naming_suffix}"
-    is_manual_connection           = false
-    private_connection_resource_id = azurerm_key_vault.core.id
-    subresource_names              = ["Vault"]
-  }
 }
 
 resource "azurerm_log_analytics_workspace" "core" {

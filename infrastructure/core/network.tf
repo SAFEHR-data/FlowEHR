@@ -90,3 +90,26 @@ resource "azurerm_virtual_network_peering" "flowehr_to_ci" {
   virtual_network_name      = azurerm_virtual_network.core.name
   remote_virtual_network_id = data.azurerm_virtual_network.ci[0].id
 }
+
+resource "azurerm_private_endpoint" "keyvault" {
+  name                = "pe-kv-${local.naming_suffix}"
+  location            = azurerm_resource_group.core.location
+  resource_group_name = azurerm_resource_group.core.name
+  subnet_id           = azurerm_subnet.core_shared.id
+
+  private_dns_zone_group {
+    name = "private-dns-zone-group-kv-${local.naming_suffix}"
+    private_dns_zone_ids = [
+      var.create_dns_zones
+      ? azurerm_private_dns_zone.created_zones["keyvault"].id
+      : data.azurerm_private_dns_zone.existing_zones["keyvault"].id
+    ]
+  }
+
+  private_service_connection {
+    name                           = "private-service-connection-kv-${local.naming_suffix}"
+    is_manual_connection           = false
+    private_connection_resource_id = azurerm_key_vault.core.id
+    subresource_names              = ["Vault"]
+  }
+}
