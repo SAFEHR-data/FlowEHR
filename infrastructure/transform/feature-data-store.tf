@@ -101,9 +101,9 @@ resource "azurerm_mssql_database" "feature_database" {
   server_id            = azurerm_mssql_server.sql_server_features.id
   collation            = "SQL_Latin1_General_CP1_CI_AS"
   license_type         = "LicenseIncluded"
-  max_size_gb          = 2
-  sku_name             = "Basic"
-  storage_account_type = "Local"
+  max_size_gb          = var.accesses_real_data ? 250 : 2
+  sku_name             = var.accesses_real_data ? "S0" : "Basic"
+  storage_account_type = var.accesses_real_data ? "Geo": "Local"
   zone_redundant       = false
   tags                 = var.tags
 }
