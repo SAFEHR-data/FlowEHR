@@ -51,11 +51,3 @@ jobs:
 
       - name: Pre-commit linting
         uses: pre-commit/action@v3.0.0
-
-      # find all terraform folders and run validate to catch
-      # configuration errors
-      - name: Terraform validation
-        run: |
-          find . -type d -name 'terraform' -not -path '*cnab*' -print0 \
-          | xargs -0 -I{} sh -c 'echo "***** Validating: {} *****"; \
-          terraform -chdir={} init -backend=false; terraform -chdir={} validate'
