@@ -38,7 +38,7 @@
 	"remoteUser": "vscode",
 	"features": {
 		"ghcr.io/devcontainers/features/terraform:1": {
-			"version": "1.4.2",
+			"version": "1.4.4",
 			"tflint": "0.44.1",
 			"terragrunt": "0.42.8"
 		},

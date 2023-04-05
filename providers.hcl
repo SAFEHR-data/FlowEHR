@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 locals {
-  terraform_version = "1.4.2"
+  terraform_version = "1.4.4"
   azure_provider    = <<EOF
 provider "azurerm" {
   features {
