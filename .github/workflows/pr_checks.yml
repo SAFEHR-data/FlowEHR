@@ -55,7 +55,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Init terraform
-        run: terragrunt run-all init
+        run: terragrunt run-all validate
 
       - name: Pre-commit linting
         uses: pre-commit/action@v3.0.0
