@@ -28,7 +28,7 @@ resource "azurerm_storage_account" "core" {
   tags                          = var.tags
 
   network_rules {
-    bypass         = "AzureServices"
+    bypass         = ["AzureServices"]
     default_action = "Deny"
     ip_rules       = var.tf_in_automation ? null : [data.http.local_ip[0].response_body]
   }
@@ -50,7 +50,7 @@ resource "azurerm_key_vault" "core" {
     default_action = "Deny"
     ip_rules       = var.tf_in_automation ? null : [data.http.local_ip[0].response_body]
 
-    # Add CI subnets if any so deployer can access KV in automation
+    # Add CI subnets if any so deployer can access KV in automation (creation involves Data Plane read)
     virtual_network_subnet_ids = ([for subnet in data.azurerm_subnet.ci : subnet.id])
   }
 }
