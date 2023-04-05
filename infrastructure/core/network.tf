@@ -39,7 +39,6 @@ resource "azurerm_subnet" "core_shared" {
   resource_group_name  = azurerm_resource_group.core.name
   virtual_network_name = azurerm_virtual_network.core.name
   address_prefixes     = [local.core_shared_address_space]
-  service_endpoints    = ["Microsoft.KeyVault", "Microsoft.Storage"]
 }
 
 resource "azurerm_private_dns_zone" "created_zones" {
@@ -74,6 +73,31 @@ resource "azurerm_private_dns_zone_virtual_network_link" "flowehr" {
   virtual_network_id    = azurerm_virtual_network.core.id
   tags                  = var.tags
 }
+
+resource "azurerm_private_endpoint" "blob" {
+  name                = "pe-blob-${local.naming_suffix}"
+  location            = azurerm_resource_group.core.location
+  resource_group_name = azurerm_resource_group.core.name
+  subnet_id           = azurerm_subnet.core_shared.id
+  tags                = var.tags
+
+  private_dns_zone_group {
+    name = "private-dns-zone-group-kblob-${local.naming_suffix}"
+    private_dns_zone_ids = [
+      var.private_dns_zones_rg == null
+      ? azurerm_private_dns_zone.created_zones["blob"].id
+      : data.azurerm_private_dns_zone.existing_zones["blob"].id
+    ]
+  }
+
+  private_service_connection {
+    name                           = "private-service-connection-blob-${local.naming_suffix}"
+    is_manual_connection           = false
+    private_connection_resource_id = azurerm_storage_account.core.id
+    subresource_names              = ["Blob"]
+  }
+}
+
 
 resource "azurerm_private_endpoint" "keyvault" {
   name                = "pe-kv-${local.naming_suffix}"
