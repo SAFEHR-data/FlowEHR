@@ -36,16 +36,18 @@
 			"jqVersion": "1",
 			"yqVersion": "4"
 		},
+		"ghcr.io/jlaundry/devcontainer-features/mssql-odbc-driver:1": {
+			"version": "18"
+		},
 
 		// Install arbitrary APT packages
 		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-			"packages": "parallel, yamllint"
+			"packages": "parallel, yamllint, unixodbc, unixodbc-dev"
 		}
 	},
 
 	// Run commands after the container is created.
 	"postCreateCommand": {
-		"install mssql-odbc": "./scripts/install_mssql_odbc.sh",
 		"install python requirements": "python3 -m pip install --no-cache-dir -r requirements.txt",
 		"check out transform repos": "./scripts/pipeline_repo_checkout.sh"
 	},
