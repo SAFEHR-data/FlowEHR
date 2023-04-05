@@ -36,12 +36,12 @@ jobs:
 
       - uses: hashicorp/setup-terraform@v2
         with:
+          terraform_wrapper: false
           terraform_version: 1.4.4
 
       - uses: terraform-linters/setup-tflint@v2
         name: Setup TFLint
         with:
-          terraform_wrapper: false
           tflint_version: v0.44.1
 
       - name: Setup Terragrunt
