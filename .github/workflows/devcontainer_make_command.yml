@@ -107,6 +107,7 @@ jobs:
           # https://github.com/devcontainers/ci/issues/231
           SUFFIX_OVERRIDE: ${{ inputs.suffix_override }}
           GH_APP_CERT: ${{ secrets.GH_APP_CERT }}
+          TF_LOG: ${{ (env.RUNNER_DEBUG == 1 && 'DEBUG') }}
         with:
           imageName: ${{ steps.dc.outputs.image_path }}
           imageTag: ${{ steps.dc.outputs.tag }}
@@ -129,3 +130,4 @@ jobs:
             FLOWEHR_REPOSITORIES_GH_TOKEN=${{ secrets.FLOWEHR_REPOSITORIES_GH_TOKEN }}
             GH_APP_CERT
             TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
+            TF_LOG
