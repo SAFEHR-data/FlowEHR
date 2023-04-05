@@ -34,6 +34,10 @@ jobs:
           path: ~/.tflint.d/plugins
           key: tflint-${{ hashFiles('.tflint.hcl') }}
 
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.4.4
+
       - uses: terraform-linters/setup-tflint@v2
         name: Setup TFLint
         with:
