@@ -106,7 +106,7 @@ jobs:
           # https://github.com/devcontainers/ci/issues/231
           SUFFIX_OVERRIDE: ${{ inputs.suffix_override }}
           GH_APP_CERT: ${{ secrets.GH_APP_CERT }}
-          TF_LOG: ${{ (env.RUNNER_DEBUG == 1 && 'DEBUG') }}
+          TF_LOG: ${{ (env.RUNNER_DEBUG == '1' && 'INFO') || '' }}
         with:
           imageName: ${{ steps.dc.outputs.image_path }}
           imageTag: ${{ steps.dc.outputs.tag }}
