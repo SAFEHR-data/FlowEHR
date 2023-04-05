@@ -94,7 +94,7 @@ dependency "core" {
     core_kv_id              = "core_kv_id"
     core_log_analytics_name = "core_log_analytics_name"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["validate", "destroy"]
 }
 
 dependency "transform" {
@@ -106,7 +106,7 @@ dependency "transform" {
     apps_ad_group_principal_id       = "transform_apps_ad_group_principal_id"
     developers_ad_group_principal_id = "transform_developers_ad_group_principal_id"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["validate", "destroy"]
 }
 
 dependency "serve" {
@@ -118,7 +118,7 @@ dependency "serve" {
     cosmos_account_name   = "serve_cosmos_account_name"
     webapps_subnet_id     = "serve_webapps_subnet_id"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["validate", "destroy"]
 }
 
 inputs = {

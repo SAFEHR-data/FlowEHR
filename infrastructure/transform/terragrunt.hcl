@@ -33,7 +33,7 @@ dependency "core" {
     databricks_host_address_space      = "databricks_host_address_space"
     databricks_container_address_space = "databricks_container_address_space"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["validate", "destroy"]
 }
 
 generate "terraform" {
