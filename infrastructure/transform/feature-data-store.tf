@@ -103,7 +103,7 @@ resource "azurerm_mssql_database" "feature_database" {
   license_type         = "LicenseIncluded"
   max_size_gb          = var.accesses_real_data ? 250 : 2
   sku_name             = var.accesses_real_data ? "S0" : "Basic"
-  storage_account_type = var.accesses_real_data ? "Geo": "Local"
+  storage_account_type = var.accesses_real_data ? "Geo" : "Local"
   zone_redundant       = false
   tags                 = var.tags
 }
