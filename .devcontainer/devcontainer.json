@@ -43,9 +43,11 @@
 		}
 	},
 
-	// Run commands after the container is created.
-	"postCreateCommand": "./scripts/install_mssql_odbc.sh && ./scripts/pipeline_repo_checkout.sh && pip install --no-cache-dir -r requirements.txt",
-	"waitFor": "postCreateCommand",
+	// Run commands on container start-up before tools attach
+	"onCreateCommand": "./scripts/install_mssql_odbc.sh && pip install --no-cache-dir -r requirements.txt",
+
+	// Run commands after the container is created
+	"postCreateCommand": "./scripts/pipeline_repo_checkout.sh",
 
 	// Ensure working directory is trusted by Git (needs to be post start so we pick up host's git configuration first)
 	"postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder} && pre-commit install"
