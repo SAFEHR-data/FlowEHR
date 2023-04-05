@@ -45,6 +45,7 @@
 
 	// Run commands after the container is created.
 	"postCreateCommand": "./scripts/install_mssql_odbc.sh && ./scripts/pipeline_repo_checkout.sh && pip install --no-cache-dir -r requirements.txt",
+	"waitFor": "postCreateCommand",
 
 	// Ensure working directory is trusted by Git (needs to be post start so we pick up host's git configuration first)
 	"postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder} && pre-commit install"
