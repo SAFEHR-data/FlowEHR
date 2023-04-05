@@ -34,7 +34,7 @@ resource "azurerm_storage_account" "core" {
 
 resource "time_sleep" "wait_for_ci_vnet_peer" {
   count           = var.tf_in_automation ? 1 : 0
-  create_duration = "120s"
+  create_duration = "300s"
   depends_on = [
     azurerm_virtual_network_peering.ci_to_flowehr,
     azurerm_virtual_network_peering.flowehr_to_ci
