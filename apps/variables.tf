@@ -45,14 +45,6 @@ variable "transform_feature_store_db_name" {
   type = string
 }
 
-variable "transform_apps_ad_group_display_name" {
-  type = string
-}
-
-variable "transform_developers_ad_group_display_name" {
-  type = string
-}
-
 variable "transform_apps_ad_group_principal_id" {
   type = string
 }

@@ -103,8 +103,6 @@ dependency "transform" {
   mock_outputs = {
     feature_store_server_name        = "transform_feature_store_server_name"
     feature_store_db_name            = "transform_feature_store_db_name"
-    apps_ad_group_display_name       = "transform_apps_ad_group_display_name"
-    developers_ad_group_display_name = "transform_developers_ad_group_display_name"
     apps_ad_group_principal_id       = "transform_apps_ad_group_principal_id"
     developers_ad_group_principal_id = "transform_developers_ad_group_principal_id"
   }
@@ -131,8 +129,6 @@ inputs = {
 
   transform_feature_store_server_name        = dependency.transform.outputs.feature_store_server_name
   transform_feature_store_db_name            = dependency.transform.outputs.feature_store_db_name
-  transform_apps_ad_group_display_name       = dependency.transform.outputs.apps_ad_group_display_name
-  transform_developers_ad_group_display_name = dependency.transform.outputs.developers_ad_group_display_name
   transform_apps_ad_group_principal_id       = dependency.transform.outputs.apps_ad_group_principal_id
   transform_developers_ad_group_principal_id = dependency.transform.outputs.developers_ad_group_principal_id
 
