@@ -19,38 +19,12 @@ resource "azurerm_resource_group" "core" {
 }
 
 resource "azurerm_storage_account" "core" {
-  name                     = "strg${local.naming_suffix_truncated}"
-  resource_group_name      = azurerm_resource_group.core.name
-  location                 = azurerm_resource_group.core.location
-  account_tier             = "Standard"
-  account_replication_type = "GRS"
-  tags                     = var.tags
-
-  network_rules {
-    default_action             = "Deny"
-    virtual_network_subnet_ids = [azurerm_subnet.core_shared.id]
-  }
-}
-
-resource "time_sleep" "wait_for_ci_vnet_peer" {
-  count           = var.tf_in_automation ? 1 : 0
-  create_duration = "300s"
-  depends_on = [
-    azurerm_virtual_network_peering.ci_to_flowehr,
-    azurerm_virtual_network_peering.flowehr_to_ci
-  ]
-}
-
-resource "azurerm_key_vault" "core" {
-  name                          = "kv-${local.naming_suffix_truncated}"
-  location                      = azurerm_resource_group.core.location
+  name                          = "strg${local.naming_suffix_truncated}"
   resource_group_name           = azurerm_resource_group.core.name
-  tenant_id                     = data.azurerm_client_config.current.tenant_id
-  soft_delete_retention_days    = 7
-  purge_protection_enabled      = var.accesses_real_data
-  enable_rbac_authorization     = true
-  public_network_access_enabled = (var.tf_in_automation || var.accesses_real_data) ? false : true
-  sku_name                      = "standard"
+  location                      = azurerm_resource_group.core.location
+  account_tier                  = "Standard"
+  account_replication_type      = "GRS"
+  public_network_access_enabled = !var.tf_in_automation
   tags                          = var.tags
 
   network_acls {
@@ -58,8 +32,27 @@ resource "azurerm_key_vault" "core" {
     default_action = "Deny"
     ip_rules       = var.tf_in_automation ? null : [data.http.local_ip[0].response_body]
   }
+}
 
-  depends_on = [time_sleep.wait_for_ci_vnet_peer]
+resource "azurerm_key_vault" "core" {
+  name                       = "kv-${local.naming_suffix_truncated}"
+  location                   = azurerm_resource_group.core.location
+  resource_group_name        = azurerm_resource_group.core.name
+  tenant_id                  = data.azurerm_client_config.current.tenant_id
+  soft_delete_retention_days = 7
+  purge_protection_enabled   = var.accesses_real_data
+  enable_rbac_authorization  = true
+  sku_name                   = "standard"
+  tags                       = var.tags
+
+  network_acls {
+    bypass         = "AzureServices"
+    default_action = "Deny"
+    ip_rules       = var.tf_in_automation ? null : [data.http.local_ip[0].response_body]
+
+    # Add CI subnets if any so deployer can access KV in automation
+    virtual_network_subnet_ids = ([for subnet in data.azurerm_subnet.ci : subnet.id])
+  }
 }
 
 resource "azurerm_role_assignment" "deployer_can_administrate_kv" {
