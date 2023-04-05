@@ -23,7 +23,7 @@ dependency "bootstrap" {
     mgmt_rg                 = "mgmt_rg"
     mgmt_acr                = "mgmt_acr"
   }
-  mock_outputs_allowed_terraform_commands = ["destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
 }
 
 locals {
