@@ -35,23 +35,22 @@ resource "azurerm_storage_account" "core" {
 }
 
 resource "azurerm_key_vault" "core" {
-  name                       = "kv-${local.naming_suffix_truncated}"
-  location                   = azurerm_resource_group.core.location
-  resource_group_name        = azurerm_resource_group.core.name
-  tenant_id                  = data.azurerm_client_config.current.tenant_id
-  soft_delete_retention_days = 7
-  purge_protection_enabled   = var.accesses_real_data
-  enable_rbac_authorization  = true
-  sku_name                   = "standard"
-  tags                       = var.tags
+  name                          = "kv-${local.naming_suffix_truncated}"
+  location                      = azurerm_resource_group.core.location
+  resource_group_name           = azurerm_resource_group.core.name
+  tenant_id                     = data.azurerm_client_config.current.tenant_id
+  enabled_for_disk_encryption   = false
+  public_network_access_enabled = !var.tf_in_automation
+  soft_delete_retention_days    = 7
+  purge_protection_enabled      = var.accesses_real_data
+  enable_rbac_authorization     = true
+  sku_name                      = "standard"
+  tags                          = var.tags
 
   network_acls {
     bypass         = "AzureServices"
     default_action = "Deny"
     ip_rules       = var.tf_in_automation ? null : [data.http.local_ip[0].response_body]
-
-    # Add CI subnets if any so deployer can access KV in automation (creation involves Data Plane read)
-    virtual_network_subnet_ids = ([for subnet in data.azurerm_subnet.ci : subnet.id])
   }
 }
 
@@ -65,7 +64,7 @@ resource "azurerm_log_analytics_workspace" "core" {
   name                       = "log-${local.naming_suffix}"
   location                   = azurerm_resource_group.core.location
   resource_group_name        = azurerm_resource_group.core.name
-  internet_ingestion_enabled = var.tf_in_automation ? false : true
+  internet_ingestion_enabled = !var.tf_in_automation
   sku                        = "PerGB2018"
   retention_in_days          = 30
   tags                       = var.tags
@@ -78,6 +77,7 @@ resource "azurerm_monitor_action_group" "p0" {
 
   dynamic "email_receiver" {
     for_each = toset(var.alert_recipients)
+
     content {
       name                    = email_receiver.value.name
       email_address           = email_receiver.value.email
