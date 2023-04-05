@@ -25,14 +25,15 @@ resource "azurerm_storage_account" "core" {
   account_tier                      = "Standard"
   account_replication_type          = "GRS"
   infrastructure_encryption_enabled = true
-  public_network_access_enabled     = false
+  public_network_access_enabled     = var.accesses_real_data ? false : true
   enable_https_traffic_only         = true
   tags                              = var.tags
 
   network_rules {
     default_action             = "Deny"
     bypass                     = ["AzureServices"]
-    virtual_network_subnet_ids = [azurerm_subnet.core_shared.id]
+    virtual_network_subnet_ids = [azurerm_subnet.core_shared.id, azurerm_subnet.core_container.id]
+    ip_rules                   = var.tf_in_automation ? [] : [var.deployer_ip_address]
   }
 
   blob_properties {
