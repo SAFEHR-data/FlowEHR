@@ -1,5 +1,5 @@
 {
-	"name": "FlowEHR Griff",
+	"name": "FlowEHR",
 	"image": "mcr.microsoft.com/devcontainers/python:0-3.10-bullseye",
 
 	// Configure VS Code properties & extensions
