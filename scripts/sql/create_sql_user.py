@@ -32,6 +32,8 @@ def create_con_str(db: str) -> str:
 users = json.loads(users_to_create)
 
 # connect to master database to create login
+# also create user in master DB (without permissions) to allow user to connect
+# to SQL without having to specify the DB name
 cnxn = pyodbc.connect(create_con_str("master"))
 cursor = cnxn.cursor()
 
@@ -41,24 +43,27 @@ for user in users:
         CREATE LOGIN [{user['name']}]
         FROM EXTERNAL PROVIDER
     END
+    IF NOT EXISTS(SELECT principal_id FROM sys.database_principals WHERE name = '{user['name']}') BEGIN
+        CREATE USER [{user['name']}] FROM EXTERNAL PROVIDER
+    END
     """  # noqa: E501
     cursor.execute(query)
 
 cnxn.commit()
 
+# create users in target database, assigning given role
 cnxn = pyodbc.connect(create_con_str(database))
 cursor = cnxn.cursor()
 
 for user in users:
-    # connect to target feature database to create user + assign given role
     query = f"""
     IF NOT EXISTS(SELECT principal_id FROM sys.database_principals WHERE name = '{user['name']}') BEGIN
         CREATE USER [{user['name']}] FROM EXTERNAL PROVIDER
         EXEC sp_addrolemember {user['role']}, [{user['name']}]
     END
     """  # noqa: E501
-
     cursor.execute(query)
 
 cnxn.commit()
+
 cnxn.close()

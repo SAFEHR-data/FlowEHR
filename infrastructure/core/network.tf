@@ -47,6 +47,7 @@ resource "azurerm_subnet" "core_container" {
   resource_group_name  = azurerm_resource_group.core.name
   virtual_network_name = azurerm_virtual_network.core.name
   address_prefixes     = [local.core_container_address_space]
+  service_endpoints    = ["Microsoft.Storage"]
 
   delegation {
     name = "delegation-core-containers-${var.naming_suffix}"
@@ -76,4 +77,53 @@ resource "azurerm_private_dns_zone_virtual_network_link" "all" {
   depends_on = [
     azurerm_private_dns_zone.all
   ]
+}
+
+resource "azurerm_network_security_group" "core" {
+  name                = "nsg-default-${var.naming_suffix}"
+  location            = azurerm_resource_group.core.location
+  resource_group_name = azurerm_resource_group.core.name
+
+  security_rule {
+    name                       = "deny-internet-outbound-override"
+    description                = "Blocks outbound internet traffic unless an explicit outbound-allow rule exists. Overrides the default rule 65001"
+    priority                   = 2000
+    access                     = "Deny"
+    protocol                   = "*"
+    direction                  = "Outbound"
+    destination_address_prefix = "Internet"
+    destination_port_range     = 443
+    source_address_prefix      = "*"
+    source_port_range          = "*"
+  }
+}
+
+resource "azurerm_network_watcher_flow_log" "data_sources" {
+  count                     = (var.monitoring.network_watcher != null) || var.accesses_real_data ? 1 : 0
+  name                      = "nw-log-${var.naming_suffix}"
+  resource_group_name       = var.monitoring.network_watcher.resource_group_name
+  network_watcher_name      = var.monitoring.network_watcher.name
+  network_security_group_id = azurerm_network_security_group.core.id
+  storage_account_id        = azurerm_storage_account.core.id
+  enabled                   = true
+
+  retention_policy {
+    enabled = true
+    days    = 7
+  }
+
+  traffic_analytics {
+    enabled               = true
+    workspace_id          = azurerm_log_analytics_workspace.core.workspace_id
+    workspace_region      = azurerm_log_analytics_workspace.core.location
+    workspace_resource_id = azurerm_log_analytics_workspace.core.id
+    interval_in_minutes   = 10
+  }
+
+  lifecycle {
+    precondition {
+      condition     = !var.accesses_real_data || var.monitoring.network_watcher != null
+      error_message = "Network watcher flow logs must be enabled with when accesses_real_data"
+    }
+  }
 }
