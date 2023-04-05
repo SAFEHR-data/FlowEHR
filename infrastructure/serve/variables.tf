@@ -52,6 +52,10 @@ variable "tf_in_automation" {
   type = bool
 }
 
+variable "accesses_real_data" {
+  type = bool
+}
+
 variable "private_dns_zones" {
   type = map(any)
 }

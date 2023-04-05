@@ -72,6 +72,10 @@ variable "core_storage_account_name" {
   type = string
 }
 
+variable "accesses_real_data" {
+  type = bool
+}
+
 variable "private_dns_zones" {
   type = map(any)
 }
