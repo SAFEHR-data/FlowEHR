@@ -22,6 +22,7 @@ dependency "bootstrap" {
     environment             = "environment"
     mgmt_rg                 = "mgmt_rg"
     mgmt_acr                = "mgmt_acr"
+    mgmt_storage            = "mgmtstorage"
   }
   mock_outputs_allowed_terraform_commands = ["init", "destroy"]
 }
