@@ -42,14 +42,15 @@
 
 		// Install arbitrary APT packages
 		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-			"packages": "parallel, yamllint, unixodbc, unixodbc-dev"
+			"packages": "parallel, yamllint"
 		}
 	},
 
 	// Run commands after the container is created.
 	"postCreateCommand": {
 		"install python requirements": "python3 -m pip install --no-cache-dir -r requirements.txt",
-		"check out transform repos": "./scripts/pipeline_repo_checkout.sh"
+		"check out transform repos": "./scripts/pipeline_repo_checkout.sh",
+		"add mssql-tools to PATH": "echo 'export PATH=\"$PATH:/opt/mssql-tools18/bin\"' >> ~/.bashrc && . ~/.bashrc"
 	},
 
 	// Ensure working directory is trusted by Git (needs to be post start so we pick up host's git configuration first)
