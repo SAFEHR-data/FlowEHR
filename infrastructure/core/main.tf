@@ -27,7 +27,7 @@ resource "azurerm_storage_account" "core" {
   public_network_access_enabled = !var.tf_in_automation
   tags                          = var.tags
 
-  network_acls {
+  network_rules {
     bypass         = "AzureServices"
     default_action = "Deny"
     ip_rules       = var.tf_in_automation ? null : [data.http.local_ip[0].response_body]
