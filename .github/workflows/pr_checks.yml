@@ -41,6 +41,7 @@ jobs:
       - uses: terraform-linters/setup-tflint@v2
         name: Setup TFLint
         with:
+          terraform_wrapper: false
           tflint_version: v0.44.1
 
       - name: Setup Terragrunt
