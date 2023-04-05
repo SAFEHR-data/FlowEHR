@@ -47,6 +47,7 @@ resource "azurerm_subnet" "core_container" {
   resource_group_name  = azurerm_resource_group.core.name
   virtual_network_name = azurerm_virtual_network.core.name
   address_prefixes     = [local.core_container_address_space]
+  service_endpoints    = ["Microsoft.Storage"]
 
   delegation {
     name = "delegation-core-containers-${var.naming_suffix}"
