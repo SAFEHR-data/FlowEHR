@@ -55,7 +55,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Validate terraform
-        run: terragrunt run-all validate --terragrunt-no-auto-init
+        run: |
+          (cd bootstrap/shared \
+            && (cd management && terraform init -backend=false) \
+            && (cd naming && terraform init -backend=false) \
+          )
+          terragrunt run-all validate --terragrunt-no-auto-init
 
       - name: Pre-commit linting
         uses: pre-commit/action@v3.0.0
