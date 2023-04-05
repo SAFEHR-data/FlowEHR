@@ -47,11 +47,7 @@
 	},
 
 	// Run commands after the container is created.
-	"postCreateCommand": {
-		"install python requirements": "python3 -m pip install --no-cache-dir -r requirements.txt",
-		"check out transform repos": "./scripts/pipeline_repo_checkout.sh",
-		"add mssql-tools to PATH": "echo 'export PATH=\"$PATH:/opt/mssql-tools18/bin\"' >> ~/.bashrc && . ~/.bashrc"
-	},
+	"postCreateCommand": "pip install --no-cache-dir -r requirements.txt && ./scripts/pipeline_repo_checkout.sh && ./scripts/install_mssql_odbc.sh",
 
 	// Ensure working directory is trusted by Git (needs to be post start so we pick up host's git configuration first)
 	"postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder} && pre-commit install"
