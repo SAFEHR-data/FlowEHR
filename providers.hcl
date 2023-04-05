@@ -18,19 +18,19 @@ locals {
 provider "azurerm" {
   features {
     resource_group {
-      prevent_deletion_if_contains_resources = false
+      prevent_deletion_if_contains_resources = !var.accesses_real_data
     }
     key_vault {
-      # Don't purge on destroy (this would fail due to purge protection being enabled on keyvault)
-      purge_soft_delete_on_destroy               = false
-      purge_soft_deleted_secrets_on_destroy      = false
-      purge_soft_deleted_certificates_on_destroy = false
-      purge_soft_deleted_keys_on_destroy         = false
-      # When recreating an environment, recover any previously soft deleted secrets - set to true by default
-      recover_soft_deleted_key_vaults   = true
-      recover_soft_deleted_secrets      = true
-      recover_soft_deleted_certificates = true
-      recover_soft_deleted_keys         = true
+      # Only purge on destroy when purge protection is not enabled
+      purge_soft_delete_on_destroy               = !var.accesses_real_data
+      purge_soft_deleted_secrets_on_destroy      = !var.accesses_real_data
+      purge_soft_deleted_certificates_on_destroy = !var.accesses_real_data
+      purge_soft_deleted_keys_on_destroy         = !var.accesses_real_data
+      # When recreating an environment, recover any previously soft deleted secrets if in prod
+      recover_soft_deleted_key_vaults   = var.accesses_real_data
+      recover_soft_deleted_secrets      = var.accesses_real_data
+      recover_soft_deleted_certificates = var.accesses_real_data
+      recover_soft_deleted_keys         = var.accesses_real_data
     }
   }
 }
