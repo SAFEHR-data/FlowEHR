@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 include "root" {
-  path   = find_in_parent_folders()
+  path = find_in_parent_folders()
 }
 
 locals {

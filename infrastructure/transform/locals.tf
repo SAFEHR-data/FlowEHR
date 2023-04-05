@@ -59,7 +59,7 @@ locals {
   triggers = flatten([
     for pipeline_dir in local.pipeline_dirs : [
       fileexists("${pipeline_dir}/${local.trigger_file}") ? {
-        pipeline = basename("${pipeline_dir}")
+        pipeline = basename(pipeline_dir)
         trigger  = jsondecode(file("${pipeline_dir}/${local.trigger_file}"))
       } : null
     ]
@@ -93,9 +93,9 @@ locals {
   ]))
 
   sql_users_to_create = [
-    { "name" : "${local.databricks_app_name}", "role" : "db_owner" },
-    { "name" : "${azuread_group.ad_group_apps.display_name}", "role" : "db_datareader" },
-    { "name" : "${azuread_group.ad_group_developers.display_name}", "role" : "db_datareader" },
-    { "name" : "${azuread_group.ad_group_data_scientists.display_name}", "role" : "db_datareader" },
+    { "name" : local.databricks_app_name, "role" : "db_owner" },
+    { "name" : azuread_group.ad_group_apps.display_name, "role" : "db_datareader" },
+    { "name" : azuread_group.ad_group_developers.display_name, "role" : "db_datareader" },
+    { "name" : azuread_group.ad_group_data_scientists.display_name, "role" : "db_datareader" },
   ]
 }

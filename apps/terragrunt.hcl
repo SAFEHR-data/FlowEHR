@@ -32,9 +32,9 @@ locals {
   merged_apps_config = {
     # As it's a map, we need to iterate as direct merge() would overwrite each key's value entirely
     for app_id, env_app_config in local.env_apps_config : app_id =>
-      # And we don't want apps defined in apps.yaml but not in current {ENVIRONMENT} file to be deployed,
-      # so only merge if key exists with env-specific config taking precedence
-      merge(try(local.shared_apps_config[app_id], null), env_app_config)
+    # And we don't want apps defined in apps.yaml but not in current {ENVIRONMENT} file to be deployed,
+    # so only merge if key exists with env-specific config taking precedence
+    merge(try(local.shared_apps_config[app_id], null), env_app_config)
   }
 }
 

@@ -17,21 +17,12 @@ variable "naming_suffix" {
   description = "Suffix used to name resources"
 }
 
-variable "naming_suffix_truncated" {
-  type        = string
-  description = "Truncated (max 20 chars, no hyphens etc.) suffix for e.g storage accounts"
-}
-
 variable "environment" {
   type = string
 }
 
 variable "suffix_override" {
   type = string
-}
-
-variable "tags" {
-  type = map(any)
 }
 
 variable "tf_in_automation" {
@@ -47,10 +38,6 @@ variable "core_rg_location" {
 }
 
 variable "core_log_analytics_name" {
-  type = string
-}
-
-variable "core_kv_id" {
   type = string
 }
 
