@@ -32,6 +32,15 @@ resource "azurerm_storage_account" "core" {
   }
 }
 
+resource "time_sleep" "wait_for_ci_vnet_peer" {
+  count           = var.tf_in_automation ? 1 : 0
+  create_duration = "120s"
+  depends_on = [
+    azurerm_virtual_network_peering.ci_to_flowehr,
+    azurerm_virtual_network_peering.flowehr_to_ci
+  ]
+}
+
 resource "azurerm_key_vault" "core" {
   name                          = "kv-${local.naming_suffix_truncated}"
   location                      = azurerm_resource_group.core.location
@@ -50,11 +59,7 @@ resource "azurerm_key_vault" "core" {
     ip_rules       = var.tf_in_automation ? null : [data.http.local_ip[0].response_body]
   }
 
-  depends_on = [
-    azurerm_virtual_network_peering.flowehr_to_ci,
-    azurerm_virtual_network_peering.ci_to_flowehr,
-    azurerm_private_dns_zone_virtual_network_link.flowehr
-  ]
+  depends_on = [time_sleep.wait_for_ci_vnet_peer]
 }
 
 resource "azurerm_role_assignment" "deployer_can_administrate_kv" {

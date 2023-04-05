@@ -84,4 +84,11 @@ github = {
   version = "5.18.3"
 }
 EOF
+
+  required_provider_time = <<EOF
+time = {
+  source = "hashicorp/time"
+  version = "0.9.1"
+}
+EOF
 }
