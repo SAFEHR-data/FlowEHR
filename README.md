@@ -32,6 +32,7 @@ Once you've created it, specify the following values:
 - `environment` - a name for your environment (set this to `local`)
 - `location` - the [Azure region](https://azuretracks.com/2021/04/current-azure-region-names-reference/) you wish to deploy resources to
 - `core_address_space` (optional) - override the default core address space, e.g. `10.1.0.0/24`
+- `private_dns_zones_rg` (optional) - if you have the required private dns zones (see [infrastructure/core/locals.tf](infrastructure/core/locals.tf)) already deployed in a network that will be peered to FlowEHR, provide the resource group name and FlowEHR will use those instead of creating its own (which would cause namespace conflicts)
 
 - `transform` (optional)
     - `spark_version` (optional) - the Spark version to install on your local cluster and Databricks clusters
@@ -163,9 +164,11 @@ This step will create an AAD Application and Service Principal in the specified 
 
     Trigger a deployment using a workflow dispatch trigger on the `Actions` tab.
 
-Next steps:
-    - Deploy a data transformation pipeline (TODO)
-    - [Configure and deploy a FlowEHR app](./apps/README.md)
+### Next steps
+
+- Deploy a data transformation pipeline (TODO)
+- [Configure and deploy a FlowEHR app](./apps/README.md)
+
 
 ## <a name="identities"></a> Identities
 
