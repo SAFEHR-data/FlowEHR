@@ -257,3 +257,26 @@ resource "azurerm_mssql_server_extended_auditing_policy" "sql_server_features" {
     azurerm_mssql_outbound_firewall_rule.allow_storage
   ]
 }
+
+resource "azurerm_storage_container" "mssql_vulnerability_assessment" {
+  name                  = "mssqlvulnerabilityassessment"
+  storage_account_name  = data.azurerm_storage_account.core.name
+  container_access_type = "private"
+}
+
+resource "azurerm_mssql_server_security_alert_policy" "sql_server_features" {
+  resource_group_name = var.core_rg_name
+  server_name         = azurerm_mssql_server.sql_server_features.name
+  state               = "Enabled"
+}
+
+resource "azurerm_mssql_server_vulnerability_assessment" "sql_server_features" {
+  server_security_alert_policy_id = azurerm_mssql_server_security_alert_policy.sql_server_features.id
+  storage_container_path          = "${data.azurerm_storage_account.core.primary_blob_endpoint}${azurerm_storage_container.mssql_vulnerability_assessment.name}/"
+
+  recurring_scans {
+    enabled                   = true
+    email_subscription_admins = true
+    emails                    = [for person in var.monitoring.alert_recipients : "${person.email}"]
+  }
+}

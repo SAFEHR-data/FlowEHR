@@ -69,3 +69,10 @@ inputs = merge(
     environment = local.configuration.locals.merged_root_config.environment
   }
 })
+
+# Databricks cluster deployment failures are transient. https://github.com/UCLH-Foundry/FlowEHR/issues/141
+retryable_errors = [
+  "cannot create cluster",              # databricks
+  "not ready for container group",      # vnet not ready for container group
+  "Waiting for deletion of application" # AD application
+]

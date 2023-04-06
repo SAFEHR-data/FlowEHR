@@ -21,12 +21,33 @@ resource "azurerm_application_insights" "serve" {
 }
 
 resource "azurerm_storage_account" "serve" {
-  name                     = "strgaml${var.naming_suffix_truncated}"
-  location                 = var.core_rg_location
-  resource_group_name      = var.core_rg_name
-  account_tier             = "Standard"
-  account_replication_type = "GRS"
-  tags                     = var.tags
+  name                              = "strgaml${var.naming_suffix_truncated}"
+  location                          = var.core_rg_location
+  resource_group_name               = var.core_rg_name
+  account_tier                      = "Standard"
+  account_replication_type          = "GRS"
+  infrastructure_encryption_enabled = true
+  public_network_access_enabled     = false
+  enable_https_traffic_only         = true
+  tags                              = var.tags
+
+  network_rules {
+    default_action             = "Deny"
+    bypass                     = ["AzureServices"]
+    virtual_network_subnet_ids = [var.core_subnet_id]
+  }
+
+  blob_properties {
+    container_delete_retention_policy {
+      days = 7
+    }
+
+    delete_retention_policy {
+      days = 7
+    }
+
+    change_feed_enabled = true
+  }
 }
 
 resource "azurerm_machine_learning_workspace" "serve" {

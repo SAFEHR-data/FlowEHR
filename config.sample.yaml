@@ -1,3 +1,4 @@
+---
 flowehr_id: sample
 location: uksouth
 environment: sample
@@ -29,6 +30,10 @@ serve:  # Optional
   github_app_id: 0000000000000
   github_app_installation_id: 00000000000000
 
-alert_recipients:  # Optional
-  - name: person
-    email: person@example.com
+monitoring:  # Optional
+  alert_recipients:  # Optional
+    - name: person
+      email: person@example.com
+  network_watcher:  # Optional, required if accesses_real_data
+    name: NetworkWatcher_location
+    resource_group_name: NetworkWatcherRG
