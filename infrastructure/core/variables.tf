@@ -43,7 +43,7 @@ variable "environment" {
 }
 
 variable "location" {
-  description = "The location to deploy resources"
+  description = "The Azure location to deploy resources"
   type        = string
 
   validation {
@@ -113,7 +113,7 @@ EOF
 }
 
 variable "monitoring" {
-  description = "Monitoring block"
+  description = "Monitoring configuration"
   type = object({
     alert_recipients = optional(
       list(object({ # List of recipients to receive alerts
