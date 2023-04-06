@@ -30,7 +30,15 @@ on:
         type: string
         required: false
         description: An override for the naming suffix
-    secrets: inherit
+    secrets:
+      ARM_SUBSCRIPTION_ID:
+        required: true
+      ARM_TENANT_ID:
+        required: true
+      ARM_CLIENT_ID:
+        required: true
+      ARM_CLIENT_SECRET:
+        required: true
 
 jobs:
   clean:
