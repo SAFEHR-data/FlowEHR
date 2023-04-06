@@ -92,6 +92,8 @@ jobs:
         run: |
           if [ ${{ steps.check_command.outputs.command }} = "test-all" ]; then
               make_command="test"
+          elif [ ${{ steps.changes.outputs.core }} = "true" ]; then
+              make_command="test"
           elif [ ${{ steps.changes.outputs.transform }} = "true" ] && \
             [ ${{ steps.changes.outputs.serve }} = "true" ]; then
               make_command="test"
