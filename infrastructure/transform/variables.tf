@@ -72,6 +72,22 @@ variable "core_storage_account_name" {
   type = string
 }
 
+variable "developers_ad_group_principal_id" {
+  type = string
+}
+
+variable "data_scientists_ad_group_principal_id" {
+  type = string
+}
+
+variable "developers_ad_group_display_name" {
+  type = string
+}
+
+variable "data_scientists_ad_group_display_name" {
+  type = string
+}
+
 variable "access_databricks_management_publicly" {
   type        = bool
   description = "Whether to allow access to the Databricks workspace management plane via a public network"

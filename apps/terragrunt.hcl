@@ -21,7 +21,7 @@ locals {
 
   # Get GitHub App PEM cert as string - first try local file otherwise look for env var
   github_app_cert_path = "${get_terragrunt_dir()}/github.pem"
-  github_app_cert      = fileexists(local.github_app_cert_path) ? file(local.github_app_cert_path) : get_env("GH_APP_CERT", "")
+  github_app_cert      = fileexists(local.github_app_cert_path) ? file(local.github_app_cert_path) : get_env("git", "")
 
   # Get shared app configuration (apps.yaml) and environment-specific config (app.{ENVIRONMENT}.yaml)
   shared_apps_config_path = "${get_terragrunt_dir()}/apps.yaml"
@@ -93,6 +93,8 @@ dependency "core" {
     core_rg_location        = "core_rg_location"
     core_kv_id              = "core_kv_id"
     core_log_analytics_name = "core_log_analytics_name"
+    core_developers_ad_group_principal_id      = "core_developers_ad_group_principal_id"
+    core_data_scientists_ad_group_principal_id = "core_data_scientists_ad_group_principal_id"
   }
   mock_outputs_allowed_terraform_commands = ["destroy"]
 }
@@ -104,10 +106,7 @@ dependency "transform" {
     feature_store_server_name             = "transform_feature_store_server_name"
     feature_store_db_name                 = "transform_feature_store_db_name"
     apps_ad_group_display_name            = "transform_apps_ad_group_display_name"
-    developers_ad_group_display_name      = "transform_developers_ad_group_display_name"
     apps_ad_group_principal_id            = "transform_apps_ad_group_principal_id"
-    developers_ad_group_principal_id      = "transform_developers_ad_group_principal_id"
-    data_scientists_ad_group_principal_id = "transform_data_scientists_ad_group_principal_id"
   }
   mock_outputs_allowed_terraform_commands = ["destroy"]
 }
@@ -129,14 +128,15 @@ inputs = {
   core_rg_location        = dependency.core.outputs.core_rg_location
   core_kv_id              = dependency.core.outputs.core_kv_id
   core_log_analytics_name = dependency.core.outputs.core_log_analytics_name
+  core_developers_ad_group_principal_id = dependency.core.outputs.developers_ad_group_principal_id
+  core_data_scientists_ad_group_principal_id = dependency.core.outputs.data_scientists_ad_group_principal_id
+
 
   transform_feature_store_server_name        = dependency.transform.outputs.feature_store_server_name
   transform_feature_store_db_name            = dependency.transform.outputs.feature_store_db_name
   transform_apps_ad_group_display_name       = dependency.transform.outputs.apps_ad_group_display_name
-  transform_developers_ad_group_display_name = dependency.transform.outputs.developers_ad_group_display_name
   transform_apps_ad_group_principal_id       = dependency.transform.outputs.apps_ad_group_principal_id
-  transform_developers_ad_group_principal_id = dependency.transform.outputs.developers_ad_group_principal_id
-  transform_data_scientists_ad_group_principal_id = dependency.transform.outputs.data_scientists_ad_group_principal_id
+  
 
   serve_app_service_plan_name = dependency.serve.outputs.app_service_plan_name
   serve_acr_name              = dependency.serve.outputs.acr_name

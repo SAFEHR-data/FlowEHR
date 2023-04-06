@@ -32,6 +32,10 @@ dependency "core" {
     core_kv_uri                        = "core_kv_uri"
     databricks_host_address_space      = "databricks_host_address_space"
     databricks_container_address_space = "databricks_container_address_space"
+    developers_ad_group_principal_id   = "developers_ad_group_principal_id"
+    data_scientists_ad_group_principal_id = "data_scientists_ad_group_principal_id"
+    developers_ad_group_display_name = "developers_ad_group_display_name"
+    data_scientists_ad_group_display_name = "data_scientists_ad_group_display_name"
   }
   mock_outputs_allowed_terraform_commands = ["destroy"]
 }
@@ -78,4 +82,8 @@ inputs = {
   core_storage_account_name          = dependency.core.outputs.storage_account_name
   databricks_host_address_space      = dependency.core.outputs.databricks_host_address_space
   databricks_container_address_space = dependency.core.outputs.databricks_container_address_space
+  developers_ad_group_principal_id   = dependency.core.outputs.developers_ad_group_principal_id
+  data_scientists_ad_group_principal_id   = dependency.core.outputs.data_scientists_ad_group_principal_id
+  developers_ad_group_display_name   = dependency.core.outputs.developers_ad_group_display_name
+  data_scientists_ad_group_display_name   = dependency.core.outputs.data_scientists_ad_group_display_name
 }

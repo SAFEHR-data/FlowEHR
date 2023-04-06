@@ -63,3 +63,23 @@ output "p0_action_group_id" {
 output "storage_account_name" {
   value = azurerm_storage_account.core.name
 }
+
+output "developers_ad_group_principal_id" {
+  description = "Developers AD group principal id"
+  value       = azuread_group.ad_group_developers.object_id
+}
+
+output "data_scientists_ad_group_principal_id" {
+  description = "Data scientists AD group principal id"
+  value       = azuread_group.ad_group_data_scientists.object_id
+}
+
+output "developers_ad_group_display_name" {
+  description = "Developers AD group display name"
+  value       = azuread_group.ad_group_developers.display_name
+}
+
+output "data_scientists_ad_group_display_name" {
+  description = "Data scientists AD group display name"
+  value       = azuread_group.ad_group_data_scientists.display_name
+}

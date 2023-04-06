@@ -62,19 +62,15 @@ variable "transform_apps_ad_group_display_name" {
   type = string
 }
 
-variable "transform_developers_ad_group_display_name" {
-  type = string
-}
-
 variable "transform_apps_ad_group_principal_id" {
   type = string
 }
 
-variable "transform_developers_ad_group_principal_id" {
+variable "core_developers_ad_group_principal_id" {
   type = string
 }
 
-variable "transform_data_scientists_ad_group_principal_id" {
+variable "core_data_scientists_ad_group_principal_id" {
   type = string
 }
 
