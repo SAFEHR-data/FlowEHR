@@ -36,20 +36,20 @@ This layer deploys the core components required for other layers, including a nu
 | Azure Resource | CIS Reference | Adherence | Notes |
 |--|--|--|--|
 | Core Virtual Network: <br/>`vnet-<suffix>` | `CIS 6` | [network.tf](./infrastructure/core/network.tf) | Allows other resources to remain non-internet-accessible |
-| | `CIS 5.1.6`: Ensure NSG Flow Logs are captured and sent to Log Analytics | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/187 |
-| | `CIS 6.6`: Ensure 'Network Watcher' is enabled for all networks | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/187 |
+| | `CIS 5.1.6`: Ensure NSG Flow Logs are captured and sent to Log Analytics | Y | https://github.com/UCLH-Foundry/FlowEHR/issues/187 |
+| | `CIS 6.6`: Ensure 'Network Watcher' is enabled for all networks | Y | https://github.com/UCLH-Foundry/FlowEHR/issues/187 |
 | Azure Storage Account for FlowEHR management: <br/>`strg<suffix>` | `CIS 3` | [main.tf](./infrastructure/core/main.tf) | Issues summarised https://github.com/UCLH-Foundry/FlowEHR/issues/176 |
 | | `CIS 3.1`: Ensure 'Secure Transfer Required' set to 'Enabled' | Y | |
-| | `CIS 3.2`: Ensure 'Enable Infrastructure Encryption' set to 'Enabled' | TODO |  |
+| | `CIS 3.2`: Ensure 'Enable Infrastructure Encryption' set to 'Enabled' | Y |  |
 | | `CIS 3.3`: Enable key rotation reminders for each storage account | N | Storage keys are not used for authentication |
 | | `CIS 3.4`: Ensure that Storage Account Access keys are periodically regenerated | N | Storage keys are not used for authentication |
-| | `CIS 3.7`: Ensure 'Public Access Level' is disabled | TODO | |
+| | `CIS 3.7`: Ensure 'Public Access Level' is disabled | Y | |
 | | `CIS 3.8`: Ensure Default Network Access Rule is set to 'Deny' | Y | |
 | | `CIS 3.9`: Ensure 'Trusted Azure Services' can access the storage account | Y | |
 | | `CIS 3.10`: Ensure Private Endpoints are used to access storage accounts | n/a | Using VNET integration |
-| | `CIS 3.11`: Ensure Soft Delete is enabled | TODO | |
+| | `CIS 3.11`: Ensure Soft Delete is enabled | Y | |
 | | `CIS 3.12`: Ensure storage is encrypted with Customer Managed Keys | N | Will use Microsoft Managed Keys to reduce management overhead |
-| | `CIS: 3.13`: Ensure Storage Logging is enabled for 'read', 'write' and 'delete' requests | TODO | | 
+| | `CIS: 3.13`: Ensure Storage Logging is enabled for 'read', 'write' and 'delete' requests | Y | | 
 | | `CIS 3.15`: Ensure Minimum TLS Version is set to 1.2 | Y | |
 | Azure Key Vault: <br/>`kv-<suffix>` | `CIS 8` | [main.tf](./infrastructure/core/main.tf)  | |
 | | `CIS 8.5`: Ensure the key vault is recoverable | Y | | 
@@ -78,14 +78,14 @@ This layer deploys components required to ingest data, transform data, and save 
 | Azure Resource | CIS Reference | Adherence | Notes |
 |--|--|--|--|
 | Azure SQL Server:<br/> `sql-server-features-suffix` | [feature-data-store.tf](./infrastructure/core/feature-data-store.tf) | |
-| | `CIS 4.1.1`: Ensure auditing is set to 'on' | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/172 |
+| | `CIS 4.1.1`: Ensure auditing is set to 'on' | Y | https://github.com/UCLH-Foundry/FlowEHR/issues/172 |
 | | `CIS 4.1.2`: Ensure no SQL databases allow ingress from 0.0.0.0/0 (any IP) | Y | All public access disabled |
 | | `CIS 4.1.3`: Ensure SQL uses Transparent Data Encryption with customer managed key | N | Decision was made to use Service Managed Key to decrease management overhead |
 | | `CIS 4.1.4`: Ensure AAD admin is configured | Y | Owner is an auto-created Service Principal account, with credentials saved in key vault | 
 | | `CIS 4.1.5`: Ensure 'Data encryption' is set to 'on' | Y | Service Managed Key |
-| | `CIS 4.1.6`: Ensure that 'Auditing Retention' is set to 'Greater than 90 days' | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/172 |
+| | `CIS 4.1.6`: Ensure that 'Auditing Retention' is set to 'Greater than 90 days' | Y | https://github.com/UCLH-Foundry/FlowEHR/issues/172 |
 | | `CIS 4.2.1`: Ensure Microsoft Defender for SQL is set to 'on' | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/174 |
-| | `CIS 4.2.2 -> CIS 4.2.5`: Ensure Vulnerability Assessment is enabled by setting a storage account | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/173 | 
+| | `CIS 4.2.2 -> CIS 4.2.5`: Ensure Vulnerability Assessment is enabled by setting a storage account | Y |  | 
 | Azure Key Vault Secrets | | [secrets.tf](./infrastructure/transform/secrets.tf) |
 | | `CIS 8.3`: Ensure expiration is set for all secrets in RBAC vaults | N | No automated secret rotation in place as of yet. Will be taken care of as a manual background task. | 
 | Azure Databricks | Databricks is not referenced in the CIS benchmark | | Below are some relevant security settings |

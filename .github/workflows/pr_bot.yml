@@ -154,6 +154,7 @@ jobs:
     with:
       suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
       environment: infra-test
+    secrets: inherit
 
   run_test:
     needs: [pr_comment]
@@ -176,6 +177,7 @@ jobs:
     with:
       suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
       environment: infra-test
+    secrets: inherit
 
   summary:
     name: Summary
