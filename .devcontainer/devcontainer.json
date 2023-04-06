@@ -36,6 +36,9 @@
 			"jqVersion": "1",
 			"yqVersion": "4"
 		},
+		"ghcr.io/jlaundry/devcontainer-features/mssql-odbc-driver:1": {
+			"version": "18"
+		},
 
 		// Install arbitrary APT packages
 		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
@@ -44,7 +47,7 @@
 	},
 
 	// Run commands on container start-up before tools attach
-	"onCreateCommand": "./scripts/install_mssql_odbc.sh && pip install --no-cache-dir -r requirements.txt",
+	"onCreateCommand": "pip install --no-cache-dir -r requirements.txt",
 
 	// Run commands after the container is created
 	"postCreateCommand": "./scripts/pipeline_repo_checkout.sh",
