@@ -57,6 +57,11 @@ resource "azurerm_subnet" "databricks_container" {
       name = "Microsoft.Databricks/workspaces"
     }
   }
+
+  # Prevent operation conflicts on vnet
+  depends_on = [
+    azurerm_subnet.databricks_host
+  ]
 }
 
 resource "azurerm_subnet_network_security_group_association" "databricks_container" {
@@ -109,6 +114,12 @@ resource "azurerm_subnet_route_table_association" "databricks_host" {
 resource "azurerm_subnet_route_table_association" "shared" {
   subnet_id      = var.core_subnet_id
   route_table_id = azurerm_route_table.databricks_udrs.id
+
+  # Prevent operation conflicts on vnet
+  depends_on = [
+    azurerm_subnet.databricks_host,
+    azurerm_subnet.databricks_container
+  ]
 }
 
 resource "azurerm_private_endpoint" "databricks_control_plane" {

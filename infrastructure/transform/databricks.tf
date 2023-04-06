@@ -49,6 +49,15 @@ data "databricks_node_type" "smallest" {
   depends_on = [azurerm_databricks_workspace.databricks]
 }
 
+resource "time_sleep" "wait_for_databricks_pe" {
+  create_duration = "180s"
+
+  depends_on = [
+    azurerm_private_endpoint.databricks_control_plane,
+    azurerm_private_endpoint.databricks_filesystem
+  ]
+}
+
 resource "databricks_cluster" "fixed_single_node" {
   cluster_name            = "Fixed Job Cluster"
   spark_version           = data.databricks_spark_version.latest_lts.id
@@ -89,9 +98,7 @@ resource "databricks_cluster" "fixed_single_node" {
   }
 
   depends_on = [
-    azurerm_databricks_workspace.databricks,
-    azurerm_private_endpoint.databricks_control_plane,
-    azurerm_private_endpoint.databricks_filesystem
+    time_sleep.wait_for_databricks_pe
   ]
 }
 
