@@ -276,4 +276,5 @@ jobs:
           az storage blob directory delete \
             -c tfstate \
             -d ${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }} \
-            --account-name ${{ vars.CI_STORAGE_ACCOUNT }}
+            --account-name ${{ vars.CI_STORAGE_ACCOUNT }} \
+            --recursive

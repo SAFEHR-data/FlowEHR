@@ -45,7 +45,9 @@
 		"ghcr.io/devcontainers/features/azure-cli:1": {
 			"version": "2.44.1"
 		},
-		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {
+			"version": "2.25.0"
+		},
 		"ghcr.io/stuartleeks/dev-container-features/azure-cli-persistence:0": {},
 		"ghcr.io/stuartleeks/dev-container-features/shell-history:0": {}
 	}
