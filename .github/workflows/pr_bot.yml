@@ -139,7 +139,7 @@ jobs:
           status: "completed"
           conclusion: "success"
 
-  destroy_pr_env:  # Remove the resource groups
+  destroy_pr_env:  # Destroy all resources deployed by PR
     needs: [pr_comment]
     if: |
       (needs.pr_comment.outputs.command == 'destroy') ||
