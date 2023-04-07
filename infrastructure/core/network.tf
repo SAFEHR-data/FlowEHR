@@ -124,7 +124,7 @@ resource "azurerm_private_endpoint" "keyvault" {
 }
 
 resource "azurerm_network_security_group" "core" {
-  name                = "nsg-default-${var.naming_suffix}"
+  name                = "nsg-default-${local.naming_suffix}"
   location            = azurerm_resource_group.core.location
   resource_group_name = azurerm_resource_group.core.name
 
@@ -144,7 +144,7 @@ resource "azurerm_network_security_group" "core" {
 
 resource "azurerm_network_watcher_flow_log" "data_sources" {
   count                     = (var.monitoring.network_watcher != null) || var.accesses_real_data ? 1 : 0
-  name                      = "nw-log-${var.naming_suffix}"
+  name                      = "nw-log-${local.naming_suffix}"
   resource_group_name       = var.monitoring.network_watcher.resource_group_name
   network_watcher_name      = var.monitoring.network_watcher.name
   network_security_group_id = azurerm_network_security_group.core.id

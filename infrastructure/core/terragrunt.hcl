@@ -17,6 +17,7 @@ include "shared" {
 }
 
 inputs = {
-  ci_vnet_name = get_env("CI_PEERING_VNET", "")
-  ci_rg_name   = get_env("CI_RESOURCE_GROUP", "")
+  ci_vnet_name    = get_env("CI_PEERING_VNET", "")
+  ci_rg_name      = get_env("CI_RESOURCE_GROUP", "")
+  suffix_override = get_env("SUFFIX_OVERRIDE", "")
 }

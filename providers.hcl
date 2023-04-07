@@ -18,7 +18,7 @@ locals {
 provider "azurerm" {
   features {
     resource_group {
-      prevent_deletion_if_contains_resources = !var.accesses_real_data
+      prevent_deletion_if_contains_resources = var.accesses_real_data
     }
     key_vault {
       # Only purge on destroy when purge protection is not enabled
