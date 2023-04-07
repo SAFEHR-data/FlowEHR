@@ -92,6 +92,10 @@ jobs:
         run: |
           if [ ${{ steps.check_command.outputs.command }} = "test-all" ]; then
               make_command="test"
+          elif [ ${{ steps.check_command.outputs.command }} = "destroy" ]; then
+              make_command="destroy"
+          elif [ ${{ steps.check_command.outputs.command }} = "destroy-no-terraform" ]; then
+              make_command="destroy-no-terraform"
           elif [ ${{ steps.changes.outputs.core }} = "true" ]; then
               make_command="test"
           elif [ ${{ steps.changes.outputs.transform }} = "true" ] && \
