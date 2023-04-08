@@ -42,7 +42,7 @@ resource "azurerm_subnet" "core_shared" {
 }
 
 resource "azurerm_subnet" "databricks_host" {
-  name                 = "subnet-dbks-host-${var.naming_suffix}"
+  name                 = "subnet-dbks-host-${local.naming_suffix}"
   resource_group_name  = azurerm_resource_group.core.name
   virtual_network_name = azurerm_virtual_network.core.name
   address_prefixes     = [local.databricks_host_address_space]
@@ -62,7 +62,7 @@ resource "azurerm_subnet" "databricks_host" {
 }
 
 resource "azurerm_subnet" "databricks_container" {
-  name                 = "subnet-dbks-container-${var.naming_suffix}"
+  name                 = "subnet-dbks-container-${local.naming_suffix}"
   resource_group_name  = azurerm_resource_group.core.name
   virtual_network_name = azurerm_virtual_network.core.name
   address_prefixes     = [local.databricks_container_address_space]
@@ -82,7 +82,7 @@ resource "azurerm_subnet" "databricks_container" {
 }
 
 resource "azurerm_subnet" "serve_webapps" {
-  name                                          = "subnet-serve-webapps-${var.naming_suffix}"
+  name                                          = "subnet-serve-webapps-${local.naming_suffix}"
   resource_group_name                           = azurerm_resource_group.core.name
   virtual_network_name                          = azurerm_virtual_network.core.name
   private_endpoint_network_policies_enabled     = false
