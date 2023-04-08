@@ -17,6 +17,7 @@ locals {
   configuration    = read_terragrunt_config("${get_repo_root()}/configuration.hcl")
   tf_in_automation = get_env("TF_IN_AUTOMATION", false)
   suffix_override  = get_env("SUFFIX_OVERRIDE", "")
+  state_folder     = local.suffix_override != "" ? local.suffix_override : "${get_env("ENVIRONMENT")}
 }
 
 generate "terraform" {
@@ -42,7 +43,7 @@ remote_state {
     resource_group_name  = get_env("CI_RESOURCE_GROUP")
     storage_account_name = get_env("CI_STORAGE_ACCOUNT")
     container_name       = "tfstate"
-    key                  = local.suffix_override != "" ? local.suffix_override : "${get_env("ENVIRONMENT")}/${path_relative_to_include()}/terraform.tfstate"
+    key                  = "${local.state_folder}/${path_relative_to_include()}/terraform.tfstate"
   } : {}
   generate = {
     path      = "backend.tf"
