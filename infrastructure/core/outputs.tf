@@ -44,20 +44,16 @@ output "core_kv_uri" {
   value = azurerm_key_vault.core.vault_uri
 }
 
-output "core_shared_address_space" {
-  value = local.core_shared_address_space
+output "databricks_host_subnet_name" {
+  value = azurerm_subnet.databricks_host.name
 }
 
-output "databricks_host_address_space" {
-  value = local.databricks_host_address_space
+output "databricks_container_subnet_name" {
+  value = azurerm_subnet.databricks_container.name
 }
 
-output "databricks_container_address_space" {
-  value = local.databricks_container_address_space
-}
-
-output "serve_webapps_address_space" {
-  value = local.serve_webapps_address_space
+output "webapps_subnet_id" {
+  value = azurerm_subnet.serve_webapps.id
 }
 
 output "core_log_analytics_name" {

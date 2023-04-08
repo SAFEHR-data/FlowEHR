@@ -19,58 +19,13 @@ resource "azurerm_network_security_group" "databricks" {
   tags                = var.tags
 }
 
-resource "azurerm_subnet" "databricks_host" {
-  name                 = "subnet-dbks-host-${var.naming_suffix}"
-  resource_group_name  = var.core_rg_name
-  virtual_network_name = data.azurerm_virtual_network.core.name
-  address_prefixes     = [var.databricks_host_address_space]
-
-  delegation {
-    name = "dbks-host-vnet-integration"
-
-    service_delegation {
-      actions = [
-        "Microsoft.Network/virtualNetworks/subnets/join/action",
-        "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
-        "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action",
-      ]
-      name = "Microsoft.Databricks/workspaces"
-    }
-  }
-}
-
-resource "azurerm_subnet" "databricks_container" {
-  name                 = "subnet-dbks-container-${var.naming_suffix}"
-  resource_group_name  = var.core_rg_name
-  virtual_network_name = data.azurerm_virtual_network.core.name
-  address_prefixes     = [var.databricks_container_address_space]
-
-  delegation {
-    name = "dbks-container-vnet-integration"
-
-    service_delegation {
-      actions = [
-        "Microsoft.Network/virtualNetworks/subnets/join/action",
-        "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
-        "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action",
-      ]
-      name = "Microsoft.Databricks/workspaces"
-    }
-  }
-
-  # Prevent operation conflicts on vnet
-  depends_on = [
-    azurerm_subnet.databricks_host
-  ]
-}
-
 resource "azurerm_subnet_network_security_group_association" "databricks_container" {
-  subnet_id                 = azurerm_subnet.databricks_container.id
+  subnet_id                 = var.databricks_container_subnet_id
   network_security_group_id = azurerm_network_security_group.databricks.id
 }
 
 resource "azurerm_subnet_network_security_group_association" "databricks_host" {
-  subnet_id                 = azurerm_subnet.databricks_host.id
+  subnet_id                 = var.databricks_host_subnet_id
   network_security_group_id = azurerm_network_security_group.databricks.id
 }
 
@@ -102,24 +57,18 @@ resource "azurerm_route" "databricks_extinfra_ips" {
 }
 
 resource "azurerm_subnet_route_table_association" "databricks_container" {
-  subnet_id      = azurerm_subnet.databricks_container.id
+  subnet_id      = data.azurerm_subnet.databricks_container.id
   route_table_id = azurerm_route_table.databricks_udrs.id
 }
 
 resource "azurerm_subnet_route_table_association" "databricks_host" {
-  subnet_id      = azurerm_subnet.databricks_host.id
+  subnet_id      = data.azurerm_subnet.databricks_host.id
   route_table_id = azurerm_route_table.databricks_udrs.id
 }
 
 resource "azurerm_subnet_route_table_association" "shared" {
   subnet_id      = var.core_subnet_id
   route_table_id = azurerm_route_table.databricks_udrs.id
-
-  # Prevent operation conflicts on vnet
-  depends_on = [
-    azurerm_subnet.databricks_host,
-    azurerm_subnet.databricks_container
-  ]
 }
 
 resource "azurerm_private_endpoint" "databricks_control_plane" {

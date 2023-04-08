@@ -130,6 +130,7 @@ inputs = {
   core_rg_location        = dependency.core.outputs.core_rg_location
   core_kv_id              = dependency.core.outputs.core_kv_id
   core_log_analytics_name = dependency.core.outputs.core_log_analytics_name
+  serve_webapps_subnet_id = dependency.core.outputs.webapps_subnet_id
 
   transform_feature_store_server_name        = dependency.transform.outputs.feature_store_server_name
   transform_feature_store_db_name            = dependency.transform.outputs.feature_store_db_name
@@ -141,7 +142,6 @@ inputs = {
   serve_app_service_plan_name = dependency.serve.outputs.app_service_plan_name
   serve_acr_name              = dependency.serve.outputs.acr_name
   serve_cosmos_account_name   = dependency.serve.outputs.cosmos_account_name
-  serve_webapps_subnet_id     = dependency.serve.outputs.webapps_subnet_id
 
   github_app_cert = local.github_app_cert
   apps            = local.merged_apps_config

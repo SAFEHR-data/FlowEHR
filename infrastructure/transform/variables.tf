@@ -20,11 +20,11 @@ variable "naming_suffix_truncated" {
   type = string
 }
 
-variable "databricks_host_address_space" {
+variable "databricks_host_subnet_name" {
   type = string
 }
 
-variable "databricks_container_address_space" {
+variable "databricks_container_subnet_name" {
   type = string
 }
 
