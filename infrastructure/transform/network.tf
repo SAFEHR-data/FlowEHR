@@ -19,13 +19,13 @@ resource "azurerm_network_security_group" "databricks" {
   tags                = var.tags
 }
 
-resource "azurerm_subnet_network_security_group_association" "databricks_container" {
-  subnet_id                 = data.azurerm_subnet.databricks_container.id
+resource "azurerm_subnet_network_security_group_association" "databricks_host" {
+  subnet_id                 = data.azurerm_subnet.databricks_host.id
   network_security_group_id = azurerm_network_security_group.databricks.id
 }
 
-resource "azurerm_subnet_network_security_group_association" "databricks_host" {
-  subnet_id                 = data.azurerm_subnet.databricks_host.id
+resource "azurerm_subnet_network_security_group_association" "databricks_container" {
+  subnet_id                 = data.azurerm_subnet.databricks_container.id
   network_security_group_id = azurerm_network_security_group.databricks.id
 }
 
