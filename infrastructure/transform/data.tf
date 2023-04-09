@@ -33,16 +33,6 @@ data "azurerm_subnet" "databricks_container" {
   resource_group_name  = var.core_rg_name
 }
 
-data "databricks_spark_version" "latest_lts" {
-  spark_version = var.transform.spark_version
-  depends_on    = [azurerm_databricks_workspace.databricks]
-}
-
-data "databricks_node_type" "smallest" {
-  # Providing no required configuration, Databricks will pick the smallest node possible
-  depends_on = [azurerm_databricks_workspace.databricks]
-}
-
 data "azurerm_client_config" "current" {}
 
 # get the MSGraph app

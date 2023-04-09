@@ -34,17 +34,28 @@ resource "azurerm_databricks_workspace" "databricks" {
   }
 }
 
-// Allow Databricks network setting propagation
+// Allow Databricks network configuration to propagate
 resource "time_sleep" "wait_for_databricks_network" {
   create_duration = "180s"
 
   depends_on = [
+    azurerm_databricks_workspace.databricks,
     azurerm_private_endpoint.databricks_control_plane,
     azurerm_private_endpoint.databricks_filesystem,
     azurerm_subnet_route_table_association.databricks_host,
     azurerm_subnet_route_table_association.databricks_container,
     azurerm_subnet_route_table_association.shared
   ]
+}
+
+data "databricks_spark_version" "latest_lts" {
+  spark_version = var.transform.spark_version
+  depends_on    = [time_sleep.wait_for_databricks_network]
+}
+
+data "databricks_node_type" "smallest" {
+  # Providing no required configuration, Databricks will pick the smallest node possible
+  depends_on = [time_sleep.wait_for_databricks_network]
 }
 
 resource "databricks_cluster" "fixed_single_node" {
@@ -86,9 +97,7 @@ resource "databricks_cluster" "fixed_single_node" {
     "ResourceClass" = "SingleNode"
   }
 
-  depends_on = [
-    time_sleep.wait_for_databricks_network
-  ]
+  depends_on = [time_sleep.wait_for_databricks_network]
 }
 
 # databricks secret scope, in-built. Not able to use key vault backed scope due to limitation in databricks:
