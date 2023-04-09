@@ -188,7 +188,7 @@ jobs:
   summary:
     name: Summary
     needs: [pr_comment, run_test]
-    if: always() # Run even on test failure
+    if: always() && needs.run_test.result != 'skipped' # Run even on test failure
     runs-on: ubuntu-latest
     environment: infra-test
     steps:
