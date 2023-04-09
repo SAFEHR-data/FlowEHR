@@ -188,6 +188,7 @@ jobs:
   summary:
     name: Summary
     needs: [pr_comment, run_test]
+    if: always()
     runs-on: ubuntu-latest
     environment: infra-test
     steps:
