@@ -154,6 +154,13 @@ resource "azurerm_private_endpoint" "blob" {
     private_connection_resource_id = azurerm_storage_account.core.id
     subresource_names              = ["Blob"]
   }
+
+  # Wait for all subnet operations to avoid operation conflicts
+  depends_on = [
+    azurerm_subnet.core_shared,
+    azurerm_subnet.databricks_host,
+    azurerm_subnet.databricks_container
+  ]
 }
 
 
@@ -179,6 +186,13 @@ resource "azurerm_private_endpoint" "keyvault" {
     private_connection_resource_id = azurerm_key_vault.core.id
     subresource_names              = ["Vault"]
   }
+
+  # Wait for all subnet operations to avoid operation conflicts
+  depends_on = [
+    azurerm_subnet.core_shared,
+    azurerm_subnet.databricks_host,
+    azurerm_subnet.databricks_container
+  ]
 }
 
 resource "azurerm_network_security_group" "core" {
