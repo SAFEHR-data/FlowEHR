@@ -48,6 +48,10 @@ variable "tf_in_automation" {
   type = bool
 }
 
+variable "deployer_ip" {
+  type = string
+}
+
 variable "accesses_real_data" {
   type = bool
 }

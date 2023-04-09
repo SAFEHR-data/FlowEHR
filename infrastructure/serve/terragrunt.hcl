@@ -39,5 +39,6 @@ inputs = {
   core_kv_id                  = dependency.core.outputs.core_kv_id
   core_vnet_name              = dependency.core.outputs.core_vnet_name
   core_subnet_id              = dependency.core.outputs.core_subnet_id
+  deployer_ip                 = dependency.core.outputs.deployer_ip
   private_dns_zones           = dependency.core.outputs.private_dns_zones
 }

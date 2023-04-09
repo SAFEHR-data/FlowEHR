@@ -140,7 +140,7 @@ resource "azurerm_private_endpoint" "blob" {
   tags                = var.tags
 
   private_dns_zone_group {
-    name = "private-dns-zone-group-kblob-${local.naming_suffix}"
+    name = "private-dns-zone-group-blob-${local.naming_suffix}"
     private_dns_zone_ids = [
       var.private_dns_zones_rg == null
       ? azurerm_private_dns_zone.created_zones["blob"].id

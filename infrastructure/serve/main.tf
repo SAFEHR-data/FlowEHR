@@ -20,21 +20,21 @@ resource "azurerm_application_insights" "serve" {
   tags                = var.tags
 }
 
-resource "azurerm_storage_account" "serve" {
+resource "azurerm_storage_account" "aml" {
   name                              = "strgaml${var.naming_suffix_truncated}"
   location                          = var.core_rg_location
   resource_group_name               = var.core_rg_name
   account_tier                      = "Standard"
   account_replication_type          = "GRS"
   infrastructure_encryption_enabled = true
-  public_network_access_enabled     = false
+  public_network_access_enabled     = !var.tf_in_automation
   enable_https_traffic_only         = true
   tags                              = var.tags
 
   network_rules {
-    default_action             = "Deny"
-    bypass                     = ["AzureServices"]
-    virtual_network_subnet_ids = [var.core_subnet_id]
+    bypass         = ["AzureServices"]
+    default_action = "Deny"
+    ip_rules       = var.tf_in_automation ? null : [var.deployer_ip]
   }
 
   blob_properties {
@@ -56,12 +56,16 @@ resource "azurerm_machine_learning_workspace" "serve" {
   resource_group_name     = var.core_rg_name
   application_insights_id = azurerm_application_insights.serve.id
   key_vault_id            = var.core_kv_id
-  storage_account_id      = azurerm_storage_account.serve.id
+  storage_account_id      = azurerm_storage_account.aml.id
   tags                    = var.tags
 
   identity {
     type = "SystemAssigned"
   }
+
+  depends_on = [
+    azurerm_private_endpoint.aml_blob
+  ]
 }
 
 resource "azurerm_container_registry" "serve" {
