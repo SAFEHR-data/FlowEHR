@@ -20,12 +20,12 @@ resource "azurerm_network_security_group" "databricks" {
 }
 
 resource "azurerm_subnet_network_security_group_association" "databricks_container" {
-  subnet_id                 = var.databricks_container_subnet_id
+  subnet_id                 = data.azurerm_subnet.databricks_container.id
   network_security_group_id = azurerm_network_security_group.databricks.id
 }
 
 resource "azurerm_subnet_network_security_group_association" "databricks_host" {
-  subnet_id                 = var.databricks_host_subnet_id
+  subnet_id                 = data.azurerm_subnet.databricks_host.id
   network_security_group_id = azurerm_network_security_group.databricks.id
 }
 
