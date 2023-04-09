@@ -103,5 +103,6 @@ resource "databricks_cluster" "fixed_single_node" {
 # databricks secret scope, in-built. Not able to use key vault backed scope due to limitation in databricks:
 # https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secret-scopes#--create-an-azure-key-vault-backed-secret-scope-using-the-databricks-cli 
 resource "databricks_secret_scope" "secrets" {
-  name = "flowehr-secrets"
+  name       = "flowehr-secrets"
+  depends_on = [time_sleep.wait_for_databricks_network]
 }
