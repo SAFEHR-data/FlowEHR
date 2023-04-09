@@ -13,19 +13,19 @@
 #  limitations under the License.
 
 resource "azurerm_private_endpoint" "aml_blob" {
-  name                = "pe-aml-blob-${local.naming_suffix}"
+  name                = "pe-aml-blob-${var.naming_suffix}"
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
   subnet_id           = var.core_subnet_id
   tags                = var.tags
 
   private_dns_zone_group {
-    name                 = "private-dns-zone-group-blob-${local.naming_suffix}"
+    name                 = "private-dns-zone-group-blob-${var.naming_suffix}"
     private_dns_zone_ids = [var.private_dns_zones["blob"].id]
   }
 
   private_service_connection {
-    name                           = "private-service-connection-aml-blob-${local.naming_suffix}"
+    name                           = "private-service-connection-aml-blob-${var.naming_suffix}"
     is_manual_connection           = false
     private_connection_resource_id = azurerm_storage_account.aml.id
     subresource_names              = ["Blob"]
