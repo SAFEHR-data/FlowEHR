@@ -20,12 +20,8 @@ resource "azurerm_private_endpoint" "aml_blob" {
   tags                = var.tags
 
   private_dns_zone_group {
-    name = "private-dns-zone-group-aml-blob-${local.naming_suffix}"
-    private_dns_zone_ids = [
-      var.private_dns_zones_rg == null
-      ? azurerm_private_dns_zone.created_zones["blob"].id
-      : data.azurerm_private_dns_zone.existing_zones["blob"].id
-    ]
+    name                 = "private-dns-zone-group-blob-${local.naming_suffix}"
+    private_dns_zone_ids = [var.private_dns_zones["blob"].id]
   }
 
   private_service_connection {

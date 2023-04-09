@@ -26,35 +26,24 @@ resource "azurerm_databricks_workspace" "databricks" {
   custom_parameters {
     no_public_ip                                         = true
     storage_account_name                                 = local.storage_account_name
-    public_subnet_name                                   = var.databricks_host_subnet_name
-    private_subnet_name                                  = var.databricks_container_subnet_name
+    public_subnet_name                                   = data.azurerm_subnet.databricks_host.name
+    private_subnet_name                                  = data.azurerm_subnet.databricks_container.name
     virtual_network_id                                   = data.azurerm_virtual_network.core.id
     public_subnet_network_security_group_association_id  = azurerm_subnet_network_security_group_association.databricks_host.id
     private_subnet_network_security_group_association_id = azurerm_subnet_network_security_group_association.databricks_container.id
   }
-
-  depends_on = [
-    azurerm_subnet_route_table_association.databricks_host,
-    azurerm_subnet_route_table_association.databricks_container
-  ]
 }
 
-data "databricks_spark_version" "latest_lts" {
-  spark_version = var.transform.spark_version
-  depends_on    = [azurerm_databricks_workspace.databricks]
-}
-
-data "databricks_node_type" "smallest" {
-  # Providing no required configuration, Databricks will pick the smallest node possible
-  depends_on = [azurerm_databricks_workspace.databricks]
-}
-
-resource "time_sleep" "wait_for_databricks_pe" {
+// Allow Databricks network setting propagation
+resource "time_sleep" "wait_for_databricks_network" {
   create_duration = "180s"
 
   depends_on = [
     azurerm_private_endpoint.databricks_control_plane,
-    azurerm_private_endpoint.databricks_filesystem
+    azurerm_private_endpoint.databricks_filesystem,
+    azurerm_subnet_route_table_association.databricks_host,
+    azurerm_subnet_route_table_association.databricks_container,
+    azurerm_subnet_route_table_association.shared
   ]
 }
 
@@ -98,7 +87,7 @@ resource "databricks_cluster" "fixed_single_node" {
   }
 
   depends_on = [
-    time_sleep.wait_for_databricks_pe
+    time_sleep.wait_for_databricks_network
   ]
 }
 
