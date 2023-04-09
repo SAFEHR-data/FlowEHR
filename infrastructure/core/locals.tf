@@ -16,7 +16,7 @@ locals {
   naming_suffix           = var.suffix_override == "" ? "${var.flowehr_id}-${var.environment}" : var.suffix_override
   naming_suffix_truncated = substr(replace(replace(local.naming_suffix, "-", ""), "_", ""), 0, 17)
 
-  # Split the /24 address space into (30, 30, 62, 62, 62) usable IP addresses
+  # Split the /24 address space into (30, 30, 62, 62) usable IP addresses
   # for the different terraform modules/required delegations
   subnet_address_spaces              = cidrsubnets(azurerm_virtual_network.core.address_space[0], 3, 3, 2, 2)
   core_shared_address_space          = local.subnet_address_spaces[0]
