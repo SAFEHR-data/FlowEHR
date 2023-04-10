@@ -154,7 +154,7 @@ jobs:
     secrets: inherit
 
   destroy_cleanup: # Clean up state and dev container if destroy successful
-    needs: [destroy_pr_env]
+    needs: [pr_comment, destroy_pr_env]
     name: Clean-up
     uses: ./.github/workflows/clean_state.yml
     with:
@@ -177,7 +177,7 @@ jobs:
     secrets: inherit
 
   test_cleanup: # Clean up state and dev container if test successful
-    needs: [run_test]
+    needs: [pr_comment, run_test]
     name: Clean-up
     uses: ./.github/workflows/clean_state.yml
     with:
