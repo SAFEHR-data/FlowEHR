@@ -42,6 +42,7 @@ on:
 
 jobs:
   clean:
+    name: Clean devcontainer & TF state
     runs-on: [self-hosted, "${{ vars.CI_GITHUB_RUNNER_LABEL }}"]
     environment: ${{ inputs.environment }}
     steps:

@@ -54,6 +54,7 @@ on:
 
 jobs:
   make:
+    name: make ${{ inputs.command }}
     runs-on: [self-hosted, "${{ vars.CI_GITHUB_RUNNER_LABEL }}"]
     environment: ${{ inputs.environment }}
     steps:
