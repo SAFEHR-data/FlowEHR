@@ -50,16 +50,17 @@ jobs:
         uses: azure/login@v1
         with:
           creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
-      - name: Clean
+      - name: Delete TF state
         run: |
-          az config set extension.use_dynamic_install=yes_without_prompt
-          az acr repository delete \
+          az storage fs directory delete \
+            --file-system tfstate \
+            --name ${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }} \
+            --account-name ${{ vars.CI_STORAGE_ACCOUNT }} \
+            --auth-mode login \
+            --yes
+      - name: Untag devcontainer image
+        run: |
+          az acr repository untag \
             --name ${{ vars.CI_CONTAINER_REGISTRY }} \
             --image ${{ inputs.devcontainer_name }}:${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }} \
             --yes
-          az storage blob directory delete \
-            -c tfstate \
-            -d ${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }} \
-            --account-name ${{ vars.CI_STORAGE_ACCOUNT }} \
-            --auth-mode login \
-            --recursive
