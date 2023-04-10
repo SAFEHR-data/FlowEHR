@@ -46,13 +46,13 @@ This layer deploys the core components required for other layers, including a nu
 | | `CIS 3.7`: Ensure 'Public Access Level' is disabled | Y | |
 | | `CIS 3.8`: Ensure Default Network Access Rule is set to 'Deny' | Y | |
 | | `CIS 3.9`: Ensure 'Trusted Azure Services' can access the storage account | Y | |
-| | `CIS 3.10`: Ensure Private Endpoints are used to access storage accounts | n/a | Using VNET integration |
+| | `CIS 3.10`: Ensure Private Endpoints are used to access storage accounts | Y | |
 | | `CIS 3.11`: Ensure Soft Delete is enabled | Y | |
 | | `CIS 3.12`: Ensure storage is encrypted with Customer Managed Keys | N | Will use Microsoft Managed Keys to reduce management overhead |
 | | `CIS: 3.13`: Ensure Storage Logging is enabled for 'read', 'write' and 'delete' requests | Y | | 
 | | `CIS 3.15`: Ensure Minimum TLS Version is set to 1.2 | Y | |
 | Azure Key Vault: <br/>`kv-<suffix>` | `CIS 8` | [main.tf](./infrastructure/core/main.tf)  | |
-| | `CIS 8.5`: Ensure the key vault is recoverable | Y | | 
+| | `CIS 8.5`: Ensure the key vault is recoverable | Y | Purge protection enabled for prod environments | 
 | | `CIS 8.6`: Ensure RBAC enabled for Azure Key Vault | Y | | 
 | | `CIS 8.7`: Ensure Private Endpoints are used for Azure Key Vault | Y | Public internet access disabled, PE into VNET |
 | | `CIS 10.1`: Ensure that resource locks are set for critical resources | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/124 |
