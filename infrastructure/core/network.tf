@@ -152,7 +152,7 @@ resource "azurerm_private_endpoint" "blob" {
     name                           = "private-service-connection-blob-${local.naming_suffix}"
     is_manual_connection           = false
     private_connection_resource_id = azurerm_storage_account.core.id
-    subresource_names              = ["Blob"]
+    subresource_names              = ["blob"]
   }
 
   # Wait for all subnet operations to avoid operation conflicts

@@ -56,13 +56,13 @@ resource "azurerm_route" "databricks_extinfra_ips" {
   next_hop_type       = "Internet"
 }
 
-resource "azurerm_subnet_route_table_association" "databricks_container" {
-  subnet_id      = data.azurerm_subnet.databricks_container.id
+resource "azurerm_subnet_route_table_association" "databricks_host" {
+  subnet_id      = data.azurerm_subnet.databricks_host.id
   route_table_id = azurerm_route_table.databricks_udrs.id
 }
 
-resource "azurerm_subnet_route_table_association" "databricks_host" {
-  subnet_id      = data.azurerm_subnet.databricks_host.id
+resource "azurerm_subnet_route_table_association" "databricks_container" {
+  subnet_id      = data.azurerm_subnet.databricks_container.id
   route_table_id = azurerm_route_table.databricks_udrs.id
 }
 
@@ -102,7 +102,7 @@ resource "azurerm_private_endpoint" "databricks_filesystem" {
     name                           = "private-service-connection-databricks-filesystem-${var.naming_suffix}"
     private_connection_resource_id = join("", [azurerm_databricks_workspace.databricks.managed_resource_group_id, "/providers/Microsoft.Storage/storageAccounts/${local.storage_account_name}"])
     is_manual_connection           = false
-    subresource_names              = ["Blob"]
+    subresource_names              = ["blob"]
   }
 
   private_dns_zone_group {

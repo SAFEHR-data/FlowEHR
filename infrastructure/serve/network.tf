@@ -28,6 +28,6 @@ resource "azurerm_private_endpoint" "aml_blob" {
     name                           = "private-service-connection-aml-blob-${var.naming_suffix}"
     is_manual_connection           = false
     private_connection_resource_id = azurerm_storage_account.aml.id
-    subresource_names              = ["Blob"]
+    subresource_names              = ["blob"]
   }
 }
