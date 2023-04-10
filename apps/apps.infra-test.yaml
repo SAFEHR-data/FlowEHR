@@ -1,10 +1,6 @@
 ---
 flowehr_cicd_test:
   add_testing_slot: false
-  owners:
-    jjgriff93: jamesgr_microsoft.com#EXT#@MngEnv888133.onmicrosoft.com
-  contributors:
-    jjgriff93: jamesgr_microsoft.com#EXT#@MngEnv888133.onmicrosoft.com
   managed_repo:
     private: false
     template: UCLH-Foundry/Dash-Seedling
