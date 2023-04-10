@@ -110,7 +110,7 @@ jobs:
         with:
           imageName: ${{ steps.dc.outputs.image_path }}
           imageTag: ${{ steps.dc.outputs.tag }}
-          runCmd: make ${{ steps.post_core.outputs.setup_command }}
+          runCmd: make ${{ inputs.command }}
           push: never
           env: |
             DOCKER_BUILDKIT=1

@@ -149,7 +149,7 @@ jobs:
     with:
       suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
       environment: infra-test
-      command: ${{ needs.pr_comment.outputs.command }}
+      command: ${{ needs.pr_comment.outputs.makeCommand }}
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}
     secrets: inherit
 
