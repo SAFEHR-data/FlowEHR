@@ -35,7 +35,7 @@
 		"ghcr.io/devcontainers-contrib/features/pre-commit:2": {},
 		"ghcr.io/lukewiwa/features/shellcheck:0": {},
 		"ghcr.io/eitsupi/devcontainer-features/jq-likes:1": {
-			"jqVersion": "1",
+			"jqVersion": "1.6",
 			"yqVersion": "4"
 		},
 		"ghcr.io/jlaundry/devcontainer-features/mssql-odbc-driver:1": {
