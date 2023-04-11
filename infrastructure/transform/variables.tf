@@ -73,7 +73,8 @@ variable "core_storage_account_name" {
 }
 
 variable "accesses_real_data" {
-  type = bool
+  type    = bool
+  default = false
 }
 
 variable "private_dns_zones" {

@@ -16,10 +16,6 @@ variable "flowehr_id" {
   type = string
 }
 
-variable "environment" {
-  type = string
-}
-
 variable "location" {
   type = string
 }
@@ -31,4 +27,19 @@ variable "tf_in_automation" {
     condition     = !var.tf_in_automation
     error_message = "Auth should be ran locally to create credentials for CI. Please run this from a local machine as a user with rights to assign AD roles."
   }
+}
+
+variable "accesses_real_data" {
+  type    = bool
+  default = false
+}
+
+variable "ci_storage_account" {
+  type        = string
+  description = "The name of the storage account used for CI deployments"
+}
+
+variable "ci_resource_group" {
+  type        = string
+  description = "The name of the resource group containing the CI storage account"
 }

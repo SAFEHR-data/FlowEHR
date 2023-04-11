@@ -53,7 +53,8 @@ variable "deployer_ip" {
 }
 
 variable "accesses_real_data" {
-  type = bool
+  type    = bool
+  default = false
 }
 
 variable "private_dns_zones" {

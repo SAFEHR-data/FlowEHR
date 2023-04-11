@@ -114,17 +114,7 @@ This step will create an AAD Application and Service Principal in the specified 
 
 > Note: if you want to reference secrets in these files (i.e. a data source password), you can use the syntax: `${MY_SECRET}`. In the CICD workflow, matching GitHub secrets will be searched for and, if found, will replace these tokens before running deployment steps.
 
-3. Create a deployer identity (AAD App Registration/Service Principal) with required AAD permissions: 
-
-    ```bash
-    make auth
-    ```
-
-    > _NOTE_: CI deployments require a service principal with access to deploy resources in the subscription. See `sp-flowehr-cicd-<naming-suffix>` in the [identities section](#identities) for the roles that are assigned to this.
-
-    Copy the outputted values to populate in step 5.
-
-4. Create a GitHub PAT (access token)
+3. Create a GitHub PAT (access token)
 
     We require a GitHub [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#fine-grained-personal-access-tokens) with scopes to clone any transform repositories defined in `config.infra-test.yaml` (or `config.yaml` if you haven't defined env-specific repositories).
 
@@ -142,11 +132,21 @@ This step will create an AAD Application and Service Principal in the specified 
 
     > Note: if you're not an owner of the Organization you defined as Resource Owner for the token, your token won't be active until approved by an owner.
 
-5. Deploy a bootstrap environment
+4. Deploy a bootstrap environment
 
     For CI deployments, due to certain resources being deployed within a Virtual Network with public access disabled, we need to use private build agents (also called self-hosted GitHub runners) to run our CI pipelines. We also need somewhere to store the associated container images and Terraform state within a vnet.
 
     You can use [the Azure Bootstrap template](https://github.com/UCLH-Foundry/Azure-Bootstrap) to deploy all these resources, or alternatively, you can reference pre-existing resources in the next step.
+
+5. Create a deployer identity (AAD App Registration/Service Principal) with required AAD permissions: 
+
+    ```bash
+    make auth
+    ```
+
+    > _NOTE_: CI deployments require a service principal with access to deploy resources in the subscription. See `sp-flowehr-cicd-<naming-suffix>` in the [identities section](#identities) for the roles that are assigned to this.
+
+    You will be prompted to enter the `ci_resource_group` and `ci_storage_account` values outputted from the previous step. Once ran, copy the outputted credentials to populate in the next step.
 
 6. Create and populate a GitHub environment
 

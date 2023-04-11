@@ -19,7 +19,7 @@ resource "azuread_service_principal" "msgraph" {
 }
 
 resource "azuread_application" "ci_app" {
-  display_name = "sp-flowehr-cicd-${var.flowehr_id}-${var.environment}"
+  display_name = "sp-flowehr-ci-${var.flowehr_id}"
   owners       = [data.azurerm_client_config.current.object_id]
 
   required_resource_access {
@@ -58,5 +58,12 @@ resource "azuread_app_role_assignment" "grant_consent" {
 resource "azurerm_role_assignment" "ci_app_owner" {
   scope                = data.azurerm_subscription.primary.id
   role_definition_name = "Owner"
+  principal_id         = azuread_service_principal.ci_app.id
+}
+
+# enable CI to manage blobs within CI storage account
+resource "azurerm_role_assignment" "ci_storage_data_contributor" {
+  scope                = data.azurerm_storage_account.ci.id
+  role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azuread_service_principal.ci_app.id
 }
