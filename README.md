@@ -175,7 +175,7 @@ This step will create an AAD Application and Service Principal in the specified 
 
 ### Next steps
 
-- Deploy a data transformation pipeline (TODO)
+- [Deploy a data transformation pipeline](https://github.com/UCLH-Foundry/FlowEHR-Data-Pot/blob/main/README.md)
 - [Configure and deploy a FlowEHR app](./apps/README.md)
 
 
