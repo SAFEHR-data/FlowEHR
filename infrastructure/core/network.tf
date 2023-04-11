@@ -12,8 +12,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-resource "random_integer" "ip" {
-  count = var.use_random_address_space ? 2 : 0
+resource "random_integer" "ip1" {
+  count = var.use_random_address_space ? 1 : 0
+  min   = 65
+  max   = 69
+  keepers = {
+    suffix = local.naming_suffix
+  }
+}
+
+resource "random_integer" "ip2" {
+  count = var.use_random_address_space ? 1 : 0
   min   = 0
   max   = 255
   keepers = {
@@ -29,7 +38,7 @@ resource "azurerm_virtual_network" "core" {
 
   address_space = [
     var.use_random_address_space
-    ? "10.${random_integer.ip[0].result}.${random_integer.ip[1].result}.0/24"
+    ? "10.${random_integer.ip1[0].result}.${random_integer.ip2[0].result}.0/24"
     : var.core_address_space
   ]
 }

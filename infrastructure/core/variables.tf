@@ -76,7 +76,7 @@ variable "core_address_space" {
 variable "use_random_address_space" {
   type        = bool
   description = <<EOF
-Whether to randomise the core address space (if set to true this will override the core_address_space variable).
+Whether to randomise the core address space wihin 10.65.0.0 <-> 10.69.255.254 (if true this will override var.core_address_space).
 Use for PR/transient environments that peer with other static vnets (i.e. data sources) to reduce chance of conflicts."
 EOF
   default     = false
