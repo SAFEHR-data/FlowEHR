@@ -33,7 +33,6 @@ provider "azurerm" {
       recover_soft_deleted_keys         = true
     }
   }
-  skip_provider_registration = "true"
 }
 EOF
 
