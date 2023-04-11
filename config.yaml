@@ -1,7 +1,7 @@
 ---
-flowehr_id: flowehr21
+flowehr_id: flowehr
 location: uksouth
-environment: local21
+environment: infra-test
 accesses_real_data: false
 core_address_space: 10.64.0.0/22
 
