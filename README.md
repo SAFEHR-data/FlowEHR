@@ -142,13 +142,20 @@ This step will create an AAD Application and Service Principal in the specified 
 
     > Note: if you're not an owner of the Organization you defined as Resource Owner for the token, your token won't be active until approved by an owner.
 
-5. Create and populate a GitHub environment
+5. Deploy a bootstrap environment
 
-    Add an environment called `infra-test` (or whatever you called your deployment environment earlier) with the following environment variables:
+    For CI deployments, due to certain resources being deployed within a Virtual Network with public access disabled, we need to use private build agents (also called self-hosted GitHub runners) to run our CI pipelines. We also need somewhere to store the associated container images and Terraform state within a vnet.
 
-    - `CI_RESOURCE_GROUP`: Resource group for shared CI resources (outputted from step 3)
-    - `CI_CONTAINER_REGISTRY`: Name of the Azure Container Registry to use for the devcontainer storage (outputted from step 3)
-    - `CI_STORAGE_ACCOUNT`: Storage account for shared CI state storage (outputted from step 3)
+    You can use [the Azure Bootstrap template](https://github.com/UCLH-Foundry/Azure-Bootstrap) to deploy all these resources, or alternatively, you can reference pre-existing resources in the next step.
+
+6. Create and populate a GitHub environment
+
+    Add an environment called `infra-test` (or whatever you called your deployment environment earlier) with the following environment variables, using the values outputted from the previous step:
+
+    - `CI_RESOURCE_GROUP`: Resource group for shared CI resources
+    - `CI_CONTAINER_REGISTRY`: Name of the Azure Container Registry to use for the devcontainer storage
+    - `CI_STORAGE_ACCOUNT`: Storage account for shared CI state storage
+    - `CI_PEERING_VNET`: Virtual network for your CI environment which FlowEHR will peer to
 
     And the following secrets:
 
@@ -158,9 +165,11 @@ This step will create an AAD Application and Service Principal in the specified 
     - `ARM_CLIENT_SECRET`: Client secret of the service principal created in step 3
     - `FLOWEHR_REPOSITORIES_GH_TOKEN`: The token you created in the previous step (this may be added as a repository or organisation secret rather than environment secret and be re-used betweeen environments if you prefer)
 
-> If you used any tokens in your config yaml files, make sure you populate the equivalent GitHub secret with an identical name so that the token replacement step will substitute your secret(s) into the configuration on deploy (e.g. if you put `${SQL_CONN_STRING}` in config.yaml, make sure you have a GitHub secret called `SQL_CONN_STRING` containing the secret value).
+    > If you used any tokens in your config yaml files, make sure you populate the equivalent GitHub secret with an identical name so that the token replacement step will substitute your secret(s) into the configuration on deploy (e.g. if you put `${SQL_CONN_STRING}` in config.yaml, make sure you have a GitHub secret called `SQL_CONN_STRING` containing the secret value).
 
-6. Run `Deploy Infra-Test`
+    Finally, add a repository-scoped variable (or organization-scoped if you wish to use across multiple repos) called `CI_GITHUB_RUNNER_LABEL`, with the name of the GitHub runner label outputted from the previous step. This will tell FlowEHR actions workflows to use our private agent instead of a public runner.
+
+7. Run `Deploy Infra-Test`
 
     Trigger a deployment using a workflow dispatch trigger on the `Actions` tab.
 
