@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 include "root" {
-  path   = find_in_parent_folders()
+  path = find_in_parent_folders()
 }
 
 locals {
@@ -24,17 +24,17 @@ dependency "core" {
   config_path = "../core"
 
   mock_outputs = {
-    core_rg_name                       = "core_rg_name"
-    core_rg_location                   = "core_rg_location"
-    core_vnet_name                     = "core_vnet_name"
-    core_subnet_id                     = "core_subnet_id"
-    core_kv_id                         = "core_kv_id"
-    core_kv_uri                        = "core_kv_uri"
-    databricks_host_address_space      = "databricks_host_address_space"
-    databricks_container_address_space = "databricks_container_address_space"
-    developers_ad_group_principal_id   = "developers_ad_group_principal_id"
+    core_rg_name                          = "core_rg_name"
+    core_rg_location                      = "core_rg_location"
+    core_vnet_name                        = "core_vnet_name"
+    core_subnet_id                        = "core_subnet_id"
+    core_kv_id                            = "core_kv_id"
+    core_kv_uri                           = "core_kv_uri"
+    databricks_host_address_space         = "databricks_host_address_space"
+    databricks_container_address_space    = "databricks_container_address_space"
+    developers_ad_group_principal_id      = "developers_ad_group_principal_id"
     data_scientists_ad_group_principal_id = "data_scientists_ad_group_principal_id"
-    developers_ad_group_display_name = "developers_ad_group_display_name"
+    developers_ad_group_display_name      = "developers_ad_group_display_name"
     data_scientists_ad_group_display_name = "data_scientists_ad_group_display_name"
   }
   mock_outputs_allowed_terraform_commands = ["destroy"]
@@ -72,18 +72,18 @@ EOF
 }
 
 inputs = {
-  core_rg_name                       = dependency.core.outputs.core_rg_name
-  core_rg_location                   = dependency.core.outputs.core_rg_location
-  core_vnet_name                     = dependency.core.outputs.core_vnet_name
-  core_subnet_id                     = dependency.core.outputs.core_subnet_id
-  core_kv_id                         = dependency.core.outputs.core_kv_id
-  core_kv_uri                        = dependency.core.outputs.core_kv_uri
-  p0_action_group_id                 = dependency.core.outputs.p0_action_group_id
-  core_storage_account_name          = dependency.core.outputs.storage_account_name
-  databricks_host_address_space      = dependency.core.outputs.databricks_host_address_space
-  databricks_container_address_space = dependency.core.outputs.databricks_container_address_space
-  developers_ad_group_principal_id   = dependency.core.outputs.developers_ad_group_principal_id
-  data_scientists_ad_group_principal_id   = dependency.core.outputs.data_scientists_ad_group_principal_id
-  developers_ad_group_display_name   = dependency.core.outputs.developers_ad_group_display_name
-  data_scientists_ad_group_display_name   = dependency.core.outputs.data_scientists_ad_group_display_name
+  core_rg_name                          = dependency.core.outputs.core_rg_name
+  core_rg_location                      = dependency.core.outputs.core_rg_location
+  core_vnet_name                        = dependency.core.outputs.core_vnet_name
+  core_subnet_id                        = dependency.core.outputs.core_subnet_id
+  core_kv_id                            = dependency.core.outputs.core_kv_id
+  core_kv_uri                           = dependency.core.outputs.core_kv_uri
+  p0_action_group_id                    = dependency.core.outputs.p0_action_group_id
+  core_storage_account_name             = dependency.core.outputs.storage_account_name
+  databricks_host_address_space         = dependency.core.outputs.databricks_host_address_space
+  databricks_container_address_space    = dependency.core.outputs.databricks_container_address_space
+  developers_ad_group_principal_id      = dependency.core.outputs.developers_ad_group_principal_id
+  data_scientists_ad_group_principal_id = dependency.core.outputs.data_scientists_ad_group_principal_id
+  developers_ad_group_display_name      = dependency.core.outputs.developers_ad_group_display_name
+  data_scientists_ad_group_display_name = dependency.core.outputs.data_scientists_ad_group_display_name
 }
