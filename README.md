@@ -163,11 +163,16 @@ This step will create an AAD Application and Service Principal in the specified 
     - `ARM_TENANT_ID`: Tenant ID containing the Azure subscription to deploy into (outputted from step 3)
     - `ARM_SUBSCRIPTION_ID`: Subscription ID of the Azure subscription to deploy into (outputted from step 3)
     - `ARM_CLIENT_SECRET`: Client secret of the service principal created in step 3
-    - `FLOWEHR_REPOSITORIES_GH_TOKEN`: The token you created in the previous step (this may be added as a repository or organisation secret rather than environment secret and be re-used betweeen environments if you prefer)
 
     > If you used any tokens in your config yaml files, make sure you populate the equivalent GitHub secret with an identical name so that the token replacement step will substitute your secret(s) into the configuration on deploy (e.g. if you put `${SQL_CONN_STRING}` in config.yaml, make sure you have a GitHub secret called `SQL_CONN_STRING` containing the secret value).
 
-    Finally, add a repository-scoped variable (or organization-scoped if you wish to use across multiple repos) called `CI_GITHUB_RUNNER_LABEL`, with the name of the GitHub runner label outputted from the previous step. This will tell FlowEHR actions workflows to use our private agent instead of a public runner.
+    Finally, add a repository-scoped variable for the following (or organization-scoped if you wish to use across multiple repos):
+
+    - `CI_GITHUB_RUNNER_LABEL`: the name of the GitHub runner label outputted from the previous step
+
+    And secret:
+
+     - `FLOWEHR_REPOSITORIES_GH_TOKEN`: the GitHub PAT token you created in step 3
 
 7. Run `Deploy Infra-Test`
 
