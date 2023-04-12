@@ -144,7 +144,7 @@ This step will create an AAD Application and Service Principal in the specified 
     make auth
     ```
 
-    > _NOTE_: CI deployments require a service principal with access to deploy resources in the subscription. See `sp-flowehr-cicd-<naming-suffix>` in the [identities section](#identities) for the roles that are assigned to this.
+    > _NOTE_: CI deployments require a service principal with access to deploy resources in the subscription. See `sp-flowehr-ci-<naming-suffix>` in the [identities section](#identities) for the roles that are assigned to this.
 
     You will be prompted to enter the `ci_resource_group` and `ci_storage_account` values outputted from the previous step. Once ran, copy the outputted credentials to populate in the next step.
 
@@ -186,7 +186,7 @@ This table summarises the various authentication identities involved in the depl
 | Name | Type | Access Needed | Purpose |
 |--|--|--|--|
 | Local Developer | User context of developer running `az login` | Azure: `Owner`. <br/> AAD: Either `Global Administrator` or `Priviliged Role Administrator`. | To automate the deployment of resources and identities during development |
-| `sp-flowehr-cicd-<naming-suffix>` | App / Service Principal | Azure: `Owner`. <br/>AAD: `Application.ReadWrite.All` / `AppRoleAssignment.ReadWrite.All` / `Group.ReadWrite.All` / `Directory.Read` | Context for GitHub runner for CICD. Needs to query apps, create new apps (detailed below), create AD groups and view and assign roles to identities |
+| `sp-flowehr-ci-<naming-suffix>` | App / Service Principal | Azure: `Owner`. <br/>AAD: `Application.ReadWrite.All` / `AppRoleAssignment.ReadWrite.All` / `Group.ReadWrite.All` / `Directory.Read` | Context for GitHub runner for CICD. Needs to query apps, create new apps (detailed below), create AD groups and view and assign roles to identities |
 | `flowehr-sql-owner-<naming-suffix>` | App / Service Principal | AAD Administrator of SQL Feature Data Store | Used to connect to SQL as a Service Principal, and create logins + users during deployment |
 | `flowehr-databricks-datawriter-<naming-suffix>` | App / Service Principal | No access to resources or AAD. Added as a `db_owner` of the Feature Data Store database. Credentials stored in databricks secrets to be used in saving features to SQL |
 | `sql-server-features-<naming-suffix>` | System Managed Identity | AAD: `User.Read.All` / `GroupMember.Read.All` / `Application.Read.All` | For SQL to accept AAD connections |
