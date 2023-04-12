@@ -135,3 +135,8 @@ variable "monitoring" {
     alert_recipients = []
   }
 }
+
+
+variable "accesses_real_data" {
+  type = bool
+}

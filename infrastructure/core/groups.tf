@@ -13,12 +13,14 @@
 #  limitations under the License.
 
 resource "azuread_group" "ad_group_developers" {
+  count            = var.accesses_real_data ? 0 : 1
   display_name     = "${var.naming_suffix} flowehr-developers"
   owners           = [data.azurerm_client_config.current.object_id]
   security_enabled = true
 }
 
 resource "azuread_group" "ad_group_data_scientists" {
+  count            = var.accesses_real_data ? 0 : 1
   display_name     = "${var.naming_suffix} flowehr-data-scientists"
   owners           = [data.azurerm_client_config.current.object_id]
   security_enabled = true
