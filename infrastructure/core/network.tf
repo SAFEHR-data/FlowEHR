@@ -12,75 +12,200 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-resource "random_integer" "ip" {
-  count = var.use_random_address_space ? 2 : 0
+resource "random_integer" "ip1" {
+  count = var.use_random_address_space ? 1 : 0
+  min   = 65
+  max   = 69
+  keepers = {
+    suffix = local.naming_suffix
+  }
+}
+
+resource "random_integer" "ip2" {
+  count = var.use_random_address_space ? 1 : 0
   min   = 0
   max   = 255
   keepers = {
-    suffix = var.naming_suffix
+    suffix = local.naming_suffix
   }
 }
 
 resource "azurerm_virtual_network" "core" {
-  name                = "vnet-${var.naming_suffix}"
+  name                = "vnet-${local.naming_suffix}"
   resource_group_name = azurerm_resource_group.core.name
   location            = azurerm_resource_group.core.location
   tags                = var.tags
 
   address_space = [
     var.use_random_address_space
-    ? "10.${random_integer.ip[0].result}.${random_integer.ip[1].result}.0/24"
+    ? "10.${random_integer.ip1[0].result}.${random_integer.ip2[0].result}.0/24"
     : var.core_address_space
   ]
 }
 
 resource "azurerm_subnet" "core_shared" {
-  name                 = "subnet-core-shared-${var.naming_suffix}"
+  name                 = "subnet-core-shared-${local.naming_suffix}"
   resource_group_name  = azurerm_resource_group.core.name
   virtual_network_name = azurerm_virtual_network.core.name
   address_prefixes     = [local.core_shared_address_space]
-  service_endpoints    = ["Microsoft.KeyVault", "Microsoft.Storage"]
 }
 
-resource "azurerm_subnet" "core_container" {
-  name                 = "subnet-core-containers-${var.naming_suffix}"
+resource "azurerm_subnet" "databricks_host" {
+  name                 = "subnet-dbks-host-${local.naming_suffix}"
   resource_group_name  = azurerm_resource_group.core.name
   virtual_network_name = azurerm_virtual_network.core.name
-  address_prefixes     = [local.core_container_address_space]
-  service_endpoints    = ["Microsoft.Storage"]
+  address_prefixes     = [local.databricks_host_address_space]
 
   delegation {
-    name = "delegation-core-containers-${var.naming_suffix}"
+    name = "dbks-host-vnet-integration"
 
     service_delegation {
-      name    = "Microsoft.ContainerInstance/containerGroups"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+        "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
+        "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action",
+      ]
+      name = "Microsoft.Databricks/workspaces"
+    }
+  }
+}
+
+resource "azurerm_subnet" "databricks_container" {
+  name                 = "subnet-dbks-container-${local.naming_suffix}"
+  resource_group_name  = azurerm_resource_group.core.name
+  virtual_network_name = azurerm_virtual_network.core.name
+  address_prefixes     = [local.databricks_container_address_space]
+
+  delegation {
+    name = "dbks-container-vnet-integration"
+
+    service_delegation {
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+        "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
+        "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action",
+      ]
+      name = "Microsoft.Databricks/workspaces"
+    }
+  }
+}
+
+resource "azurerm_subnet" "serve_webapps" {
+  name                                          = "subnet-serve-webapps-${local.naming_suffix}"
+  resource_group_name                           = azurerm_resource_group.core.name
+  virtual_network_name                          = azurerm_virtual_network.core.name
+  private_endpoint_network_policies_enabled     = false
+  private_link_service_network_policies_enabled = true
+  address_prefixes                              = [local.serve_webapps_address_space]
+
+  delegation {
+    name = "web-app-vnet-integration"
+
+    service_delegation {
+      name    = "Microsoft.Web/serverFarms"
       actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
     }
   }
 }
 
-resource "azurerm_private_dns_zone" "all" {
-  for_each            = local.private_dns_zones
+resource "azurerm_private_dns_zone" "created_zones" {
+  for_each            = var.private_dns_zones_rg == null ? local.required_private_dns_zones : {}
   name                = each.value
   resource_group_name = azurerm_resource_group.core.name
   tags                = var.tags
 }
 
-resource "azurerm_private_dns_zone_virtual_network_link" "all" {
-  for_each              = local.private_dns_zones
-  name                  = "vnl-${each.key}-${var.naming_suffix}"
-  resource_group_name   = azurerm_resource_group.core.name
-  private_dns_zone_name = each.value
+resource "azurerm_virtual_network_peering" "ci_to_flowehr" {
+  count                     = var.tf_in_automation ? 1 : 0
+  name                      = "peer-ci-to-flwr-${local.naming_suffix}"
+  resource_group_name       = var.ci_rg_name
+  virtual_network_name      = var.ci_vnet_name
+  remote_virtual_network_id = azurerm_virtual_network.core.id
+}
+
+resource "azurerm_virtual_network_peering" "flowehr_to_ci" {
+  count                     = var.tf_in_automation ? 1 : 0
+  name                      = "peer-flwr-${local.naming_suffix}-to-ci"
+  resource_group_name       = azurerm_resource_group.core.name
+  virtual_network_name      = azurerm_virtual_network.core.name
+  remote_virtual_network_id = data.azurerm_virtual_network.ci[0].id
+}
+
+# If create_dns_zones is true, we link to the created zones, otherwise link to pre-existing zones
+resource "azurerm_private_dns_zone_virtual_network_link" "flowehr" {
+  for_each              = var.private_dns_zones_rg == null ? azurerm_private_dns_zone.created_zones : data.azurerm_private_dns_zone.existing_zones
+  name                  = "vnl-${each.value.name}-flwr-${local.naming_suffix}"
+  resource_group_name   = var.private_dns_zones_rg == null ? azurerm_resource_group.core.name : var.private_dns_zones_rg
+  private_dns_zone_name = each.value.name
   virtual_network_id    = azurerm_virtual_network.core.id
   tags                  = var.tags
+}
 
+resource "azurerm_private_endpoint" "blob" {
+  name                = "pe-blob-${local.naming_suffix}"
+  location            = azurerm_resource_group.core.location
+  resource_group_name = azurerm_resource_group.core.name
+  subnet_id           = azurerm_subnet.core_shared.id
+  tags                = var.tags
+
+  private_dns_zone_group {
+    name = "private-dns-zone-group-blob-${local.naming_suffix}"
+    private_dns_zone_ids = [
+      var.private_dns_zones_rg == null
+      ? azurerm_private_dns_zone.created_zones["blob"].id
+      : data.azurerm_private_dns_zone.existing_zones["blob"].id
+    ]
+  }
+
+  private_service_connection {
+    name                           = "private-service-connection-blob-${local.naming_suffix}"
+    is_manual_connection           = false
+    private_connection_resource_id = azurerm_storage_account.core.id
+    subresource_names              = ["blob"]
+  }
+
+  # Wait for all subnet operations to avoid operation conflicts
   depends_on = [
-    azurerm_private_dns_zone.all
+    azurerm_subnet.core_shared,
+    azurerm_subnet.databricks_host,
+    azurerm_subnet.databricks_container
+  ]
+}
+
+
+resource "azurerm_private_endpoint" "keyvault" {
+  name                = "pe-kv-${local.naming_suffix}"
+  location            = azurerm_resource_group.core.location
+  resource_group_name = azurerm_resource_group.core.name
+  subnet_id           = azurerm_subnet.core_shared.id
+  tags                = var.tags
+
+  private_dns_zone_group {
+    name = "private-dns-zone-group-kv-${local.naming_suffix}"
+    private_dns_zone_ids = [
+      var.private_dns_zones_rg == null
+      ? azurerm_private_dns_zone.created_zones["keyvault"].id
+      : data.azurerm_private_dns_zone.existing_zones["keyvault"].id
+    ]
+  }
+
+  private_service_connection {
+    name                           = "private-service-connection-kv-${local.naming_suffix}"
+    is_manual_connection           = false
+    private_connection_resource_id = azurerm_key_vault.core.id
+    subresource_names              = ["Vault"]
+  }
+
+  # Wait for all subnet operations to avoid operation conflicts
+  depends_on = [
+    azurerm_subnet.core_shared,
+    azurerm_subnet.databricks_host,
+    azurerm_subnet.databricks_container
   ]
 }
 
 resource "azurerm_network_security_group" "core" {
-  name                = "nsg-default-${var.naming_suffix}"
+  name                = "nsg-default-${local.naming_suffix}"
   location            = azurerm_resource_group.core.location
   resource_group_name = azurerm_resource_group.core.name
 
@@ -100,7 +225,7 @@ resource "azurerm_network_security_group" "core" {
 
 resource "azurerm_network_watcher_flow_log" "data_sources" {
   count                     = (var.monitoring.network_watcher != null) || var.accesses_real_data ? 1 : 0
-  name                      = "nw-log-${var.naming_suffix}"
+  name                      = "nw-log-${local.naming_suffix}"
   resource_group_name       = var.monitoring.network_watcher.resource_group_name
   network_watcher_name      = var.monitoring.network_watcher.name
   network_security_group_id = azurerm_network_security_group.core.id

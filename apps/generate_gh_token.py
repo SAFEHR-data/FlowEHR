@@ -53,8 +53,11 @@ headers = {
 
 url = f"https://api.github.com/app/installations/{installation_id}/access_tokens"
 response = requests.post(url, headers=headers)
-token = response.json()["token"]
+
+if not response.ok:
+    raise Exception("Error getting GitHub access token", response)
 
 # Output JSON string with token for Terraform to use
+token = response.json()["token"]
 output = {"token": token}
 sys.stdout.write(json.dumps(output))

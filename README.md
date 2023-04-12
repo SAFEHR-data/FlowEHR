@@ -32,6 +32,7 @@ Once you've created it, specify the following values:
 - `environment` - a name for your environment (set this to `local`)
 - `location` - the [Azure region](https://azuretracks.com/2021/04/current-azure-region-names-reference/) you wish to deploy resources to
 - `core_address_space` (optional) - override the default core address space, e.g. `10.1.0.0/24`
+- `private_dns_zones_rg` (optional) - if you have the required private dns zones (see [infrastructure/core/locals.tf](infrastructure/core/locals.tf)) already deployed in a network that will be peered to FlowEHR, provide the resource group name and FlowEHR will use those instead of creating its own (which would cause namespace conflicts)
 
 - `transform` (optional)
     - `spark_version` (optional) - the Spark version to install on your local cluster and Databricks clusters
@@ -76,7 +77,7 @@ Once you've created it, specify the following values:
 
 3. Run `make all`
 
-    To bootstrap Terraform, and deploy all infrastructure, and any configured pipelines and apps, run:
+    To deploy all infrastructure, and any configured pipelines and apps, run:
 
     ```bash
     make all
@@ -113,28 +114,15 @@ This step will create an AAD Application and Service Principal in the specified 
 
 > Note: if you want to reference secrets in these files (i.e. a data source password), you can use the syntax: `${MY_SECRET}`. In the CICD workflow, matching GitHub secrets will be searched for and, if found, will replace these tokens before running deployment steps.
 
-3. Create the CI resources and service principal with required AAD permissions: 
+3. Create a GitHub PAT (access token)
 
-    ```bash
-    make ci
-    ```
-
-    > _NOTE_: CI deployments require a service principal with access to deploy resources in the subscription. See `sp-flowehr-cicd-<naming-suffix>` in the [identities section](#identities) for the roles that are assigned to this.
-
-    Copy the outputted values to populate in step 5.
-
-4. Create a GitHub PAT (access token)
-
-    We require a GitHub [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#fine-grained-personal-access-tokens) with scopes to clone any transform repositories defined in `config.infra-test.yaml` (or `config.yaml` if you haven't defined env-specific repositories), as well as permissions to deploy GitHub runners for executing CI deployments.
+    We require a GitHub [PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#fine-grained-personal-access-tokens) with scopes to clone any transform repositories defined in `config.infra-test.yaml` (or `config.yaml` if you haven't defined env-specific repositories).
 
     Follow the instructions [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#fine-grained-personal-access-tokens) to create a token, set a sensible expiration time (you'll need to manually repeat these steps to create a new one after expiry) and set the `Resource Owner` as the organisation containing your FlowEHR fork and any transform pipeline repositories.
 
     Then provide it repository access to either `All Repositories` (within that org), or `Selected Repositories` and ensure you select the FlowEHR fork as well as any transform repos that will be cloned during deployments.
 
     Finally, give it the following scopes:
-
-    `Organization Permissions`
-    - `Administration`: `Read and write` - required for GitHub Runner registration
 
     `Repository Permissions`
     - `Contents`: `Read-only` - required to clone transformation pipeline repos for deployment
@@ -144,13 +132,30 @@ This step will create an AAD Application and Service Principal in the specified 
 
     > Note: if you're not an owner of the Organization you defined as Resource Owner for the token, your token won't be active until approved by an owner.
 
-5. Create and populate a GitHub environment
+4. Deploy a bootstrap environment
 
-    Add an environment called `infra-test` (or whatever you called your deployment environment earlier) with the following environment variables:
+    For CI deployments, due to certain resources being deployed within a Virtual Network with public access disabled, we need to use private build agents (also called self-hosted GitHub runners) to run our CI pipelines. We also need somewhere to store the associated container images and Terraform state within a vnet.
 
-    - `CI_RESOURCE_GROUP`: Resource group for shared CI resources (outputted from step 3)
-    - `CI_CONTAINER_REGISTRY`: Name of the Azure Container Registry to use for the devcontainer storage (outputted from step 3)
-    - `CI_STORAGE_ACCOUNT`: Storage account for shared CI state storage (outputted from step 3)
+    You can use [the Azure Bootstrap template](https://github.com/UCLH-Foundry/Azure-Bootstrap) to deploy all these resources, or alternatively, you can reference pre-existing resources in the next step.
+
+5. Create a deployer identity (AAD App Registration/Service Principal) with required AAD permissions: 
+
+    ```bash
+    make auth
+    ```
+
+    > _NOTE_: CI deployments require a service principal with access to deploy resources in the subscription. See `sp-flowehr-ci-<naming-suffix>` in the [identities section](#identities) for the roles that are assigned to this.
+
+    You will be prompted to enter the `ci_resource_group` and `ci_storage_account` values outputted from the previous step. Once ran, copy the outputted credentials to populate in the next step.
+
+6. Create and populate a GitHub environment
+
+    Add an environment called `infra-test` (or whatever you called your deployment environment earlier) with the following environment variables, using the values outputted from the previous step:
+
+    - `CI_RESOURCE_GROUP`: Resource group for shared CI resources
+    - `CI_CONTAINER_REGISTRY`: Name of the Azure Container Registry to use for the devcontainer storage
+    - `CI_STORAGE_ACCOUNT`: Storage account for shared CI state storage
+    - `CI_PEERING_VNET`: Virtual network for your CI environment which FlowEHR will peer to
 
     And the following secrets:
 
@@ -158,17 +163,26 @@ This step will create an AAD Application and Service Principal in the specified 
     - `ARM_TENANT_ID`: Tenant ID containing the Azure subscription to deploy into (outputted from step 3)
     - `ARM_SUBSCRIPTION_ID`: Subscription ID of the Azure subscription to deploy into (outputted from step 3)
     - `ARM_CLIENT_SECRET`: Client secret of the service principal created in step 3
-    - `FLOWEHR_GITHUB_TOKEN`: The token you created in the previous step (this may be added as a repository or organisation secret rather than environment secret and be re-used betweeen environments if you prefer)
 
-> If you used any tokens in your config yaml files, make sure you populate the equivalent GitHub secret with an identical name so that the token replacement step will substitute your secret(s) into the configuration on deploy (e.g. if you put `${SQL_CONN_STRING}` in config.yaml, make sure you have a GitHub secret called `SQL_CONN_STRING` containing the secret value).
+    > If you used any tokens in your config yaml files, make sure you populate the equivalent GitHub secret with an identical name so that the token replacement step will substitute your secret(s) into the configuration on deploy (e.g. if you put `${SQL_CONN_STRING}` in config.yaml, make sure you have a GitHub secret called `SQL_CONN_STRING` containing the secret value).
 
-6. Run `Deploy Infra-Test`
+    Finally, add a repository-scoped variable for the following (or organization-scoped if you wish to use across multiple repos):
+
+    - `CI_GITHUB_RUNNER_LABEL`: the name of the GitHub runner label outputted from the previous step
+
+    And secret:
+
+     - `FLOWEHR_REPOSITORIES_GH_TOKEN`: the GitHub PAT token you created in step 3
+
+7. Run `Deploy Infra-Test`
 
     Trigger a deployment using a workflow dispatch trigger on the `Actions` tab.
 
-Next steps:
-    - Deploy a data transformation pipeline (TODO)
-    - [Configure and deploy a FlowEHR app](./apps/README.md)
+### Next steps
+
+- [Deploy a data transformation pipeline](https://github.com/UCLH-Foundry/FlowEHR-Data-Pot/blob/main/README.md)
+- [Configure and deploy a FlowEHR app](./apps/README.md)
+
 
 ## <a name="identities"></a> Identities
 
@@ -177,7 +191,7 @@ This table summarises the various authentication identities involved in the depl
 | Name | Type | Access Needed | Purpose |
 |--|--|--|--|
 | Local Developer | User context of developer running `az login` | Azure: `Owner`. <br/> AAD: Either `Global Administrator` or `Priviliged Role Administrator`. | To automate the deployment of resources and identities during development |
-| `sp-flowehr-cicd-<naming-suffix>` | App / Service Principal | Azure: `Owner`. <br/>AAD: `Application.ReadWrite.All` / `AppRoleAssignment.ReadWrite.All` / `Group.ReadWrite.All` / `Directory.Read` | Context for GitHub runner for CICD. Needs to query apps, create new apps (detailed below), create AD groups and view and assign roles to identities |
+| `sp-flowehr-ci-<naming-suffix>` | App / Service Principal | Azure: `Owner`. <br/>AAD: `Application.ReadWrite.All` / `AppRoleAssignment.ReadWrite.All` / `Group.ReadWrite.All` / `Directory.Read` | Context for GitHub runner for CICD. Needs to query apps, create new apps (detailed below), create AD groups and view and assign roles to identities |
 | `flowehr-sql-owner-<naming-suffix>` | App / Service Principal | AAD Administrator of SQL Feature Data Store | Used to connect to SQL as a Service Principal, and create logins + users during deployment |
 | `flowehr-databricks-datawriter-<naming-suffix>` | App / Service Principal | No access to resources or AAD. Added as a `db_owner` of the Feature Data Store database. Credentials stored in databricks secrets to be used in saving features to SQL |
 | `sql-server-features-<naming-suffix>` | System Managed Identity | AAD: `User.Read.All` / `GroupMember.Read.All` / `Application.Read.All` | For SQL to accept AAD connections |

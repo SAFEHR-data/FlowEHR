@@ -47,7 +47,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.FLOWEHR_GITHUB_TOKEN }}
+          token: ${{ secrets.FLOWEHR_REPOSITORIES_GH_TOKEN }}
           fetch-depth: 0  # entire history is needed for paths filter
           persist-credentials: false
 
@@ -56,7 +56,7 @@ jobs:
         name: Check for a command using GitHub script
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.FLOWEHR_GITHUB_TOKEN }}
+          github-token: ${{ secrets.FLOWEHR_REPOSITORIES_GH_TOKEN }}
           script: |
             const script = require('./.github/scripts/build.js')
             await script.getCommandFromComment({core, context, github});
@@ -73,7 +73,7 @@ jobs:
       - uses: dorny/paths-filter@v2
         id: changes
         with:
-          token: ${{ secrets.FLOWEHR_GITHUB_TOKEN }}
+          token: ${{ secrets.FLOWEHR_REPOSITORIES_GH_TOKEN }}
           base: main
           ref: ${{ steps.check_command.outputs.prHeadSha }}
           filters: |
@@ -91,6 +91,12 @@ jobs:
       - id: set_make_command
         run: |
           if [ ${{ steps.check_command.outputs.command }} = "test-all" ]; then
+              make_command="test"
+          elif [ ${{ steps.check_command.outputs.command }} = "destroy" ]; then
+              make_command="destroy"
+          elif [ ${{ steps.check_command.outputs.command }} = "destroy-no-terraform" ]; then
+              make_command="destroy-no-terraform"
+          elif [ ${{ steps.changes.outputs.core }} = "true" ]; then
               make_command="test"
           elif [ ${{ steps.changes.outputs.transform }} = "true" ] && \
             [ ${{ steps.changes.outputs.serve }} = "true" ]; then
@@ -133,7 +139,7 @@ jobs:
           status: "completed"
           conclusion: "success"
 
-  destroy_pr_env:  # Remove the resource groups
+  destroy_pr_env:  # Destroy all resources deployed by PR
     needs: [pr_comment]
     if: |
       (needs.pr_comment.outputs.command == 'destroy') ||
@@ -143,8 +149,17 @@ jobs:
     with:
       suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
       environment: infra-test
-      command: ${{ needs.pr_comment.outputs.command }}
+      command: ${{ needs.pr_comment.outputs.makeCommand }}
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}
+    secrets: inherit
+
+  destroy_cleanup: # Clean up state and dev container if destroy successful
+    needs: [pr_comment, destroy_pr_env]
+    name: Clean-up
+    uses: ./.github/workflows/clean_state.yml
+    with:
+      suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
+      environment: infra-test
     secrets: inherit
 
   run_test:
@@ -161,9 +176,19 @@ jobs:
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}
     secrets: inherit
 
+  test_cleanup: # Clean up state and dev container if test successful
+    needs: [pr_comment, run_test]
+    name: Clean-up
+    uses: ./.github/workflows/clean_state.yml
+    with:
+      suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
+      environment: infra-test
+    secrets: inherit
+
   summary:
     name: Summary
     needs: [pr_comment, run_test]
+    if: always() && needs.run_test.result != 'skipped' # Run even on test failure
     runs-on: ubuntu-latest
     environment: infra-test
     steps:
