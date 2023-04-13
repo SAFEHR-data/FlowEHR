@@ -54,6 +54,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "cosmos" {
 }
 
 resource "azurerm_private_endpoint" "cosmos" {
+  count               = var.accesses_real_data ? 1 : 0
   name                = "pe-cosmos-${var.naming_suffix}"
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
