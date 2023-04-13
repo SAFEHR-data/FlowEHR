@@ -131,7 +131,7 @@ resource "azurerm_virtual_network_peering" "flowehr_to_ci" {
   remote_virtual_network_id = data.azurerm_virtual_network.ci[0].id
 }
 
-# If create_dns_zones is true, we link to the created zones, otherwise link to pre-existing zones
+# If private_dns_zones_rg isn't set, we link to the created zones, otherwise link to pre-existing zones
 resource "azurerm_private_dns_zone_virtual_network_link" "flowehr" {
   for_each              = var.private_dns_zones_rg == null ? azurerm_private_dns_zone.created_zones : data.azurerm_private_dns_zone.existing_zones
   name                  = "vnl-${each.value.name}-flwr-${local.naming_suffix}"

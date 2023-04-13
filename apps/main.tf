@@ -15,6 +15,7 @@
 # TODO: remove when https://github.com/integrations/terraform-provider-github/pull/1530 is merged
 # Needed for manual POST to GitHub APIs and redundant when able to create branch policies in TF
 data "external" "github_access_token" {
+  count = length(var.apps) > 0 ? 1 : 0
   program = [
     "python",
     "${path.module}/generate_gh_token.py",
@@ -47,5 +48,5 @@ module "app" {
   apps_ad_group_principal_id       = var.transform_apps_ad_group_principal_id
   developers_ad_group_principal_id = var.transform_developers_ad_group_principal_id
   github_owner                     = var.serve.github_owner
-  github_access_token              = data.external.github_access_token.result.token
+  github_access_token              = data.external.github_access_token[0].result.token
 }
