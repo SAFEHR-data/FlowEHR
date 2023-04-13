@@ -31,6 +31,8 @@ resource "databricks_dbfs_file" "dbfs_artifact_upload" {
   source = each.key
   # Path on DBFS
   path = "/pipelines/${each.value}/${local.artifacts_dir}/${basename(each.key)}"
+
+  depends_on = [time_sleep.wait_for_databricks_network]
 }
 
 resource "azurerm_data_factory_trigger_tumbling_window" "pipeline_trigger" {

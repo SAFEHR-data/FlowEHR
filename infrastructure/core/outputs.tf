@@ -12,6 +12,14 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+output "naming_suffix" {
+  value = local.naming_suffix
+}
+
+output "naming_suffix_truncated" {
+  value = local.naming_suffix_truncated
+}
+
 output "core_rg_name" {
   value = azurerm_resource_group.core.name
 }
@@ -36,24 +44,24 @@ output "core_kv_uri" {
   value = azurerm_key_vault.core.vault_uri
 }
 
-output "core_shared_address_space" {
-  value = local.core_shared_address_space
+output "databricks_host_subnet_name" {
+  value = azurerm_subnet.databricks_host.name
 }
 
-output "databricks_host_address_space" {
-  value = local.databricks_host_address_space
+output "databricks_container_subnet_name" {
+  value = azurerm_subnet.databricks_container.name
 }
 
-output "databricks_container_address_space" {
-  value = local.databricks_container_address_space
-}
-
-output "serve_webapps_address_space" {
-  value = local.serve_webapps_address_space
+output "webapps_subnet_id" {
+  value = azurerm_subnet.serve_webapps.id
 }
 
 output "core_log_analytics_name" {
   value = azurerm_log_analytics_workspace.core.name
+}
+
+output "deployer_ip" {
+  value = var.tf_in_automation ? "" : data.http.local_ip[0].response_body
 }
 
 output "p0_action_group_id" {
@@ -62,4 +70,8 @@ output "p0_action_group_id" {
 
 output "storage_account_name" {
   value = azurerm_storage_account.core.name
+}
+
+output "private_dns_zones" {
+  value = var.private_dns_zones_rg == null ? azurerm_private_dns_zone.created_zones : data.azurerm_private_dns_zone.existing_zones
 }

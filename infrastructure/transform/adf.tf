@@ -12,7 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-
 resource "azurerm_data_factory" "adf" {
   name                = "adf-${var.naming_suffix}"
   location            = var.core_rg_location

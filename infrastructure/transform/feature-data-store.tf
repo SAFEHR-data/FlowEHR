@@ -79,8 +79,8 @@ resource "azurerm_mssql_firewall_rule" "deployer_ip_exception" {
   count            = var.tf_in_automation ? 0 : 1
   name             = "DeployerIP"
   server_id        = azurerm_mssql_server.sql_server_features.id
-  start_ip_address = var.deployer_ip_address
-  end_ip_address   = var.deployer_ip_address
+  start_ip_address = var.deployer_ip
+  end_ip_address   = var.deployer_ip
 }
 
 # Required for the sql database to access the storage
@@ -188,21 +188,6 @@ resource "azurerm_key_vault_secret" "flowehr_databricks_sql_spn_app_secret" {
   key_vault_id = var.core_kv_id
 }
 
-# Private DNS + endpoint for SQL Server
-resource "azurerm_private_dns_zone" "sql" {
-  name                = "privatelink.database.windows.net"
-  resource_group_name = var.core_rg_name
-  tags                = var.tags
-}
-
-resource "azurerm_private_dns_zone_virtual_network_link" "sql" {
-  name                  = "vnl-sql-${var.naming_suffix}"
-  resource_group_name   = var.core_rg_name
-  private_dns_zone_name = azurerm_private_dns_zone.sql.name
-  virtual_network_id    = data.azurerm_virtual_network.core.id
-  tags                  = var.tags
-}
-
 resource "azurerm_private_endpoint" "sql_server_features_pe" {
   name                = "pe-sql-feature-data-${var.naming_suffix}"
   resource_group_name = var.core_rg_name
@@ -219,7 +204,7 @@ resource "azurerm_private_endpoint" "sql_server_features_pe" {
 
   private_dns_zone_group {
     name                 = "private-dns-zone-group-sql-${var.naming_suffix}"
-    private_dns_zone_ids = [azurerm_private_dns_zone.sql.id]
+    private_dns_zone_ids = [var.private_dns_zones["sql"].id]
   }
 }
 
