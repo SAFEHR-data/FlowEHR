@@ -128,8 +128,3 @@ variable "monitoring" {
     alert_recipients = []
   }
 }
-
-variable "accesses_real_data" {
-  description = "Do the data pipelines and feature data store contain non-synthetic data?"
-  type        = bool
-}
