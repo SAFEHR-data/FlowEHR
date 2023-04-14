@@ -12,10 +12,12 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-include "root" {
-  path = find_in_parent_folders()
+include "shared" {
+  path = "${get_repo_root()}/shared.hcl"
 }
 
 inputs = {
-  github_runner_token = get_env("FLOWEHR_GITHUB_TOKEN", "")
+  ci_vnet_name    = get_env("CI_PEERING_VNET", "")
+  ci_rg_name      = get_env("CI_RESOURCE_GROUP", "")
+  suffix_override = get_env("SUFFIX_OVERRIDE", "")
 }

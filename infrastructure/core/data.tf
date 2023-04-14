@@ -14,8 +14,19 @@
 
 data "azurerm_client_config" "current" {}
 
-data "azurerm_container_registry" "devcontainer" {
+data "http" "local_ip" {
+  count = var.tf_in_automation ? 0 : 1
+  url   = "https://api64.ipify.org"
+}
+
+data "azurerm_virtual_network" "ci" {
   count               = var.tf_in_automation ? 1 : 0
-  name                = var.mgmt_acr
-  resource_group_name = var.mgmt_rg
+  name                = var.ci_vnet_name
+  resource_group_name = var.ci_rg_name
+}
+
+data "azurerm_private_dns_zone" "existing_zones" {
+  for_each            = var.private_dns_zones_rg != null ? local.required_private_dns_zones : {}
+  name                = each.value
+  resource_group_name = var.private_dns_zones_rg
 }

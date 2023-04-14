@@ -39,20 +39,6 @@ resource "azurerm_cosmosdb_account" "serve" {
   }
 }
 
-resource "azurerm_private_dns_zone" "cosmos" {
-  name                = "privatelink.documents.azure.com"
-  resource_group_name = var.core_rg_name
-  tags                = var.tags
-}
-
-resource "azurerm_private_dns_zone_virtual_network_link" "cosmos" {
-  name                  = "vnl-cosmos-${var.naming_suffix}"
-  resource_group_name   = var.core_rg_name
-  private_dns_zone_name = azurerm_private_dns_zone.cosmos.name
-  virtual_network_id    = data.azurerm_virtual_network.core.id
-  tags                  = var.tags
-}
-
 resource "azurerm_private_endpoint" "cosmos" {
   count               = var.accesses_real_data ? 1 : 0
   name                = "pe-cosmos-${var.naming_suffix}"
@@ -63,7 +49,7 @@ resource "azurerm_private_endpoint" "cosmos" {
 
   private_dns_zone_group {
     name                 = "private-dns-zone-group-cosmos-${var.naming_suffix}"
-    private_dns_zone_ids = [azurerm_private_dns_zone.cosmos.id]
+    private_dns_zone_ids = [var.private_dns_zones["cosmos"].id]
   }
 
   private_service_connection {

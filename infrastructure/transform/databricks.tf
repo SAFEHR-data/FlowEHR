@@ -12,7 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-
 resource "azurerm_databricks_workspace" "databricks" {
   name                                  = "dbks-${var.naming_suffix}"
   resource_group_name                   = var.core_rg_name
@@ -27,28 +26,36 @@ resource "azurerm_databricks_workspace" "databricks" {
   custom_parameters {
     no_public_ip                                         = true
     storage_account_name                                 = local.storage_account_name
-    public_subnet_name                                   = azurerm_subnet.databricks_host.name
-    private_subnet_name                                  = azurerm_subnet.databricks_container.name
+    public_subnet_name                                   = data.azurerm_subnet.databricks_host.name
+    private_subnet_name                                  = data.azurerm_subnet.databricks_container.name
     virtual_network_id                                   = data.azurerm_virtual_network.core.id
     public_subnet_network_security_group_association_id  = azurerm_subnet_network_security_group_association.databricks_host.id
     private_subnet_network_security_group_association_id = azurerm_subnet_network_security_group_association.databricks_container.id
   }
+}
+
+// Allow Databricks network configuration to propagate
+resource "time_sleep" "wait_for_databricks_network" {
+  create_duration = "180s"
 
   depends_on = [
+    azurerm_databricks_workspace.databricks,
+    azurerm_private_endpoint.databricks_control_plane,
+    azurerm_private_endpoint.databricks_filesystem,
     azurerm_subnet_route_table_association.databricks_host,
     azurerm_subnet_route_table_association.databricks_container,
-    azurerm_private_dns_zone_virtual_network_link.databricks
+    azurerm_subnet_route_table_association.shared
   ]
 }
 
 data "databricks_spark_version" "latest_lts" {
   spark_version = var.transform.spark_version
-  depends_on    = [azurerm_databricks_workspace.databricks]
+  depends_on    = [time_sleep.wait_for_databricks_network]
 }
 
 data "databricks_node_type" "smallest" {
   # Providing no required configuration, Databricks will pick the smallest node possible
-  depends_on = [azurerm_databricks_workspace.databricks]
+  depends_on = [time_sleep.wait_for_databricks_network]
 }
 
 resource "databricks_cluster" "fixed_single_node" {
@@ -90,15 +97,12 @@ resource "databricks_cluster" "fixed_single_node" {
     "ResourceClass" = "SingleNode"
   }
 
-  depends_on = [
-    azurerm_databricks_workspace.databricks,
-    azurerm_private_endpoint.databricks_control_plane,
-    azurerm_private_endpoint.databricks_filesystem
-  ]
+  depends_on = [time_sleep.wait_for_databricks_network]
 }
 
 # databricks secret scope, in-built. Not able to use key vault backed scope due to limitation in databricks:
 # https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secret-scopes#--create-an-azure-key-vault-backed-secret-scope-using-the-databricks-cli 
 resource "databricks_secret_scope" "secrets" {
-  name = "flowehr-secrets"
+  name       = "flowehr-secrets"
+  depends_on = [time_sleep.wait_for_databricks_network]
 }

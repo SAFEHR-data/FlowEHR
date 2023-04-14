@@ -44,15 +44,19 @@ variable "core_subnet_id" {
   type = string
 }
 
-variable "serve_webapps_address_space" {
-  type = string
-}
-
 variable "tf_in_automation" {
   type = bool
 }
 
+variable "deployer_ip" {
+  type = string
+}
+
 variable "accesses_real_data" {
-  type        = bool
-  description = "Does this deployment access real data? I.e. is this a staging/production environment?"
+  type    = bool
+  default = false
+}
+
+variable "private_dns_zones" {
+  type = map(any)
 }

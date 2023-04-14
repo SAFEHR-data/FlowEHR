@@ -20,11 +20,11 @@ variable "naming_suffix_truncated" {
   type = string
 }
 
-variable "databricks_host_address_space" {
+variable "databricks_host_subnet_name" {
   type = string
 }
 
-variable "databricks_container_address_space" {
+variable "databricks_container_subnet_name" {
   type = string
 }
 
@@ -56,7 +56,7 @@ variable "core_kv_uri" {
   type = string
 }
 
-variable "deployer_ip_address" {
+variable "deployer_ip" {
   type = string
 }
 
@@ -70,6 +70,15 @@ variable "p0_action_group_id" {
 
 variable "core_storage_account_name" {
   type = string
+}
+
+variable "accesses_real_data" {
+  type    = bool
+  default = false
+}
+
+variable "private_dns_zones" {
+  type = map(any)
 }
 
 variable "developers_ad_group_principal_id" {
@@ -134,9 +143,4 @@ variable "monitoring" {
   default = {
     alert_recipients = []
   }
-}
-
-
-variable "accesses_real_data" {
-  type = bool
 }

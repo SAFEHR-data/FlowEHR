@@ -22,8 +22,10 @@ target_title = @echo -e "\n\e[34m»»» 🌺 \e[96m$(1)\e[0m..."
 define terragrunt  # Arguments: <command>, <folder name>
     $(call target_title, "Running: terragrunt $(1) on $(2)") \
 	&& cd ${MAKEFILE_DIR}/$(2) \
-	&& terragrunt run-all $(1) --terragrunt-include-external-dependencies \
-		--terragrunt-non-interactive --terragrunt-exclude-dir ${MAKEFILE_DIR}/bootstrap/ci
+	&& terragrunt run-all $(1) \
+		--terragrunt-include-external-dependencies \
+		--terragrunt-non-interactive \
+		--terragrunt-exclude-dir ${MAKEFILE_DIR}/auth
 endef
 
 all: az-login ## Deploy everything
@@ -44,19 +46,13 @@ az-login: ## Check logged in/log into azure with a service principal
 	$(call target_title, "Log-in to Azure") \
 	&& cd ${MAKEFILE_DIR}/scripts && ./az_login.sh
 
-ci: az-login ## Deploy bootstrap resources for CI builds (management infrastructure and AAD app with deployment permissions)
-	$(call target_title, "Creating CI resources") \
-	&& cd ${MAKEFILE_DIR}/bootstrap/ci \
+auth: az-login ## Create auth app for deployments
+	$(call target_title, "Creating auth app") \
+	&& cd ${MAKEFILE_DIR}/auth \
 	&& terragrunt apply \
-	&& printf "\n🌺 Use the below values to create your CI GitHub vars/secrets:\033[36m\n\n" \
+	&& printf "\n🌺 Below are the credentials for your auth app:\033[36m\n\n" \
 	&& terraform output -json \
 	  | jq -r 'with_entries(.value |= .value) | to_entries[] | "\(.key +": "+ .value)"'
-
-bootstrap: az-login ## Boostrap Terraform backend
-	$(call terragrunt,apply,bootstrap/local)
-
-bootstrap-destroy: az-login ## Destroy boostrap rg
-	$(call terragrunt,destroy,bootstrap/local)
 
 infrastructure: az-login transform-artifacts ## Deploy all infrastructure
 	$(call terragrunt,apply,infrastructure)
@@ -82,14 +78,6 @@ test-serve: infrastructure-serve destroy  ## Test serve deploy->destroy
 
 test-apps: apps destroy  ## Test apps deploy->destroy
 
-test-without-core-destroy: infrastructure test-pipelines apps destroy-non-core ## Test non-core deploy->destroy destroying core
-
-test-transform-without-core-destroy: infrastructure-transform test-pipelines destroy-non-core  ## Test transform deploy->destroy destroying core
-
-test-serve-without-core-destroy: infrastructure-serve destroy-non-core  ## Test serve deploy->destroy without destroying core
-
-test-apps-without-core-destroy: apps destroy-non-core  ## Test apps deploy->destroy without destroying core
-
 transform-artifacts: az-login ## Build transform artifacts
 	${MAKEFILE_DIR}/scripts/pipeline_repo_checkout.sh \
 	&& ${MAKEFILE_DIR}/scripts/build_artifacts.sh
@@ -114,16 +102,6 @@ destroy-transform: az-login ## Destroy transform infrastructure
 
 destroy-serve: az-login ## Destroy serve infrastructure
 	$(call terragrunt,destroy,infrastructure/serve)
-
-destroy-non-core: az-login ## Destroy non-core 
-	$(call target_title, "Destroying non-core infrastructure") \
-	&& cd ${MAKEFILE_DIR} \
-	&& terragrunt run-all destroy \
-		--terragrunt-include-external-dependencies \
-		--terragrunt-non-interactive \
-		--terragrunt-exclude-dir ${MAKEFILE_DIR}/infrastructure/core \
-		--terragrunt-exclude-dir ${MAKEFILE_DIR}/bootstrap/ci \
-		--terragrunt-exclude-dir ${MAKEFILE_DIR}/bootstrap/local
 
 destroy-no-terraform: az-login ## Destroy all resource groups associated with this deployment
 	$(call target_title, "Destroy no terraform") \

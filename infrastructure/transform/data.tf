@@ -21,9 +21,16 @@ data "azurerm_virtual_network" "core" {
   resource_group_name = var.core_rg_name
 }
 
-data "azurerm_private_dns_zone" "blobcore" {
-  name                = "privatelink.blob.core.windows.net"
-  resource_group_name = var.core_rg_name
+data "azurerm_subnet" "databricks_host" {
+  name                 = var.databricks_host_subnet_name
+  virtual_network_name = var.core_vnet_name
+  resource_group_name  = var.core_rg_name
+}
+
+data "azurerm_subnet" "databricks_container" {
+  name                 = var.databricks_container_subnet_name
+  virtual_network_name = var.core_vnet_name
+  resource_group_name  = var.core_rg_name
 }
 
 data "azurerm_client_config" "current" {}

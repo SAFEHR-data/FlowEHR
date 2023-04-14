@@ -18,3 +18,8 @@ data "azurerm_subscription" "primary" {}
 
 # get the MSGraph app
 data "azuread_application_published_app_ids" "well_known" {}
+
+data "azurerm_storage_account" "ci" {
+  name                = var.ci_storage_account
+  resource_group_name = var.ci_resource_group
+}

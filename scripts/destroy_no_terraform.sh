@@ -19,8 +19,8 @@ set -o nounset
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-# If suffix env var isn't set (i.e. by build agent), use bootstrap output
-SUFFIX=${SUFFIX_OVERRIDE:="$(cd "${SCRIPT_DIR}"/../bootstrap/local && terragrunt output naming_suffix | tr -d '"')"}
+# If suffix env var isn't set (i.e. by build agent), use core output
+SUFFIX=${SUFFIX_OVERRIDE:="$(cd "${SCRIPT_DIR}"/../infrastructure/core && terragrunt output naming_suffix | tr -d '"')"}
 
 az group list -o table | while read -r line ; do
 

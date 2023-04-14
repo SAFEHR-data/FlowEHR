@@ -13,17 +13,22 @@
 #  limitations under the License.
 
 locals {
-  # Split the /24 address space into (30, 30, 62, 62, 62) usable IP addresses
-  # for the different terraform modules/required delegations
-  subnet_address_spaces              = cidrsubnets(azurerm_virtual_network.core.address_space[0], 3, 3, 2, 2, 2)
-  core_shared_address_space          = local.subnet_address_spaces[0]
-  core_container_address_space       = local.subnet_address_spaces[1]
-  databricks_host_address_space      = local.subnet_address_spaces[2]
-  databricks_container_address_space = local.subnet_address_spaces[3]
-  serve_webapps_address_space        = local.subnet_address_spaces[4]
+  naming_suffix           = var.suffix_override == "" ? "${var.flowehr_id}-${var.environment}" : var.suffix_override
+  naming_suffix_truncated = substr(replace(replace(local.naming_suffix, "-", ""), "_", ""), 0, 17)
 
-  private_dns_zones = {
-    blob     = "privatelink.blob.core.windows.net"
-    keyvault = "privatelink.vaultcore.azure.net"
+  # Split the /24 (or larger) address space into subnets of required sizes
+  # for the different terraform modules/required delegations
+  subnet_address_spaces              = cidrsubnets(azurerm_virtual_network.core.address_space[0], 2, 2, 2, 2)
+  core_shared_address_space          = local.subnet_address_spaces[0]
+  databricks_host_address_space      = local.subnet_address_spaces[1]
+  databricks_container_address_space = local.subnet_address_spaces[2]
+  serve_webapps_address_space        = local.subnet_address_spaces[3]
+
+  required_private_dns_zones = {
+    blob       = "privatelink.blob.core.windows.net"
+    keyvault   = "privatelink.vaultcore.azure.net"
+    cosmos     = "privatelink.documents.azure.com"
+    databricks = "privatelink.azuredatabricks.net"
+    sql        = "privatelink.database.windows.net"
   }
 }

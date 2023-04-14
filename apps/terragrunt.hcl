@@ -12,8 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-include "root" {
-  path = find_in_parent_folders()
+include "shared" {
+  path = "${get_repo_root()}/shared.hcl"
 }
 
 locals {
@@ -124,10 +124,13 @@ dependency "serve" {
 }
 
 inputs = {
+  naming_suffix                              = dependency.core.outputs.naming_suffix
+  naming_suffix_truncated                    = dependency.core.outputs.naming_suffix_truncated
   core_rg_name                               = dependency.core.outputs.core_rg_name
   core_rg_location                           = dependency.core.outputs.core_rg_location
   core_kv_id                                 = dependency.core.outputs.core_kv_id
   core_log_analytics_name                    = dependency.core.outputs.core_log_analytics_name
+  serve_webapps_subnet_id                    = dependency.core.outputs.webapps_subnet_id
   core_developers_ad_group_principal_id      = dependency.core.outputs.developers_ad_group_principal_id
   core_data_scientists_ad_group_principal_id = dependency.core.outputs.data_scientists_ad_group_principal_id
 
@@ -141,7 +144,6 @@ inputs = {
   serve_app_service_plan_name = dependency.serve.outputs.app_service_plan_name
   serve_acr_name              = dependency.serve.outputs.acr_name
   serve_cosmos_account_name   = dependency.serve.outputs.cosmos_account_name
-  serve_webapps_subnet_id     = dependency.serve.outputs.webapps_subnet_id
 
   github_app_cert = local.github_app_cert
   apps            = local.merged_apps_config

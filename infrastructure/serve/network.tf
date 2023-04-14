@@ -12,20 +12,22 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-resource "azurerm_subnet" "serve_webapps" {
-  name                                          = "subnet-serve-webapps-${var.naming_suffix}"
-  resource_group_name                           = var.core_rg_name
-  virtual_network_name                          = data.azurerm_virtual_network.core.name
-  private_endpoint_network_policies_enabled     = false
-  private_link_service_network_policies_enabled = true
-  address_prefixes                              = [var.serve_webapps_address_space]
+resource "azurerm_private_endpoint" "aml_blob" {
+  name                = "pe-aml-blob-${var.naming_suffix}"
+  location            = var.core_rg_location
+  resource_group_name = var.core_rg_name
+  subnet_id           = var.core_subnet_id
+  tags                = var.tags
 
-  delegation {
-    name = "web-app-vnet-integration"
+  private_dns_zone_group {
+    name                 = "private-dns-zone-group-blob-${var.naming_suffix}"
+    private_dns_zone_ids = [var.private_dns_zones["blob"].id]
+  }
 
-    service_delegation {
-      name    = "Microsoft.Web/serverFarms"
-      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
-    }
+  private_service_connection {
+    name                           = "private-service-connection-aml-blob-${var.naming_suffix}"
+    is_manual_connection           = false
+    private_connection_resource_id = azurerm_storage_account.aml.id
+    subresource_names              = ["blob"]
   }
 }

@@ -23,13 +23,12 @@ locals {
 
   # IPs required for Databricks UDRs 
   # Built from https://learn.microsoft.com/en-us/azure/databricks/resources/supported-regions#--control-plane-nat-webapp-and-extended-infrastructure-ip-addresses-and-domains
-  databricks_udr_ips   = yamldecode(file("${path.module}/databricks-udr-ips.yaml"))
-  title_cased_location = title(var.core_rg_location)
+  databricks_udr_ips = yamldecode(file("${path.module}/databricks-udr-ips.yaml"))
   databricks_service_tags = {
     "databricks" : "AzureDatabricks",
-    "sql" : "Sql.${local.title_cased_location}",
-    "storage" : "Storage.${local.title_cased_location}",
-    "eventhub" : "EventHub.${local.title_cased_location}"
+    "sql" : "Sql",
+    "storage" : "Storage",
+    "eventhub" : "EventHub"
   }
 
   all_pipeline_files = fileset(path.module, "../../transform/pipelines/**/${local.pipeline_file}")

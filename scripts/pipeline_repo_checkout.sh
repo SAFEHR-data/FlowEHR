@@ -21,7 +21,7 @@ set -o nounset
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PIPELINE_DIR="${SCRIPT_DIR}/../transform/pipelines"
-GITHUB_TOKEN="${FLOWEHR_GITHUB_TOKEN:-}" # May be unset
+GITHUB_TOKEN="${FLOWEHR_REPOSITORIES_GH_TOKEN:-}" # May be unset
 ENVIRONMENT="${ENVIRONMENT:=local}"
 CONFIG_PATH="${SCRIPT_DIR}/../config.yaml"
 
