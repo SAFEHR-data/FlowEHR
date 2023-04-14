@@ -113,7 +113,12 @@ variable "serve" {
     github_app_id              = string
     github_app_installation_id = string
   })
-  default = {} # Set a default so a serve block isn't required when running make all without any apps configured
+  # Set a default so a serve block isn't required when running make all without any apps configured
+  default = {
+    github_owner               = null
+    github_app_id              = null
+    github_app_installation_id = null
+  }
 }
 
 variable "apps" {
