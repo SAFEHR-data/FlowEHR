@@ -31,3 +31,21 @@ resource "azurerm_private_endpoint" "aml_blob" {
     subresource_names              = ["blob"]
   }
 }
+
+resource "azurerm_subnet" "aml" {
+  name                 = "subnet-aml-${local.naming_suffix}"
+  virtual_network_name = var.core_vnet_name
+  resource_group_name  = var.core_rg_name
+  address_prefixes     = [var.aml_address_space]
+
+  # need to be disabled for AML private compute
+  private_endpoint_network_policies_enabled     = false
+  private_link_service_network_policies_enabled = false
+
+  service_endpoints = [
+    "Microsoft.Storage"
+  ]
+  service_endpoint_policy_ids = [azapi_resource.aml_service_endpoint_policy.id]
+}
+
+

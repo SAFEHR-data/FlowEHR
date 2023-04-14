@@ -50,24 +50,6 @@ resource "azurerm_storage_account" "aml" {
   }
 }
 
-resource "azurerm_machine_learning_workspace" "serve" {
-  name                    = "aml-${var.naming_suffix}"
-  location                = var.core_rg_location
-  resource_group_name     = var.core_rg_name
-  application_insights_id = azurerm_application_insights.serve.id
-  key_vault_id            = var.core_kv_id
-  storage_account_id      = azurerm_storage_account.aml.id
-  tags                    = var.tags
-
-  identity {
-    type = "SystemAssigned"
-  }
-
-  depends_on = [
-    azurerm_private_endpoint.aml_blob
-  ]
-}
-
 resource "azurerm_container_registry" "serve" {
   name                          = "acrserve${var.naming_suffix_truncated}"
   location                      = var.core_rg_location

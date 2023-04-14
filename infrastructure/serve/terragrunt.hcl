@@ -27,6 +27,7 @@ dependency "core" {
     core_subnet_id              = "core_subnet_id"
     serve_webapps_address_space = "serve_webapps_address_space"
     private_dns_zones           = "private_dns_zones"
+    aml_address_space           = "aml_address_space"
   }
   mock_outputs_allowed_terraform_commands = ["destroy"]
 }
@@ -41,4 +42,5 @@ inputs = {
   core_subnet_id              = dependency.core.outputs.core_subnet_id
   deployer_ip                 = dependency.core.outputs.deployer_ip
   private_dns_zones           = dependency.core.outputs.private_dns_zones
+  aml_address_space           = dependency.core.outputs.aml_address_space
 }

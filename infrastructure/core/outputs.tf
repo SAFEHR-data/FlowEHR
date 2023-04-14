@@ -75,3 +75,7 @@ output "storage_account_name" {
 output "private_dns_zones" {
   value = var.private_dns_zones_rg == null ? azurerm_private_dns_zone.created_zones : data.azurerm_private_dns_zone.existing_zones
 }
+
+output "aml_address_space" {
+  value = local.aml_address_space
+}
