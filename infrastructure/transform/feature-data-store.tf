@@ -97,13 +97,14 @@ resource "azurerm_mssql_server_transparent_data_encryption" "sql_server_features
 # Azure SQL database, basic + small for dev
 # TODO: Rightsize for prod -> https://github.com/UCLH-Foundry/FlowEHR/issues/63
 resource "azurerm_mssql_database" "feature_database" {
-  name                 = "sql-db-features"
-  server_id            = azurerm_mssql_server.sql_server_features.id
-  collation            = "SQL_Latin1_General_CP1_CI_AS"
-  license_type         = "LicenseIncluded"
-  max_size_gb          = 2
-  sku_name             = "Basic"
-  storage_account_type = "Local"
+  name         = "sql-db-features"
+  server_id    = azurerm_mssql_server.sql_server_features.id
+  collation    = "SQL_Latin1_General_CP1_CI_AS"
+  license_type = "LicenseIncluded"
+  # Use an standard sku for all non-locally deployed environments
+  max_size_gb          = var.tf_in_automation ? 250 : 2
+  sku_name             = var.tf_in_automation ? "S0" : "Basic"
+  storage_account_type = var.tf_in_automation ? "Geo" : "Local"
   zone_redundant       = false
   tags                 = var.tags
 }
