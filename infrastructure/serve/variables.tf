@@ -51,3 +51,8 @@ variable "serve_webapps_address_space" {
 variable "tf_in_automation" {
   type = bool
 }
+
+variable "accesses_real_data" {
+  type        = bool
+  description = "Does this deployment access real data? I.e. is this a staging/production environment?"
+}

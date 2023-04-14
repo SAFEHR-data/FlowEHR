@@ -21,7 +21,7 @@ locals {
 
   # Get GitHub App PEM cert as string - first try local file otherwise look for env var
   github_app_cert_path = "${get_terragrunt_dir()}/github.pem"
-  github_app_cert      = fileexists(local.github_app_cert_path) ? file(local.github_app_cert_path) : get_env("git", "")
+  github_app_cert      = fileexists(local.github_app_cert_path) ? file(local.github_app_cert_path) : get_env("GH_APP_CERT", "")
 
   # Get shared app configuration (apps.yaml) and environment-specific config (app.{ENVIRONMENT}.yaml)
   shared_apps_config_path = "${get_terragrunt_dir()}/apps.yaml"
