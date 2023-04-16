@@ -89,12 +89,14 @@ dependency "core" {
   config_path = "${get_repo_root()}/infrastructure/core"
 
   mock_outputs = {
+    naming_suffix           = "naming_suffix"
+    naming_suffix_truncated = "naming_suffix_truncated"
     core_rg_name            = "core_rg_name"
     core_rg_location        = "core_rg_location"
     core_kv_id              = "core_kv_id"
     core_log_analytics_name = "core_log_analytics_name"
   }
-  mock_outputs_allowed_terraform_commands = ["destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
 }
 
 dependency "transform" {
@@ -108,7 +110,7 @@ dependency "transform" {
     apps_ad_group_principal_id       = "transform_apps_ad_group_principal_id"
     developers_ad_group_principal_id = "transform_developers_ad_group_principal_id"
   }
-  mock_outputs_allowed_terraform_commands = ["destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
 }
 
 dependency "serve" {
@@ -120,7 +122,7 @@ dependency "serve" {
     cosmos_account_name   = "serve_cosmos_account_name"
     webapps_subnet_id     = "serve_webapps_subnet_id"
   }
-  mock_outputs_allowed_terraform_commands = ["destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
 }
 
 inputs = {

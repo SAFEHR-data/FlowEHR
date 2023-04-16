@@ -20,6 +20,8 @@ dependency "core" {
   config_path = "../core"
 
   mock_outputs = {
+    naming_suffix               = "naming_suffix"
+    naming_suffix_truncated     = "naming_suffix_truncated"
     core_rg_name                = "core_rg_name"
     core_rg_location            = "core_rg_location"
     core_kv_id                  = "core_kv_id"
@@ -28,7 +30,7 @@ dependency "core" {
     serve_webapps_address_space = "serve_webapps_address_space"
     private_dns_zones           = "private_dns_zones"
   }
-  mock_outputs_allowed_terraform_commands = ["destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
 }
 
 inputs = {
