@@ -95,6 +95,7 @@ dependency "core" {
     core_rg_location        = "core_rg_location"
     core_kv_id              = "core_kv_id"
     core_log_analytics_name = "core_log_analytics_name"
+    webapps_subnet_id       = "serve_webapps_subnet_id"
   }
   mock_outputs_allowed_terraform_commands = ["init", "destroy"]
 }
@@ -120,7 +121,6 @@ dependency "serve" {
     app_service_plan_name = "serve_app_service_plan_name"
     acr_name              = "serve_acr_name"
     cosmos_account_name   = "serve_cosmos_account_name"
-    webapps_subnet_id     = "serve_webapps_subnet_id"
   }
   mock_outputs_allowed_terraform_commands = ["init", "destroy"]
 }
