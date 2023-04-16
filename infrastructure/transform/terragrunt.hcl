@@ -32,8 +32,10 @@ dependency "core" {
     core_subnet_id                     = "core_subnet_id"
     core_kv_id                         = "core_kv_id"
     core_kv_uri                        = "core_kv_uri"
-    databricks_host_address_space      = "databricks_host_address_space"
-    databricks_container_address_space = "databricks_container_address_space"
+    p0_action_group_id                 = "p0_action_group_id"
+    storage_account_name               = "storage_account_name"
+    databricks_host_subnet_name        = "databricks_host_subnet_name"
+    databricks_container_subnet_name   = "databricks_container_subnet_name"
     deployer_ip                        = "deployer_ip"
     private_dns_zones                  = "private_dns_zones"
   }
