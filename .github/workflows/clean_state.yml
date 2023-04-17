@@ -53,9 +53,9 @@ jobs:
       - name: Delete TF state
         run: |
           az storage blob delete-batch \
-            --account-name "${{ vars.CI_STORAGE_ACCOUNT }}"
-            -s tfstate
-            --pattern "flowehr/${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}/*"
+            --account-name "${{ vars.CI_STORAGE_ACCOUNT }}" \
+            --source tfstate \
+            --pattern "flowehr/${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}/*" \
             --auth-mode login
       - name: Untag devcontainer image
         run: |
