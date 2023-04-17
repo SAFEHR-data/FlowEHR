@@ -25,4 +25,3 @@ resource "azuread_group" "ad_group_data_scientists" {
   owners           = [data.azurerm_client_config.current.object_id]
   security_enabled = true
 }
-
