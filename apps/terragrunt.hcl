@@ -134,7 +134,6 @@ inputs = {
   core_developers_ad_group_principal_id      = dependency.core.outputs.developers_ad_group_principal_id
   core_data_scientists_ad_group_principal_id = dependency.core.outputs.data_scientists_ad_group_principal_id
 
-
   transform_feature_store_server_name  = dependency.transform.outputs.feature_store_server_name
   transform_feature_store_db_name      = dependency.transform.outputs.feature_store_db_name
   transform_apps_ad_group_display_name = dependency.transform.outputs.apps_ad_group_display_name
