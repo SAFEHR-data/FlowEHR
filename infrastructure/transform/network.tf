@@ -100,7 +100,7 @@ resource "azurerm_private_endpoint" "databricks_filesystem" {
 
   private_service_connection {
     name                           = "private-service-connection-databricks-filesystem-${var.naming_suffix}"
-    private_connection_resource_id = join("", [azurerm_databricks_workspace.databricks.managed_resource_group_id, "/providers/Microsoft.Storage/storageAccounts/${local.storage_account_name}"])
+    private_connection_resource_id = join("", [azurerm_databricks_workspace.databricks.managed_resource_group_id, "/providers/Microsoft.Storage/storageAccounts/${local.dbfs_storage_account_name}"])
     is_manual_connection           = false
     subresource_names              = ["blob"]
   }
@@ -132,5 +132,5 @@ resource "azurerm_private_dns_zone_virtual_network_link" "data_sources" {
   name                  = "vnl-${each.key}-flwr-${var.naming_suffix}"
   private_dns_zone_name = each.value.dns_zone_name
   virtual_network_id    = data.azurerm_virtual_network.core.id
-  resource_group_name   = each.value.resource_group_name
+  resource_group_name   = var.private_dns_zones_rg == null ? each.value.resource_group_name : var.private_dns_zones_rg
 }
