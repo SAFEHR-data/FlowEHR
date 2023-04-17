@@ -68,5 +68,5 @@ data "template_file" "core_github_workflow" {
 data "azurerm_cosmosdb_sql_role_definition" "data_contributor" {
   resource_group_name = var.resource_group_name
   account_name        = var.cosmos_account_name
-  role_definition_id  = "00000000-0000-0000-0000-000000000002" # Azure Cosmos Built in role ID
+  role_definition_id  = "00000000-0000-0000-0000-000000000002" # Cosmos Data Contributor built-in role ID
 }
