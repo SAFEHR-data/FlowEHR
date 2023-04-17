@@ -73,7 +73,7 @@ output "storage_account_name" {
 }
 
 output "private_dns_zones" {
-  value = var.private_dns_zones_rg == null ? azurerm_private_dns_zone.created_zones : data.azurerm_private_dns_zone.existing_zones
+  value = local.create_dns_zones ? azurerm_private_dns_zone.created_zones : data.azurerm_private_dns_zone.existing_zones
 }
 
 output "developers_ad_group_principal_id" {

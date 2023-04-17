@@ -25,7 +25,7 @@ resource "azurerm_databricks_workspace" "databricks" {
 
   custom_parameters {
     no_public_ip                                         = true
-    storage_account_name                                 = local.storage_account_name
+    storage_account_name                                 = local.dbfs_storage_account_name
     public_subnet_name                                   = data.azurerm_subnet.databricks_host.name
     private_subnet_name                                  = data.azurerm_subnet.databricks_container.name
     virtual_network_id                                   = data.azurerm_virtual_network.core.id

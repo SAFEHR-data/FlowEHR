@@ -20,6 +20,7 @@ locals {
   trigger_file                       = "trigger.json"
   artifacts_dir                      = "artifacts"
   adb_linked_service_name            = "ADBLinkedServiceViaMSI"
+  dbfs_storage_account_name          = "dbfs${var.naming_suffix_truncated}"
 
   # IPs required for Databricks UDRs 
   # Built from https://learn.microsoft.com/en-us/azure/databricks/resources/supported-regions#--control-plane-nat-webapp-and-extended-infrastructure-ip-addresses-and-domains
@@ -63,8 +64,6 @@ locals {
       } : null
     ]
   ])
-
-  storage_account_name = "dbfs${var.naming_suffix_truncated}"
 
   data_source_connections_with_peerings = [
     for idx, item in var.data_source_connections : item if item.peering != null

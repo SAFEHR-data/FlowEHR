@@ -17,7 +17,7 @@ locals {
   configuration    = read_terragrunt_config("${get_repo_root()}/configuration.hcl")
   tf_in_automation = get_env("TF_IN_AUTOMATION", false)
   suffix_override  = get_env("SUFFIX_OVERRIDE", "")
-  state_folder     = local.suffix_override != "" ? local.suffix_override : get_env("ENVIRONMENT", "")
+  state_folder     = "flowehr/${local.suffix_override != "" ? local.suffix_override : get_env("ENVIRONMENT", "")}"
 }
 
 generate "terraform" {
@@ -67,7 +67,7 @@ inputs = merge(
 
   # Tags to add to every resource that accepts them
   tags = {
-    environment = local.configuration.locals.merged_root_config.environment
+    environment = try(local.configuration.locals.merged_root_config.environment, "local")
   }
 })
 

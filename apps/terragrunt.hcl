@@ -89,14 +89,17 @@ dependency "core" {
   config_path = "${get_repo_root()}/infrastructure/core"
 
   mock_outputs = {
-    core_rg_name                               = "core_rg_name"
-    core_rg_location                           = "core_rg_location"
-    core_kv_id                                 = "core_kv_id"
-    core_log_analytics_name                    = "core_log_analytics_name"
-    core_developers_ad_group_principal_id      = "core_developers_ad_group_principal_id"
-    core_data_scientists_ad_group_principal_id = "core_data_scientists_ad_group_principal_id"
+    naming_suffix                         = "naming_suffix"
+    naming_suffix_truncated               = "naming_suffix_truncated"
+    core_rg_name                          = "core_rg_name"
+    core_rg_location                      = "core_rg_location"
+    core_kv_id                            = "core_kv_id"
+    core_log_analytics_name               = "core_log_analytics_name"
+    webapps_subnet_id                     = "serve_webapps_subnet_id"
+    developers_ad_group_principal_id      = "core_developers_ad_group_principal_id"
+    data_scientists_ad_group_principal_id = "core_data_scientists_ad_group_principal_id"
   }
-  mock_outputs_allowed_terraform_commands = ["destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
 }
 
 dependency "transform" {
@@ -108,7 +111,7 @@ dependency "transform" {
     apps_ad_group_display_name = "transform_apps_ad_group_display_name"
     apps_ad_group_principal_id = "transform_apps_ad_group_principal_id"
   }
-  mock_outputs_allowed_terraform_commands = ["destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
 }
 
 dependency "serve" {
@@ -118,9 +121,8 @@ dependency "serve" {
     app_service_plan_name = "serve_app_service_plan_name"
     acr_name              = "serve_acr_name"
     cosmos_account_name   = "serve_cosmos_account_name"
-    webapps_subnet_id     = "serve_webapps_subnet_id"
   }
-  mock_outputs_allowed_terraform_commands = ["destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
 }
 
 inputs = {

@@ -81,6 +81,11 @@ variable "private_dns_zones" {
   type = map(any)
 }
 
+variable "private_dns_zones_rg" {
+  type    = string
+  default = null
+}
+
 variable "developers_ad_group_principal_id" {
   type = string
 }
@@ -130,7 +135,7 @@ variable "data_source_connections" {
       object({
         virtual_network_name = string
         resource_group_name  = string
-        dns_zones            = list(string)
+        dns_zones            = optional(list(string), [])
       })
     )
   }))

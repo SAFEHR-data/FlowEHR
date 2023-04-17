@@ -20,18 +20,30 @@ locals {
   providers = read_terragrunt_config("${get_repo_root()}/providers.hcl")
 }
 
+terraform {
+  before_hook "before_hook" {
+    commands    = ["apply", "plan"]
+    execute     = ["make", "transform-artifacts"]
+    working_dir = get_repo_root()
+  }
+}
+
 dependency "core" {
   config_path = "../core"
 
   mock_outputs = {
+    naming_suffix                         = "naming_suffix"
+    naming_suffix_truncated               = "naming_suffix_truncated"
     core_rg_name                          = "core_rg_name"
     core_rg_location                      = "core_rg_location"
     core_vnet_name                        = "core_vnet_name"
     core_subnet_id                        = "core_subnet_id"
     core_kv_id                            = "core_kv_id"
     core_kv_uri                           = "core_kv_uri"
-    databricks_host_address_space         = "databricks_host_address_space"
-    databricks_container_address_space    = "databricks_container_address_space"
+    p0_action_group_id                    = "p0_action_group_id"
+    storage_account_name                  = "storage_account_name"
+    databricks_host_subnet_name           = "databricks_host_subnet_name"
+    databricks_container_subnet_name      = "databricks_container_subnet_name"
     deployer_ip                           = "deployer_ip"
     private_dns_zones                     = "private_dns_zones"
     developers_ad_group_principal_id      = "developers_ad_group_principal_id"
@@ -39,7 +51,7 @@ dependency "core" {
     developers_ad_group_display_name      = "developers_ad_group_display_name"
     data_scientists_ad_group_display_name = "data_scientists_ad_group_display_name"
   }
-  mock_outputs_allowed_terraform_commands = ["destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
 }
 
 generate "terraform" {
