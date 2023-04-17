@@ -28,7 +28,7 @@ define terragrunt  # Arguments: <command>, <folder name>
 		--terragrunt-exclude-dir ${MAKEFILE_DIR}/auth
 endef
 
-all: az-login ## Deploy everything
+all: az-login transform-artifacts ## Deploy everything
 	$(call terragrunt,apply,.)
 
 help: ## Show this help
