@@ -139,7 +139,6 @@ inputs = {
   transform_apps_ad_group_display_name = dependency.transform.outputs.apps_ad_group_display_name
   transform_apps_ad_group_principal_id = dependency.transform.outputs.apps_ad_group_principal_id
 
-
   serve_app_service_plan_name = dependency.serve.outputs.app_service_plan_name
   serve_acr_name              = dependency.serve.outputs.acr_name
   serve_cosmos_account_name   = dependency.serve.outputs.cosmos_account_name
