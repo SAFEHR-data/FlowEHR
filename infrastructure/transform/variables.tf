@@ -81,6 +81,11 @@ variable "private_dns_zones" {
   type = map(any)
 }
 
+variable "private_dns_zones_rg" {
+  type    = string
+  default = null
+}
+
 variable "access_databricks_management_publicly" {
   type        = bool
   description = "Whether to allow access to the Databricks workspace management plane via a public network"
