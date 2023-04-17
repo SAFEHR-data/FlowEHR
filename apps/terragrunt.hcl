@@ -89,15 +89,15 @@ dependency "core" {
   config_path = "${get_repo_root()}/infrastructure/core"
 
   mock_outputs = {
-    naming_suffix                              = "naming_suffix"
-    naming_suffix_truncated                    = "naming_suffix_truncated"
-    core_rg_name                               = "core_rg_name"
-    core_rg_location                           = "core_rg_location"
-    core_kv_id                                 = "core_kv_id"
-    core_log_analytics_name                    = "core_log_analytics_name"
-    webapps_subnet_id                          = "serve_webapps_subnet_id"
-    core_developers_ad_group_principal_id      = "core_developers_ad_group_principal_id"
-    core_data_scientists_ad_group_principal_id = "core_data_scientists_ad_group_principal_id"
+    naming_suffix                         = "naming_suffix"
+    naming_suffix_truncated               = "naming_suffix_truncated"
+    core_rg_name                          = "core_rg_name"
+    core_rg_location                      = "core_rg_location"
+    core_kv_id                            = "core_kv_id"
+    core_log_analytics_name               = "core_log_analytics_name"
+    webapps_subnet_id                     = "serve_webapps_subnet_id"
+    developers_ad_group_principal_id      = "core_developers_ad_group_principal_id"
+    data_scientists_ad_group_principal_id = "core_data_scientists_ad_group_principal_id"
   }
   mock_outputs_allowed_terraform_commands = ["init", "destroy"]
 }
