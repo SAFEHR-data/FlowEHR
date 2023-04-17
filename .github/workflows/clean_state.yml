@@ -61,5 +61,4 @@ jobs:
         run: |
           az acr repository untag \
             --name ${{ vars.CI_CONTAINER_REGISTRY }} \
-            --image ${{ inputs.devcontainer_name }}:${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }} \
-            --yes
+            --image ${{ inputs.devcontainer_name }}:${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}
