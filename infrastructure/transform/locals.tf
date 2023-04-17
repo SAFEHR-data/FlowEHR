@@ -90,10 +90,13 @@ locals {
     ]
   ]))
 
-  sql_users_to_create = [
+  developers      = { "name" : "${var.developers_ad_group_display_name}", "role" : "db_datareader" }
+  data_scientists = { "name" : "${var.data_scientists_ad_group_display_name}", "role" : "db_datareader" }
+
+  msi_users = [
     { "name" : "${local.databricks_app_name}", "role" : "db_owner" },
     { "name" : "${azuread_group.ad_group_apps.display_name}", "role" : "db_datareader" },
-    { "name" : "${azuread_group.ad_group_developers.display_name}", "role" : "db_datareader" },
-    { "name" : "${azuread_group.ad_group_data_scientists.display_name}", "role" : "db_datareader" },
   ]
+
+  sql_users_to_create = var.accesses_real_data ? local.msi_users : concat(local.msi_users, [local.developers, local.data_scientists])
 }
