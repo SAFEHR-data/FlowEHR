@@ -1,14 +1,17 @@
 ---
+flowehr_id: flwrgriff
+location: uksouth
 environment: infra-test
 accesses_real_data: false
 core_address_space: 10.64.0.0/22
-private_dns_zones_rg: rg-bootstrap-uclh-ci-dev
+private_dns_zones_rg: rg-bootstrap-griffdev
 
 transform:
+  spark_version: 3.3.1
   repositories:
     - url: https://github.com/UCLH-Foundry/FlowEHR-Data-Pot
 
 serve:
-  github_owner: UCLH-FlowEHR-TestBed
-  github_app_id: 309047
-  github_app_installation_id: 35581991
+  github_owner: Griff-Labs
+  github_app_id: 309106
+  github_app_installation_id: 35587759
