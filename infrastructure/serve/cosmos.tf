@@ -20,8 +20,8 @@ resource "azurerm_cosmosdb_account" "serve" {
   kind                = "GlobalDocumentDB"
   tags                = var.tags
 
-  public_network_access_enabled = !var.tf_in_automation
-  local_authentication_disabled = var.tf_in_automation
+  public_network_access_enabled = !var.accesses_real_data
+  local_authentication_disabled = var.accesses_real_data
 
   capabilities {
     name = "EnableServerless"
@@ -40,6 +40,7 @@ resource "azurerm_cosmosdb_account" "serve" {
 }
 
 resource "azurerm_private_endpoint" "cosmos" {
+  count               = var.accesses_real_data ? 1 : 0
   name                = "pe-cosmos-${var.naming_suffix}"
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name

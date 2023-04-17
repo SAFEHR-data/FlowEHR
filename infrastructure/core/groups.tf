@@ -12,25 +12,16 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-output "feature_store_server_name" {
-  value = azurerm_mssql_server.sql_server_features.name
+resource "azuread_group" "ad_group_developers" {
+  count            = var.accesses_real_data ? 0 : 1
+  display_name     = "${var.suffix_override} flowehr-developers"
+  owners           = [data.azurerm_client_config.current.object_id]
+  security_enabled = true
 }
 
-output "feature_store_db_name" {
-  value = azurerm_mssql_database.feature_database.name
-}
-
-
-output "apps_ad_group_display_name" {
-  description = "Apps AD group display name"
-  value       = azuread_group.ad_group_apps.display_name
-}
-
-output "apps_ad_group_principal_id" {
-  description = "Apps AD group principal id"
-  value       = azuread_group.ad_group_apps.object_id
-}
-
-output "adf_name" {
-  value = azurerm_data_factory.adf.name
+resource "azuread_group" "ad_group_data_scientists" {
+  count            = var.accesses_real_data ? 0 : 1
+  display_name     = "${var.suffix_override} flowehr-data-scientists"
+  owners           = [data.azurerm_client_config.current.object_id]
+  security_enabled = true
 }

@@ -64,3 +64,9 @@ data "template_file" "core_github_workflow" {
     branch_name                = local.core_branch_name
   }
 }
+
+data "azurerm_cosmosdb_sql_role_definition" "data_contributor" {
+  resource_group_name = var.resource_group_name
+  account_name        = var.cosmos_account_name
+  role_definition_id  = "00000000-0000-0000-0000-000000000002" # Cosmos Data Contributor built-in role ID
+}
