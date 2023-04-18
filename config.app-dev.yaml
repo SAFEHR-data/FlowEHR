@@ -10,8 +10,8 @@ data_source_connections:
     peering:
       virtual_network_name: vnet-data-sources-ds-uclhflowehr-appdev
       resource_group_name: rg-ds-uclhflowehr-appdev
-    dns_zones:
-      - privatelink.postgres.database.azure.com
+      dns_zones:
+        - privatelink.postgres.database.azure.com
     fqdn: psqlserver-ds-uclhflowehr-appdev.postgres.database.azure.com
     database: emap
     username: flowehr
