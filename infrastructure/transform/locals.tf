@@ -96,7 +96,8 @@ locals {
   msi_users = [
     { "name" : "${local.databricks_app_name}", "role" : "db_owner" },
     { "name" : "${azuread_group.ad_group_apps.display_name}", "role" : "db_datareader" },
+    local.data_scientists
   ]
 
-  sql_users_to_create = var.accesses_real_data ? local.msi_users : concat(local.msi_users, [local.developers, local.data_scientists])
+  sql_users_to_create = var.accesses_real_data ? local.msi_users : concat(local.msi_users, [local.developers])
 }
