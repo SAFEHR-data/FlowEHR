@@ -60,5 +60,5 @@ jobs:
       - name: Untag devcontainer image
         run: |
           az acr repository untag \
-            --name ${{ vars.CI_CONTAINER_REGISTRY }} \
+            --name "${{ vars.CI_CONTAINER_REGISTRY }}" \
             --image "${{ inputs.devcontainer_name }}:${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}"
