@@ -1,11 +1,14 @@
 ---
-flowehr_cicd_test:
-  name: FlowEHR CICD Test App
-  description: Test of app deployment
+hyacinth:
+  name: Hyacinth
+  description: HyUI on FlowEHR
   owners:
-    flowehr-testing-app-owner: FlowEHR-testing-app-owner@uclhdif.onmicrosoft.com
+    RichardClarke-dm: richard.clarke14_nhs.net#EXT#@uclhdif.onmicrosoft.com
+    dram1964: d.ramlakhan_nhs.net#EXT#@uclhdif.onmicrosoft.com
   contributors:
-    flowehr-testing-app-contributor: FlowEHR-testing-app-contributor@uclhdif.onmicrosoft.com
+    hqva: h.vaidya_nhs.net#EXT#@uclhdif.onmicrosoft.com
+    t-young31: tom.a.young_ucl.ac.uk#EXT#@uclhdif.onmicrosoft.com
+    jjgriff93: james.griffin_microsoft.com#EXT#@uclhdif.onmicrosoft.com
   branch:
     num_of_approvals: 1
   env:

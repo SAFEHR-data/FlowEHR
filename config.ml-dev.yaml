@@ -1,0 +1,27 @@
+---
+environment: ml-dev
+core_address_space: 10.64.8.0/22
+accesses_real_data: true
+
+# TODO
+#data_source_connections:
+#  - emap:
+#    name: star
+#    peering:
+#      virtual_network_name: vnet-data-sources-ds-uclhflowehr-prod
+#      resource_group_name: rg-ds-uclhflowehr-prod
+#      dns_zones:
+#        - privatelink.postgres.database.azure.com
+#    fqdn: psqlserver-ds-uclhflowehr-prod.postgres.database.azure.com
+#    database: emap
+#    username: flowehr
+#    password: ${EMAP_STAR_CONSUMER_PASSWORD}
+
+# TODO
+# monitoring:  # Optional
+#   alert_recipients:  # Optional
+#     - name: person
+#       email: person@example.com
+#   network_watcher:  # Optional, required if accesses_real_data
+#     name: NetworkWatcher_location
+#     resource_group_name: NetworkWatcherRG

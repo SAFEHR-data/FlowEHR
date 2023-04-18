@@ -148,7 +148,7 @@ jobs:
     uses: ./.github/workflows/devcontainer_make_command.yml
     with:
       suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
-      environment: infra-test
+      environment: app-dev
       command: ${{ needs.pr_comment.outputs.makeCommand }}
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}
     secrets: inherit
@@ -159,7 +159,7 @@ jobs:
     uses: ./.github/workflows/clean_state.yml
     with:
       suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
-      environment: infra-test
+      environment: app-dev
     secrets: inherit
 
   run_test:
@@ -171,7 +171,7 @@ jobs:
     uses: ./.github/workflows/devcontainer_make_command.yml
     with:
       suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
-      environment: infra-test
+      environment: app-dev
       command: ${{ needs.pr_comment.outputs.makeCommand }}
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}
     secrets: inherit
@@ -182,7 +182,7 @@ jobs:
     uses: ./.github/workflows/clean_state.yml
     with:
       suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
-      environment: infra-test
+      environment: app-dev
     secrets: inherit
 
   summary:
@@ -190,7 +190,7 @@ jobs:
     needs: [pr_comment, run_test]
     if: always() && needs.run_test.result != 'skipped' # Run even on test failure
     runs-on: ubuntu-latest
-    environment: infra-test
+    environment: app-dev
     steps:
       # For PR builds triggered from comment builds, the GITHUB_REF is set to main
       # so the checks aren't automatically associated with the PR

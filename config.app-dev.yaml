@@ -1,0 +1,16 @@
+---
+environment: app-dev
+core_address_space: 10.64.4.0/22
+accesses_real_data: false
+private_dns_zones_rg: rg-bootstrap-uclh-ci-dev
+
+data_source_connections:
+  - synthetic-emap:
+    name: star
+    peering:
+      virtual_network_name: vnet-data-sources-ds-uclhflowehr-appdev
+      resource_group_name: rg-ds-uclhflowehr-appdev
+    fqdn: psqlserver-ds-uclhflowehr-appdev.postgres.database.azure.com
+    database: emap
+    username: flowehr
+    password: ${EMAP_STAR_CONSUMER_PASSWORD}

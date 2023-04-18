@@ -12,22 +12,20 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-name: Deploy Infra-Test
-
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
-
-# Only have a single instance of this workflow running at any time
-concurrency:
-  group: ${{ github.workflow }}
-
-jobs:
-  deploy:
-    uses: ./.github/workflows/devcontainer_make_command.yml
-    name: Make All
-    with:
-      command: all
-      environment: infra-test
-    secrets: inherit
+    name: Deploy prod
+    
+    on:
+      push:
+        branches: [prod]
+    
+    concurrency:
+      group: ${{ github.workflow }}
+    
+    jobs:
+      deploy:
+        uses: ./.github/workflows/devcontainer_make_command.yml
+        name: Make All
+        with:
+          command: all
+          environment: prod
+        secrets: inherit
