@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-name: Destroy App-Dev
+name: Destroy app-dev
 
 on:
   workflow_dispatch:
