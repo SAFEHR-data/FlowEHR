@@ -52,15 +52,13 @@ jobs:
           creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
       - name: Delete TF state
         run: |
-          az storage fs directory delete \
-            --file-system tfstate \
-            --name ${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }} \
-            --account-name ${{ vars.CI_STORAGE_ACCOUNT }} \
-            --auth-mode login \
-            --yes
+          az storage blob delete-batch \
+            --account-name "${{ vars.CI_STORAGE_ACCOUNT }}" \
+            --source tfstate \
+            --pattern "flowehr/${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}/*" \
+            --auth-mode login
       - name: Untag devcontainer image
         run: |
           az acr repository untag \
-            --name ${{ vars.CI_CONTAINER_REGISTRY }} \
-            --image ${{ inputs.devcontainer_name }}:${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }} \
-            --yes
+            --name "${{ vars.CI_CONTAINER_REGISTRY }}" \
+            --image "${{ inputs.devcontainer_name }}:${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}"
