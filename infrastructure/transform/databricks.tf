@@ -93,6 +93,12 @@ resource "databricks_cluster" "fixed_single_node" {
     })
   )
 
+  spark_env_vars = {
+    # "APPLICATIONINSIGHTS_CONNECTION_STRING" = data.azurerm_log_analytics_workspace.core.primary_shared_key
+    # "APPLICATIONINSIGHTS_CONNECTION_STRING" = "InstrumentationKey=b19d1bcf-96d6-42ac-9d92-e122e99bdf43;IngestionEndpoint=https://westeurope-1.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/"
+    "APPLICATIONINSIGHTS_CONNECTION_STRING" = "InstrumentationKey=b19d1bcf-1111-2222-3333-e122e99bdf43"
+  }
+
   custom_tags = {
     "ResourceClass" = "SingleNode"
   }

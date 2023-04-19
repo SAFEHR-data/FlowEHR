@@ -13,7 +13,8 @@
 #  limitations under the License.
 
 resource "azurerm_portal_dashboard" "pipeline_status_dashboard" {
-  name                 = "PipelineStatusDashboard"
+  for_each             = azurerm_data_factory_pipeline.pipeline
+  name                 = "${each.value.name}StatusDashboard"
   location             = var.core_rg_location
   resource_group_name  = var.core_rg_name
   dashboard_properties = <<EOF
@@ -33,51 +34,6 @@ resource "azurerm_portal_dashboard" "pipeline_status_dashboard" {
               "inputs": [
                 {
                   "name": "options",
-                  "value": {
-                    "chart": {
-                      "metrics": [
-                        {
-                          "resourceMetadata": {
-                            "id": "/subscriptions/d8ef0881-fb74-4e8b-9c71-fc24f5bd4ab2/resourceGroups/rg-tborflwhr-dev/providers/Microsoft.DataFactory/factories/adf-tborflwhr-dev"
-                          },
-                          "name": "PipelineSucceededRuns",
-                          "aggregationType": 1,
-                          "namespace": "microsoft.datafactory/factories",
-                          "metricVisualization": {
-                            "displayName": "Succeeded pipeline runs metrics",
-                            "resourceDisplayName": "adf-tborflwhr-dev"
-                          }
-                        }
-                      ],
-                      "title": "Sum Succeeded pipeline runs metrics for adf-tborflwhr-dev",
-                      "titleKind": 1,
-                      "visualization": {
-                        "chartType": 2,
-                        "legendVisualization": {
-                          "isVisible": true,
-                          "position": 2,
-                          "hideSubtitle": false
-                        },
-                        "axisVisualization": {
-                          "x": {
-                            "isVisible": true,
-                            "axisType": 2
-                          },
-                          "y": {
-                            "isVisible": true,
-                            "axisType": 1
-                          }
-                        }
-                      },
-                      "timespan": {
-                        "relative": {
-                          "duration": 86400000
-                        },
-                        "showUTCTime": true,
-                        "grain": 1
-                      }
-                    }
-                  },
                   "isOptional": true
                 },
                 {
@@ -93,18 +49,18 @@ resource "azurerm_portal_dashboard" "pipeline_status_dashboard" {
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/d8ef0881-fb74-4e8b-9c71-fc24f5bd4ab2/resourceGroups/rg-tborflwhr-dev/providers/Microsoft.DataFactory/factories/adf-tborflwhr-dev"
+                            "id": "${azurerm_data_factory.adf.id}"
                           },
                           "name": "PipelineSucceededRuns",
                           "aggregationType": 1,
                           "namespace": "microsoft.datafactory/factories",
                           "metricVisualization": {
                             "displayName": "Succeeded pipeline runs metrics",
-                            "resourceDisplayName": "adf-tborflwhr-dev"
+                            "resourceDisplayName": "${azurerm_data_factory.adf.name}"
                           }
                         }
                       ],
-                      "title": "Sum Succeeded pipeline runs metrics for adf-tborflwhr-dev",
+                      "title": "Succeeded pipeline runs metrics for ${each.value.name}",
                       "titleKind": 1,
                       "visualization": {
                         "chartType": 2,
@@ -126,15 +82,6 @@ resource "azurerm_portal_dashboard" "pipeline_status_dashboard" {
                         "disablePinning": true
                       }
                     }
-                  }
-                }
-              },
-              "filters": {
-                "MsPortalFx_TimeRange": {
-                  "model": {
-                    "format": "utc",
-                    "granularity": "auto",
-                    "relative": "1440m"
                   }
                 }
               }
@@ -166,18 +113,18 @@ resource "azurerm_portal_dashboard" "pipeline_status_dashboard" {
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/d8ef0881-fb74-4e8b-9c71-fc24f5bd4ab2/resourceGroups/rg-tborflwhr-dev/providers/Microsoft.DataFactory/factories/adf-tborflwhr-dev"
+                            "id": "${azurerm_data_factory.adf.id}"
                           },
                           "name": "PipelineFailedRuns",
                           "aggregationType": 1,
                           "namespace": "microsoft.datafactory/factories",
                           "metricVisualization": {
                             "displayName": "Failed pipeline runs metrics",
-                            "resourceDisplayName": "adf-tborflwhr-dev"
+                            "resourceDisplayName": "${azurerm_data_factory.adf.name}"
                           }
                         }
                       ],
-                      "title": "Sum Failed pipeline runs metrics for adf-tborflwhr-dev",
+                      "title": "Failed pipeline runs for ${each.value.name}",
                       "titleKind": 1,
                       "visualization": {
                         "chartType": 2,
