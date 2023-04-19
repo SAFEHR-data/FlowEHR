@@ -1,11 +1,6 @@
 ---
-infra_test_app:
-  name: Infra-Test App
-  description: Test of app deployment from infra-test
-  owners:
-    jjgriff93: jamesgr_microsoft.com#EXT#@MngEnv888133.onmicrosoft.com
-  contributors:
-    jjgriff93: jamesgr_microsoft.com#EXT#@MngEnv888133.onmicrosoft.com
+flowehr_cicd_test:
+  add_testing_slot: false
   managed_repo:
     private: false
     template: UCLH-Foundry/Dash-Seedling
