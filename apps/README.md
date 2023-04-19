@@ -19,6 +19,7 @@ Once you've done (or not done) that, follow [these instructions](https://docs.gi
 - `Webhook`: uncheck the Active checkbox
 - `Permissions`
     - `Repository Permissions`
+        - `Actions`: `Read-only`
         - `Administration`: `Read and write`
         - `Contents`: `Read and write`
         - `Environments`: `Read and write`
