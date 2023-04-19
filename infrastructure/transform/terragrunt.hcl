@@ -67,6 +67,7 @@ terraform {
     ${local.providers.locals.required_provider_random}
     ${local.providers.locals.required_provider_databricks}
     ${local.providers.locals.required_provider_null}
+    ${local.providers.locals.required_provider_time}
   }
 }
 EOF

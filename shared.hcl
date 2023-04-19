@@ -29,12 +29,16 @@ terraform {
 
   required_providers {
     ${local.providers.locals.required_provider_azure}
-    ${local.providers.locals.required_provider_null}
-    ${local.providers.locals.required_provider_external}
-    ${local.providers.locals.required_provider_time}
   }
 }
 EOF
+}
+
+terraform {
+  before_hook "before_hook" {
+    commands = ["apply", "plan"]
+    execute  = ["tflint"]
+  }
 }
 
 remote_state {

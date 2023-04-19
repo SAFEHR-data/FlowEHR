@@ -48,6 +48,8 @@ terraform {
   required_providers {
     ${local.providers.locals.required_provider_azure}
     ${local.providers.locals.required_provider_github}
+    ${local.providers.locals.required_provider_null}
+    ${local.providers.locals.required_provider_external}
   }
 }
 EOF
