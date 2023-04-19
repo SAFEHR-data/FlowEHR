@@ -110,7 +110,6 @@ dependency "transform" {
   mock_outputs = {
     feature_store_server_name  = "transform_feature_store_server_name"
     feature_store_db_name      = "transform_feature_store_db_name"
-    apps_ad_group_display_name = "transform_apps_ad_group_display_name"
     apps_ad_group_principal_id = "transform_apps_ad_group_principal_id"
   }
   mock_outputs_allowed_terraform_commands = ["init", "destroy"]
@@ -140,7 +139,6 @@ inputs = {
 
   transform_feature_store_server_name  = dependency.transform.outputs.feature_store_server_name
   transform_feature_store_db_name      = dependency.transform.outputs.feature_store_db_name
-  transform_apps_ad_group_display_name = dependency.transform.outputs.apps_ad_group_display_name
   transform_apps_ad_group_principal_id = dependency.transform.outputs.apps_ad_group_principal_id
 
   serve_app_service_plan_name = dependency.serve.outputs.app_service_plan_name

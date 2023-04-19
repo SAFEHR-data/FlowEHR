@@ -58,8 +58,7 @@ resource "azurerm_data_factory_trigger_tumbling_window" "pipeline_trigger" {
     parameters = each.value.properties.pipeline.parameters
   }
 
-  // Trigger dependencies and additional properties aren't supported
-
+  # Trigger dependencies and additional properties aren't supported
   depends_on = [
     azurerm_data_factory_pipeline.pipeline
   ]

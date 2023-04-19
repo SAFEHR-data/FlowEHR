@@ -42,18 +42,18 @@ locals {
 
   # Map deployment branch and github environment names for main & testing slot (if enabled)
   branches_and_envs = var.app_config.add_testing_slot ? {
-    "${local.core_branch_name}"    = local.core_gh_env
-    "${local.testing_branch_name}" = local.testing_gh_env
-  } : { "${local.core_branch_name}" = local.core_gh_env }
+    local.core_branch_name    = local.core_gh_env
+    local.testing_branch_name = local.testing_gh_env
+  } : { local.core_branch_name = local.core_gh_env }
 
   acr_deploy_reusable_workflow_filename = "acr_deploy_reusable.yml"
   slot_swap_reusable_workflow_filename  = "slot_swap_reusable.yml"
 
   # Map GitHub/FlowEHR environments and corresponding GH workflow files to deploy to them
   envs_and_workflow_templates = var.app_config.add_testing_slot ? {
-    "${local.core_gh_env}"    = data.template_file.core_github_workflow
-    "${local.testing_gh_env}" = data.template_file.testing_github_workflow[0]
-  } : { "${local.core_gh_env}" = data.template_file.core_github_workflow }
+    local.core_gh_env    = data.template_file.core_github_workflow
+    local.testing_gh_env = data.template_file.testing_github_workflow[0]
+  } : { local.core_gh_env = data.template_file.core_github_workflow }
 
   site_credential_name     = azurerm_linux_web_app.app.site_credential[0].name
   site_credential_password = azurerm_linux_web_app.app.site_credential[0].password

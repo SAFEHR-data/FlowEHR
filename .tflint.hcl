@@ -15,10 +15,6 @@
 config {
   format     = "compact"
   plugin_dir = "~/.tflint.d/plugins"
-
-  module              = true
-  force               = false
-  disabled_by_default = false
 }
 
 plugin "terraform" {
@@ -48,5 +44,9 @@ rule "terraform_documented_outputs" {
 }
 
 rule "terraform_documented_variables" {
+  enabled = false
+}
+
+rule "terraform_naming_convention" {
   enabled = false
 }
