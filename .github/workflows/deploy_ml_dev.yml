@@ -12,20 +12,21 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-    name: Deploy ml-dev
-    
-    on:
-      push:
-        branches: [ml-dev]
-    
-    concurrency:
-      group: ${{ github.workflow }}
-    
-    jobs:
-      deploy:
-        uses: ./.github/workflows/devcontainer_make_command.yml
-        name: Make Transform
-        with:
-          command: infrastructure-transform
-          environment: ml-dev
-        secrets: inherit
+name: Deploy ml-dev
+
+on:
+  push:
+    branches: [ml-dev]
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/devcontainer_make_command.yml
+    name: Make Transform
+    with:
+      command: infrastructure-transform
+      environment: ml-dev
+      runner_label: gh-runner-uclh-ci-prod
+    secrets: inherit
