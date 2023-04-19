@@ -92,11 +92,21 @@ locals {
 
   developers      = { "name" : "${var.developers_ad_group_display_name}", "role" : "db_datareader" }
   data_scientists = { "name" : "${var.data_scientists_ad_group_display_name}", "role" : "db_datareader" }
+  apps            = { "name" : "${azuread_group.ad_group_apps.display_name}", "role" : "db_datareader" }
+  databricks_app  = { "name" : "${local.databricks_app_name}", "role" : "db_owner" }
 
-  msi_users = [
-    { "name" : "${local.databricks_app_name}", "role" : "db_owner" },
-    { "name" : "${azuread_group.ad_group_apps.display_name}", "role" : "db_datareader" },
+  real_data_users_groups = [
+    local.data_scientists,
+    local.apps,
+    local.databricks_app
   ]
 
-  sql_users_to_create = var.accesses_real_data ? local.msi_users : concat(local.msi_users, [local.developers, local.data_scientists])
+  synth_data_users_groups = [
+    local.data_scientists,
+    local.apps,
+    local.databricks_app,
+    local.developers
+  ]
+
+  sql_users_to_create = var.accesses_real_data ? local.real_data_users_groups : local.synth_data_users_groups
 }
