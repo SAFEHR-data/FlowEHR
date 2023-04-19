@@ -38,6 +38,10 @@ on:
         required: false
         description: The devcontainer image name
         default: flowehr/devcontainer
+      runner_label:
+        type: string
+        required: false
+        description: A specific GitHub runner label to run this workflow on. Overrides vars.CI_GITHUB_RUNNER_LABEL, which may be set at a repo level
     secrets:
       ARM_SUBSCRIPTION_ID:
         required: true
@@ -55,7 +59,7 @@ on:
 jobs:
   make:
     name: make ${{ inputs.command }}
-    runs-on: [self-hosted, "${{ vars.CI_GITHUB_RUNNER_LABEL }}"]
+    runs-on: [self-hosted, "${{ (inputs.runner_label != '' && inputs.runner_label) || vars.CI_GITHUB_RUNNER_LABEL }}"]
     environment: ${{ inputs.environment }}
     steps:
       - name: Set devcontainer attributes
