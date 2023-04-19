@@ -32,9 +32,9 @@ locals {
   merged_apps_config = {
     # As it's a map, we need to iterate as direct merge() would overwrite each key's value entirely
     for app_id, env_app_config in local.env_apps_config : app_id =>
-      # And we don't want apps defined in apps.yaml but not in current {ENVIRONMENT} file to be deployed,
-      # so only merge if key exists with env-specific config taking precedence
-      merge(try(local.shared_apps_config[app_id], null), env_app_config)
+    # And we don't want apps defined in apps.yaml but not in current {ENVIRONMENT} file to be deployed,
+    # so only merge if key exists with env-specific config taking precedence
+    merge(try(local.shared_apps_config[app_id], null), env_app_config)
   }
 }
 
@@ -89,26 +89,29 @@ dependency "core" {
   config_path = "${get_repo_root()}/infrastructure/core"
 
   mock_outputs = {
-    core_rg_name            = "core_rg_name"
-    core_rg_location        = "core_rg_location"
-    core_kv_id              = "core_kv_id"
-    core_log_analytics_name = "core_log_analytics_name"
+    naming_suffix                         = "naming_suffix"
+    naming_suffix_truncated               = "naming_suffix_truncated"
+    core_rg_name                          = "core_rg_name"
+    core_rg_location                      = "core_rg_location"
+    core_kv_id                            = "core_kv_id"
+    core_log_analytics_name               = "core_log_analytics_name"
+    webapps_subnet_id                     = "serve_webapps_subnet_id"
+    developers_ad_group_principal_id      = "core_developers_ad_group_principal_id"
+    data_scientists_ad_group_principal_id = "core_data_scientists_ad_group_principal_id"
   }
-  mock_outputs_allowed_terraform_commands = ["destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
 }
 
 dependency "transform" {
   config_path = "${get_repo_root()}/infrastructure/transform"
 
   mock_outputs = {
-    feature_store_server_name        = "transform_feature_store_server_name"
-    feature_store_db_name            = "transform_feature_store_db_name"
-    apps_ad_group_display_name       = "transform_apps_ad_group_display_name"
-    developers_ad_group_display_name = "transform_developers_ad_group_display_name"
-    apps_ad_group_principal_id       = "transform_apps_ad_group_principal_id"
-    developers_ad_group_principal_id = "transform_developers_ad_group_principal_id"
+    feature_store_server_name  = "transform_feature_store_server_name"
+    feature_store_db_name      = "transform_feature_store_db_name"
+    apps_ad_group_display_name = "transform_apps_ad_group_display_name"
+    apps_ad_group_principal_id = "transform_apps_ad_group_principal_id"
   }
-  mock_outputs_allowed_terraform_commands = ["destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
 }
 
 dependency "serve" {
@@ -118,26 +121,25 @@ dependency "serve" {
     app_service_plan_name = "serve_app_service_plan_name"
     acr_name              = "serve_acr_name"
     cosmos_account_name   = "serve_cosmos_account_name"
-    webapps_subnet_id     = "serve_webapps_subnet_id"
   }
-  mock_outputs_allowed_terraform_commands = ["destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
 }
 
 inputs = {
-  naming_suffix           = dependency.core.outputs.naming_suffix
-  naming_suffix_truncated = dependency.core.outputs.naming_suffix_truncated
-  core_rg_name            = dependency.core.outputs.core_rg_name
-  core_rg_location        = dependency.core.outputs.core_rg_location
-  core_kv_id              = dependency.core.outputs.core_kv_id
-  core_log_analytics_name = dependency.core.outputs.core_log_analytics_name
-  serve_webapps_subnet_id = dependency.core.outputs.webapps_subnet_id
+  naming_suffix                              = dependency.core.outputs.naming_suffix
+  naming_suffix_truncated                    = dependency.core.outputs.naming_suffix_truncated
+  core_rg_name                               = dependency.core.outputs.core_rg_name
+  core_rg_location                           = dependency.core.outputs.core_rg_location
+  core_kv_id                                 = dependency.core.outputs.core_kv_id
+  core_log_analytics_name                    = dependency.core.outputs.core_log_analytics_name
+  serve_webapps_subnet_id                    = dependency.core.outputs.webapps_subnet_id
+  core_developers_ad_group_principal_id      = dependency.core.outputs.developers_ad_group_principal_id
+  core_data_scientists_ad_group_principal_id = dependency.core.outputs.data_scientists_ad_group_principal_id
 
-  transform_feature_store_server_name        = dependency.transform.outputs.feature_store_server_name
-  transform_feature_store_db_name            = dependency.transform.outputs.feature_store_db_name
-  transform_apps_ad_group_display_name       = dependency.transform.outputs.apps_ad_group_display_name
-  transform_developers_ad_group_display_name = dependency.transform.outputs.developers_ad_group_display_name
-  transform_apps_ad_group_principal_id       = dependency.transform.outputs.apps_ad_group_principal_id
-  transform_developers_ad_group_principal_id = dependency.transform.outputs.developers_ad_group_principal_id
+  transform_feature_store_server_name  = dependency.transform.outputs.feature_store_server_name
+  transform_feature_store_db_name      = dependency.transform.outputs.feature_store_db_name
+  transform_apps_ad_group_display_name = dependency.transform.outputs.apps_ad_group_display_name
+  transform_apps_ad_group_principal_id = dependency.transform.outputs.apps_ad_group_principal_id
 
   serve_app_service_plan_name = dependency.serve.outputs.app_service_plan_name
   serve_acr_name              = dependency.serve.outputs.acr_name

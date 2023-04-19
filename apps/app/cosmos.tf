@@ -18,21 +18,19 @@ resource "azurerm_cosmosdb_sql_database" "app" {
   account_name        = var.cosmos_account_name
 }
 
-resource "azurerm_cosmosdb_sql_role_definition" "webapp" {
-  name                = "${var.app_id}-AccessCosmosSingleDB"
-  resource_group_name = var.resource_group_name
-  account_name        = var.cosmos_account_name
-  assignable_scopes   = ["${data.azurerm_cosmosdb_account.state_store.id}/dbs/${azurerm_cosmosdb_sql_database.app.name}"]
-
-  permissions {
-    data_actions = ["Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/*"]
-  }
-}
-
 resource "azurerm_cosmosdb_sql_role_assignment" "webapp" {
   resource_group_name = var.resource_group_name
   account_name        = var.cosmos_account_name
-  role_definition_id  = azurerm_cosmosdb_sql_role_definition.webapp.id
+  role_definition_id  = data.azurerm_cosmosdb_sql_role_definition.data_contributor.id
   principal_id        = azurerm_linux_web_app.app.identity[0].principal_id
+  scope               = "${data.azurerm_cosmosdb_account.state_store.id}/dbs/${azurerm_cosmosdb_sql_database.app.name}"
+}
+
+resource "azurerm_cosmosdb_sql_role_assignment" "cosmos_access" {
+  for_each            = var.accesses_real_data ? toset([]) : toset([var.developers_ad_group_principal_id, var.data_scientists_ad_group_principal_id])
+  resource_group_name = var.resource_group_name
+  account_name        = var.cosmos_account_name
+  role_definition_id  = data.azurerm_cosmosdb_sql_role_definition.data_contributor.id
+  principal_id        = each.value
   scope               = "${data.azurerm_cosmosdb_account.state_store.id}/dbs/${azurerm_cosmosdb_sql_database.app.name}"
 }

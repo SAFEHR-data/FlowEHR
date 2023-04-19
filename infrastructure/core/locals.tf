@@ -38,6 +38,7 @@ locals {
   aml_address_space                  = local.subnet_address_spaces[4]
   # free_address_space               = local.subnet_address_spaces[5]
 
+  create_dns_zones = var.private_dns_zones_rg == null
   required_private_dns_zones = {
     blob       = "privatelink.blob.core.windows.net"
     keyvault   = "privatelink.vaultcore.azure.net"

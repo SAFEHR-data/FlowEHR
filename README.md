@@ -52,12 +52,13 @@ Once you've created it, specify the following values:
       virtual_network_name: name of the virtual network
       resource_group_name: resource group name containing vnet
       dns_zones:
-        - list of dns zones
+        - list of dns zones created in the data source to link to (if private_dns_zones_rg is defined, FlowEHR will look for these in that rg)
     fqdn: fqdn for the datasource (e.g. asqlserver.database.windows.net)
     database: database name
     username: db username
     password: db password
 ```
+
 
 ## Deploying
 

@@ -20,6 +20,7 @@ locals {
   trigger_file                       = "trigger.json"
   artifacts_dir                      = "artifacts"
   adb_linked_service_name            = "ADBLinkedServiceViaMSI"
+  dbfs_storage_account_name          = "dbfs${var.naming_suffix_truncated}"
 
   # IPs required for Databricks UDRs 
   # Built from https://learn.microsoft.com/en-us/azure/databricks/resources/supported-regions#--control-plane-nat-webapp-and-extended-infrastructure-ip-addresses-and-domains
@@ -64,8 +65,6 @@ locals {
     ]
   ])
 
-  storage_account_name = "dbfs${var.naming_suffix_truncated}"
-
   data_source_connections_with_peerings = [
     for idx, item in var.data_source_connections : item if item.peering != null
   ]
@@ -91,10 +90,23 @@ locals {
     ]
   ]))
 
-  sql_users_to_create = [
-    { "name" : "${local.databricks_app_name}", "role" : "db_owner" },
-    { "name" : "${azuread_group.ad_group_apps.display_name}", "role" : "db_datareader" },
-    { "name" : "${azuread_group.ad_group_developers.display_name}", "role" : "db_datareader" },
-    { "name" : "${azuread_group.ad_group_data_scientists.display_name}", "role" : "db_datareader" },
+  developers      = { "name" : "${var.developers_ad_group_display_name}", "role" : "db_datareader" }
+  data_scientists = { "name" : "${var.data_scientists_ad_group_display_name}", "role" : "db_datareader" }
+  apps            = { "name" : "${azuread_group.ad_group_apps.display_name}", "role" : "db_datareader" }
+  databricks_app  = { "name" : "${local.databricks_app_name}", "role" : "db_owner" }
+
+  real_data_users_groups = [
+    local.data_scientists,
+    local.apps,
+    local.databricks_app
   ]
+
+  synth_data_users_groups = [
+    local.data_scientists,
+    local.apps,
+    local.databricks_app,
+    local.developers
+  ]
+
+  sql_users_to_create = var.accesses_real_data ? local.real_data_users_groups : local.synth_data_users_groups
 }

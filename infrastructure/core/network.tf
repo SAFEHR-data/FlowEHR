@@ -109,7 +109,7 @@ resource "azurerm_subnet" "serve_webapps" {
 }
 
 resource "azurerm_private_dns_zone" "created_zones" {
-  for_each            = var.private_dns_zones_rg == null ? local.required_private_dns_zones : {}
+  for_each            = local.create_dns_zones ? local.required_private_dns_zones : {}
   name                = each.value
   resource_group_name = azurerm_resource_group.core.name
   tags                = var.tags
@@ -131,11 +131,11 @@ resource "azurerm_virtual_network_peering" "flowehr_to_ci" {
   remote_virtual_network_id = data.azurerm_virtual_network.ci[0].id
 }
 
-# If create_dns_zones is true, we link to the created zones, otherwise link to pre-existing zones
+# If private_dns_zones_rg isn't set, we link to the created zones, otherwise link to pre-existing zones
 resource "azurerm_private_dns_zone_virtual_network_link" "flowehr" {
-  for_each              = var.private_dns_zones_rg == null ? azurerm_private_dns_zone.created_zones : data.azurerm_private_dns_zone.existing_zones
+  for_each              = local.create_dns_zones ? azurerm_private_dns_zone.created_zones : data.azurerm_private_dns_zone.existing_zones
   name                  = "vnl-${each.value.name}-flwr-${local.naming_suffix}"
-  resource_group_name   = var.private_dns_zones_rg == null ? azurerm_resource_group.core.name : var.private_dns_zones_rg
+  resource_group_name   = local.create_dns_zones ? azurerm_resource_group.core.name : var.private_dns_zones_rg
   private_dns_zone_name = each.value.name
   virtual_network_id    = azurerm_virtual_network.core.id
   tags                  = var.tags
@@ -151,7 +151,7 @@ resource "azurerm_private_endpoint" "blob" {
   private_dns_zone_group {
     name = "private-dns-zone-group-blob-${local.naming_suffix}"
     private_dns_zone_ids = [
-      var.private_dns_zones_rg == null
+      local.create_dns_zones
       ? azurerm_private_dns_zone.created_zones["blob"].id
       : data.azurerm_private_dns_zone.existing_zones["blob"].id
     ]
@@ -183,7 +183,7 @@ resource "azurerm_private_endpoint" "keyvault" {
   private_dns_zone_group {
     name = "private-dns-zone-group-kv-${local.naming_suffix}"
     private_dns_zone_ids = [
-      var.private_dns_zones_rg == null
+      local.create_dns_zones
       ? azurerm_private_dns_zone.created_zones["keyvault"].id
       : data.azurerm_private_dns_zone.existing_zones["keyvault"].id
     ]

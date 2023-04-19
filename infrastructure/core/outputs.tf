@@ -73,7 +73,27 @@ output "storage_account_name" {
 }
 
 output "private_dns_zones" {
-  value = var.private_dns_zones_rg == null ? azurerm_private_dns_zone.created_zones : data.azurerm_private_dns_zone.existing_zones
+  value = local.create_dns_zones ? azurerm_private_dns_zone.created_zones : data.azurerm_private_dns_zone.existing_zones
+}
+
+output "developers_ad_group_principal_id" {
+  description = "Developers AD group principal id"
+  value       = azuread_group.ad_group_developers[0].object_id
+}
+
+output "data_scientists_ad_group_principal_id" {
+  description = "Data scientists AD group principal id"
+  value       = azuread_group.ad_group_data_scientists.object_id
+}
+
+output "developers_ad_group_display_name" {
+  description = "Developers AD group display name"
+  value       = azuread_group.ad_group_developers[0].display_name
+}
+
+output "data_scientists_ad_group_display_name" {
+  description = "Data scientists AD group display name"
+  value       = azuread_group.ad_group_data_scientists.display_name
 }
 
 output "aml_address_space" {

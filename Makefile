@@ -54,13 +54,13 @@ auth: az-login ## Create auth app for deployments
 	&& terraform output -json \
 	  | jq -r 'with_entries(.value |= .value) | to_entries[] | "\(.key +": "+ .value)"'
 
-infrastructure: az-login transform-artifacts ## Deploy all infrastructure
+infrastructure: az-login ## Deploy all infrastructure
 	$(call terragrunt,apply,infrastructure)
 
 infrastructure-core: az-login ## Deploy core infrastructure
 	$(call terragrunt,apply,infrastructure/core)
 
-infrastructure-transform: az-login transform-artifacts ## Deploy transform infrastructure
+infrastructure-transform: az-login ## Deploy transform infrastructure
 	$(call terragrunt,apply,infrastructure/transform)
 
 infrastructure-serve: az-login ## Deploy serve infrastructure

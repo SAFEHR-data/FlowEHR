@@ -62,15 +62,15 @@ variable "transform_apps_ad_group_display_name" {
   type = string
 }
 
-variable "transform_developers_ad_group_display_name" {
-  type = string
-}
-
 variable "transform_apps_ad_group_principal_id" {
   type = string
 }
 
-variable "transform_developers_ad_group_principal_id" {
+variable "core_developers_ad_group_principal_id" {
+  type = string
+}
+
+variable "core_data_scientists_ad_group_principal_id" {
   type = string
 }
 
@@ -102,16 +102,23 @@ variable "github_app_cert" {
 
 # -- FROM CONFIGURATION FILES --------
 variable "accesses_real_data" {
-  type = bool
+  type    = bool
+  default = false
 }
 
 variable "serve" {
-  description = "Serve configuration block (populated from root config file(s))"
+  description = "Serve configuration block (populated from root config file(s)). Required when apps are configured for deployment."
   type = object({
     github_owner               = string
     github_app_id              = string
     github_app_installation_id = string
   })
+  # Set a default so a serve block isn't required when running make all without any apps configured
+  default = {
+    github_owner               = null
+    github_app_id              = null
+    github_app_installation_id = null
+  }
 }
 
 variable "apps" {
