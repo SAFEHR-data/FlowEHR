@@ -96,16 +96,16 @@ locals {
   databricks_app  = { "name" : "${local.databricks_app_name}", "role" : "db_owner" }
 
   real_data_users_groups = [
-    data_scientists,
-    apps,
-    databricks_app
+    local.data_scientists,
+    local.apps,
+    local.databricks_app
   ]
 
   synth_data_users_groups = [
-    data_scientists,
-    apps,
-    databricks_app,
-    developers
+    local.data_scientists,
+    local.apps,
+    local.databricks_app,
+    local.developers
   ]
 
   sql_users_to_create = var.accesses_real_data ? local.real_data_users_groups : local.synth_data_users_groups
