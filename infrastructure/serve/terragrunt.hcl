@@ -35,13 +35,13 @@ dependency "core" {
 }
 
 inputs = {
-  naming_suffix               = dependency.core.outputs.naming_suffix
-  naming_suffix_truncated     = dependency.core.outputs.naming_suffix_truncated
-  core_rg_name                = dependency.core.outputs.core_rg_name
-  core_rg_location            = dependency.core.outputs.core_rg_location
-  core_kv_id                  = dependency.core.outputs.core_kv_id
-  core_vnet_name              = dependency.core.outputs.core_vnet_name
-  core_subnet_id              = dependency.core.outputs.core_subnet_id
-  deployer_ip                 = dependency.core.outputs.deployer_ip
-  private_dns_zones           = dependency.core.outputs.private_dns_zones
+  naming_suffix           = dependency.core.outputs.naming_suffix
+  naming_suffix_truncated = dependency.core.outputs.naming_suffix_truncated
+  core_rg_name            = dependency.core.outputs.core_rg_name
+  core_rg_location        = dependency.core.outputs.core_rg_location
+  core_kv_id              = dependency.core.outputs.core_kv_id
+  core_vnet_name          = dependency.core.outputs.core_vnet_name
+  core_subnet_id          = dependency.core.outputs.core_subnet_id
+  deployer_ip             = dependency.core.outputs.deployer_ip
+  private_dns_zones       = dependency.core.outputs.private_dns_zones
 }
