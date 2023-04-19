@@ -31,6 +31,7 @@ repos:
       - id: terraform-fmt
       - id: tflint
       - id: terragrunt-hclfmt
+      - id: terraform-validate
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.9.0.2
