@@ -46,5 +46,8 @@ jobs:
             "https://github.com/gruntwork-io/terragrunt/releases/download/v0.42.8/terragrunt_linux_amd64"
           sudo chmod +x /bin/terragrunt
 
+      - name: Terragrunt init
+        run: terragrunt run-all init
+
       - name: Run pre-commit tests
         uses: pre-commit/action@v3.0.0
