@@ -46,8 +46,10 @@ jobs:
             "https://github.com/gruntwork-io/terragrunt/releases/download/v0.42.8/terragrunt_linux_amd64"
           sudo chmod +x /bin/terragrunt
 
-      - name: Terragrunt init
-        run: terragrunt run-all init
+      - uses: terraform-linters/setup-tflint@v2
+        name: Setup TFLint
+        with:
+          tflint_version: v0.44.1
 
-      - name: Run pre-commit tests
+      - name: Pre-commit linting
         uses: pre-commit/action@v3.0.0
