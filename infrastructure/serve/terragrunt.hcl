@@ -31,7 +31,7 @@ dependency "core" {
     private_dns_zones           = "private_dns_zones"
     deployer_ip                 = "depoyer_ip"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy", "validate"]
 }
 
 inputs = {

@@ -51,7 +51,7 @@ dependency "core" {
     developers_ad_group_display_name      = "developers_ad_group_display_name"
     data_scientists_ad_group_display_name = "data_scientists_ad_group_display_name"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy", "validate"]
 }
 
 generate "terraform" {

@@ -101,7 +101,7 @@ dependency "core" {
     developers_ad_group_principal_id      = "core_developers_ad_group_principal_id"
     data_scientists_ad_group_principal_id = "core_data_scientists_ad_group_principal_id"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy", "validate"]
 }
 
 dependency "transform" {
@@ -112,7 +112,7 @@ dependency "transform" {
     feature_store_db_name      = "transform_feature_store_db_name"
     apps_ad_group_principal_id = "transform_apps_ad_group_principal_id"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy", "validate"]
 }
 
 dependency "serve" {
@@ -123,7 +123,7 @@ dependency "serve" {
     acr_name              = "serve_acr_name"
     cosmos_account_name   = "serve_cosmos_account_name"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy", "validate"]
 }
 
 inputs = {
