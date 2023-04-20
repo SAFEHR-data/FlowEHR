@@ -16,6 +16,29 @@ include "shared" {
   path = "${get_repo_root()}/shared.hcl"
 }
 
+locals {
+  providers = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+}
+
+generate "terraform" {
+  path      = "terraform.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+terraform {
+  required_version = "${local.providers.locals.terraform_version}"
+
+  required_providers {
+    ${local.providers.locals.required_provider_azure}
+    ${local.providers.locals.required_provider_null}
+    ${local.providers.locals.required_provider_external}
+    ${local.providers.locals.required_provider_time}
+    ${local.providers.locals.required_provider_local}
+    ${local.providers.locals.required_provider_azapi}
+  }
+}
+EOF
+}
+
 dependency "core" {
   config_path = "../core"
 

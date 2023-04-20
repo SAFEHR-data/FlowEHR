@@ -33,7 +33,7 @@ resource "azurerm_private_endpoint" "aml_blob" {
 }
 
 resource "azurerm_subnet" "aml" {
-  name                 = "subnet-aml-${local.naming_suffix}"
+  name                 = "subnet-aml-${var.naming_suffix}"
   virtual_network_name = var.core_vnet_name
   resource_group_name  = var.core_rg_name
   address_prefixes     = [var.aml_address_space]
@@ -48,8 +48,20 @@ resource "azurerm_subnet" "aml" {
   service_endpoint_policy_ids = [azapi_resource.aml_service_endpoint_policy.id]
 }
 
+resource "azurerm_network_security_group" "aml" {
+  name                = "nsg-aml-${var.naming_suffix}"
+  location            = var.core_rg_location
+  resource_group_name = var.core_rg_name
+  tags                = var.tags
+}
+
+resource "azurerm_subnet_network_security_group_association" "aml" {
+  network_security_group_id = azurerm_network_security_group.aml.id
+  subnet_id                 = azurerm_subnet.aml.id
+}
+
 resource "azurerm_private_endpoint" "aml" {
-  name                = "pe-aml-${local.naming_suffix}"
+  name                = "pe-aml-${var.naming_suffix}"
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
   subnet_id           = azurerm_subnet.aml.id
@@ -78,19 +90,19 @@ resource "azurerm_private_endpoint" "aml" {
 
 
 resource "azurerm_private_endpoint" "file" {
-  name                = "pe-file-${local.naming_suffix}"
+  name                = "pe-file-${var.naming_suffix}"
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
   subnet_id           = azurerm_subnet.aml.id
   tags                = var.tags
 
   private_dns_zone_group {
-    name                 = "private-dns-zone-group-file-${local.naming_suffix}"
-    private_dns_zone_ids = [data.azurerm_private_dns_zone.filecore.id]
+    name                 = "private-dns-zone-group-file-${var.naming_suffix}"
+    private_dns_zone_ids = [var.private_dns_zones["file"].id]
   }
 
   private_service_connection {
-    name                           = "private-service-connection-file-${var.tre_id}"
+    name                           = "private-service-connection-file-${var.naming_suffix}"
     private_connection_resource_id = azurerm_storage_account.aml.id
     is_manual_connection           = false
     subresource_names              = ["file"]
@@ -99,14 +111,14 @@ resource "azurerm_private_endpoint" "file" {
 
 resource "azapi_resource" "aml_service_endpoint_policy" {
   type      = "Microsoft.Network/serviceEndpointPolicies@2022-05-01"
-  name      = "aml-service-endpoint-policy-${local.naming_suffix}"
+  name      = "aml-service-endpoint-policy-${var.naming_suffix}"
   location  = var.core_rg_location
   parent_id = azurerm_storage_account.aml.id
   body = jsonencode({
     properties = {
       serviceEndpointPolicyDefinitions = [
         {
-          name = "aml-service-endpoint-policy-definition-storage-${local.naming_suffix}"
+          name = "aml-service-endpoint-policy-definition-storage-${var.naming_suffix}"
           properties = {
             service = "Microsoft.Storage"
             serviceResources = [
@@ -116,7 +128,7 @@ resource "azapi_resource" "aml_service_endpoint_policy" {
           type = "Microsoft.Network/serviceEndpointPolicies/serviceEndpointPolicyDefinitions"
         },
         {
-          name = "aml-service-endpoint-policy-definition-azureml-${local.naming_suffix}"
+          name = "aml-service-endpoint-policy-definition-azureml-${var.naming_suffix}"
           properties = {
             service = "Global"
             serviceResources = [

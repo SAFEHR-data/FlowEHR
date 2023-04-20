@@ -98,4 +98,11 @@ local = {
   version = "2.4.0"
 }
 EOF
+
+required_provider_azapi = <<EOF
+azapi = {
+  source = "Azure/azapi"
+  version = "1.5.0"
+}
+EOF
 }
