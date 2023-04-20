@@ -110,10 +110,11 @@ destroy-no-terraform: az-login ## Destroy all resource groups associated with th
 clean: ## Remove all local terraform state
 	find ${MAKEFILE_DIR} -type d -name ".terraform" -exec rm -rf "{}" \; || true
 
-tf-reinit: ## Re-init Terraform (use for updating lock files & when backend state changes)
+tf-reinit: ## Re-init Terraform (use for when backend state changes)
 	$(call target_title, "Terraform init") \
 	&& cd ${MAKEFILE_DIR} \
-	&& terragrunt run-all init -upgrade -migrate-state -input=true \
-	&& terragrunt run-all providers lock -platform=linux_arm64 -platform=linux_amd64 \
-	&& cd apps/app \
-	&& terraform providers lock -platform=linux_arm64 -platform=linux_amd64
+	&& terragrunt run-all init -upgrade -migrate-state -input=true
+
+tf-update-locks: ## Update Terraform lockfiles (use when new providers are referenced)
+	$(call target_title, "Terraform update lock files") \
+	&& pre-commit run terraform_providers_lock

@@ -32,6 +32,9 @@ repos:
       - id: terraform_validate
       - id: terragrunt_fmt
       - id: terraform_tflint
+      - id: terraform_providers_lock
+        args: ["-platform=linux_arm64", "-platform=linux_amd64"]
+        stages: ["manual"]
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.9.0.2
