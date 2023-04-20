@@ -43,13 +43,13 @@ jobs:
       - name: Setup Terragrunt
         run: |
           sudo wget -q -O /bin/terragrunt \
-            "https://github.com/gruntwork-io/terragrunt/releases/download/v0.42.8/terragrunt_linux_amd64"
+            "https://github.com/gruntwork-io/terragrunt/releases/download/v0.44.5/terragrunt_linux_amd64"
           sudo chmod +x /bin/terragrunt
 
       - uses: terraform-linters/setup-tflint@v2
         name: Setup TFLint
         with:
-          tflint_version: v0.44.1
+          tflint_version: v0.46.0
 
       - name: Terragrunt init
         run: terragrunt run-all init
