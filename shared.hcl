@@ -29,7 +29,6 @@ terraform {
 
   required_providers {
     ${local.providers.locals.required_provider_azure}
-    ${local.providers.locals.required_provider_http}
   }
 }
 EOF

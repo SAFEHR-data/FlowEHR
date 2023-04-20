@@ -31,6 +31,7 @@ terraform {
     ${local.providers.locals.required_provider_azure}
     ${local.providers.locals.required_provider_azuread}
     ${local.providers.locals.required_provider_random}
+    ${local.providers.locals.required_provider_http}
   }
 }
 EOF
