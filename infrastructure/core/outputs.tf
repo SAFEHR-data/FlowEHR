@@ -78,7 +78,7 @@ output "private_dns_zones" {
 
 output "developers_ad_group_principal_id" {
   description = "Developers AD group principal id"
-  value       = azuread_group.ad_group_developers[0].object_id
+  value       = var.accesses_real_data ? "" : azuread_group.ad_group_developers[0].object_id
 }
 
 output "data_scientists_ad_group_principal_id" {
@@ -88,7 +88,7 @@ output "data_scientists_ad_group_principal_id" {
 
 output "developers_ad_group_display_name" {
   description = "Developers AD group display name"
-  value       = azuread_group.ad_group_developers[0].display_name
+  value       = var.accesses_real_data ? "" : azuread_group.ad_group_developers[0].display_name
 }
 
 output "data_scientists_ad_group_display_name" {
