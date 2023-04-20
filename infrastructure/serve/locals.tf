@@ -12,9 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-data "azurerm_client_config" "current" {}
-
-data "azurerm_virtual_network" "core" {
-  name                = var.core_vnet_name
-  resource_group_name = var.core_rg_name
+locals {
+  aml_registry_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.core_rg_name}/providers/Microsoft.MachineLearningServices/registries/${data.external.az_cli_registry_create.result.name}"
 }

@@ -78,31 +78,54 @@ resource "azurerm_private_endpoint" "aml" {
 
 
 resource "azurerm_private_endpoint" "file" {
-  name                = "pe-file-${local.storage_name}"
+  name                = "pe-file-${local.naming_suffix}"
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
   subnet_id           = azurerm_subnet.aml.id
   tags                = var.tags
 
-  # TODO
-
-
-  
   private_dns_zone_group {
-    name                 = "dnsgroup-files-${local.storage_name}"
+    name                 = "private-dns-zone-group-file-${local.naming_suffix}"
     private_dns_zone_ids = [data.azurerm_private_dns_zone.filecore.id]
   }
 
   private_service_connection {
-    name                           = "dnsgroup-file-${var.tre_id}"
+    name                           = "private-service-connection-file-${var.tre_id}"
     private_connection_resource_id = azurerm_storage_account.aml.id
     is_manual_connection           = false
     subresource_names              = ["file"]
   }
-
-  depends_on = [
-    azurerm_private_endpoint.blobpe
-  ]
-
 }
 
+resource "azapi_resource" "aml_service_endpoint_policy" {
+  type      = "Microsoft.Network/serviceEndpointPolicies@2022-05-01"
+  name      = "aml-service-endpoint-policy-${local.naming_suffix}"
+  location  = var.core_rg_location
+  parent_id = azurerm_storage_account.aml.id
+  body = jsonencode({
+    properties = {
+      serviceEndpointPolicyDefinitions = [
+        {
+          name = "aml-service-endpoint-policy-definition-storage-${local.naming_suffix}"
+          properties = {
+            service = "Microsoft.Storage"
+            serviceResources = [
+              azurerm_storage_account.aml.id
+            ]
+          }
+          type = "Microsoft.Network/serviceEndpointPolicies/serviceEndpointPolicyDefinitions"
+        },
+        {
+          name = "aml-service-endpoint-policy-definition-azureml-${local.naming_suffix}"
+          properties = {
+            service = "Global"
+            serviceResources = [
+              "/services/Azure/MachineLearning"
+            ]
+          }
+          type = "Microsoft.Network/serviceEndpointPolicies/serviceEndpointPolicyDefinitions"
+        }
+      ]
+    }
+  })
+}

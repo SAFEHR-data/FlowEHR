@@ -91,4 +91,11 @@ time = {
   version = "0.9.1"
 }
 EOF
+
+  required_provider_local = <<EOF
+local = {
+  source = "hashicorp/local"
+  version = "2.4.0"
+}
+EOF
 }
