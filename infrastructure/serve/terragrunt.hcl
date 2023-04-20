@@ -31,6 +31,8 @@ dependency "core" {
     private_dns_zones           = "private_dns_zones"
     deployer_ip                 = "depoyer_ip"
     aml_address_space           = "aml_address_space"
+
+    data_scientists_ad_group_principal_id = "data_scientists_ad_group_principal_id"
   }
   mock_outputs_allowed_terraform_commands = ["init", "destroy"]
 }
@@ -46,4 +48,6 @@ inputs = {
   deployer_ip                 = dependency.core.outputs.deployer_ip
   private_dns_zones           = dependency.core.outputs.private_dns_zones
   aml_address_space           = dependency.core.outputs.aml_address_space
+
+  data_scientists_ad_group_principal_id = dependency.core.outputs.data_scientists_ad_group_principal_id
 }

@@ -40,10 +40,13 @@ locals {
 
   create_dns_zones = var.private_dns_zones_rg == null
   required_private_dns_zones = {
-    blob       = "privatelink.blob.core.windows.net"
-    keyvault   = "privatelink.vaultcore.azure.net"
-    cosmos     = "privatelink.documents.azure.com"
-    databricks = "privatelink.azuredatabricks.net"
-    sql        = "privatelink.database.windows.net"
+    blob        = "privatelink.blob.core.windows.net"
+    file        = "privatelink.file.core.windows.net"
+    keyvault    = "privatelink.vaultcore.azure.net"
+    cosmos      = "privatelink.documents.azure.com"
+    databricks  = "privatelink.azuredatabricks.net"
+    sql         = "privatelink.database.windows.net"
+    aml         = "privatelink.api.azureml.ms",
+    amlcert     = "privatelink.cert.api.azureml.ms",
   }
 }

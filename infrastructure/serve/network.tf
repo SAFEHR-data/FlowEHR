@@ -48,4 +48,61 @@ resource "azurerm_subnet" "aml" {
   service_endpoint_policy_ids = [azapi_resource.aml_service_endpoint_policy.id]
 }
 
+resource "azurerm_private_endpoint" "aml" {
+  name                = "pe-aml-${local.naming_suffix}"
+  location            = var.core_rg_location
+  resource_group_name = var.core_rg_name
+  subnet_id           = azurerm_subnet.aml.id
+  tags                    = var.tags
+
+  private_dns_zone_group {
+    name                 = "private-dns-zone-group-blob-${var.naming_suffix}"
+    private_dns_zone_ids = [
+      var.private_dns_zones["aml"].id,
+      var.private_dns_zones["amlcert"].id
+    ]
+  }
+
+  private_service_connection {
+    name                           = "private-service-connection-aml-${var.naming_suffix}"
+    is_manual_connection           = false
+    private_connection_resource_id = azurerm_machine_learning_workspace.serve.id
+    subresource_names              = ["amlworkspace"]
+  }
+
+  depends_on = [
+    azurerm_subnet_network_security_group_association.aml,
+    azapi_resource.aml_service_endpoint_policy
+  ]
+}
+
+
+resource "azurerm_private_endpoint" "file" {
+  name                = "pe-file-${local.storage_name}"
+  location            = var.core_rg_location
+  resource_group_name = var.core_rg_name
+  subnet_id           = azurerm_subnet.aml.id
+  tags                = var.tags
+
+  # TODO
+
+
+  
+  private_dns_zone_group {
+    name                 = "dnsgroup-files-${local.storage_name}"
+    private_dns_zone_ids = [data.azurerm_private_dns_zone.filecore.id]
+  }
+
+  private_service_connection {
+    name                           = "dnsgroup-file-${var.tre_id}"
+    private_connection_resource_id = azurerm_storage_account.aml.id
+    is_manual_connection           = false
+    subresource_names              = ["file"]
+  }
+
+  depends_on = [
+    azurerm_private_endpoint.blobpe
+  ]
+
+}
 

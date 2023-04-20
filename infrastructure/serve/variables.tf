@@ -60,3 +60,11 @@ variable "accesses_real_data" {
 variable "private_dns_zones" {
   type = map(any)
 }
+
+variable "aml_address_space" {
+  type = string
+}
+
+variable "data_scientists_ad_group_principal_id" {
+  type = string
+}
