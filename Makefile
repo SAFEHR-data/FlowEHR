@@ -115,6 +115,6 @@ tf-reinit: ## Re-init Terraform (use for when backend state changes)
 	&& cd ${MAKEFILE_DIR} \
 	&& terragrunt run-all init -upgrade -migrate-state -input=true
 
-tf-update-locks: ## Update Terraform lockfiles (use when new providers are referenced)
+tf-update-locks: ## Update Terraform lockfiles to latest constrained versions (can take a while!)
 	$(call target_title, "Terraform update lock files") \
-	&& pre-commit run terraform_providers_lock
+	&& pre-commit run --hook-stage manual terraform_providers_lock --all-files
