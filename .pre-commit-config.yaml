@@ -25,12 +25,18 @@ repos:
     hooks:
       - id: black
 
-  - repo: https://github.com/gruntwork-io/pre-commit
-    rev: v0.1.20
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.77.2
     hooks:
-      - id: terraform-fmt
-      - id: terragrunt-hclfmt
-      - id: tflint
+      - id: terraform_providers_lock
+        args:
+          - --tf-init-args=-upgrade
+        stages:
+          - pre-push
+      - id: terraform_fmt
+      - id: terraform_validate
+      - id: terragrunt_fmt
+      - id: terraform_tflint
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.9.0.2
@@ -50,10 +56,5 @@ repos:
       - id: check-headers-exist
         name: Ensure copyright and license headers are present
         entry: .github/linters/check_headers_exist.sh
-        language: script
-        pass_filenames: false
-      - id: terragrunt-validate
-        name: Terragrunt validate
-        entry: .github/linters/terragrunt_validate.sh
         language: script
         pass_filenames: false

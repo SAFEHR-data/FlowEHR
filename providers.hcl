@@ -91,4 +91,11 @@ time = {
       version = "0.9.1"
     }
 EOF
+
+  required_provider_http = <<EOF
+http = {
+      source = "hashicorp/http"
+      version = "3.2.1"
+    }
+EOF
 }

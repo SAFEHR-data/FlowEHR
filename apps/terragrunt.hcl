@@ -62,9 +62,14 @@ generate "child_terraform" {
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
 terraform {
+  required_version = "${local.providers.locals.terraform_version}"
+
   required_providers {
     ${local.providers.locals.required_provider_github}
     ${local.providers.locals.required_provider_external}
+    ${local.providers.locals.required_provider_random}
+    ${local.providers.locals.required_provider_azure}
+    ${local.providers.locals.required_provider_azuread}
   }
 }
 EOF
