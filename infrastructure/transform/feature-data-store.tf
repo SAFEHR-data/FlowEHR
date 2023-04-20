@@ -266,6 +266,6 @@ resource "azurerm_mssql_server_vulnerability_assessment" "sql_server_features" {
   recurring_scans {
     enabled                   = true
     email_subscription_admins = true
-    emails                    = [for person in var.monitoring.alert_recipients : "${person.email}"]
+    emails                    = [for person in var.monitoring.alert_recipients : person.email]
   }
 }

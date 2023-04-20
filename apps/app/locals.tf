@@ -22,7 +22,7 @@ locals {
 
   core_gh_env         = var.environment
   core_branch_name    = local.core_gh_env
-  testing_gh_env      = var.app_config.add_testing_slot ? "${var.environment}-testing_slot" : null
+  testing_gh_env      = var.app_config.add_testing_slot ? "${var.environment}-testing_slot" : ""
   testing_branch_name = local.testing_gh_env
 
   webapp_name              = "webapp-${replace(var.app_id, "_", "-")}-${var.naming_suffix}"
@@ -42,18 +42,31 @@ locals {
 
   # Map deployment branch and github environment names for main & testing slot (if enabled)
   branches_and_envs = var.app_config.add_testing_slot ? {
-    "${local.core_branch_name}"    = local.core_gh_env
-    "${local.testing_branch_name}" = local.testing_gh_env
-  } : { "${local.core_branch_name}" = local.core_gh_env }
+    tostring(local.core_branch_name)    = local.core_gh_env
+    tostring(local.testing_branch_name) = local.testing_gh_env
+  } : { tostring(local.core_branch_name) = local.core_gh_env }
 
   acr_deploy_reusable_workflow_filename = "acr_deploy_reusable.yml"
   slot_swap_reusable_workflow_filename  = "slot_swap_reusable.yml"
+  workflow_template_path                = "${path.module}/deploy_workflow_template.yaml"
+
+  core_deploy_workflow_file = templatefile(local.workflow_template_path, {
+    environment                = local.core_gh_env
+    reusable_workflow_filename = var.app_config.add_testing_slot ? local.slot_swap_reusable_workflow_filename : local.acr_deploy_reusable_workflow_filename
+    branch_name                = local.core_branch_name
+  })
+
+  testing_deploy_workflow_file = templatefile(local.workflow_template_path, {
+    environment                = local.testing_gh_env
+    reusable_workflow_filename = local.acr_deploy_reusable_workflow_filename
+    branch_name                = local.testing_branch_name
+  })
 
   # Map GitHub/FlowEHR environments and corresponding GH workflow files to deploy to them
   envs_and_workflow_templates = var.app_config.add_testing_slot ? {
-    "${local.core_gh_env}"    = data.template_file.core_github_workflow
-    "${local.testing_gh_env}" = data.template_file.testing_github_workflow[0]
-  } : { "${local.core_gh_env}" = data.template_file.core_github_workflow }
+    tostring(local.core_gh_env)    = local.core_deploy_workflow_file
+    tostring(local.testing_gh_env) = local.testing_deploy_workflow_file
+  } : { tostring(local.core_gh_env) = local.core_deploy_workflow_file }
 
   site_credential_name     = azurerm_linux_web_app.app.site_credential[0].name
   site_credential_password = azurerm_linux_web_app.app.site_credential[0].password

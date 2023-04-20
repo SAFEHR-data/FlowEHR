@@ -29,9 +29,6 @@ terraform {
 
   required_providers {
     ${local.providers.locals.required_provider_azure}
-    ${local.providers.locals.required_provider_null}
-    ${local.providers.locals.required_provider_external}
-    ${local.providers.locals.required_provider_time}
   }
 }
 EOF
@@ -62,13 +59,13 @@ inputs = merge(
   # Add values from the merged config files (root and environment-specific)
   local.configuration.locals.merged_root_config, {
 
-  # And any global env vars that should be made available
-  tf_in_automation = local.tf_in_automation
+    # And any global env vars that should be made available
+    tf_in_automation = local.tf_in_automation
 
-  # Tags to add to every resource that accepts them
-  tags = {
-    environment = try(local.configuration.locals.merged_root_config.environment, "local")
-  }
+    # Tags to add to every resource that accepts them
+    tags = {
+      environment = try(local.configuration.locals.merged_root_config.environment, "local")
+    }
 })
 
 # Databricks cluster deployment failures are transient. https://github.com/UCLH-Foundry/FlowEHR/issues/141

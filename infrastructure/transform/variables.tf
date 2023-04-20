@@ -52,10 +52,6 @@ variable "core_kv_id" {
   type = string
 }
 
-variable "core_kv_uri" {
-  type = string
-}
-
 variable "deployer_ip" {
   type = string
 }
@@ -84,14 +80,6 @@ variable "private_dns_zones" {
 variable "private_dns_zones_rg" {
   type    = string
   default = null
-}
-
-variable "developers_ad_group_principal_id" {
-  type = string
-}
-
-variable "data_scientists_ad_group_principal_id" {
-  type = string
 }
 
 variable "developers_ad_group_display_name" {

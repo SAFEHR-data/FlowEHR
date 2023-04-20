@@ -16,6 +16,27 @@ include "shared" {
   path = "${get_repo_root()}/shared.hcl"
 }
 
+locals {
+  providers = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+}
+
+generate "terraform" {
+  path      = "terraform.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+terraform {
+  required_version = "${local.providers.locals.terraform_version}"
+
+  required_providers {
+    ${local.providers.locals.required_provider_azure}
+    ${local.providers.locals.required_provider_azuread}
+    ${local.providers.locals.required_provider_random}
+    ${local.providers.locals.required_provider_http}
+  }
+}
+EOF
+}
+
 inputs = {
   ci_vnet_name    = get_env("CI_PEERING_VNET", "")
   ci_rg_name      = get_env("CI_RESOURCE_GROUP", "")
