@@ -36,7 +36,7 @@ resource "azurerm_linux_web_app" "app" {
 
     # Only define the docker image to pull if there is not a testing slot
     dynamic "application_stack" {
-      for_each = var.app_config.add_testing_slot ? {} : { local.acr_repository = var.app_id }
+      for_each = var.app_config.add_testing_slot ? {} : { tostring(local.acr_repository) = var.app_id }
 
       content {
         docker_image     = "${var.acr_name}.azurecr.io/${local.acr_repository}"
@@ -143,24 +143,24 @@ resource "azurerm_linux_web_app_slot" "testing" {
 }
 
 resource "azuread_application" "webapp_sp" {
-  count        = local.testing_gh_env != null ? 1 : 0
+  count        = var.app_config.add_testing_slot ? 1 : 0
   display_name = "sp-flowehr-app-${replace(var.app_id, "_", "-")}"
   owners       = [data.azurerm_client_config.current.object_id]
 }
 
 resource "azuread_application_password" "webapp_sp" {
-  count                 = local.testing_gh_env != null ? 1 : 0
+  count                 = var.app_config.add_testing_slot ? 1 : 0
   application_object_id = azuread_application.webapp_sp[0].object_id
 }
 
 resource "azuread_service_principal" "webapp_sp" {
-  count          = local.testing_gh_env != null ? 1 : 0
+  count          = var.app_config.add_testing_slot ? 1 : 0
   application_id = azuread_application.webapp_sp[0].application_id
   owners         = [data.azurerm_client_config.current.object_id]
 }
 
 resource "azurerm_role_definition" "slot_swap" {
-  count       = local.testing_gh_env != null ? 1 : 0
+  count       = var.app_config.add_testing_slot ? 1 : 0
   name        = "role-slot-swap-on-${replace(var.app_id, "_", "-")}"
   scope       = azurerm_linux_web_app.app.id
   description = "Slot swap role"

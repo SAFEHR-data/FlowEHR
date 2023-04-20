@@ -113,4 +113,7 @@ clean: ## Remove all local terraform state
 tf-reinit: ## Re-init Terraform (use for updating lock files & when backend state changes)
 	$(call target_title, "Terraform init") \
 	&& cd ${MAKEFILE_DIR} \
-	&& terragrunt run-all init -upgrade -migrate-state -input=true
+	&& terragrunt run-all init -upgrade -migrate-state -input=true \
+	&& terragrunt run-all providers lock -platform=linux_arm64 -platform=linux_amd64 \
+	&& cd apps/app \
+	&& terraform providers lock -platform=linux_arm64 -platform=linux_amd64
