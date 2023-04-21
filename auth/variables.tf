@@ -16,10 +16,6 @@ variable "flowehr_id" {
   type = string
 }
 
-variable "location" {
-  type = string
-}
-
 variable "tf_in_automation" {
   type = bool
 

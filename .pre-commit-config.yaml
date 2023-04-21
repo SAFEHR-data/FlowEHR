@@ -17,7 +17,9 @@ repos:
     rev: v1.2.3
     hooks:
       - id: flake8
-        args: ["--max-line-length", "88"]
+        args:
+          - --max-line-length
+          - "88"
       - id: end-of-file-fixer
 
   - repo: https://github.com/psf/black
@@ -26,14 +28,19 @@ repos:
       - id: black
 
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.77.0
+    rev: v1.77.2
     hooks:
       - id: terraform_fmt
+      - id: terraform_validate
+      - id: terragrunt_fmt
       - id: terraform_tflint
+      - id: terraform_providers_lock
         args:
-          - --args=--chdir="${PWD}/infrastructure/"
-          - --args=--init
-          - --args=--module
+          - --tf-init-args=-upgrade
+          - --args=-platform=linux_arm64
+          - --args=-platform=linux_amd64
+        stages:
+          - manual
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.9.0.2
@@ -46,7 +53,9 @@ repos:
       - id: yamllint
         name: yamllint
         entry: yamllint
-        types: [file, yaml]
+        types:
+          - file
+          - yaml
 
   - repo: local
     hooks:

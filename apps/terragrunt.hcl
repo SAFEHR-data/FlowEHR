@@ -48,6 +48,8 @@ terraform {
   required_providers {
     ${local.providers.locals.required_provider_azure}
     ${local.providers.locals.required_provider_github}
+    ${local.providers.locals.required_provider_null}
+    ${local.providers.locals.required_provider_external}
   }
 }
 EOF
@@ -60,9 +62,14 @@ generate "child_terraform" {
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
 terraform {
+  required_version = "${local.providers.locals.terraform_version}"
+
   required_providers {
     ${local.providers.locals.required_provider_github}
     ${local.providers.locals.required_provider_external}
+    ${local.providers.locals.required_provider_random}
+    ${local.providers.locals.required_provider_azure}
+    ${local.providers.locals.required_provider_azuread}
   }
 }
 EOF
@@ -99,7 +106,7 @@ dependency "core" {
     developers_ad_group_principal_id      = "core_developers_ad_group_principal_id"
     data_scientists_ad_group_principal_id = "core_data_scientists_ad_group_principal_id"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy", "validate"]
 }
 
 dependency "transform" {
@@ -108,10 +115,9 @@ dependency "transform" {
   mock_outputs = {
     feature_store_server_name  = "transform_feature_store_server_name"
     feature_store_db_name      = "transform_feature_store_db_name"
-    apps_ad_group_display_name = "transform_apps_ad_group_display_name"
     apps_ad_group_principal_id = "transform_apps_ad_group_principal_id"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy", "validate"]
 }
 
 dependency "serve" {
@@ -122,7 +128,7 @@ dependency "serve" {
     acr_name              = "serve_acr_name"
     cosmos_account_name   = "serve_cosmos_account_name"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy", "validate"]
 }
 
 inputs = {
@@ -138,7 +144,6 @@ inputs = {
 
   transform_feature_store_server_name  = dependency.transform.outputs.feature_store_server_name
   transform_feature_store_db_name      = dependency.transform.outputs.feature_store_db_name
-  transform_apps_ad_group_display_name = dependency.transform.outputs.apps_ad_group_display_name
   transform_apps_ad_group_principal_id = dependency.transform.outputs.apps_ad_group_principal_id
 
   serve_app_service_plan_name = dependency.serve.outputs.app_service_plan_name

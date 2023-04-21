@@ -38,58 +38,65 @@ EOF
 
   required_provider_azure = <<EOF
 azurerm = {
-  source  = "hashicorp/azurerm"
-  version = "3.47.0"
-}
+      source  = "hashicorp/azurerm"
+      version = "3.47.0"
+    }
 EOF
 
   required_provider_azuread = <<EOF
 azuread = {
-  source  = "hashicorp/azuread"
-  version = "2.35.0"
-}
+      source  = "hashicorp/azuread"
+      version = "2.35.0"
+    }
 EOF
 
   required_provider_random = <<EOF
 random = {
-  source = "hashicorp/random"
-  version = "3.4.3"
-}  
+      source = "hashicorp/random"
+      version = "3.4.3"
+    }
 EOF
 
   required_provider_databricks = <<EOF
 databricks = {
-  source = "databricks/databricks"
-  version = "1.9.1"
-}
+      source = "databricks/databricks"
+      version = "1.9.1"
+    }
 EOF
 
   required_provider_external = <<EOF
 external = {
-  source = "hashicorp/external"
-  version = "2.3.1"
-}
+      source = "hashicorp/external"
+      version = "2.3.1"
+    }
 EOF
 
   required_provider_null = <<EOF
 null = {
-  source = "hashicorp/null"
-  version = "3.2.1"
-}
+      source = "hashicorp/null"
+      version = "3.2.1"
+    }
 EOF
 
   required_provider_github = <<EOF
 github = {
-  source  = "integrations/github"
-  version = "5.18.3"
-}
+      source  = "integrations/github"
+      version = "5.18.3"
+    }
 EOF
 
   required_provider_time = <<EOF
 time = {
-  source = "hashicorp/time"
-  version = "0.9.1"
-}
+      source = "hashicorp/time"
+      version = "0.9.1"
+    }
+EOF
+
+  required_provider_http = <<EOF
+http = {
+      source = "hashicorp/http"
+      version = "3.2.1"
+    }
 EOF
 
   required_provider_local = <<EOF
@@ -99,7 +106,7 @@ local = {
 }
 EOF
 
-required_provider_azapi = <<EOF
+  required_provider_azapi = <<EOF
 azapi = {
   source = "Azure/azapi"
   version = "1.5.0"

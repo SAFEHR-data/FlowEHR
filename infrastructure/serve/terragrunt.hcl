@@ -57,20 +57,20 @@ dependency "core" {
 
     data_scientists_ad_group_principal_id = "data_scientists_ad_group_principal_id"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "destroy", "validate"]
 }
 
 inputs = {
-  naming_suffix               = dependency.core.outputs.naming_suffix
-  naming_suffix_truncated     = dependency.core.outputs.naming_suffix_truncated
-  core_rg_name                = dependency.core.outputs.core_rg_name
-  core_rg_location            = dependency.core.outputs.core_rg_location
-  core_kv_id                  = dependency.core.outputs.core_kv_id
-  core_vnet_name              = dependency.core.outputs.core_vnet_name
-  core_subnet_id              = dependency.core.outputs.core_subnet_id
-  deployer_ip                 = dependency.core.outputs.deployer_ip
-  private_dns_zones           = dependency.core.outputs.private_dns_zones
-  aml_address_space           = dependency.core.outputs.aml_address_space
+  naming_suffix           = dependency.core.outputs.naming_suffix
+  naming_suffix_truncated = dependency.core.outputs.naming_suffix_truncated
+  core_rg_name            = dependency.core.outputs.core_rg_name
+  core_rg_location        = dependency.core.outputs.core_rg_location
+  core_kv_id              = dependency.core.outputs.core_kv_id
+  core_vnet_name          = dependency.core.outputs.core_vnet_name
+  core_subnet_id          = dependency.core.outputs.core_subnet_id
+  deployer_ip             = dependency.core.outputs.deployer_ip
+  private_dns_zones       = dependency.core.outputs.private_dns_zones
+  aml_address_space       = dependency.core.outputs.aml_address_space
 
   data_scientists_ad_group_principal_id = dependency.core.outputs.data_scientists_ad_group_principal_id
 }

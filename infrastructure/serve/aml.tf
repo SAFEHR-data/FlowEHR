@@ -32,7 +32,7 @@ resource "azurerm_machine_learning_workspace" "serve" {
 }
 
 resource "local_file" "aml_registry_config" {
-  content = <<EOF
+  content  = <<EOF
 name: "aml-registry-${var.naming_suffix}"
 description: Basic AML registry located in ${var.core_rg_location}
 location: ${var.core_rg_location}

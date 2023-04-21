@@ -65,10 +65,10 @@ resource "azurerm_private_endpoint" "aml" {
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
   subnet_id           = azurerm_subnet.aml.id
-  tags                    = var.tags
+  tags                = var.tags
 
   private_dns_zone_group {
-    name                 = "private-dns-zone-group-blob-${var.naming_suffix}"
+    name = "private-dns-zone-group-blob-${var.naming_suffix}"
     private_dns_zone_ids = [
       var.private_dns_zones["aml"].id,
       var.private_dns_zones["amlcert"].id

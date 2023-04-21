@@ -36,10 +36,6 @@ variable "core_kv_id" {
   type = string
 }
 
-variable "core_vnet_name" {
-  type = string
-}
-
 variable "core_subnet_id" {
   type = string
 }
