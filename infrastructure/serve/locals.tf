@@ -13,5 +13,6 @@
 #  limitations under the License.
 
 locals {
-  aml_registry_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.core_rg_name}/providers/Microsoft.MachineLearningServices/registries/${data.external.az_cli_registry_create.result.name}"
+  aml_registry_name = "aml-registry-${var.naming_suffix}"
+  aml_registry_id   = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.core_rg_name}/providers/Microsoft.MachineLearningServices/registries/${local.aml_registry_name}"
 }

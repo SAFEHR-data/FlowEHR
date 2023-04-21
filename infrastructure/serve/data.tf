@@ -13,3 +13,12 @@
 #  limitations under the License.
 
 data "azurerm_client_config" "current" {}
+
+data "azurerm_virtual_network" "core" {
+  name                = var.core_vnet_name
+  resource_group_name = var.core_rg_name
+}
+
+data "azurerm_resource_group" "core" {
+  name = var.core_rg_name
+}

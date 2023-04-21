@@ -33,7 +33,7 @@ resource "azurerm_machine_learning_workspace" "serve" {
 
 resource "local_file" "aml_registry_config" {
   content  = <<EOF
-name: "aml-registry-${var.naming_suffix}"
+name: ${local.aml_registry_name}
 description: Basic AML registry located in ${var.core_rg_location}
 location: ${var.core_rg_location}
 replication_locations:
@@ -42,8 +42,10 @@ EOF
   filename = "registry.yml"
 }
 
-data "external" "az_cli_registry_create" {
-  program = ["az", "ml registry create --file ${local_file.aml_registry_config.filename} --resource-group ${var.core_rg_name} --public-network-access Disabled"]
+resource "null_resource" "az_cli_registry_create" {
+  provisioner "local-exec" {
+    command = "az ml registry create --file ${local_file.aml_registry_config.filename} --resource-group ${var.core_rg_name} --public-network-access Disabled"
+  }
 }
 
 resource "azurerm_role_definition" "aml_registry_read_write" {
@@ -62,10 +64,14 @@ resource "azurerm_role_definition" "aml_registry_read_write" {
   assignable_scopes = [
     local.aml_registry_id
   ]
+
+  depends_on = [
+    null_resource.az_cli_registry_create
+  ]
 }
 
 resource "azurerm_role_assignment" "data_scientists_can_use_registry" {
   scope              = local.aml_registry_id
-  role_definition_id = azurerm_role_definition.aml_registry_read_write.id
+  role_definition_id = replace(azurerm_role_definition.aml_registry_read_write.id, "|", "")
   principal_id       = var.data_scientists_ad_group_principal_id
 }
