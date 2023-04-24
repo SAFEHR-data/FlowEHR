@@ -32,7 +32,7 @@ resource "github_branch_protection" "deployment" {
 
   required_status_checks {
     strict   = var.accesses_real_data
-    contexts = ["Semgrep CI"]
+    contexts = ["Code Scanning"]
   }
 
   required_pull_request_reviews {
