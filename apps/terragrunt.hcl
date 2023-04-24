@@ -26,8 +26,8 @@ locals {
   # Get shared app configuration (apps.yaml) and environment-specific config (app.{ENVIRONMENT}.yaml)
   shared_apps_config_path = "${get_terragrunt_dir()}/apps.yaml"
   env_apps_config_path    = "${get_terragrunt_dir()}/apps.${get_env("ENVIRONMENT", "local")}.yaml"
-  shared_apps_config      = fileexists(local.shared_apps_config_path) ? yamldecode(file(local.shared_apps_config_path)) : tomap({})
-  env_apps_config         = fileexists(local.env_apps_config_path) ? yamldecode(file(local.env_apps_config_path)) : tomap({})
+  shared_apps_config      = fileexists(local.shared_apps_config_path) ? tomap(yamldecode(file(local.shared_apps_config_path))) : tomap({})
+  env_apps_config         = fileexists(local.env_apps_config_path) ? tomap(yamldecode(file(local.env_apps_config_path))) : tomap({})
 
   merged_apps_config = {
     # As it's a map, we need to iterate as direct merge() would overwrite each key's value entirely
