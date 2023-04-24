@@ -68,7 +68,7 @@ infrastructure-serve: az-login ## Deploy serve infrastructure
 
 test: infrastructure test-pipelines apps destroy  ## Test by deploy->destroy
 
-test-pipelines: transform-artifacts
+test-pipelines:
 	$(call target_title, "Test Transform Pipelines") \
 	&& ${MAKEFILE_DIR}/transform/run_pipelines.sh
 
