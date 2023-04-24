@@ -42,9 +42,10 @@ EOF
   filename = "registry.yml"
 }
 
+# AML registry usees public network accesss, should be altered when it support private
 resource "null_resource" "az_cli_registry_create" {
   provisioner "local-exec" {
-    command = "az ml registry create --file ${local_file.aml_registry_config.filename} --resource-group ${var.core_rg_name} --public-network-access Disabled"
+    command = "az ml registry create --file ${local_file.aml_registry_config.filename} --resource-group ${var.core_rg_name} --public-network-access Enabled"
   }
 }
 
@@ -56,7 +57,7 @@ resource "azurerm_role_definition" "aml_registry_read_write" {
   permissions {
     actions = [
       "Microsoft.MachineLearningServices/registries/read",
-      "Microsoft.MachineLearningServices/registries/assets/read",
+      # "Microsoft.MachineLearningServices/registries/assets/read",
       "Microsoft.MachineLearningServices/registries/assets/write"
     ]
   }
@@ -74,4 +75,23 @@ resource "azurerm_role_assignment" "data_scientists_can_use_registry" {
   scope              = local.aml_registry_id
   role_definition_id = replace(azurerm_role_definition.aml_registry_read_write.id, "|", "")
   principal_id       = var.data_scientists_ad_group_principal_id
+}
+
+resource "azurerm_machine_learning_compute_cluster" "serve" {
+  name                          = "amlcc-serve-${var.naming_suffix}"
+  vm_priority                   = "LowPriority"
+  vm_size                       = "STANDARD_DS2_V2"
+  machine_learning_workspace_id = azurerm_machine_learning_workspace.serve.id
+  subnet_resource_id            = azurerm_subnet.aml.id
+  location                      = var.core_rg_location
+
+  scale_settings {
+    min_node_count                       = 0
+    max_node_count                       = 1
+    scale_down_nodes_after_idle_duration = "PT30S" # 30 seconds
+  }
+
+  identity {
+    type = "SystemAssigned"
+  }
 }
