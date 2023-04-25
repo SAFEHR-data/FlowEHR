@@ -23,8 +23,8 @@
 			"tflint": "0.46.0",
 			"terragrunt": "0.44.5"
 		},
-		"ghcr.io/devcontainers/features/azure-cli:1": {
-			"version": "2.44.1"
+		"ghcr.io/devcontainers/features/azure-cli:1.0.8": {
+			"version": "2.47.0"
 		},
 		"ghcr.io/devcontainers/features/node:1": {},
 		"ghcr.io/devcontainers/features/github-cli:1": {
@@ -49,7 +49,7 @@
 	},
 
 	// Run commands on container start-up before tools attach
-	"onCreateCommand": "pip install --no-cache-dir -r requirements.txt",
+	"onCreateCommand": "pip install --no-cache-dir -r requirements.txt && az extension add --name ml",
 
 	// Run commands after the container is created
 	"postCreateCommand": "./scripts/pipeline_repo_checkout.sh",

@@ -98,4 +98,18 @@ http = {
       version = "3.2.1"
     }
 EOF
+
+  required_provider_local = <<EOF
+local = {
+  source = "hashicorp/local"
+  version = "2.4.0"
+}
+EOF
+
+  required_provider_azapi = <<EOF
+azapi = {
+  source = "Azure/azapi"
+  version = "1.5.0"
+}
+EOF
 }
