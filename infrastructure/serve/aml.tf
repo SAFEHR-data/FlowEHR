@@ -45,18 +45,18 @@ EOF
 # AML registry usees public network accesss, should be altered when it support private
 resource "null_resource" "az_cli_registry_create" {
   provisioner "local-exec" {
-    when = create
+    when    = create
     command = "az ml registry create --file ${local_file.aml_registry_config.filename} --resource-group ${var.core_rg_name} --public-network-access Enabled"
   }
 }
 
 resource "null_resource" "az_cli_registry_create_destroy" {
   triggers = {
-    core_rg_name = var.core_rg_name
+    core_rg_name      = var.core_rg_name
     aml_registry_name = local.aml_registry_name
   }
   provisioner "local-exec" {
-    when = destroy
+    when    = destroy
     command = "az ml registry delete --name ${self.triggers.aml_registry_name} --resource-group ${self.triggers.core_rg_name}"
   }
 }
