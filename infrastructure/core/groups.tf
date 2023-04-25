@@ -12,9 +12,15 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-data "azurerm_client_config" "current" {}
+resource "azuread_group" "ad_group_developers" {
+  count            = var.accesses_real_data ? 0 : 1
+  display_name     = "${local.naming_suffix} flowehr-developers"
+  owners           = [data.azurerm_client_config.current.object_id]
+  security_enabled = true
+}
 
-data "azurerm_virtual_network" "core" {
-  name                = var.core_vnet_name
-  resource_group_name = var.core_rg_name
+resource "azuread_group" "ad_group_data_scientists" {
+  display_name     = "${local.naming_suffix} flowehr-data-scientists"
+  owners           = [data.azurerm_client_config.current.object_id]
+  security_enabled = true
 }

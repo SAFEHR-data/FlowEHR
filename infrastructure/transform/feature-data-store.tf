@@ -41,7 +41,7 @@ resource "azurerm_mssql_server" "sql_server_features" {
   version                              = "12.0"
   administrator_login                  = local.sql_server_features_admin_username
   administrator_login_password         = random_password.sql_admin_password.result
-  public_network_access_enabled        = !var.tf_in_automation
+  public_network_access_enabled        = !var.accesses_real_data
   outbound_network_restriction_enabled = true
   tags                                 = var.tags
   azuread_administrator {
@@ -97,13 +97,14 @@ resource "azurerm_mssql_server_transparent_data_encryption" "sql_server_features
 # Azure SQL database, basic + small for dev
 # TODO: Rightsize for prod -> https://github.com/UCLH-Foundry/FlowEHR/issues/63
 resource "azurerm_mssql_database" "feature_database" {
-  name                 = "sql-db-features"
-  server_id            = azurerm_mssql_server.sql_server_features.id
-  collation            = "SQL_Latin1_General_CP1_CI_AS"
-  license_type         = "LicenseIncluded"
-  max_size_gb          = 2
-  sku_name             = "Basic"
-  storage_account_type = "Local"
+  name         = "sql-db-features"
+  server_id    = azurerm_mssql_server.sql_server_features.id
+  collation    = "SQL_Latin1_General_CP1_CI_AS"
+  license_type = "LicenseIncluded"
+  # Use an standard sku for all non-locally deployed environments
+  max_size_gb          = var.tf_in_automation ? 250 : 2
+  sku_name             = var.tf_in_automation ? "S0" : "Basic"
+  storage_account_type = var.tf_in_automation ? "Geo" : "Local"
   zone_redundant       = false
   tags                 = var.tags
 }
@@ -214,18 +215,6 @@ resource "azuread_group" "ad_group_apps" {
   security_enabled = true
 }
 
-resource "azuread_group" "ad_group_developers" {
-  display_name     = "${var.naming_suffix} flowehr-developers"
-  owners           = [data.azurerm_client_config.current.object_id]
-  security_enabled = true
-}
-
-resource "azuread_group" "ad_group_data_scientists" {
-  display_name     = "${var.naming_suffix} flowehr-data-scientists"
-  owners           = [data.azurerm_client_config.current.object_id]
-  security_enabled = true
-}
-
 resource "azurerm_monitor_activity_log_alert" "feature_database_firewall_update" {
   name                = "activity-log-alert-sql-fw-${var.naming_suffix}"
   resource_group_name = var.core_rg_name
@@ -277,6 +266,6 @@ resource "azurerm_mssql_server_vulnerability_assessment" "sql_server_features" {
   recurring_scans {
     enabled                   = true
     email_subscription_admins = true
-    emails                    = [for person in var.monitoring.alert_recipients : "${person.email}"]
+    emails                    = [for person in var.monitoring.alert_recipients : person.email]
   }
 }

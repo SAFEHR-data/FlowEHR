@@ -25,7 +25,7 @@ resource "azurerm_databricks_workspace" "databricks" {
 
   custom_parameters {
     no_public_ip                                         = true
-    storage_account_name                                 = local.storage_account_name
+    storage_account_name                                 = local.dbfs_storage_account_name
     public_subnet_name                                   = data.azurerm_subnet.databricks_host.name
     private_subnet_name                                  = data.azurerm_subnet.databricks_container.name
     virtual_network_id                                   = data.azurerm_virtual_network.core.id
@@ -34,7 +34,7 @@ resource "azurerm_databricks_workspace" "databricks" {
   }
 }
 
-// Allow Databricks network configuration to propagate
+# Allow Databricks network configuration to propagate
 resource "time_sleep" "wait_for_databricks_network" {
   create_duration = "180s"
 
@@ -68,17 +68,17 @@ resource "databricks_cluster" "fixed_single_node" {
     tomap({
       "spark.databricks.cluster.profile" = "singleNode"
       "spark.master"                     = "local[*]"
-      // Secrets for Feature store
-      // Formatted according to syntax for referencing secrets in Spark config:
-      // https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secrets
+      # Secrets for Feature store
+      # Formatted according to syntax for referencing secrets in Spark config:
+      # https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secrets
       "spark.secret.feature-store-app-id"     = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_spn_app_id.key}}}"
       "spark.secret.feature-store-app-secret" = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_spn_app_secret.key}}}"
       "spark.secret.feature-store-fqdn"       = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_fqdn.key}}}"
       "spark.secret.feature-store-database"   = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_database.key}}}"
     }),
-    // Secrets for each data source
-    // Formatted according to syntax for referencing secrets in Spark config:
-    // https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secrets
+    # Secrets for each data source
+    # Formatted according to syntax for referencing secrets in Spark config:
+    # https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secrets
     tomap({ for connection in var.data_source_connections :
       "spark.secret.${connection.name}-fqdn" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-fqdn}}"
     }),
@@ -94,9 +94,7 @@ resource "databricks_cluster" "fixed_single_node" {
   )
 
   spark_env_vars = {
-    # "APPLICATIONINSIGHTS_CONNECTION_STRING" = data.azurerm_log_analytics_workspace.core.primary_shared_key
-    # "APPLICATIONINSIGHTS_CONNECTION_STRING" = "InstrumentationKey=b19d1bcf-96d6-42ac-9d92-e122e99bdf43;IngestionEndpoint=https://westeurope-1.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/"
-    "APPLICATIONINSIGHTS_CONNECTION_STRING" = "InstrumentationKey=b19d1bcf-1111-2222-3333-e122e99bdf43"
+    "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.transform.connection_string
   }
 
   custom_tags = {

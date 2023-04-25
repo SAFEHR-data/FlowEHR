@@ -54,13 +54,13 @@ auth: az-login ## Create auth app for deployments
 	&& terraform output -json \
 	  | jq -r 'with_entries(.value |= .value) | to_entries[] | "\(.key +": "+ .value)"'
 
-infrastructure: az-login transform-artifacts ## Deploy all infrastructure
+infrastructure: az-login ## Deploy all infrastructure
 	$(call terragrunt,apply,infrastructure)
 
 infrastructure-core: az-login ## Deploy core infrastructure
 	$(call terragrunt,apply,infrastructure/core)
 
-infrastructure-transform: az-login transform-artifacts ## Deploy transform infrastructure
+infrastructure-transform: az-login ## Deploy transform infrastructure
 	$(call terragrunt,apply,infrastructure/transform)
 
 infrastructure-serve: az-login ## Deploy serve infrastructure
@@ -110,7 +110,11 @@ destroy-no-terraform: az-login ## Destroy all resource groups associated with th
 clean: ## Remove all local terraform state
 	find ${MAKEFILE_DIR} -type d -name ".terraform" -exec rm -rf "{}" \; || true
 
-tf-reinit: ## Re-init Terraform (use for updating lock files & when backend state changes)
+tf-reinit: ## Re-init Terraform (use for when backend state changes)
 	$(call target_title, "Terraform init") \
 	&& cd ${MAKEFILE_DIR} \
 	&& terragrunt run-all init -upgrade -migrate-state -input=true
+
+tf-update-locks: ## Update Terraform lockfiles to latest constrained versions (can take a while!)
+	$(call target_title, "Terraform update lock files") \
+	&& pre-commit run --hook-stage manual terraform_providers_lock --all-files

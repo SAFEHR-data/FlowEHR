@@ -52,10 +52,6 @@ variable "core_kv_id" {
   type = string
 }
 
-variable "core_kv_uri" {
-  type = string
-}
-
 variable "deployer_ip" {
   type = string
 }
@@ -79,6 +75,19 @@ variable "accesses_real_data" {
 
 variable "private_dns_zones" {
   type = map(any)
+}
+
+variable "private_dns_zones_rg" {
+  type    = string
+  default = null
+}
+
+variable "developers_ad_group_display_name" {
+  type = string
+}
+
+variable "data_scientists_ad_group_display_name" {
+  type = string
 }
 
 variable "access_databricks_management_publicly" {
@@ -114,7 +123,7 @@ variable "data_source_connections" {
       object({
         virtual_network_name = string
         resource_group_name  = string
-        dns_zones            = list(string)
+        dns_zones            = optional(list(string), [])
       })
     )
   }))

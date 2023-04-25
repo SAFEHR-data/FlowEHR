@@ -24,6 +24,7 @@ locals {
   databricks_container_address_space = local.subnet_address_spaces[2]
   serve_webapps_address_space        = local.subnet_address_spaces[3]
 
+  create_dns_zones = var.private_dns_zones_rg == null
   required_private_dns_zones = {
     blob       = "privatelink.blob.core.windows.net"
     keyvault   = "privatelink.vaultcore.azure.net"

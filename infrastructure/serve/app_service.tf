@@ -40,6 +40,7 @@ resource "azurerm_monitor_autoscale_setting" "asp" {
       metric_trigger {
         metric_name        = "CpuPercentage"
         metric_resource_id = azurerm_service_plan.serve.id
+        metric_namespace   = "Microsoft.Web/serverfarms"
         time_grain         = "PT1M"
         statistic          = "Average"
         time_window        = "PT5M"
@@ -60,6 +61,7 @@ resource "azurerm_monitor_autoscale_setting" "asp" {
       metric_trigger {
         metric_name        = "CpuPercentage"
         metric_resource_id = azurerm_service_plan.serve.id
+        metric_namespace   = "Microsoft.Web/serverfarms"
         time_grain         = "PT1M"
         statistic          = "Average"
         time_window        = "PT5M"

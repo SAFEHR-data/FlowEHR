@@ -12,6 +12,15 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+
+resource "azurerm_application_insights" "transform" {
+  name                = "transform-ai-${var.naming_suffix}"
+  location            = var.core_rg_location
+  resource_group_name = var.core_rg_name
+  application_type    = "web"
+  tags                = var.tags
+}
+
 resource "azurerm_portal_dashboard" "pipeline_status_dashboard" {
   for_each             = azurerm_data_factory_pipeline.pipeline
   name                 = "${each.value.name}StatusDashboard"
