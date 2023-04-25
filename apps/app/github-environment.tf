@@ -32,7 +32,7 @@ resource "github_branch_protection" "deployment" {
 
   required_status_checks {
     strict   = var.accesses_real_data
-    contexts = ["Lint"]
+    contexts = ["Code Scanning"]
   }
 
   required_pull_request_reviews {
@@ -124,7 +124,7 @@ resource "github_actions_environment_secret" "acr_image_name" {
 # If there is a testing environment defined then the SP is needed to bump the deployed
 # docker version tag and in the production slot to slot swap
 resource "github_actions_environment_secret" "sp_client_id" {
-  for_each        = local.testing_gh_env != null ? local.branches_and_envs : {}
+  for_each        = var.app_config.add_testing_slot ? local.branches_and_envs : {}
   repository      = local.github_repository_name
   environment     = each.value
   secret_name     = "ARM_CLIENT_ID"
@@ -136,7 +136,7 @@ resource "github_actions_environment_secret" "sp_client_id" {
 }
 
 resource "github_actions_environment_secret" "sp_client_secret" {
-  for_each        = local.testing_gh_env != null ? local.branches_and_envs : {}
+  for_each        = var.app_config.add_testing_slot ? local.branches_and_envs : {}
   repository      = local.github_repository_name
   environment     = each.value
   secret_name     = "ARM_CLIENT_SECRET"
@@ -148,7 +148,7 @@ resource "github_actions_environment_secret" "sp_client_secret" {
 }
 
 resource "github_actions_environment_secret" "tenant_id" {
-  for_each        = local.testing_gh_env != null ? local.branches_and_envs : {}
+  for_each        = var.app_config.add_testing_slot ? local.branches_and_envs : {}
   repository      = local.github_repository_name
   environment     = each.value
   secret_name     = "ARM_TENANT_ID"
@@ -160,7 +160,7 @@ resource "github_actions_environment_secret" "tenant_id" {
 }
 
 resource "github_actions_environment_secret" "subscription_id" {
-  for_each        = local.testing_gh_env != null ? local.branches_and_envs : {}
+  for_each        = var.app_config.add_testing_slot ? local.branches_and_envs : {}
   repository      = local.github_repository_name
   environment     = each.value
   secret_name     = "ARM_SUBSCRIPTION_ID"
@@ -172,7 +172,7 @@ resource "github_actions_environment_secret" "subscription_id" {
 }
 
 resource "github_actions_environment_secret" "webapp_id" {
-  for_each        = local.testing_gh_env != null ? local.branches_and_envs : {}
+  for_each        = var.app_config.add_testing_slot ? local.branches_and_envs : {}
   repository      = local.github_repository_name
   environment     = each.value
   secret_name     = "WEBAPP_ID"
@@ -184,7 +184,7 @@ resource "github_actions_environment_secret" "webapp_id" {
 }
 
 resource "github_actions_environment_secret" "slot_name" {
-  for_each        = local.testing_gh_env != null ? local.branches_and_envs : {}
+  for_each        = var.app_config.add_testing_slot ? local.branches_and_envs : {}
   repository      = local.github_repository_name
   environment     = each.value
   secret_name     = "SLOT_NAME"
@@ -200,7 +200,7 @@ resource "github_repository_file" "deploy_workflows" {
   repository          = local.github_repository_name
   branch              = "main"
   file                = ".github/workflows/deploy_${each.key}.yml"
-  content             = each.value.rendered
+  content             = each.value
   commit_message      = "Add workflow (managed by Terraform)"
   commit_author       = "Terraform"
   commit_email        = "terraform@flowehr.io"

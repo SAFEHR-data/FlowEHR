@@ -13,13 +13,7 @@
 #  limitations under the License.
 
 variable "naming_suffix" {
-  type        = string
-  description = "Suffix used to name resources"
-}
-
-variable "naming_suffix_truncated" {
-  type        = string
-  description = "Truncated (max 20 chars, no hyphens etc.) suffix for e.g storage accounts"
+  type = string
 }
 
 variable "environment" {
@@ -28,10 +22,6 @@ variable "environment" {
 
 variable "suffix_override" {
   type = string
-}
-
-variable "tags" {
-  type = map(any)
 }
 
 variable "tf_in_automation" {
@@ -50,15 +40,7 @@ variable "core_log_analytics_name" {
   type = string
 }
 
-variable "core_kv_id" {
-  type = string
-}
-
 variable "transform_feature_store_db_name" {
-  type = string
-}
-
-variable "transform_apps_ad_group_display_name" {
   type = string
 }
 

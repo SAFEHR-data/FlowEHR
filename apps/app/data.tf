@@ -46,25 +46,6 @@ data "azuread_user" "contributors_ids" {
   user_principal_name = each.value
 }
 
-data "template_file" "testing_github_workflow" {
-  count    = var.app_config.add_testing_slot ? 1 : 0
-  template = file("${path.module}/deploy_workflow_template.yaml")
-  vars = {
-    environment                = local.testing_gh_env
-    reusable_workflow_filename = local.acr_deploy_reusable_workflow_filename
-    branch_name                = local.testing_branch_name
-  }
-}
-
-data "template_file" "core_github_workflow" {
-  template = file("${path.module}/deploy_workflow_template.yaml")
-  vars = {
-    environment                = local.core_gh_env
-    reusable_workflow_filename = var.app_config.add_testing_slot ? local.slot_swap_reusable_workflow_filename : local.acr_deploy_reusable_workflow_filename
-    branch_name                = local.core_branch_name
-  }
-}
-
 data "azurerm_cosmosdb_sql_role_definition" "data_contributor" {
   resource_group_name = var.resource_group_name
   account_name        = var.cosmos_account_name

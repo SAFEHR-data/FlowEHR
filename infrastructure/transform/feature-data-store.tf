@@ -41,7 +41,7 @@ resource "azurerm_mssql_server" "sql_server_features" {
   version                              = "12.0"
   administrator_login                  = local.sql_server_features_admin_username
   administrator_login_password         = random_password.sql_admin_password.result
-  public_network_access_enabled        = !var.tf_in_automation
+  public_network_access_enabled        = !var.accesses_real_data
   outbound_network_restriction_enabled = true
   tags                                 = var.tags
   azuread_administrator {
@@ -266,6 +266,6 @@ resource "azurerm_mssql_server_vulnerability_assessment" "sql_server_features" {
   recurring_scans {
     enabled                   = true
     email_subscription_admins = true
-    emails                    = [for person in var.monitoring.alert_recipients : "${person.email}"]
+    emails                    = [for person in var.monitoring.alert_recipients : person.email]
   }
 }

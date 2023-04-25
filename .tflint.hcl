@@ -12,14 +12,21 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+config {
+  format     = "compact"
+  plugin_dir = "~/.tflint.d/plugins"
+  module     = true
+}
+
 plugin "terraform" {
   enabled = true
-  preset  = "recommended"
+  version = "0.2.2"
+  source  = "github.com/terraform-linters/tflint-ruleset-terraform"
 }
 
 plugin "azurerm" {
   enabled = true
-  version = "0.20.0"
+  version = "0.22.0"
   source  = "github.com/terraform-linters/tflint-ruleset-azurerm"
 }
 
@@ -30,5 +37,17 @@ rule "terraform_required_version" {
 }
 
 rule "terraform_required_providers" {
+  enabled = false
+}
+
+rule "terraform_documented_outputs" {
+  enabled = false
+}
+
+rule "terraform_documented_variables" {
+  enabled = false
+}
+
+rule "terraform_naming_convention" {
   enabled = false
 }
