@@ -27,7 +27,7 @@ EOF
 resource "null_resource" "az_cli_registry_create" {
   provisioner "local-exec" {
     when    = create
-    command = "az ml registry create --file ${local_file.aml_registry_config.filename} --resource-group ${var.core_rg_name} --public-network-access Enabled"
+    command = "az extension add --name ml && az ml registry create --file ${local_file.aml_registry_config.filename} --resource-group ${var.core_rg_name} --public-network-access Enabled"
   }
 }
 
@@ -38,7 +38,7 @@ resource "null_resource" "az_cli_registry_create_destroy" {
   }
   provisioner "local-exec" {
     when    = destroy
-    command = "az ml registry delete --name ${self.triggers.aml_registry_name} --resource-group ${self.triggers.core_rg_name}"
+    command = "az extension add --name ml && az ml registry delete --name ${self.triggers.aml_registry_name} --resource-group ${self.triggers.core_rg_name}"
   }
 }
 
