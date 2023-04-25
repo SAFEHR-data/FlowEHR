@@ -100,27 +100,5 @@ variable "data_scientists_ad_group_principal_id" {
 }
 
 variable "app_config" {
-  type = object({
-    name             = string
-    description      = optional(string, "Created by FlowEHR")
-    add_testing_slot = optional(bool, false)
-    require_auth     = optional(bool, true)
-    owners           = map(string)
-    contributors     = map(string)
-
-    managed_repo = optional(object({
-      private  = bool
-      template = string
-    }))
-
-    branch = optional(object({
-      num_of_approvals      = optional(number, 1),
-      dismiss_stale_reviews = optional(bool, false)
-      }), {
-      num_of_approvals      = 1
-      dismiss_stale_reviews = false
-    })
-
-    env = optional(map(string))
-  })
+  type = any // validated by parent
 }
