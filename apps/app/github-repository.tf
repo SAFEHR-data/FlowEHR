@@ -31,14 +31,11 @@ resource "github_team" "owners" {
   privacy     = "closed"
 }
 
-resource "github_team_members" "owners" {
+resource "github_team_membership" "owners" {
   for_each = local.create_repo ? var.app_config.owners : tomap({})
   team_id  = github_team.owners[0].id
-
-  members {
-    username = each.key
-    role     = "maintainer"
-  }
+  username = each.key
+  role     = "maintainer"
 }
 
 resource "github_team_repository" "owners_repo_permissions" {
@@ -75,14 +72,11 @@ resource "github_team" "contributors" {
   privacy     = "closed"
 }
 
-resource "github_team_members" "contributors" {
+resource "github_team_membership" "contributors" {
   for_each = local.create_repo ? var.app_config.contributors : tomap({})
   team_id  = github_team.contributors[0].id
-
-  members {
-    username = each.key
-    role     = "member"
-  }
+  username = each.key
+  role     = "member"
 }
 
 resource "github_team_repository" "contributors_repo_permissions" {
