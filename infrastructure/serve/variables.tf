@@ -32,19 +32,7 @@ variable "core_rg_location" {
   type = string
 }
 
-variable "core_kv_id" {
-  type = string
-}
-
 variable "core_subnet_id" {
-  type = string
-}
-
-variable "tf_in_automation" {
-  type = bool
-}
-
-variable "deployer_ip" {
   type = string
 }
 

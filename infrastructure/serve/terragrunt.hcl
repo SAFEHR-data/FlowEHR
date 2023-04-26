@@ -47,11 +47,9 @@ dependency "core" {
     naming_suffix_truncated     = "naming_suffix_truncated"
     core_rg_name                = "core_rg_name"
     core_rg_location            = "core_rg_location"
-    core_kv_id                  = "core_kv_id"
     core_subnet_id              = "core_subnet_id"
     serve_webapps_address_space = "serve_webapps_address_space"
     private_dns_zones           = "private_dns_zones"
-    deployer_ip                 = "depoyer_ip"
     aml_address_space           = "aml_address_space"
 
     algorithm_stewards_ad_group_principal_id = "algorithm_stewards_ad_group_principal_id"
@@ -64,9 +62,7 @@ inputs = {
   naming_suffix_truncated                  = dependency.core.outputs.naming_suffix_truncated
   core_rg_name                             = dependency.core.outputs.core_rg_name
   core_rg_location                         = dependency.core.outputs.core_rg_location
-  core_kv_id                               = dependency.core.outputs.core_kv_id
   core_subnet_id                           = dependency.core.outputs.core_subnet_id
-  deployer_ip                              = dependency.core.outputs.deployer_ip
   private_dns_zones                        = dependency.core.outputs.private_dns_zones
   algorithm_stewards_ad_group_principal_id = dependency.core.outputs.algorithm_stewards_ad_group_principal_id
 }
