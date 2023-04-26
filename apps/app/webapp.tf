@@ -208,7 +208,7 @@ resource "azuread_group" "developers_of_this_app" {
 }
 
 resource "azuread_group_member" "add_each_developer_to_group" {
-  for_each         = !var.accesses_real_data ? data.azuread_user.contributors_ids : toset([])
+  for_each         = !var.accesses_real_data ? data.azuread_user.contributors_ids : tomap({})
   group_object_id  = azuread_group.developers_of_this_app[0].id
   member_object_id = each.value.object_id
 }
