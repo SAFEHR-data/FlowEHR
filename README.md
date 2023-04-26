@@ -169,7 +169,7 @@ This step will create an AAD Application and Service Principal in the specified 
 
     Finally, add a repository-scoped variable for the following (or organization-scoped if you wish to use across multiple repos):
 
-    - `CI_GITHUB_RUNNER_LABEL`: the name of the GitHub runner label outputted from the previous step
+    - `CI_GITHUB_RUNNER_LABEL`: the name of the GitHub runner label outputted from step 4 (bootstrap deployment)
 
     And secret:
 
