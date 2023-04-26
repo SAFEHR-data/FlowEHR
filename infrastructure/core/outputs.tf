@@ -95,3 +95,13 @@ output "data_scientists_ad_group_display_name" {
   description = "Data scientists AD group display name"
   value       = azuread_group.ad_group_data_scientists.display_name
 }
+
+output "algorithm_stewards_ad_group_principal_id" {
+  description = "Algorithm Stewards AD group principal id"
+  value       = azuread_group.ad_group_algorithm_stewards.object_id
+}
+
+output "algorithm_stewards_ad_group_display_name" {
+  description = "Algorithm Stewards AD group display name"
+  value       = azuread_group.ad_group_algorithm_stewards.display_name
+}

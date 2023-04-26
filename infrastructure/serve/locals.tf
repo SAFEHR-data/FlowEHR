@@ -12,39 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-variable "naming_suffix" {
-  type = string
-}
-
-variable "naming_suffix_truncated" {
-  type = string
-}
-
-variable "tags" {
-  type = map(any)
-}
-
-variable "core_rg_name" {
-  type = string
-}
-
-variable "core_rg_location" {
-  type = string
-}
-
-variable "core_subnet_id" {
-  type = string
-}
-
-variable "accesses_real_data" {
-  type    = bool
-  default = false
-}
-
-variable "private_dns_zones" {
-  type = map(any)
-}
-
-variable "algorithm_stewards_ad_group_principal_id" {
-  type = string
+locals {
+  aml_registry_name = "aml-registry-${var.naming_suffix}"
+  aml_registry_id   = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.core_rg_name}/providers/Microsoft.MachineLearningServices/registries/${local.aml_registry_name}"
 }

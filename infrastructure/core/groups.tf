@@ -24,3 +24,9 @@ resource "azuread_group" "ad_group_data_scientists" {
   owners           = [data.azurerm_client_config.current.object_id]
   security_enabled = true
 }
+
+resource "azuread_group" "ad_group_algorithm_stewards" {
+  display_name     = "${local.naming_suffix} flowehr-algorithm-stewards"
+  owners           = [data.azurerm_client_config.current.object_id]
+  security_enabled = true
+}
