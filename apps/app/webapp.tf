@@ -202,17 +202,19 @@ resource "azuread_group_member" "webapp" {
 }
 
 resource "azuread_group" "developers_of_this_app" {
+  count            = !var.accesses_real_data ? 1 : 0
   display_name     = "${var.app_id} app developers"
   security_enabled = true
 }
 
 resource "azuread_group_member" "add_each_developer_to_group" {
-  for_each         = data.azuread_user.contributors_ids
-  group_object_id  = azuread_group.developers_of_this_app.id
+  for_each         = !var.accesses_real_data ? data.azuread_user.contributors_ids : toset([])
+  group_object_id  = azuread_group.developers_of_this_app[0].id
   member_object_id = each.value.object_id
 }
 
 resource "azuread_group_member" "developers" {
+  count            = !var.accesses_real_data ? 1 : 0
   group_object_id  = var.developers_ad_group_principal_id
-  member_object_id = azuread_group.developers_of_this_app.id
+  member_object_id = azuread_group.developers_of_this_app[0].id
 }
