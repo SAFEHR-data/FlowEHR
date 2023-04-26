@@ -25,7 +25,7 @@
 		},
 		"ghcr.io/devcontainers/features/azure-cli:1.0.8": {
 			"version": "2.47.0",
-			"extensions": ["ml"]
+			"extensions": "ml" // currently does not work, investigating in separate issue
 		},
 		"ghcr.io/devcontainers/features/node:1": {},
 		"ghcr.io/devcontainers/features/github-cli:1": {
