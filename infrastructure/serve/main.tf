@@ -16,7 +16,7 @@ resource "azurerm_container_registry" "serve" {
   name                          = "acrserve${var.naming_suffix_truncated}"
   location                      = var.core_rg_location
   resource_group_name           = var.core_rg_name
-  sku                           = "Basic"
+  sku                           = "Standard"
   admin_enabled                 = true
   public_network_access_enabled = true
 }
