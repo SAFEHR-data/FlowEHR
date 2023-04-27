@@ -14,6 +14,7 @@
 
 # Required diagnostics for Application Insights Dashboard
 resource "azurerm_monitor_diagnostic_setting" "logs_and_metrics" {
+  count                      = var.app_config.app_monitoring != null ? 1 : 0
   name                       = "metrics-logs-diagnostics-${replace(var.app_id, "_", "-")}"
   target_resource_id         = azurerm_linux_web_app.app.id
   log_analytics_workspace_id = data.azurerm_log_analytics_workspace.core.id

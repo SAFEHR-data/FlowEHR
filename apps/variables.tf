@@ -113,7 +113,7 @@ variable "apps" {
     owners           = map(string)
     contributors     = map(string)
     app_monitoring = optional(object({
-      diagnostics = optional(object({
+      diagnostics = object({
         logs = optional(
           list(object({
             name = string
@@ -122,7 +122,7 @@ variable "apps" {
           list(object({
             name = string
         })), [])
-      }))
+      })
     }))
 
     managed_repo = optional(object({
