@@ -112,6 +112,18 @@ variable "apps" {
     require_auth     = optional(bool, true)
     owners           = map(string)
     contributors     = map(string)
+    app_monitoring = optional(object({
+      diagnostics = optional(object({
+        logs = optional(
+          list(object({
+            name = string
+        })), [])
+        metrics = optional(
+          list(object({
+            name = string
+        })), [])
+      }))
+    }))
 
     managed_repo = optional(object({
       private  = bool
