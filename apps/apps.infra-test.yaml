@@ -4,3 +4,14 @@ flowehr_cicd_test:
   managed_repo:
     private: false
     template: UCLH-Foundry/Dash-Seedling
+  app_monitoring:
+    diagnostics:
+      logs:
+        - name: AppServiceHTTPLogs
+        - name: AppServiceConsoleLogs
+        - name: AppServiceAppLogs
+        - name: AppServiceAuditLogs
+        - name: AppServiceIPSecAuditLogs
+        - name: AppServicePlatformLogs
+      metrics:
+        - name: AllMetrics
