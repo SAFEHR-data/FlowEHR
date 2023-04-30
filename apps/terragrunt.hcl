@@ -105,7 +105,7 @@ dependency "core" {
     webapps_subnet_id                     = "serve_webapps_subnet_id"
     developers_ad_group_principal_id      = "core_developers_ad_group_principal_id"
     data_scientists_ad_group_principal_id = "core_data_scientists_ad_group_principal_id"
-    ad_group_principal_id                 = "core_apps_ad_group_principal_id"
+    apps_ad_group_principal_id            = "core_apps_ad_group_principal_id"
   }
   mock_outputs_allowed_terraform_commands = ["init", "destroy", "validate"]
 }
