@@ -53,6 +53,7 @@ dependency "core" {
     aml_address_space           = "aml_address_space"
 
     algorithm_stewards_ad_group_principal_id = "algorithm_stewards_ad_group_principal_id"
+    apps_ad_group_principal_id               = "apps_ad_group_principal_id"
   }
   mock_outputs_allowed_terraform_commands = ["init", "destroy", "validate"]
 }

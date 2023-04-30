@@ -50,6 +50,7 @@ dependency "core" {
     data_scientists_ad_group_principal_id = "data_scientists_ad_group_principal_id"
     developers_ad_group_display_name      = "developers_ad_group_display_name"
     data_scientists_ad_group_display_name = "data_scientists_ad_group_display_name"
+    apps_ad_group_display_name            = "apps_ad_group_display_name"
   }
   mock_outputs_allowed_terraform_commands = ["init", "destroy", "validate"]
 }
