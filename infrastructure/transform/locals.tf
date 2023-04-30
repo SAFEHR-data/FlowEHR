@@ -96,14 +96,14 @@ locals {
   databricks_app  = { "name" : local.databricks_app_name, "role" : "db_owner" }
 
   real_data_users_groups = [
-    local.data_scientists,
     local.apps,
+    local.data_scientists,
     local.databricks_app
   ]
 
   synth_data_users_groups = [
-    local.data_scientists,
     local.apps,
+    local.data_scientists,
     local.databricks_app,
     local.developers
   ]
