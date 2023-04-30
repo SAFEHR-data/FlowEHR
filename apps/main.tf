@@ -43,7 +43,7 @@ module "app" {
   cosmos_account_name                   = var.serve_cosmos_account_name
   feature_store_db_name                 = var.transform_feature_store_db_name
   feature_store_server_name             = var.transform_feature_store_server_name
-  apps_ad_group_principal_id            = var.transform_apps_ad_group_principal_id
+  apps_ad_group_principal_id            = var.core_apps_ad_group_principal_id
   developers_ad_group_principal_id      = var.core_developers_ad_group_principal_id
   github_owner                          = var.serve.github_owner
   github_access_token                   = data.external.github_access_token[0].result.token
