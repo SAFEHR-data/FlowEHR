@@ -30,3 +30,9 @@ resource "azuread_group" "ad_group_algorithm_stewards" {
   owners           = [data.azurerm_client_config.current.object_id]
   security_enabled = true
 }
+
+resource "azuread_group" "ad_group_apps" {
+  display_name     = "${local.naming_suffix} flowehr-apps"
+  owners           = [data.azurerm_client_config.current.object_id]
+  security_enabled = true
+}

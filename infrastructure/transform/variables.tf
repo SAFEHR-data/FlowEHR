@@ -82,6 +82,10 @@ variable "private_dns_zones_rg" {
   default = null
 }
 
+variable "apps_ad_group_display_name" {
+  type = string
+}
+
 variable "developers_ad_group_display_name" {
   type = string
 }
