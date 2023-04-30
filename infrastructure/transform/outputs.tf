@@ -20,11 +20,6 @@ output "feature_store_db_name" {
   value = azurerm_mssql_database.feature_database.name
 }
 
-output "apps_ad_group_principal_id" {
-  description = "Apps AD group principal id"
-  value       = azuread_group.ad_group_apps.object_id
-}
-
 output "adf_name" {
   value = azurerm_data_factory.adf.name
 }

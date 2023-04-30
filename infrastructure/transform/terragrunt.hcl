@@ -105,4 +105,5 @@ inputs = {
   data_scientists_ad_group_principal_id = dependency.core.outputs.data_scientists_ad_group_principal_id
   developers_ad_group_display_name      = dependency.core.outputs.developers_ad_group_display_name
   data_scientists_ad_group_display_name = dependency.core.outputs.data_scientists_ad_group_display_name
+  apps_ad_group_display_name            = dependency.core.outputs.apps_ad_group_display_name
 }

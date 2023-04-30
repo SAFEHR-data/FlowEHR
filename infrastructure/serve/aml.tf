@@ -64,8 +64,35 @@ resource "azurerm_role_definition" "aml_registry_read_write" {
   ]
 }
 
+resource "azurerm_role_definition" "aml_registry_read_only" {
+  name        = "role-aml-registry-read-${var.naming_suffix}"
+  scope       = local.aml_registry_id
+  description = "Read from an AML model registry"
+
+  permissions {
+    actions = [
+      "Microsoft.MachineLearningServices/registries/read",
+      "Microsoft.MachineLearningServices/registries/assets/read"
+    ]
+  }
+
+  assignable_scopes = [
+    local.aml_registry_id
+  ]
+
+  depends_on = [
+    null_resource.az_cli_registry_create
+  ]
+}
+
 resource "azurerm_role_assignment" "algorithm_stewards_can_use_registry" {
   scope              = local.aml_registry_id
   role_definition_id = replace(azurerm_role_definition.aml_registry_read_write.id, "|", "")
   principal_id       = var.algorithm_stewards_ad_group_principal_id
+}
+
+resource "azurerm_role_assignment" "apps_can_read_registry" {
+  scope              = local.aml_registry_id
+  role_definition_id = replace(azurerm_role_definition.aml_registry_read_only.id, "|", "")
+  principal_id       = var.apps_ad_group_principal_id
 }
