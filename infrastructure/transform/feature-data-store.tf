@@ -209,12 +209,6 @@ resource "azurerm_private_endpoint" "sql_server_features_pe" {
   }
 }
 
-resource "azuread_group" "ad_group_apps" {
-  display_name     = "${var.naming_suffix} flowehr-apps"
-  owners           = [data.azurerm_client_config.current.object_id]
-  security_enabled = true
-}
-
 resource "azurerm_monitor_activity_log_alert" "feature_database_firewall_update" {
   name                = "activity-log-alert-sql-fw-${var.naming_suffix}"
   resource_group_name = var.core_rg_name

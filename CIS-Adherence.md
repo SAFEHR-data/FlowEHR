@@ -112,3 +112,17 @@ This layer deploys components required to ingest data, transform data, and save 
 | | `CIS 4.5.3`: Ensure AAD Client Auth & RBAC are used where possible | Y | |
 | App Insights: <br/>`ai-<suffix>` | | | |
 | | `CIS 5.3.1`: Ensure App Insights are configured | Y | |
+| Background Storage Account for AML Registry | `CIS 3` | | [aml.tf](./infrastructure/serve/aml.tf). [Issue to track here](https://github.com/UCLH-Foundry/FlowEHR/issues/285) |
+| | `CIS 3.1`: Ensure 'Secure Transfer Required' set to 'Enabled' | Y | |
+| | `CIS 3.2`: Ensure 'Enable Infrastructure Encryption' set to 'Enabled' | Y |  |
+| | `CIS 3.3`: Enable key rotation reminders for each storage account | N | Storage keys are not used for authentication |
+| | `CIS 3.4`: Ensure that Storage Account Access keys are periodically regenerated | N | Storage keys are not used for authentication |
+| | `CIS 3.7`: Ensure 'Public Access Level' is disabled | Y | |
+| | `CIS 3.8`: Ensure Default Network Access Rule is set to 'Deny' | N | |
+| | `CIS 3.9`: Ensure 'Trusted Azure Services' can access the storage account | Y | |
+| | `CIS 3.10`: Ensure Private Endpoints are used to access storage accounts | N | |
+| | `CIS 3.11`: Ensure Soft Delete is enabled | N | |
+| | `CIS 3.12`: Ensure storage is encrypted with Customer Managed Keys | N | Will use Microsoft Managed Keys to reduce management overhead |
+| | `CIS: 3.13`: Ensure Storage Logging is enabled for 'read', 'write' and 'delete' requests | N | | 
+| | `CIS 3.15`: Ensure Minimum TLS Version is set to 1.2 | Y | |
+| Azure Key Vault: <br/>`kv-<suffix>` | `CIS 8` | [main.tf](./infrastructure/core/main.tf)  | |

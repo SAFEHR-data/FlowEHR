@@ -58,10 +58,18 @@ data "databricks_node_type" "smallest" {
   depends_on = [time_sleep.wait_for_databricks_network]
 }
 
+# for prod - this will select something like E16ads v5 => ~$1.18ph whilst running
+data "databricks_node_type" "prod" {
+  min_memory_gb       = 128
+  min_cores           = 16
+  local_disk_min_size = 600
+  category            = "Memory Optimized"
+}
+
 resource "databricks_cluster" "fixed_single_node" {
   cluster_name            = "Fixed Job Cluster"
   spark_version           = data.databricks_spark_version.latest_lts.id
-  node_type_id            = data.databricks_node_type.smallest.id
+  node_type_id            = var.accesses_real_data ? data.databricks_node_type.prod.id : data.databricks_node_type.smallest.id
   autotermination_minutes = 10
 
   spark_conf = merge(

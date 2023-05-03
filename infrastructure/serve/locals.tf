@@ -12,14 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-output "feature_store_server_name" {
-  value = azurerm_mssql_server.sql_server_features.name
-}
-
-output "feature_store_db_name" {
-  value = azurerm_mssql_database.feature_database.name
-}
-
-output "adf_name" {
-  value = azurerm_data_factory.adf.name
+locals {
+  aml_registry_name = "aml-registry-${var.naming_suffix}"
+  aml_registry_id   = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.core_rg_name}/providers/Microsoft.MachineLearningServices/registries/${local.aml_registry_name}"
 }
