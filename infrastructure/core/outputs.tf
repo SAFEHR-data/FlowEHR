@@ -86,6 +86,16 @@ output "data_scientists_ad_group_principal_id" {
   value       = azuread_group.ad_group_data_scientists.object_id
 }
 
+output "apps_ad_group_principal_id" {
+  description = "Apps AD group principal id"
+  value       = azuread_group.ad_group_apps.object_id
+}
+
+output "apps_ad_group_display_name" {
+  description = "Apps AD group display name"
+  value       = azuread_group.ad_group_apps.display_name
+}
+
 output "developers_ad_group_display_name" {
   description = "Developers AD group display name"
   value       = var.accesses_real_data ? "" : azuread_group.ad_group_developers[0].display_name
@@ -94,4 +104,14 @@ output "developers_ad_group_display_name" {
 output "data_scientists_ad_group_display_name" {
   description = "Data scientists AD group display name"
   value       = azuread_group.ad_group_data_scientists.display_name
+}
+
+output "algorithm_stewards_ad_group_principal_id" {
+  description = "Algorithm Stewards AD group principal id"
+  value       = azuread_group.ad_group_algorithm_stewards.object_id
+}
+
+output "algorithm_stewards_ad_group_display_name" {
+  description = "Algorithm Stewards AD group display name"
+  value       = azuread_group.ad_group_algorithm_stewards.display_name
 }

@@ -93,18 +93,18 @@ locals {
 
   developers      = { "name" : var.developers_ad_group_display_name, "role" : "db_datareader" }
   data_scientists = { "name" : var.data_scientists_ad_group_display_name, "role" : "db_datareader" }
-  apps            = { "name" : azuread_group.ad_group_apps.display_name, "role" : "db_datareader" }
+  apps            = { "name" : var.apps_ad_group_display_name, "role" : "db_datareader" }
   databricks_app  = { "name" : local.databricks_app_name, "role" : "db_owner" }
 
   real_data_users_groups = [
-    local.data_scientists,
     local.apps,
+    local.data_scientists,
     local.databricks_app
   ]
 
   synth_data_users_groups = [
-    local.data_scientists,
     local.apps,
+    local.data_scientists,
     local.databricks_app,
     local.developers
   ]

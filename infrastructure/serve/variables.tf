@@ -32,19 +32,7 @@ variable "core_rg_location" {
   type = string
 }
 
-variable "core_kv_id" {
-  type = string
-}
-
 variable "core_subnet_id" {
-  type = string
-}
-
-variable "tf_in_automation" {
-  type = bool
-}
-
-variable "deployer_ip" {
   type = string
 }
 
@@ -55,4 +43,12 @@ variable "accesses_real_data" {
 
 variable "private_dns_zones" {
   type = map(any)
+}
+
+variable "algorithm_stewards_ad_group_principal_id" {
+  type = string
+}
+
+variable "apps_ad_group_principal_id" {
+  type = string
 }

@@ -23,8 +23,10 @@
 			"tflint": "0.46.0",
 			"terragrunt": "0.44.5"
 		},
-		"ghcr.io/devcontainers/features/azure-cli:1": {
-			"version": "2.44.1"
+		"ghcr.io/devcontainers/features/azure-cli:1.0.8": {
+			"version": "2.47.0",
+			"extensions": "ml" 
+			// extensions do not currently install, investigating in separate issue: https://github.com/UCLH-Foundry/FlowEHR/issues/286
 		},
 		"ghcr.io/devcontainers/features/node:1": {},
 		"ghcr.io/devcontainers/features/github-cli:1": {

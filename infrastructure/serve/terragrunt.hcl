@@ -16,6 +16,29 @@ include "shared" {
   path = "${get_repo_root()}/shared.hcl"
 }
 
+locals {
+  providers = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+}
+
+generate "terraform" {
+  path      = "terraform.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+terraform {
+  required_version = "${local.providers.locals.terraform_version}"
+
+  required_providers {
+    ${local.providers.locals.required_provider_azure}
+    ${local.providers.locals.required_provider_null}
+    ${local.providers.locals.required_provider_external}
+    ${local.providers.locals.required_provider_time}
+    ${local.providers.locals.required_provider_local}
+    ${local.providers.locals.required_provider_azapi}
+  }
+}
+EOF
+}
+
 dependency "core" {
   config_path = "../core"
 
@@ -24,24 +47,24 @@ dependency "core" {
     naming_suffix_truncated     = "naming_suffix_truncated"
     core_rg_name                = "core_rg_name"
     core_rg_location            = "core_rg_location"
-    core_kv_id                  = "core_kv_id"
-    core_vnet_name              = "core_vnet_name"
     core_subnet_id              = "core_subnet_id"
     serve_webapps_address_space = "serve_webapps_address_space"
     private_dns_zones           = "private_dns_zones"
-    deployer_ip                 = "depoyer_ip"
+    aml_address_space           = "aml_address_space"
+
+    algorithm_stewards_ad_group_principal_id = "algorithm_stewards_ad_group_principal_id"
+    apps_ad_group_principal_id               = "apps_ad_group_principal_id"
   }
   mock_outputs_allowed_terraform_commands = ["init", "destroy", "validate"]
 }
 
 inputs = {
-  naming_suffix           = dependency.core.outputs.naming_suffix
-  naming_suffix_truncated = dependency.core.outputs.naming_suffix_truncated
-  core_rg_name            = dependency.core.outputs.core_rg_name
-  core_rg_location        = dependency.core.outputs.core_rg_location
-  core_kv_id              = dependency.core.outputs.core_kv_id
-  core_vnet_name          = dependency.core.outputs.core_vnet_name
-  core_subnet_id          = dependency.core.outputs.core_subnet_id
-  deployer_ip             = dependency.core.outputs.deployer_ip
-  private_dns_zones       = dependency.core.outputs.private_dns_zones
+  naming_suffix                            = dependency.core.outputs.naming_suffix
+  naming_suffix_truncated                  = dependency.core.outputs.naming_suffix_truncated
+  core_rg_name                             = dependency.core.outputs.core_rg_name
+  core_rg_location                         = dependency.core.outputs.core_rg_location
+  core_subnet_id                           = dependency.core.outputs.core_subnet_id
+  private_dns_zones                        = dependency.core.outputs.private_dns_zones
+  algorithm_stewards_ad_group_principal_id = dependency.core.outputs.algorithm_stewards_ad_group_principal_id
+  apps_ad_group_principal_id               = dependency.core.outputs.apps_ad_group_principal_id
 }
