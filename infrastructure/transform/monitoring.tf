@@ -22,7 +22,7 @@ resource "azurerm_application_insights" "transform" {
 }
 
 resource "azurerm_portal_dashboard" "pipeline_status_dashboard" {
-  for_each             = azurerm_data_factory_pipeline.pipeline
+  for_each             = { for pipeline in local.pipelines : pipeline.name => pipeline.json }
   name                 = "${each.value.name}StatusDashboard"
   location             = var.core_rg_location
   resource_group_name  = var.core_rg_name
@@ -159,6 +159,74 @@ resource "azurerm_portal_dashboard" "pipeline_status_dashboard" {
                 }
               }
             }
+          },
+          "2": {
+            "position": {
+              "x": 0,
+              "y": 4,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "${azurerm_application_insights.transform.id}"
+                          },
+                          "name": "${each.key}/rows_inserted",
+                          "aggregationType": 4,
+                          "namespace": "${each.key}/rows_inserted",
+                          "metricVisualization": {
+                            "displayName": "${each.key}/rows_inserted"
+                          }
+                        }
+                      ],
+                      "title": "Rows inserted by table_name",
+                      "titleKind": 1,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideSubtitle": false
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      },
+                      "grouping": {
+                        "dimension": "table_name",
+                        "sort": 2,
+                        "top": 30
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -188,11 +256,7 @@ resource "azurerm_portal_dashboard" "pipeline_status_dashboard" {
               "displayCache": {
                 "name": "UTC Time",
                 "value": "Past 24 hours"
-              },
-              "filteredPartIds": [
-                "StartboardPart-MonitorChartPart-6625aee4-97c5-428c-8a66-cc394795118a",
-                "StartboardPart-MonitorChartPart-6625aee4-97c5-428c-8a66-cc39479511c2"
-              ]
+              }
             }
           }
         }
