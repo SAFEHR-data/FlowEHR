@@ -48,3 +48,7 @@ variable "private_dns_zones" {
 variable "algorithm_stewards_ad_group_principal_id" {
   type = string
 }
+
+variable "apps_ad_group_principal_id" {
+  type = string
+}

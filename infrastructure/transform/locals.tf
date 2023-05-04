@@ -35,32 +35,33 @@ locals {
   all_pipeline_files = fileset(path.module, "../../transform/pipelines/**/${local.pipeline_file}")
 
   # Example value: [ "../../transform/pipelines/hello-world" ]
-  pipeline_dirs = toset([
+  paths = toset([
     for pipeline_file in local.all_pipeline_files : dirname(pipeline_file)
   ])
 
   pipelines = [
-    for pipeline_dir in local.pipeline_dirs : {
-      pipeline_dir  = pipeline_dir
-      pipeline_json = jsondecode(file("${pipeline_dir}/${local.pipeline_file}"))
+    for path in local.paths : {
+      name = basename(path)
+      path = path
+      json = jsondecode(file("${path}/${local.pipeline_file}"))
     }
   ]
 
   # Example value: [ { "artifact_path" = "path/to/entrypoint.py", "pipeline" = "hello-world" } ]
   artifacts = flatten([
-    for pipeline_dir in local.pipeline_dirs : [
-      for artifact in fileset("${pipeline_dir}/${local.artifacts_dir}", "*") : {
-        artifact_path = "${pipeline_dir}/${local.artifacts_dir}/${artifact}"
-        pipeline      = basename(pipeline_dir)
+    for pipeline in local.pipelines : [
+      for artifact in fileset("${pipeline.path}/${local.artifacts_dir}", "*") : {
+        pipeline      = pipeline.name
+        artifact_path = "${pipeline.path}/${local.artifacts_dir}/${artifact}"
       }
     ]
   ])
 
   triggers = flatten([
-    for pipeline_dir in local.pipeline_dirs : [
-      fileexists("${pipeline_dir}/${local.trigger_file}") ? {
-        pipeline = basename(pipeline_dir)
-        trigger  = jsondecode(file("${pipeline_dir}/${local.trigger_file}"))
+    for pipeline in local.pipelines : [
+      fileexists("${pipeline.path}/${local.trigger_file}") ? {
+        pipeline = pipeline.name
+        trigger  = jsondecode(file("${pipeline.path}/${local.trigger_file}"))
       } : null
     ]
   ])
@@ -92,18 +93,18 @@ locals {
 
   developers      = { "name" : var.developers_ad_group_display_name, "role" : "db_datareader" }
   data_scientists = { "name" : var.data_scientists_ad_group_display_name, "role" : "db_datareader" }
-  apps            = { "name" : azuread_group.ad_group_apps.display_name, "role" : "db_datareader" }
+  apps            = { "name" : var.apps_ad_group_display_name, "role" : "db_datareader" }
   databricks_app  = { "name" : local.databricks_app_name, "role" : "db_owner" }
 
   real_data_users_groups = [
-    local.data_scientists,
     local.apps,
+    local.data_scientists,
     local.databricks_app
   ]
 
   synth_data_users_groups = [
-    local.data_scientists,
     local.apps,
+    local.data_scientists,
     local.databricks_app,
     local.developers
   ]

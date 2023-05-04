@@ -53,6 +53,7 @@ dependency "core" {
     aml_address_space           = "aml_address_space"
 
     algorithm_stewards_ad_group_principal_id = "algorithm_stewards_ad_group_principal_id"
+    apps_ad_group_principal_id               = "apps_ad_group_principal_id"
   }
   mock_outputs_allowed_terraform_commands = ["init", "destroy", "validate"]
 }
@@ -65,4 +66,5 @@ inputs = {
   core_subnet_id                           = dependency.core.outputs.core_subnet_id
   private_dns_zones                        = dependency.core.outputs.private_dns_zones
   algorithm_stewards_ad_group_principal_id = dependency.core.outputs.algorithm_stewards_ad_group_principal_id
+  apps_ad_group_principal_id               = dependency.core.outputs.apps_ad_group_principal_id
 }

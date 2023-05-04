@@ -105,6 +105,7 @@ dependency "core" {
     webapps_subnet_id                     = "serve_webapps_subnet_id"
     developers_ad_group_principal_id      = "core_developers_ad_group_principal_id"
     data_scientists_ad_group_principal_id = "core_data_scientists_ad_group_principal_id"
+    apps_ad_group_principal_id            = "core_apps_ad_group_principal_id"
   }
   mock_outputs_allowed_terraform_commands = ["init", "destroy", "validate"]
 }
@@ -113,9 +114,8 @@ dependency "transform" {
   config_path = "${get_repo_root()}/infrastructure/transform"
 
   mock_outputs = {
-    feature_store_server_name  = "transform_feature_store_server_name"
-    feature_store_db_name      = "transform_feature_store_db_name"
-    apps_ad_group_principal_id = "transform_apps_ad_group_principal_id"
+    feature_store_server_name = "transform_feature_store_server_name"
+    feature_store_db_name     = "transform_feature_store_db_name"
   }
   mock_outputs_allowed_terraform_commands = ["init", "destroy", "validate"]
 }
@@ -141,10 +141,10 @@ inputs = {
   serve_webapps_subnet_id                    = dependency.core.outputs.webapps_subnet_id
   core_developers_ad_group_principal_id      = dependency.core.outputs.developers_ad_group_principal_id
   core_data_scientists_ad_group_principal_id = dependency.core.outputs.data_scientists_ad_group_principal_id
+  core_apps_ad_group_principal_id            = dependency.core.outputs.apps_ad_group_principal_id
 
-  transform_feature_store_server_name  = dependency.transform.outputs.feature_store_server_name
-  transform_feature_store_db_name      = dependency.transform.outputs.feature_store_db_name
-  transform_apps_ad_group_principal_id = dependency.transform.outputs.apps_ad_group_principal_id
+  transform_feature_store_server_name = dependency.transform.outputs.feature_store_server_name
+  transform_feature_store_db_name     = dependency.transform.outputs.feature_store_db_name
 
   serve_app_service_plan_name = dependency.serve.outputs.app_service_plan_name
   serve_acr_name              = dependency.serve.outputs.acr_name
