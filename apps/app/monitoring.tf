@@ -14,17 +14,16 @@
 
 # Required diagnostics for Application Insights Dashboard
 resource "azurerm_monitor_diagnostic_setting" "logs_and_metrics" {
-  count                      = var.app_config.app_monitoring != null ? 1 : 0
   name                       = "metrics-logs-diagnostics-${replace(var.app_id, "_", "-")}"
   target_resource_id         = azurerm_linux_web_app.app.id
   log_analytics_workspace_id = data.azurerm_log_analytics_workspace.core.id
 
 
   dynamic "enabled_log" {
-    for_each = toset(var.app_config.app_monitoring.diagnostics.logs)
+    for_each = toset(["AppServiceHTTPLogs", "AppServiceConsoleLogs", "AppServiceAppLogs", "AppServiceAuditLogs", "AppServiceIPSecAuditLogs", "AppServicePlatformLogs"])
 
     content {
-      category = enabled_log.value.name
+      category = enabled_log.value
 
       retention_policy {
         enabled = true
@@ -33,10 +32,10 @@ resource "azurerm_monitor_diagnostic_setting" "logs_and_metrics" {
   }
 
   dynamic "metric" {
-    for_each = toset(var.app_config.app_monitoring.diagnostics.metrics)
+    for_each = toset(["AllMetrics"])
 
     content {
-      category = metric.value.name
+      category = metric.value
 
       retention_policy {
         enabled = true

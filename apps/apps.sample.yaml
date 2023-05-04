@@ -15,9 +15,3 @@ dash_seedling:  # unique ID for the app
     num_of_approvals: 1
   env:  # any env vars to pass to the app container
     WEBSITES_PORT: 8000
-  app_monitoring:
-    diagnostics:
-      logs:
-        - name: log_type
-      metrics:
-        - name: metric_type
