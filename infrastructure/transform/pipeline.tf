@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 resource "azurerm_data_factory_pipeline" "pipeline" {
-  for_each        = { for pipeline in local.pipelines : pipeline.pipeline_dir => pipeline.pipeline_json }
+  for_each        = { for pipeline in local.pipelines : pipeline.path => pipeline.json }
   name            = each.value.name
   data_factory_id = azurerm_data_factory.adf.id
   activities_json = jsonencode(each.value.properties.activities)
@@ -36,7 +36,7 @@ resource "databricks_dbfs_file" "dbfs_artifact_upload" {
 }
 
 resource "azurerm_data_factory_trigger_tumbling_window" "pipeline_trigger" {
-  for_each = { for trigger in local.triggers : trigger.pipeline => trigger.trigger if trigger != null }
+  for_each = { for trigger in local.triggers : trigger.pipeline => trigger.trigger if trigger != null && var.accesses_real_data }
 
   name            = "TumblingWindowTrigger${each.key}"
   data_factory_id = azurerm_data_factory.adf.id
