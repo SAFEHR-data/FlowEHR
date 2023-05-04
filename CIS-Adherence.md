@@ -86,11 +86,16 @@ This layer deploys components required to ingest data, transform data, and save 
 | | `CIS 4.1.6`: Ensure that 'Auditing Retention' is set to 'Greater than 90 days' | Y | https://github.com/UCLH-Foundry/FlowEHR/issues/172 |
 | | `CIS 4.2.1`: Ensure Microsoft Defender for SQL is set to 'on' | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/174 |
 | | `CIS 4.2.2 -> CIS 4.2.5`: Ensure Vulnerability Assessment is enabled by setting a storage account | Y |  | 
+| | `CIS 10.1`: Ensure that resource locks are set for critical resources | TODO | https://github.com/UCLH-Foundry/FlowEHR/issues/124 |
 | Azure Key Vault Secrets | | [secrets.tf](./infrastructure/transform/secrets.tf) |
 | | `CIS 8.3`: Ensure expiration is set for all secrets in RBAC vaults | N | No automated secret rotation in place as of yet. Will be taken care of as a manual background task. | 
 | Azure Databricks | Databricks is not referenced in the CIS benchmark | | Below are some relevant security settings |
 | | Network Isolation | Partial | - Databricks nodes are network isolated <br/>- Databricks control plane is internet accessible. This can and should be switched off when internal routing is in place: https://github.com/UCLH-Foundry/FlowEHR/issues/201 |
 | | Secret management | Y | Secrets are stored in Databricks private secret scopes. Due to API limitation, it was not possible to use Key Vault backed vaults |
+| Azure Key Vault for Apps: <br/>`kv-<suffix>-serve` | `CIS 8` | [keyvault.tf](./infrastructure/serve/keyvault.tf)  | |
+| | `CIS 8.5`: Ensure the key vault is recoverable | Y | Purge protection enabled for prod environments | 
+| | `CIS 8.6`: Ensure RBAC enabled for Azure Key Vault | Y | | 
+| | `CIS 8.7`: Ensure Private Endpoints are used for Azure Key Vault | Y | Public internet access disabled, PE into VNET for prod |
 
 
 ### FlowEHR App / Model Serving

@@ -78,6 +78,14 @@ variable "feature_store_server_name" {
   type = string
 }
 
+variable "serve_key_vault_uri" {
+  type = string
+}
+
+variable "serve_key_vault_id" {
+  type = string
+}
+
 variable "github_owner" {
   type = string
 }

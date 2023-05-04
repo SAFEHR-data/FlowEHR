@@ -12,22 +12,10 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-output "cosmos_account_name" {
-  value = azurerm_cosmosdb_account.serve.name
+output "aad_application_id" {
+  value = azuread_application.webapp_auth.application_id
 }
 
-output "app_service_plan_name" {
-  value = azurerm_service_plan.serve.name
-}
-
-output "acr_name" {
-  value = azurerm_container_registry.serve.name
-}
-
-output "serve_key_vault_uri" {
-  value = azurerm_key_vault.serve.vault_uri
-}
-
-output "serve_key_vault_id" {
-  value = azurerm_key_vault.serve.id
+output "aad_application_password" {
+  value = azuread_application_password.webapp_auth.value
 }

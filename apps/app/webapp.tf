@@ -53,6 +53,9 @@ resource "azurerm_linux_web_app" "app" {
     COSMOS_STATE_STORE_ENDPOINT                = data.azurerm_cosmosdb_account.state_store.endpoint
     FEATURE_STORE_CONNECTION_STRING            = local.feature_store_odbc
     ENVIRONMENT                                = local.core_gh_env
+    TENANT_ID                                  = data.azurerm_client_config.current.tenant_id
+    SUBSCRIPTION_ID                            = data.azurerm_client_config.current.subscription_id
+    KEY_VAULT_URI                              = var.serve_key_vault_uri
   })
 
   identity {
@@ -67,8 +70,8 @@ resource "azurerm_linux_web_app" "app" {
       issuer  = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/v2.0"
 
       active_directory {
-        client_id     = azuread_application.webapp_auth[local.webapp_name].application_id
-        client_secret = azuread_application_password.webapp_auth[local.webapp_name].value
+        client_id     = module.aad_app[local.webapp_name].aad_application_id
+        client_secret = module.aad_app[local.webapp_name].aad_application_password
       }
     }
   }
@@ -108,6 +111,9 @@ resource "azurerm_linux_web_app_slot" "testing" {
     COSMOS_STATE_STORE_ENDPOINT                = data.azurerm_cosmosdb_account.state_store.endpoint
     FEATURE_STORE_CONNECTION_STRING            = local.feature_store_odbc
     ENVIRONMENT                                = local.testing_gh_env
+    TENANT_ID                                  = data.azurerm_client_config.current.tenant_id
+    SUBSCRIPTION_ID                            = data.azurerm_client_config.current.subscription_id
+    KEY_VAULT_URI                              = var.serve_key_vault_uri
   })
 
   identity {
