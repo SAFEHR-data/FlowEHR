@@ -108,6 +108,9 @@ resource "azurerm_linux_web_app_slot" "testing" {
     COSMOS_STATE_STORE_ENDPOINT                = data.azurerm_cosmosdb_account.state_store.endpoint
     FEATURE_STORE_CONNECTION_STRING            = local.feature_store_odbc
     ENVIRONMENT                                = local.testing_gh_env
+    TENANT_ID                                  = data.azurerm_client_config.current.tenant_id
+    SUBSCRIPTION_ID                            = data.azurerm_client_config.current.subscription_id
+    KEY_VAULT_URI                              = var.serve_key_vault_uri
   })
 
   identity {
