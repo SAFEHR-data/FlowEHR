@@ -48,4 +48,6 @@ module "app" {
   github_owner                          = var.serve.github_owner
   github_access_token                   = data.external.github_access_token[0].result.token
   data_scientists_ad_group_principal_id = var.core_data_scientists_ad_group_principal_id
+  serve_key_vault_id                    = var.serve_key_vault_id
+  serve_key_vault_uri                   = var.serve_key_vault_uri
 }

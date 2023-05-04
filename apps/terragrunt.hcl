@@ -127,6 +127,8 @@ dependency "serve" {
     app_service_plan_name = "serve_app_service_plan_name"
     acr_name              = "serve_acr_name"
     cosmos_account_name   = "serve_cosmos_account_name"
+    serve_key_vault_uri   = "serve_key_vault_uri"
+    serve_key_vault_id    = "serve_key_vault_id"
   }
   mock_outputs_allowed_terraform_commands = ["init", "destroy", "validate"]
 }
@@ -149,6 +151,8 @@ inputs = {
   serve_app_service_plan_name = dependency.serve.outputs.app_service_plan_name
   serve_acr_name              = dependency.serve.outputs.acr_name
   serve_cosmos_account_name   = dependency.serve.outputs.cosmos_account_name
+  serve_key_vault_uri         = dependency.serve.outputs.serve_key_vault_uri
+  serve_key_vault_id          = dependency.serve.outputs.serve_key_vault_id
 
   github_app_cert = local.github_app_cert
   apps            = local.merged_apps_config

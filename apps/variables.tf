@@ -76,6 +76,14 @@ variable "serve_webapps_subnet_id" {
   type = string
 }
 
+variable "serve_key_vault_uri" {
+  type = string
+}
+
+variable "serve_key_vault_id" {
+  type = string
+}
+
 variable "github_app_cert" {
   description = "GitHub App Private Key PEM file contents as string"
   type        = string
