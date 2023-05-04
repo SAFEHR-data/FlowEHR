@@ -101,6 +101,22 @@ resource "databricks_cluster" "fixed_single_node" {
     })
   )
 
+  library {
+    pypi {
+      package = "opencensus-ext-azure==1.1.9"
+    }
+  }
+
+  library {
+    pypi {
+      package = "opencensus-ext-logging==0.1.1"
+    }
+  }
+
+  spark_env_vars = {
+    "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.transform.connection_string
+  }
+
   custom_tags = {
     "ResourceClass" = "SingleNode"
   }

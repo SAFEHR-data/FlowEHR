@@ -48,3 +48,8 @@ data "azurerm_storage_account" "core" {
   name                = var.core_storage_account_name
   resource_group_name = var.core_rg_name
 }
+
+data "azurerm_log_analytics_workspace" "core" {
+  name                = "log-${lower(var.naming_suffix)}"
+  resource_group_name = var.core_rg_name
+}
