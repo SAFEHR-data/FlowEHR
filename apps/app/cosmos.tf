@@ -35,7 +35,7 @@ resource "azurerm_cosmosdb_sql_role_assignment" "cosmos_access" {
   scope               = "${data.azurerm_cosmosdb_account.state_store.id}/dbs/${azurerm_cosmosdb_sql_database.app.name}"
 }
 
-resource "azurerm_cosmosdb_sql_container" "cosmos_container" {
+resource "azurerm_cosmosdb_sql_container" "app_owner_container" {
   name                = var.app_id
   resource_group_name = var.resource_group_name
   account_name        = var.cosmos_account_name
