@@ -62,3 +62,23 @@ resource "azurerm_data_factory_linked_service_key_vault" "msi_linked" {
   description     = "Key Vault linked service via MSI"
   key_vault_id    = var.core_kv_id
 }
+
+resource "azurerm_monitor_diagnostic_setting" "adf_enable_metrics_and_logs" {
+  name               = "ADFDiagnosticSettings"
+  target_resource_id = azurerm_data_factory.adf.id
+
+  log_analytics_workspace_id = data.azurerm_log_analytics_workspace.core.id
+
+  metric {
+    category = "AllMetrics"
+    enabled  = true
+  }
+
+  enabled_log {
+    category = "PipelineRuns"
+  }
+
+  enabled_log {
+    category = "ActivityRuns"
+  }
+}
