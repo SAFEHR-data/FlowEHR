@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 resource "azurerm_key_vault" "serve" {
-  name                          = "kv-${var.naming_suffix_truncated}-serve"
+  name                          = "kv-${var.naming_suffix_truncated}-srv"
   location                      = var.core_rg_location
   resource_group_name           = var.core_rg_name
   tenant_id                     = data.azurerm_client_config.current.tenant_id
