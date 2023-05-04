@@ -67,8 +67,8 @@ resource "azurerm_linux_web_app" "app" {
       issuer  = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/v2.0"
 
       active_directory {
-        client_id     = azuread_application.webapp_auth[local.webapp_name].application_id
-        client_secret = azuread_application_password.webapp_auth[local.webapp_name].value
+        client_id     = module.aad_app[local.webapp_name].aad_application_id
+        client_secret = module.aad_app[local.webapp_name].aad_application_password
       }
     }
   }
