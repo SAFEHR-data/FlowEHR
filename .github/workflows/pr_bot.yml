@@ -1,0 +1,206 @@
+#  Copyright (c) University College London Hospitals NHS Foundation Trust
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+# limitations under the License.
+---
+name: PR comment
+
+on:
+  issue_comment:
+    types: [created]  # only run on new comments
+    # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#issue_comment
+    # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issue_comment
+
+permissions:
+  checks: write
+
+jobs:
+  pr_comment:
+    name: PR comment
+    # https://docs.github.com/en/graphql/reference/enums#commentauthorassociation
+    # (and https://docs.github.com/en/rest/reference/issues#comments)
+
+    # only allow commands where:
+    # - the comment is on a PR
+    # - the commenting user has write permissions (i.e. is OWNER or COLLABORATOR)
+    if: ${{ github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+    outputs:
+      command: ${{ steps.check_command.outputs.command }}
+      prRef: ${{ steps.check_command.outputs.prRef }}
+      prHeadSha: ${{ steps.check_command.outputs.prHeadSha }}
+      prRefId: ${{ steps.check_command.outputs.prRefId }}
+      branchRefId: ${{ steps.check_command.outputs.branchRefid }}
+      ciGitRef: ${{ steps.check_command.outputs.ciGitRef }}
+      makeCommand: ${{ steps.set_make_command.outputs.makeCommand }}
+    steps:
+      # Ensure we have the script file for the github-script action to use
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.FLOWEHR_REPOSITORIES_GH_TOKEN }}
+          fetch-depth: 0  # entire history is needed for paths filter
+          persist-credentials: false
+
+      # Determine whether the comment is a command
+      - id: check_command
+        name: Check for a command using GitHub script
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.FLOWEHR_REPOSITORIES_GH_TOKEN }}
+          script: |
+            const script = require('./.github/scripts/build.js')
+            await script.getCommandFromComment({core, context, github});
+
+      - name: Output PR details
+        run: |
+          echo "PR Details"
+          echo "=========="
+          echo "prRef      : ${{ steps.check_command.outputs.prRef }}"
+          echo "prHeadSha  : ${{ steps.check_command.outputs.prHeadSha }}"
+          echo "prRefId    : ${{ steps.check_command.outputs.prRefId }}"
+          echo "ciGitRef   : ${{ steps.check_command.outputs.ciGitRef }}"
+
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          token: ${{ secrets.FLOWEHR_REPOSITORIES_GH_TOKEN }}
+          base: main
+          ref: ${{ steps.check_command.outputs.prHeadSha }}
+          filters: |
+            core:
+              - 'infrastructure/core/**'
+            transform:
+              - 'infrastructure/transform/**'
+            serve:
+              - 'infrastructure/serve/**'
+            apps:
+              - 'apps/**'
+            devcontainer:
+              - '.devcontainer/**'
+
+      - id: set_make_command
+        run: |
+          if [ ${{ steps.check_command.outputs.command }} = "test-all" ]; then
+              make_command="test"
+          elif [ ${{ steps.check_command.outputs.command }} = "destroy" ]; then
+              make_command="destroy"
+          elif [ ${{ steps.check_command.outputs.command }} = "destroy-no-terraform" ]; then
+              make_command="destroy-no-terraform"
+          elif [ ${{ steps.changes.outputs.core }} = "true" ]; then
+              make_command="test"
+          elif [ ${{ steps.changes.outputs.transform }} = "true" ] && \
+            [ ${{ steps.changes.outputs.serve }} = "true" ]; then
+              make_command="test"
+          elif [ ${{ steps.changes.outputs.transform }} = "true" ]; then
+              make_command="test-transform"
+          elif [ ${{ steps.changes.outputs.serve }} = "true" ]; then
+              make_command="test-serve"
+          elif [ ${{ steps.changes.outputs.apps }} = "true" ]; then
+              make_command="test-apps"
+          elif [ ${{ steps.changes.outputs.devcontainer }} = "true" ]; then
+              make_command="test"
+          else
+              make_command="none"
+          fi
+          echo "makeCommand=${make_command}" >> $GITHUB_OUTPUT
+
+      - name: Report check status start
+        if: ${{ steps.check_command.outputs.command == 'test' || steps.check_command.outputs.command == 'test-all' }}
+        uses: LouisBrunner/checks-action@v1.5.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}  # Needs the auto-generated token
+          sha: ${{ steps.check_command.outputs.prHeadSha }}
+          name: "Deploy PR"
+          status: "in_progress"
+          details_url: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+      # If we don't run the actual deploy (see the run_test job below) we won't receive
+      # a check-run status, and will have to send it "manually"
+      - name: Bypass E2E check-runs status
+        if: |
+          (steps.check_command.outputs.command == 'test-force-approve') ||
+          (steps.set_make_command.outputs.makeCommand == 'none')
+        uses: LouisBrunner/checks-action@v1.5.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}  # Needs the auto-generated token
+          # the name must be identical to the one received by the real job
+          sha: ${{ steps.check_command.outputs.prHeadSha }}
+          name: "Deploy PR"
+          status: "completed"
+          conclusion: "success"
+
+  destroy_pr_env:  # Destroy all resources deployed by PR
+    needs: [pr_comment]
+    if: |
+      (needs.pr_comment.outputs.command == 'destroy') ||
+      (needs.pr_comment.outputs.command == 'destroy-no-terraform')
+    name: Destroy PR
+    uses: ./.github/workflows/devcontainer_make_command.yml
+    with:
+      suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
+      environment: infra-test
+      command: ${{ needs.pr_comment.outputs.makeCommand }}
+      sha: ${{ needs.pr_comment.outputs.prHeadSha }}
+    secrets: inherit
+
+  destroy_cleanup: # Clean up state and dev container if destroy successful
+    needs: [pr_comment, destroy_pr_env]
+    name: Clean-up
+    uses: ./.github/workflows/clean_state.yml
+    with:
+      suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
+      environment: infra-test
+    secrets: inherit
+
+  run_test:
+    needs: [pr_comment]
+    if: |
+      (needs.pr_comment.outputs.command == 'test' || needs.pr_comment.outputs.command == 'test-all') &&
+      (needs.pr_comment.outputs.makeCommand != 'none')
+    name: Deploy PR
+    uses: ./.github/workflows/devcontainer_make_command.yml
+    with:
+      suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
+      environment: infra-test
+      command: ${{ needs.pr_comment.outputs.makeCommand }}
+      sha: ${{ needs.pr_comment.outputs.prHeadSha }}
+    secrets: inherit
+
+  test_cleanup: # Clean up state and dev container if test successful
+    needs: [pr_comment, run_test]
+    name: Clean-up
+    uses: ./.github/workflows/clean_state.yml
+    with:
+      suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
+      environment: infra-test
+    secrets: inherit
+
+  summary:
+    name: Summary
+    needs: [pr_comment, run_test]
+    if: always() && needs.run_test.result != 'skipped' # Run even on test failure
+    runs-on: ubuntu-latest
+    environment: infra-test
+    steps:
+      # For PR builds triggered from comment builds, the GITHUB_REF is set to main
+      # so the checks aren't automatically associated with the PR
+      # If prHeadSha is specified then explicitly mark the checks for that SHA
+      - name: Report check status
+        uses: LouisBrunner/checks-action@v1.5.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}  # Needs the auto-generated token
+          sha: ${{ needs.pr_comment.outputs.prHeadSha }}
+          name: "Deploy PR"
+          status: "completed"
+          conclusion: ${{ needs.run_test.result }}
+          details_url: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"

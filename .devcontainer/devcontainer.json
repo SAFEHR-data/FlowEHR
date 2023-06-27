@@ -1,0 +1,61 @@
+{
+	"name": "FlowEHR",
+	"image": "mcr.microsoft.com/devcontainers/python:0-3.10-bullseye",
+
+	// Configure VS Code properties & extensions
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"hashicorp.terraform",
+				"hashicorp.hcl",
+				"ms-vscode.azurecli",
+				"ms-azuretools.vscode-docker",
+				"timonwong.shellcheck",
+				"ms-python.vscode-pylance"
+			]
+		}
+	},
+
+	// Install required features (packages, runtimes, helpers etc.)
+	"features": {
+		"ghcr.io/devcontainers/features/terraform:1": {
+			"version": "1.3.7",
+			"tflint": "0.46.0",
+			"terragrunt": "0.44.5"
+		},
+		"ghcr.io/devcontainers/features/azure-cli:1.0.8": {
+			"version": "2.47.0",
+			"extensions": "ml" 
+			// extensions do not currently install, investigating in separate issue: https://github.com/UCLH-Foundry/FlowEHR/issues/286
+		},
+		"ghcr.io/devcontainers/features/node:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {
+			"version": "2.25.0"
+		},
+		"ghcr.io/stuartleeks/dev-container-features/azure-cli-persistence:0": {},
+		"ghcr.io/stuartleeks/dev-container-features/shell-history:0": {},
+		"ghcr.io/devcontainers-contrib/features/pre-commit:2": {},
+		"ghcr.io/lukewiwa/features/shellcheck:0": {},
+		"ghcr.io/eitsupi/devcontainer-features/jq-likes:1": {
+			"jqVersion": "1.6",
+			"yqVersion": "4"
+		},
+		"ghcr.io/jlaundry/devcontainer-features/mssql-odbc-driver:1": {
+			"version": "18"
+		},
+
+		// Install arbitrary APT packages
+		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
+			"packages": "parallel, yamllint"
+		}
+	},
+
+	// Run commands on container start-up before tools attach
+	"onCreateCommand": "pip install --no-cache-dir -r requirements.txt",
+
+	// Run commands after the container is created
+	"postCreateCommand": "./scripts/pipeline_repo_checkout.sh",
+
+	// Ensure working directory is trusted by Git (needs to be post start so we pick up host's git configuration first)
+	"postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder} && pre-commit install"
+}

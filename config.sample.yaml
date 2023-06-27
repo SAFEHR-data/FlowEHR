@@ -1,0 +1,39 @@
+---
+flowehr_id: sample
+location: uksouth
+environment: sample
+accesses_real_data: false  # Optional
+private_dns_zones_rg: sample-rg-name  # Optional
+
+data_source_connections:  # Optional
+  - example:
+    name: samplesql
+    peering:  # Optional
+      virtual_network_name: sample-vnet-name
+      resource_group_name: sample-rg-name
+      dns_zones:
+        - samplezone.azure.com
+    fqdn: samplesql.database.azure.com
+    database: sampledb
+    username: adminuser
+    password: ${SECRET_PASSWORD_FROM_GH}
+
+transform:  # Optional
+  spark_version: 3.3.1  # Optional
+  repositories:  # Optional
+    - url: https://github.com/MY_TRANSFORM_CODE_REPO.git
+    - url: https://github.com/MY_OTHER_TRANSFORM_CODE_REPO.git
+      sha: abcd01abcd01abcd01abcd01abcd01abcd01abcd
+
+serve:  # Optional
+  github_owner: A-GitHub-Org
+  github_app_id: 0000000000000
+  github_app_installation_id: 00000000000000
+
+monitoring:  # Optional
+  alert_recipients:  # Optional
+    - name: person
+      email: person@example.com
+  network_watcher:  # Optional, required if accesses_real_data
+    name: NetworkWatcher_location
+    resource_group_name: NetworkWatcherRG

@@ -1,0 +1,137 @@
+#  Copyright (c) University College London Hospitals NHS Foundation Trust
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+---
+name: Make command
+
+on:
+  workflow_call:
+    inputs:
+      command:
+        type: string
+        required: true
+        description: Make command to run e.g infrastructure
+      environment:
+        type: string
+        required: true
+        description: The environment to deploy e.g. testing (selects the env config file and GitHub environment to use)
+      suffix_override:
+        type: string
+        required: false
+        description: An override for the naming suffix. If defined the core address space is random
+      sha:
+        type: string
+        required: false
+        description: Commit SHA to override the default GitHub checkout
+      devcontainer_name:
+        type: string
+        required: false
+        description: The devcontainer image name
+        default: flowehr/devcontainer
+      runner_label:
+        type: string
+        required: false
+        description: A specific GitHub runner label to run this workflow on. Overrides vars.CI_GITHUB_RUNNER_LABEL, which may be set at a repo level
+    secrets:
+      ARM_SUBSCRIPTION_ID:
+        required: true
+      ARM_TENANT_ID:
+        required: true
+      ARM_CLIENT_ID:
+        required: true
+      ARM_CLIENT_SECRET:
+        required: true
+      FLOWEHR_REPOSITORIES_GH_TOKEN:
+        required: true
+      GH_APP_CERT:
+        required: false
+
+jobs:
+  make:
+    name: make ${{ inputs.command }}
+    runs-on: [self-hosted, "${{ (inputs.runner_label != '' && inputs.runner_label) || vars.CI_GITHUB_RUNNER_LABEL }}"]
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Set devcontainer attributes
+        id: dc
+        run: |
+          echo "tag=${{ (inputs.suffix_override != '' && inputs.suffix_override) || inputs.environment }}" >> $GITHUB_OUTPUT
+          echo "image_path=${{ vars.CI_CONTAINER_REGISTRY }}.azurecr.io/${{ inputs.devcontainer_name }}" >> $GITHUB_OUTPUT
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          token: ${{ secrets.FLOWEHR_REPOSITORIES_GH_TOKEN }}
+          # if the following values are missing (i.e. not triggered via comment workflow)
+          # then the default checkout will apply
+          ref: ${{ inputs.sha }}
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
+
+      - name: ACR Login
+        id: acr_login
+        run: az acr login --name "${{ vars.CI_CONTAINER_REGISTRY }}"
+
+      - name: Pre-build devcontainer
+        uses: devcontainers/ci@v0.3
+        with:
+          imageName: ${{ steps.dc.outputs.image_path }}
+          cacheFrom: ${{ steps.dc.outputs.image_path }}
+          imageTag: ${{ steps.dc.outputs.tag }}
+          push: never  # Happens as a post-step after the job so we need to do this manually
+
+      - name: Push devcontainer
+        id: devcontainer_push
+        run: docker push ${{ steps.dc.outputs.image_path }}:${{ steps.dc.outputs.tag }}
+
+      - name: Replace tokens in config files
+        uses: ./.github/actions/config_token_replacement
+        with:
+          environment: ${{ inputs.environment }}
+          secrets: ${{ toJSON(secrets) }}
+
+      - name: Make command
+        uses: devcontainers/ci@v0.3
+        env:
+          # Add optionals as step envs so only passed as env vars if not empty
+          # https://github.com/devcontainers/ci/issues/231
+          SUFFIX_OVERRIDE: ${{ inputs.suffix_override }}
+          GH_APP_CERT: ${{ secrets.GH_APP_CERT }}
+          TF_LOG: ${{ (runner.debug == '1' && 'INFO') || '' }}
+        with:
+          imageName: ${{ steps.dc.outputs.image_path }}
+          imageTag: ${{ steps.dc.outputs.tag }}
+          runCmd: make ${{ inputs.command }}
+          push: never
+          env: |
+            DOCKER_BUILDKIT=1
+            TF_INPUT=0
+            TF_IN_AUTOMATION=1
+            SUFFIX_OVERRIDE
+            ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}
+            ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
+            ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
+            ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
+            ENVIRONMENT=${{ inputs.environment }}
+            CI_CONTAINER_REGISTRY=${{ vars.CI_CONTAINER_REGISTRY }}
+            CI_RESOURCE_GROUP=${{ vars.CI_RESOURCE_GROUP }}
+            CI_STORAGE_ACCOUNT=${{ vars.CI_STORAGE_ACCOUNT }}
+            CI_PEERING_VNET=${{ vars.CI_PEERING_VNET }}
+            FLOWEHR_REPOSITORIES_GH_TOKEN=${{ secrets.FLOWEHR_REPOSITORIES_GH_TOKEN }}
+            GH_APP_CERT
+            TF_VAR_use_random_address_space=${{ (inputs.suffix_override != '' && '1') || '0' }}
+            TF_LOG
