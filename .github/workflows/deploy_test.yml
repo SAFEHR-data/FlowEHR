@@ -12,9 +12,11 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-name: Destroy Infra-Test
+name: Deploy Test
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 # Only have a single instance of this workflow running at any time
@@ -22,9 +24,10 @@ concurrency:
   group: ${{ github.workflow }}
 
 jobs:
-  destroy:
+  deploy:
     uses: ./.github/workflows/devcontainer_make_command.yml
+    name: Make All
     with:
-      command: destroy
-      environment: infra-test
+      command: all
+      environment: test
     secrets: inherit
