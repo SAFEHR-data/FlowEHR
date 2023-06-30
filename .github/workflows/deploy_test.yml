@@ -28,6 +28,6 @@ jobs:
     uses: ./.github/workflows/devcontainer_make_command.yml
     name: Make Transform
     with:
-      command: transform
+      command: infrastructure-transform
       environment: test
     secrets: inherit
