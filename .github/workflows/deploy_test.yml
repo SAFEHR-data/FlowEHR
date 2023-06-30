@@ -26,8 +26,8 @@ concurrency:
 jobs:
   deploy:
     uses: ./.github/workflows/devcontainer_make_command.yml
-    name: Make All
+    name: Make Transform
     with:
-      command: all
+      command: transform
       environment: test
     secrets: inherit
