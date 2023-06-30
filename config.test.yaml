@@ -1,5 +1,5 @@
 ---
 environment: test
 accesses_real_data: false
-core_address_space: 10.0.0.0/22
+core_address_space: 10.60.0.0/22
 private_dns_zones_rg: rg-bootstrap-mricboot-dev
