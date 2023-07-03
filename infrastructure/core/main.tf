@@ -12,6 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+# TEST PR BOT
+
 resource "azurerm_resource_group" "core" {
   name     = "rg-${local.naming_suffix}"
   location = var.location

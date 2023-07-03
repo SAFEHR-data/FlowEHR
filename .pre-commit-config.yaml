@@ -31,9 +31,9 @@ repos:
     rev: v1.77.2
     hooks:
       - id: terraform_fmt
-      - id: terraform_validate
+      # - id: terraform_validate # uncomment when https://github.com/UCLH-Foundry/FlowEHR/issues/308 is fixed
       - id: terragrunt_fmt
-      - id: terraform_tflint
+      # - id: terraform_tflint # uncomment when https://github.com/UCLH-Foundry/FlowEHR/issues/308 is fixed
       - id: terraform_providers_lock
         args:
           - --tf-init-args=-upgrade
