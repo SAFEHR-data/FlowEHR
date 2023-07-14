@@ -12,11 +12,11 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-name: Deploy Test
+name: Deploy Staging
 
 on:
   push:
-    branches: [main]
+    branches: [staging]
   workflow_dispatch:
 
 # Only have a single instance of this workflow running at any time
@@ -29,5 +29,5 @@ jobs:
     name: Make Transform
     with:
       command: infrastructure-transform
-      environment: test
+      environment: staging
     secrets: inherit
