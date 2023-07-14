@@ -1,5 +1,5 @@
 # 🌺 FlowEHR
-FlowEHR is a safe, secure &amp; cloud-native development &amp; deployment platform for digital healthcare research &amp;innovation.
+FlowEHR is a safe, secure &amp; cloud-native development &amp; deployment platform for digital healthcare research &amp; innovation.
 
 > **Warning**
 > This repository is a _work in progress_. We're working towards a v0.1.0 release

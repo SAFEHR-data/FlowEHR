@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-name: Destroy Staging
+name: Destroy Prod
 
 on:
   workflow_dispatch:
@@ -26,5 +26,5 @@ jobs:
     uses: ./.github/workflows/devcontainer_make_command.yml
     with:
       command: destroy
-      environment: staging
+      environment: prod
     secrets: inherit
