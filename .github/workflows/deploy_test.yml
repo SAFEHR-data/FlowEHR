@@ -30,4 +30,5 @@ jobs:
     with:
       command: infrastructure-transform
       environment: test
+      runner_label: gh-runner-mricboot-dev
     secrets: inherit
