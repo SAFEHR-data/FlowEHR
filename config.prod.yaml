@@ -3,3 +3,11 @@ environment: staging
 accesses_real_data: true
 core_address_space: 10.60.0.0/22
 private_dns_zones_rg: rg-bootstrap-mricboot-prod
+
+monitoring:
+  alert_recipients:
+    - name: David Salac
+      email: David.Salac@liverpool.ac.uk
+  network_watcher:
+    name: NetworkWatcher_uksouth
+    resource_group_name: NetworkWatcherRG
