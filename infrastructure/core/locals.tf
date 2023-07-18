@@ -31,5 +31,6 @@ locals {
     cosmos     = "privatelink.documents.azure.com"
     databricks = "privatelink.azuredatabricks.net"
     sql        = "privatelink.database.windows.net"
+    adls       = "privatelink.dfs.core.windows.net"
   }
 }

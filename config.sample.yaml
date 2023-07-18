@@ -24,6 +24,17 @@ transform:  # Optional
     - url: https://github.com/MY_TRANSFORM_CODE_REPO.git
     - url: https://github.com/MY_OTHER_TRANSFORM_CODE_REPO.git
       sha: abcd01abcd01abcd01abcd01abcd01abcd01abcd
+  datalake:
+    zones:
+      - name: Bronze
+        containers:
+          - name: Raw
+      - name: Silver
+        containers:
+          - name: Transformed
+      - name: Gold
+        containers:
+          - name: Curated
 
 serve:  # Optional
   github_owner: A-GitHub-Org

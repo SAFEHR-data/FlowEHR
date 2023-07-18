@@ -108,6 +108,15 @@ variable "transform" {
       url = string,
       sha = optional(string, "")
     })), [])
+    datalake = optional(object({
+      zones = optional(list(object({
+        name = string
+        containers = optional(list(object({
+          name = string
+        })), [])
+        })
+      ), [])
+    }))
   })
   default = {
     spark_version = "3.3.1"
