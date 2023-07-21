@@ -109,13 +109,7 @@ variable "transform" {
       sha = optional(string, "")
     })), [])
     datalake = optional(object({
-      zones = optional(list(object({
-        name = string
-        containers = optional(list(object({
-          name = string
-        })), [])
-        })
-      ), [])
+      zones = set(string)
     }))
   })
   default = {

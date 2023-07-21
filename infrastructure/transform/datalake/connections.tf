@@ -73,17 +73,15 @@ resource "databricks_secret" "databricks_adls_spn_app_secret" {
 }
 
 resource "databricks_mount" "adls" {
-  for_each   = { for zone in var.zones : zone.name => zone }
-  name       = "adls-${lower(each.value.name)}"
-  uri        = "abfss://${lower(each.value.name)}@${azurerm_storage_account.adls.name}.dfs.core.windows.net/"
-  cluster_id = var.databricks_cluster_id
+  for_each    = azurerm_storage_container.adls_zone
+  name        = "adls-${each.value.name}"
+  cluster_id  = var.databricks_cluster_id
+  resource_id = each.value.resource_manager_id
 
-  extra_configs = {
-    "fs.azure.account.auth.type" : "OAuth",
-    "fs.azure.account.oauth.provider.type" : "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider",
-    "fs.azure.account.oauth2.client.id" : azuread_application.databricks_adls.application_id,
-    "fs.azure.account.oauth2.client.secret" : "{{secrets/${var.databricks_secret_scope_name}/${azurerm_key_vault_secret.databricks_adls_spn_app_secret.name}}}",
-    "fs.azure.account.oauth2.client.endpoint" : "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/oauth2/token",
-    "fs.azure.createRemoteFileSystemDuringInitialization" : "false"
+  abfs {
+    client_id              = azuread_application.databricks_adls.application_id
+    client_secret_scope    = var.databricks_secret_scope_name
+    client_secret_key      = databricks_secret.databricks_adls_spn_app_secret.key
+    initialize_file_system = true
   }
 }

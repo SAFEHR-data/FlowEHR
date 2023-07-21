@@ -26,15 +26,9 @@ transform:  # Optional
       sha: abcd01abcd01abcd01abcd01abcd01abcd01abcd
   datalake:
     zones:
-      - name: Bronze
-        containers:
-          - name: Raw
-      - name: Silver
-        containers:
-          - name: Transformed
-      - name: Gold
-        containers:
-          - name: Curated
+      - Bronze
+      - Silver
+      - Gold
 
 serve:  # Optional
   github_owner: A-GitHub-Org

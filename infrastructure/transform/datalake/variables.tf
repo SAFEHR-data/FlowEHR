@@ -46,13 +46,7 @@ variable "deployer_ip" {
 
 variable "zones" {
   description = "Datalake zones to deploy"
-  type = list(object({
-    name = string
-    containers = optional(list(object({
-      name = string
-    })), [])
-    })
-  )
+  type        = set(string)
 }
 
 variable "adf_id" {

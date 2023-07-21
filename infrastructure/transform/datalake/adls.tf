@@ -13,14 +13,26 @@
 #  limitations under the License.
 
 resource "azurerm_storage_account" "adls" {
-  name                     = "adls${replace(lower(var.naming_suffix), "-", "")}"
-  resource_group_name      = var.core_rg_name
-  location                 = var.core_rg_location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  account_kind             = "StorageV2"
-  is_hns_enabled           = "true"
-  tags                     = var.tags
+  name                              = "adls${replace(lower(var.naming_suffix), "-", "")}"
+  resource_group_name               = var.core_rg_name
+  location                          = var.core_rg_location
+  account_tier                      = "Standard"
+  account_replication_type          = "GRS"
+  account_kind                      = "StorageV2"
+  is_hns_enabled                    = true
+  infrastructure_encryption_enabled = true
+  public_network_access_enabled     = !var.tf_in_automation
+  tags                              = var.tags
+
+  blob_properties {
+    container_delete_retention_policy {
+      days = 7
+    }
+
+    delete_retention_policy {
+      days = 7
+    }
+  }
 }
 
 resource "azurerm_role_assignment" "adls_deployer_contributor" {
@@ -37,29 +49,15 @@ resource "azurerm_storage_account_network_rules" "adls" {
 }
 
 # Create filesystem for each zone
-resource "azurerm_storage_data_lake_gen2_filesystem" "adls_zone" {
-  for_each           = { for zone in var.zones : zone.name => zone }
-  name               = lower(each.value.name)
-  storage_account_id = azurerm_storage_account.adls.id
+resource "azurerm_storage_container" "adls_zone" {
+  for_each              = var.zones
+  name                  = lower(each.value)
+  storage_account_name  = azurerm_storage_account.adls.name
+  container_access_type = "private"
 
   depends_on = [
     azurerm_storage_account_network_rules.adls,
     azurerm_role_assignment.adls_deployer_contributor
-  ]
-}
-
-# Create containers in filesystem
-resource "azurerm_storage_data_lake_gen2_path" "adls_container" {
-  for_each           = { for container in local.containers : "${container.zone}-${container.name}" => container }
-  path               = lower(each.value.name)
-  filesystem_name    = lower(each.value.zone)
-  storage_account_id = azurerm_storage_account.adls.id
-  resource           = "directory"
-
-  depends_on = [
-    azurerm_storage_account_network_rules.adls,
-    azurerm_role_assignment.adls_deployer_contributor,
-    azurerm_storage_data_lake_gen2_filesystem.adls_zone
   ]
 }
 
