@@ -71,17 +71,3 @@ resource "databricks_secret" "databricks_adls_spn_app_secret" {
   string_value = azuread_application_password.databricks_adls.value
   scope        = var.databricks_secret_scope_id
 }
-
-resource "databricks_mount" "adls" {
-  for_each    = azurerm_storage_container.adls_zone
-  name        = "adls-${each.value.name}"
-  cluster_id  = var.databricks_cluster_id
-  resource_id = each.value.resource_manager_id
-
-  abfs {
-    client_id              = azuread_application.databricks_adls.application_id
-    client_secret_scope    = var.databricks_secret_scope_name
-    client_secret_key      = databricks_secret.databricks_adls_spn_app_secret.key
-    initialize_file_system = true
-  }
-}

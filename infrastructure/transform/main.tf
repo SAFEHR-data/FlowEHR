@@ -13,22 +13,20 @@
 #  limitations under the License.
 
 module "datalake" {
-  count                        = var.transform.datalake != null ? 1 : 0
-  source                       = "./datalake"
-  naming_suffix                = var.naming_suffix
-  core_rg_name                 = var.core_rg_name
-  core_rg_location             = var.core_rg_location
-  core_subnet_id               = var.core_subnet_id
-  core_kv_id                   = var.core_kv_id
-  private_dns_zones            = var.private_dns_zones
-  tf_in_automation             = var.tf_in_automation
-  deployer_ip                  = var.deployer_ip
-  zones                        = var.transform.datalake.zones
-  adf_id                       = azurerm_data_factory.adf.id
-  adf_identity_object_id       = azurerm_data_factory.adf.identity[0].principal_id
-  databricks_app_name          = local.databricks_app_name
-  databricks_secret_scope_id   = databricks_secret_scope.secrets.id
-  databricks_secret_scope_name = databricks_secret_scope.secrets.name
-  databricks_cluster_id        = databricks_cluster.fixed_single_node.cluster_id
-  tags                         = var.tags
+  count                      = var.transform.datalake != null ? 1 : 0
+  source                     = "./datalake"
+  naming_suffix              = var.naming_suffix
+  core_rg_name               = var.core_rg_name
+  core_rg_location           = var.core_rg_location
+  core_subnet_id             = var.core_subnet_id
+  core_kv_id                 = var.core_kv_id
+  private_dns_zones          = var.private_dns_zones
+  tf_in_automation           = var.tf_in_automation
+  deployer_ip                = var.deployer_ip
+  zones                      = var.transform.datalake.zones
+  adf_id                     = azurerm_data_factory.adf.id
+  adf_identity_object_id     = azurerm_data_factory.adf.identity[0].principal_id
+  databricks_app_name        = local.databricks_app_name
+  databricks_secret_scope_id = databricks_secret_scope.secrets.id
+  tags                       = var.tags
 }

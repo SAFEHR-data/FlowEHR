@@ -65,14 +65,6 @@ variable "databricks_secret_scope_id" {
   type = string
 }
 
-variable "databricks_secret_scope_name" {
-  type = string
-}
-
-variable "databricks_cluster_id" {
-  type = string
-}
-
 variable "tags" {
   type = map(any)
 }
