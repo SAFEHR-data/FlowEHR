@@ -29,6 +29,12 @@ resource "azurerm_storage_account" "core" {
   enable_https_traffic_only         = true
   tags                              = var.tags
 
+  network_rules {
+    bypass         = ["AzureServices"]
+    default_action = "Deny"
+    ip_rules       = var.tf_in_automation ? null : [data.http.local_ip[0].response_body]
+  }
+
   blob_properties {
     container_delete_retention_policy {
       days = 7

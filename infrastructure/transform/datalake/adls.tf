@@ -24,6 +24,12 @@ resource "azurerm_storage_account" "adls" {
   public_network_access_enabled     = !var.tf_in_automation
   tags                              = var.tags
 
+  network_rules {
+    bypass         = ["AzureServices"]
+    default_action = "Deny"
+    ip_rules       = var.tf_in_automation ? null : [var.deployer_ip]
+  }
+
   blob_properties {
     container_delete_retention_policy {
       days = 7
