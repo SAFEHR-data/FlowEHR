@@ -71,3 +71,9 @@ resource "databricks_secret" "databricks_adls_spn_app_secret" {
   string_value = azuread_application_password.databricks_adls.value
   scope        = var.databricks_secret_scope_id
 }
+
+resource "databricks_secret" "adls_uri" {
+  key          = "flowehr-datalake-uri"
+  string_value = "${azurerm_storage_account.adls.name}.dfs.core.windows.net"
+  scope        = var.databricks_secret_scope_id
+}

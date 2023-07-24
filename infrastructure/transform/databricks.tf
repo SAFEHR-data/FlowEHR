@@ -86,13 +86,14 @@ resource "databricks_cluster" "fixed_single_node" {
       "spark.secret.feature-store-fqdn"       = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_fqdn.key}}}"
       "spark.secret.feature-store-database"   = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_database.key}}}"
     }),
-    # MSI connection to Data Lake (if enabled)
+    # MSI connection to Datalake (if enabled)
     var.transform.datalake != null ? tomap({
       "fs.azure.account.auth.type.${module.datalake[0].adls_name}.dfs.core.windows.net"              = "OAuth",
       "fs.azure.account.oauth.provider.type.${module.datalake[0].adls_name}.dfs.core.windows.net"    = "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider",
       "fs.azure.account.oauth2.client.id.${module.datalake[0].adls_name}.dfs.core.windows.net"       = module.datalake[0].databricks_adls_app_id,
       "fs.azure.account.oauth2.client.secret.${module.datalake[0].adls_name}.dfs.core.windows.net"   = "{{secrets/${databricks_secret_scope.secrets.name}/${module.datalake[0].databricks_adls_app_secret_key}}}",
       "fs.azure.account.oauth2.client.endpoint.${module.datalake[0].adls_name}.dfs.core.windows.net" = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/oauth2/token"
+      "spark.secret.datalake-uri"                                                                    = "{{secrets/${databricks_secret_scope.secrets.name}/${module.datalake[0].databricks_adls_uri_secret_key}}}"
     }) : tomap({}),
     # Secrets for each data source
     tomap({ for connection in var.data_source_connections :

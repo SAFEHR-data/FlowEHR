@@ -23,3 +23,7 @@ output "databricks_adls_app_id" {
 output "databricks_adls_app_secret_key" {
   value = databricks_secret.databricks_adls_spn_app_secret.key
 }
+
+output "databricks_adls_uri_secret_key" {
+  value = databricks_secret.adls_uri.key
+}
