@@ -34,6 +34,8 @@ repos:
       - id: terraform_validate
       - id: terragrunt_fmt
       - id: terraform_tflint
+        args:
+          - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
       - id: terraform_providers_lock
         args:
           - --tf-init-args=-upgrade

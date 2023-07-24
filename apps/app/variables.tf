@@ -108,5 +108,5 @@ variable "data_scientists_ad_group_principal_id" {
 }
 
 variable "app_config" {
-  type = any // validated by parent
+  type = any # validated by parent
 }
