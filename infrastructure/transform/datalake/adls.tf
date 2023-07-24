@@ -21,6 +21,7 @@ resource "azurerm_storage_account" "adls" {
   account_kind                      = "StorageV2"
   is_hns_enabled                    = true
   infrastructure_encryption_enabled = true
+  enable_https_traffic_only         = true
   public_network_access_enabled     = !var.tf_in_automation
   tags                              = var.tags
 
