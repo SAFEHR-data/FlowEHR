@@ -55,7 +55,7 @@ resource "azurerm_storage_account_network_rules" "adls" {
   ip_rules           = var.tf_in_automation == true ? [] : [var.deployer_ip]
 }
 
-# Create filesystem for each zone
+# Create container (otherwise known as filesystem) for each zone
 resource "azurerm_storage_container" "adls_zone" {
   for_each              = var.zones
   name                  = lower(each.value)
