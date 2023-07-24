@@ -67,6 +67,7 @@ terraform {
     ${local.providers.locals.required_provider_github}
     ${local.providers.locals.required_provider_azure}
     ${local.providers.locals.required_provider_azuread}
+    ${local.providers.locals.required_provider_random}
   }
 }
 EOF
