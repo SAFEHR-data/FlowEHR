@@ -25,12 +25,14 @@ locals {
   serve_webapps_address_space        = local.subnet_address_spaces[3]
 
   create_dns_zones = var.private_dns_zones_rg == null
-  required_private_dns_zones = {
+  datalake_enabled = try(var.transform.datalake, null) != null
+  required_private_dns_zones = merge({
     blob       = "privatelink.blob.core.windows.net"
     keyvault   = "privatelink.vaultcore.azure.net"
     cosmos     = "privatelink.documents.azure.com"
     databricks = "privatelink.azuredatabricks.net"
     sql        = "privatelink.database.windows.net"
-    adls       = "privatelink.dfs.core.windows.net"
-  }
+    }, local.datalake_enabled ? {
+    adls = "privatelink.dfs.core.windows.net"
+  } : {})
 }

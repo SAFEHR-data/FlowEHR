@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 module "datalake" {
-  count                      = var.transform.datalake != null ? 1 : 0
+  count                      = local.datalake_enabled ? 1 : 0
   source                     = "./datalake"
   naming_suffix              = var.naming_suffix
   core_rg_name               = var.core_rg_name

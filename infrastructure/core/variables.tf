@@ -113,6 +113,11 @@ EOF
   default     = null
 }
 
+variable "transform" {
+  type    = any
+  default = null
+}
+
 variable "monitoring" {
   description = "Monitoring configuration"
   type = object({
