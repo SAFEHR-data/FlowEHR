@@ -103,7 +103,7 @@ variable "access_databricks_management_publicly" {
 variable "transform" {
   description = "Transform configuration block (populated from root config file)"
   type = object({
-    spark_version = optional(string, "3.3.1")
+    spark_version = optional(string, "3.3")
     repositories = optional(list(object({
       url = string,
       sha = optional(string, "")
@@ -113,7 +113,7 @@ variable "transform" {
     }))
   })
   default = {
-    spark_version = "3.3.1"
+    spark_version = "3.3"
     repositories  = []
   }
 }

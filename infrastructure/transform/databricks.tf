@@ -49,8 +49,9 @@ resource "time_sleep" "wait_for_databricks_network" {
 }
 
 data "databricks_spark_version" "latest_lts" {
-  spark_version = var.transform.spark_version
-  depends_on    = [time_sleep.wait_for_databricks_network]
+  spark_version     = var.transform.spark_version
+  long_term_support = true
+  depends_on        = [time_sleep.wait_for_databricks_network]
 }
 
 data "databricks_node_type" "smallest" {
