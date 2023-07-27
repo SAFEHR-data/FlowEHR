@@ -56,12 +56,13 @@ resource "azurerm_storage_container" "adls_zone" {
   container_access_type = "private"
 
   depends_on = [
-    azurerm_role_assignment.adls_deployer_contributor
+    azurerm_role_assignment.adls_deployer_contributor,
+    azurerm_private_endpoint.adls
   ]
 }
 
 resource "azurerm_private_endpoint" "adls" {
-  name                = "adls-${lower(var.naming_suffix)}"
+  name                = "pe-adls-${lower(var.naming_suffix)}"
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
   subnet_id           = var.core_subnet_id
