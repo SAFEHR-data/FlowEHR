@@ -8,9 +8,10 @@ transform:
   repositories:
     - url: https://github.com/UCLH-Foundry/FlowEHR-Data-Pot
   datalake:
-    - Bronze
-    - Silver
-    - Gold
+    zones:
+      - Bronze
+      - Silver
+      - Gold
 
 serve:
   github_owner: UCLH-FlowEHR-TestBed
