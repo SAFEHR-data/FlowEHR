@@ -48,13 +48,6 @@ resource "azurerm_role_assignment" "adls_deployer_contributor" {
   principal_id         = data.azurerm_client_config.current.object_id
 }
 
-# Add IP exception when deploying locally
-resource "azurerm_storage_account_network_rules" "adls" {
-  storage_account_id = azurerm_storage_account.adls.id
-  default_action     = "Deny"
-  ip_rules           = var.tf_in_automation == true ? [] : [var.deployer_ip]
-}
-
 # Create container (otherwise known as filesystem) for each zone
 resource "azurerm_storage_container" "adls_zone" {
   for_each              = var.zones
@@ -63,7 +56,6 @@ resource "azurerm_storage_container" "adls_zone" {
   container_access_type = "private"
 
   depends_on = [
-    azurerm_storage_account_network_rules.adls,
     azurerm_role_assignment.adls_deployer_contributor
   ]
 }
