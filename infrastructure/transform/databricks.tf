@@ -48,10 +48,9 @@ resource "time_sleep" "wait_for_databricks_network" {
   ]
 }
 
-data "databricks_spark_version" "latest_lts" {
-  spark_version     = var.transform.spark_version
-  long_term_support = true
-  depends_on        = [time_sleep.wait_for_databricks_network]
+data "databricks_spark_version" "latest" {
+  spark_version = var.transform.spark_version
+  depends_on    = [time_sleep.wait_for_databricks_network]
 }
 
 data "databricks_node_type" "smallest" {
@@ -69,7 +68,7 @@ data "databricks_node_type" "prod" {
 
 resource "databricks_cluster" "fixed_single_node" {
   cluster_name            = "Fixed Job Cluster"
-  spark_version           = data.databricks_spark_version.latest_lts.id
+  spark_version           = data.databricks_spark_version.latest.id
   node_type_id            = var.accesses_real_data ? data.databricks_node_type.prod.id : data.databricks_node_type.smallest.id
   autotermination_minutes = 10
 
