@@ -48,7 +48,6 @@ terraform {
   required_providers {
     ${local.providers.locals.required_provider_azure}
     ${local.providers.locals.required_provider_github}
-    ${local.providers.locals.required_provider_null}
     ${local.providers.locals.required_provider_external}
   }
 }
@@ -66,10 +65,9 @@ terraform {
 
   required_providers {
     ${local.providers.locals.required_provider_github}
-    ${local.providers.locals.required_provider_external}
-    ${local.providers.locals.required_provider_random}
     ${local.providers.locals.required_provider_azure}
     ${local.providers.locals.required_provider_azuread}
+    ${local.providers.locals.required_provider_random}
   }
 }
 EOF
