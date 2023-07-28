@@ -172,7 +172,6 @@ resource "azurerm_private_endpoint" "blob" {
   ]
 }
 
-
 resource "azurerm_private_endpoint" "keyvault" {
   name                = "pe-kv-${local.naming_suffix}"
   location            = azurerm_resource_group.core.location

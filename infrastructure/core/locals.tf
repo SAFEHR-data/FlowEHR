@@ -33,6 +33,6 @@ locals {
     databricks = "privatelink.azuredatabricks.net"
     sql        = "privatelink.database.windows.net"
     }, local.datalake_enabled ? {
-    adls = "privatelink.dfs.core.windows.net"
+    dfs = "privatelink.dfs.core.windows.net"
   } : {})
 }

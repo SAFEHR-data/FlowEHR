@@ -76,8 +76,8 @@ resource "azurerm_private_endpoint" "adls_dfs" {
   }
 
   private_dns_zone_group {
-    name                 = "private-dns-zone-group-adls-${var.naming_suffix}"
-    private_dns_zone_ids = [var.private_dns_zones["adls"].id]
+    name                 = "private-dns-zone-group-dfs-${var.naming_suffix}"
+    private_dns_zone_ids = [var.private_dns_zones["dfs"].id]
   }
 }
 
@@ -97,7 +97,7 @@ resource "azurerm_private_endpoint" "adls_blob" {
   }
 
   private_dns_zone_group {
-    name                 = "private-dns-zone-group-adls-${var.naming_suffix}"
-    private_dns_zone_ids = [var.private_dns_zones["adls"].id]
+    name                 = "private-dns-zone-group-blob-${var.naming_suffix}"
+    private_dns_zone_ids = [var.private_dns_zones["blob"].id]
   }
 }
