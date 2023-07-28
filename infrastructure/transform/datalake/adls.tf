@@ -71,7 +71,7 @@ resource "azurerm_private_endpoint" "adls" {
     name                           = "adls-${lower(var.naming_suffix)}"
     is_manual_connection           = false
     private_connection_resource_id = azurerm_storage_account.adls.id
-    subresource_names              = ["dfs"]
+    subresource_names              = ["blob", "dfs"]
   }
 
   private_dns_zone_group {
