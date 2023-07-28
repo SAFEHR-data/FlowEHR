@@ -57,21 +57,43 @@ resource "azurerm_storage_container" "adls_zone" {
 
   depends_on = [
     azurerm_role_assignment.adls_deployer_contributor,
-    azurerm_private_endpoint.adls
+    azurerm_private_endpoint.adls_dfs,
+    azurerm_private_endpoint.adls_blob
   ]
 }
 
-resource "azurerm_private_endpoint" "adls" {
-  name                = "pe-adls-${lower(var.naming_suffix)}"
+resource "azurerm_private_endpoint" "adls_dfs" {
+  name                = "pe-adls-dfs-${lower(var.naming_suffix)}"
   location            = var.core_rg_location
   resource_group_name = var.core_rg_name
   subnet_id           = var.core_subnet_id
 
   private_service_connection {
-    name                           = "adls-${lower(var.naming_suffix)}"
+    name                           = "adls-dfs-${lower(var.naming_suffix)}"
     is_manual_connection           = false
     private_connection_resource_id = azurerm_storage_account.adls.id
-    subresource_names              = ["blob", "dfs"]
+    subresource_names              = ["dfs"]
+  }
+
+  private_dns_zone_group {
+    name                 = "private-dns-zone-group-adls-${var.naming_suffix}"
+    private_dns_zone_ids = [var.private_dns_zones["adls"].id]
+  }
+}
+
+# Blob sub-resource also required for TF & Storage Explorer management
+# and Storage only supports one sub-resource per private endpoint
+resource "azurerm_private_endpoint" "adls_blob" {
+  name                = "pe-adls-blob-${lower(var.naming_suffix)}"
+  location            = var.core_rg_location
+  resource_group_name = var.core_rg_name
+  subnet_id           = var.core_subnet_id
+
+  private_service_connection {
+    name                           = "adls-blob-${lower(var.naming_suffix)}"
+    is_manual_connection           = false
+    private_connection_resource_id = azurerm_storage_account.adls.id
+    subresource_names              = ["blob"]
   }
 
   private_dns_zone_group {
