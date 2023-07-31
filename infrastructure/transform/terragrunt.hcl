@@ -74,6 +74,22 @@ terraform {
 EOF
 }
 
+generate "datalake_terraform" {
+  path      = "datalake/terraform.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+terraform {
+  required_version = "${local.providers.locals.terraform_version}"
+
+  required_providers {
+    ${local.providers.locals.required_provider_azure}
+    ${local.providers.locals.required_provider_azuread}
+    ${local.providers.locals.required_provider_databricks}
+  }
+}
+EOF
+}
+
 generate "provider" {
   path      = "provider.tf"
   if_exists = "overwrite_terragrunt"

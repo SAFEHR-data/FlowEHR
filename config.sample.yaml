@@ -19,11 +19,16 @@ data_source_connections:  # Optional
     password: ${SECRET_PASSWORD_FROM_GH}
 
 transform:  # Optional
-  spark_version: 3.3.1  # Optional
+  spark_version: 3.3  # Optional
   repositories:  # Optional
     - url: https://github.com/MY_TRANSFORM_CODE_REPO.git
     - url: https://github.com/MY_OTHER_TRANSFORM_CODE_REPO.git
       sha: abcd01abcd01abcd01abcd01abcd01abcd01abcd
+  datalake:
+    zones:
+      - Bronze
+      - Silver
+      - Gold
 
 serve:  # Optional
   github_owner: A-GitHub-Org
