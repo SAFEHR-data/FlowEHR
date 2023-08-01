@@ -1,3 +1,11 @@
 ---
 flowehr_id: mricflwr
 location: uksouth
+
+transform:
+  spark_version: 3.4
+  datalake:
+    zones:
+      - Bronze
+      - Silver
+      - Gold
