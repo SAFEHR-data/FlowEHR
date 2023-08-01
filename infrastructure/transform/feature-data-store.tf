@@ -128,6 +128,7 @@ resource "null_resource" "create_sql_user" {
   # load a csv file into a new SQL table
   provisioner "local-exec" {
     command = <<EOF
+      set -o errexit
       SCRIPTS_DIR="../../scripts"
       $SCRIPTS_DIR/retry.sh python $SCRIPTS_DIR/sql/create_sql_user.py
       $SCRIPTS_DIR/retry.sh python $SCRIPTS_DIR/sql/load_csv_data.py

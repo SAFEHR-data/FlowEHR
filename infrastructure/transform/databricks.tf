@@ -50,7 +50,10 @@ resource "time_sleep" "wait_for_databricks_network" {
 
 data "databricks_spark_version" "latest" {
   spark_version = var.transform.spark_version
-  depends_on    = [time_sleep.wait_for_databricks_network]
+  depends_on = [
+    time_sleep.wait_for_databricks_network,
+    azurerm_databricks_workspace.databricks
+  ]
 }
 
 data "databricks_node_type" "smallest" {
