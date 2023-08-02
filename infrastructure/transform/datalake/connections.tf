@@ -29,7 +29,7 @@ resource "azurerm_role_assignment" "adls_adf_contributor" {
 
 # Connect from Databricks using AAD App + SPN
 resource "azuread_application" "databricks_adls" {
-  display_name = var.databricks_app_name
+  display_name = var.databricks_adls_app_name
   owners       = [data.azurerm_client_config.current.object_id]
 }
 
