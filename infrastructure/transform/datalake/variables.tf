@@ -57,7 +57,7 @@ variable "adf_identity_object_id" {
   type = string
 }
 
-variable "databricks_app_name" {
+variable "databricks_adls_app_name" {
   type = string
 }
 

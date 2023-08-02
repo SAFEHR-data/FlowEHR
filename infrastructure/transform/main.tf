@@ -26,7 +26,7 @@ module "datalake" {
   zones                      = var.transform.datalake.zones
   adf_id                     = azurerm_data_factory.adf.id
   adf_identity_object_id     = azurerm_data_factory.adf.identity[0].principal_id
-  databricks_app_name        = "${local.databricks_app_name}-adls"
+  databricks_adls_app_name   = local.databricks_adls_app_name
   databricks_secret_scope_id = databricks_secret_scope.secrets.id
   tags                       = var.tags
 }

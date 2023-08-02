@@ -147,7 +147,7 @@ resource "null_resource" "create_sql_user" {
 
 # AAD App + SPN for Databricks -> SQL Access
 resource "azuread_application" "flowehr_databricks_sql" {
-  display_name = local.databricks_app_name
+  display_name = local.databricks_sql_app_name
   owners       = [data.azurerm_client_config.current.object_id]
 }
 resource "azuread_application_password" "flowehr_databricks_sql" {
