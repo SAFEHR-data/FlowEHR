@@ -24,11 +24,20 @@ transform:  # Optional
     - url: https://github.com/MY_TRANSFORM_CODE_REPO.git
     - url: https://github.com/MY_OTHER_TRANSFORM_CODE_REPO.git
       sha: abcd01abcd01abcd01abcd01abcd01abcd01abcd
-  datalake:
+  datalake:  # Optional
     zones:
       - Bronze
       - Silver
       - Gold
+  spark_config:  # Optional
+    - key: spark.databricks.cluster.profile  # Configuration for a Single Node cluster
+      value: singleNode
+    - key: spark.master
+      value: local[*]
+  databricks_libraries:  # Optional
+    pypi:
+      - opencensus-ext-azure==1.1.9
+      - opencensus-ext-logging==0.1.1
 
 serve:  # Optional
   github_owner: A-GitHub-Org
