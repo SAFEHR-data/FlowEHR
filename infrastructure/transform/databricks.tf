@@ -76,10 +76,6 @@ resource "databricks_cluster" "fixed_single_node" {
   autotermination_minutes = 10
 
   spark_conf = merge(
-    tomap({
-      "spark.databricks.cluster.profile" = "singleNode"
-      "spark.master"                     = "local[*]"
-    }),
     # Secrets for SQL Feature store
     # Formatted according to syntax for referencing secrets in Spark config:
     # https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secrets
@@ -110,18 +106,19 @@ resource "databricks_cluster" "fixed_single_node" {
     }),
     tomap({ for connection in var.data_source_connections :
       "spark.secret.${connection.name}-password" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-password}}"
+    }),
+    # Any values set in the config
+    tomap({ for config_value in var.transform.spark_config :
+      config_value.key => config_value.value
     })
   )
 
-  library {
-    pypi {
-      package = "opencensus-ext-azure==1.1.9"
-    }
-  }
-
-  library {
-    pypi {
-      package = "opencensus-ext-logging==0.1.1"
+  dynamic "library" {
+    for_each = var.transform.databricks_libraries.pypi
+    content {
+      pypi {
+        package = library.value
+      }
     }
   }
 

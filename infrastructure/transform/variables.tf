@@ -111,6 +111,13 @@ variable "transform" {
     datalake = optional(object({
       zones = set(string)
     }))
+    spark_config = optional(list(object({
+      key   = string,
+      value = string
+    })), []),
+    databricks_libraries = optional(object({
+      pypi = optional(list(string), [])
+    }), {})
   })
   default = {
     spark_version = "3.3"
