@@ -20,8 +20,8 @@ transform:
       value: local[*]
   databricks_libraries:
     pypi:
-      - opencensus-ext-azure==1.1.9
-      - opencensus-ext-logging==0.1.1
+      - package: opencensus-ext-azure==1.1.9
+      - package: opencensus-ext-logging==0.1.1
 
 serve:
   github_owner: UCLH-FlowEHR-TestBed
