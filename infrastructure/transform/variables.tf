@@ -114,9 +114,9 @@ variable "transform" {
     spark_config = optional(list(object({
       key   = string,
       value = string
-    })), []),
+    })), [])
     databricks_secrets = optional(list(object({
-      key   = string,
+      name  = string,
       value = string,
     })), [])
     databricks_libraries = optional(object({

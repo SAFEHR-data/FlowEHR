@@ -65,7 +65,7 @@ data "databricks_node_type" "node_type" {
   depends_on = [time_sleep.wait_for_databricks_network]
 }
 
-resource "databricks_cluster" "fixed_single_node" {
+resource "databricks_cluster" "cluster" {
   cluster_name            = "Fixed Job Cluster"
   spark_version           = data.databricks_spark_version.latest.id
   node_type_id            = data.databricks_node_type.node_type.id
@@ -105,7 +105,7 @@ resource "databricks_cluster" "fixed_single_node" {
     }),
     # Additional secrets from the config
     tomap({ for secret in var.transform.databricks_secrets :
-      "spark.secret.${secret.key}" => "{{secrets/${databricks_secret_scope.secrets.name}/${secret.key}}}"
+      "spark.secret.${secret.name}" => "{{secrets/${databricks_secret_scope.secrets.name}/${secret.name}}}"
     }),
     # Any values set in the config
     tomap({ for config_value in var.transform.spark_config :
