@@ -117,7 +117,18 @@ resource "databricks_cluster" "fixed_single_node" {
     for_each = var.transform.databricks_libraries.pypi
     content {
       pypi {
-        package = library.value
+        package = library.value.package
+        repo    = library.value.repo
+      }
+    }
+  }
+
+  dynamic "library" {
+    for_each = var.transform.databricks_libraries.maven
+    content {
+      maven {
+        coordinates = library.value.coordinates
+        exclusions  = library.value.exclusions
       }
     }
   }
