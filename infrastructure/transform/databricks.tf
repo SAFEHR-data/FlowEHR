@@ -107,6 +107,10 @@ resource "databricks_cluster" "fixed_single_node" {
     tomap({ for connection in var.data_source_connections :
       "spark.secret.${connection.name}-password" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-password}}"
     }),
+    # Additional secrets from the config
+    tomap({ for secret in var.transform.databricks_secrets :
+      "spark.secret.${secret.key}" => "{{secrets/${databricks_secret_scope.secrets.name}/${secret.key}}}"
+    }),
     # Any values set in the config
     tomap({ for config_value in var.transform.spark_config :
       config_value.key => config_value.value
@@ -165,6 +169,21 @@ resource "databricks_cluster" "fixed_single_node" {
     }
   }
 
+  dynamic "init_scripts" {
+    for_each = var.transform.init_scripts
+    content {
+      dbfs {
+        destination = "dbfs:/${local.init_scripts_dir}/${basename(init_scripts.value)}"
+      }
+    }
+  }
+
+  cluster_log_conf {
+    dbfs {
+      destination = "dbfs:/${local.cluster_logs_dir}"
+    }
+  }
+
   spark_env_vars = {
     "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.transform.connection_string
   }
@@ -172,6 +191,16 @@ resource "databricks_cluster" "fixed_single_node" {
   custom_tags = {
     "ResourceClass" = "SingleNode"
   }
+
+  depends_on = [time_sleep.wait_for_databricks_network]
+}
+
+resource "databricks_dbfs_file" "dbfs_init_script_upload" {
+  for_each = toset(var.transform.init_scripts)
+  # Source path on local filesystem
+  source = each.key
+  # Path on DBFS
+  path = "/${local.init_scripts_dir}/${basename(each.key)}"
 
   depends_on = [time_sleep.wait_for_databricks_network]
 }

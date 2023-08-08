@@ -34,6 +34,9 @@ transform:  # Optional
       value: singleNode
     - key: spark.master
       value: local[*]
+  databricks_secrets:  # Optional
+    - key: cog_services_key
+      value: my-secret-key  # On Github, this wil lbe a token replacement
   databricks_libraries:  # Optional
     pypi:
       - package: opencensus-ext-azure==1.1.9
@@ -52,6 +55,8 @@ transform:  # Optional
       - "dbfs:/FileStore/foo.egg"
     jar:
       - "dbfs:/FileStore/app-0.0.1.jar"
+  init_scripts:
+    - /workspaces/FlowEHR/transform/sample_init_script.sh
 
 serve:  # Optional
   github_owner: A-GitHub-Org

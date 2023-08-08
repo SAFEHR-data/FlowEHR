@@ -20,6 +20,8 @@ locals {
   pipeline_file                      = "pipeline.json"
   trigger_file                       = "trigger.json"
   artifacts_dir                      = "artifacts"
+  init_scripts_dir                   = "init_scripts"
+  cluster_logs_dir                   = "cluster_logs"
   adb_linked_service_name            = "ADBLinkedServiceViaMSI"
   dbfs_storage_account_name          = "dbfs${var.naming_suffix_truncated}"
   datalake_enabled                   = try(var.transform.datalake, null) != null

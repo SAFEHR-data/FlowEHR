@@ -115,6 +115,10 @@ variable "transform" {
       key   = string,
       value = string
     })), []),
+    databricks_secrets = optional(list(object({
+      key   = string,
+      value = string,
+    })), [])
     databricks_libraries = optional(object({
       whl = optional(list(string), []),
       egg = optional(list(string), []),
@@ -131,8 +135,9 @@ variable "transform" {
       cran = optional(list(object({
         package = string,
         repo    = optional(string)
-      })))
+      })), [])
     }), {})
+    init_scripts = optional(list(string), [])
   })
   default = {
     spark_version = "3.3"
