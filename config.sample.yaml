@@ -62,6 +62,9 @@ transform:  # Optional
       local_disk_min_size: 600
       category: "Memory Optimised"
     autotermination_minutes: 120
+    autoscale:
+      min_workers: 1
+      max_workers: 3
     init_scripts:
       - /workspaces/FlowEHR/transform/sample_init_script.sh
 

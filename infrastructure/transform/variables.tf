@@ -146,6 +146,10 @@ variable "transform" {
       }), {}),
       autotermination_minutes = optional(number, 0),
       init_scripts            = optional(list(string), [])
+      autoscale = optional(object({
+        min_workers = optional(number, 0)
+        max_workers = optional(number, 0)
+      }), {})
     }), {})
   })
   default = {

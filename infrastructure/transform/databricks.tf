@@ -70,6 +70,10 @@ resource "databricks_cluster" "cluster" {
   spark_version           = data.databricks_spark_version.latest.id
   node_type_id            = data.databricks_node_type.node_type.id
   autotermination_minutes = var.transform.databricks_cluster.autotermination_minutes
+  autoscale {
+    min_workers = var.transform.databricks_cluster.autoscale.min_workers
+    max_workers = var.transform.databricks_cluster.autoscale.max_workers
+  }
 
   spark_conf = merge(
     # Secrets for SQL Feature store
