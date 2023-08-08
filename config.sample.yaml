@@ -55,8 +55,15 @@ transform:  # Optional
       - "dbfs:/FileStore/foo.egg"
     jar:
       - "dbfs:/FileStore/app-0.0.1.jar"
-  init_scripts:
-    - /workspaces/FlowEHR/transform/sample_init_script.sh
+  databricks_cluster:
+    node_type:
+      min_memory_gb: 128
+      min_cores: 16
+      local_disk_min_size: 600
+      category: "Memory Optimised"
+    autotermination_minutes: 120
+    init_scripts:
+      - /workspaces/FlowEHR/transform/sample_init_script.sh
 
 serve:  # Optional
   github_owner: A-GitHub-Org

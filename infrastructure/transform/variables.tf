@@ -136,8 +136,17 @@ variable "transform" {
         package = string,
         repo    = optional(string)
       })), [])
+    }), {}),
+    databricks_cluster = optional(object({
+      node_type = optional(object({
+        min_memory_gb       = optional(number, 0),
+        min_cores           = optional(number, 0),
+        local_disk_min_size = optional(number, 0),
+        category            = optional(string, "")
+      }), {}),
+      autotermination_minutes = optional(number, 0),
+      init_scripts            = optional(list(string), [])
     }), {})
-    init_scripts = optional(list(string), [])
   })
   default = {
     spark_version = "3.3"

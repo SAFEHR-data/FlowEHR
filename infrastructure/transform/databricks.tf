@@ -56,24 +56,20 @@ data "databricks_spark_version" "latest" {
   ]
 }
 
-data "databricks_node_type" "smallest" {
-  # Providing no required configuration, Databricks will pick the smallest node possible
-  depends_on = [time_sleep.wait_for_databricks_network]
-}
+data "databricks_node_type" "node_type" {
+  min_memory_gb       = var.transform.databricks_cluster.node_type.min_memory_gb
+  min_cores           = var.transform.databricks_cluster.node_type.min_cores
+  local_disk_min_size = var.transform.databricks_cluster.node_type.local_disk_min_size
+  category            = var.transform.databricks_cluster.node_type.category
 
-# for prod - this will select something like E16ads v5 => ~$1.18ph whilst running
-data "databricks_node_type" "prod" {
-  min_memory_gb       = 128
-  min_cores           = 16
-  local_disk_min_size = 600
-  category            = "Memory Optimized"
+  depends_on = [time_sleep.wait_for_databricks_network]
 }
 
 resource "databricks_cluster" "fixed_single_node" {
   cluster_name            = "Fixed Job Cluster"
   spark_version           = data.databricks_spark_version.latest.id
-  node_type_id            = var.accesses_real_data ? data.databricks_node_type.prod.id : data.databricks_node_type.smallest.id
-  autotermination_minutes = 10
+  node_type_id            = data.databricks_node_type.node_type.id
+  autotermination_minutes = var.transform.databricks_cluster.autotermination_minutes
 
   spark_conf = merge(
     # Secrets for SQL Feature store
@@ -170,7 +166,7 @@ resource "databricks_cluster" "fixed_single_node" {
   }
 
   dynamic "init_scripts" {
-    for_each = var.transform.init_scripts
+    for_each = var.transform.databricks_cluster.init_scripts
     content {
       dbfs {
         destination = "dbfs:/${local.init_scripts_dir}/${basename(init_scripts.value)}"
@@ -196,7 +192,7 @@ resource "databricks_cluster" "fixed_single_node" {
 }
 
 resource "databricks_dbfs_file" "dbfs_init_script_upload" {
-  for_each = toset(var.transform.init_scripts)
+  for_each = toset(var.transform.databricks_cluster.init_scripts)
   # Source path on local filesystem
   source = each.key
   # Path on DBFS
