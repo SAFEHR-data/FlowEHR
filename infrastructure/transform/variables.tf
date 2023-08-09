@@ -111,14 +111,8 @@ variable "transform" {
     datalake = optional(object({
       zones = set(string)
     }))
-    spark_config = optional(list(object({
-      key   = string,
-      value = string
-    })), [])
-    databricks_secrets = optional(list(object({
-      name  = string,
-      value = string,
-    })), [])
+    spark_config       = optional(map(string), {})
+    databricks_secrets = optional(map(string), {})
     databricks_libraries = optional(object({
       jar = optional(list(string), []),
       pypi = optional(list(object({

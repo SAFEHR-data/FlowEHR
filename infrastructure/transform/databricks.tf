@@ -108,13 +108,11 @@ resource "databricks_cluster" "cluster" {
       "spark.secret.${connection.name}-password" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-password}}"
     }),
     # Additional secrets from the config
-    tomap({ for secret in var.transform.databricks_secrets :
-      "spark.secret.${secret.name}" => "{{secrets/${databricks_secret_scope.secrets.name}/${secret.name}}}"
+    tomap({ for secret_name, secret_value in var.transform.databricks_secrets :
+      "spark.secret.${secret_name}" => "{{secrets/${databricks_secret_scope.secrets.name}/${secret_name}}}"
     }),
     # Any values set in the config
-    tomap({ for config_value in var.transform.spark_config :
-      config_value.key => config_value.value
-    })
+    var.transform.spark_config
   )
 
   dynamic "library" {

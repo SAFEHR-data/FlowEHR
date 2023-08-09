@@ -73,9 +73,7 @@ resource "databricks_secret" "flowehr_databricks_sql_database" {
 
 # Additional Databricks secrets passed in from the config
 resource "databricks_secret" "databricks_config_secret" {
-  for_each = { for secret in var.transform.databricks_secrets :
-    secret.name => secret.value
-  }
+  for_each = var.transform.databricks_secrets
 
   key          = each.key
   string_value = each.value

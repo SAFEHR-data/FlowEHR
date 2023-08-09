@@ -30,13 +30,10 @@ transform:  # Optional
       - Silver
       - Gold
   spark_config:  # Optional
-    - key: spark.databricks.cluster.profile  # Configuration for a Single Node cluster
-      value: singleNode
-    - key: spark.master
-      value: local[*]
-  databricks_secrets:  # Optional
-    - key: cog_services_key
-      value: my-secret-key  # On Github, this wil lbe a token replacement
+    spark.databricks.cluster.profile: singleNode  # Configuration for a Single Node cluster
+    spark.master: local[*]
+  databricks_secrets:
+    cog_services_key: my-super-secret-key  # On Github, this wil lbe a token replacement
   databricks_libraries:  # Optional
     pypi:
       - package: opencensus-ext-azure==1.1.9
