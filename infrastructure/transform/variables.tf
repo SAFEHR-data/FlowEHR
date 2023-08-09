@@ -120,8 +120,6 @@ variable "transform" {
       value = string,
     })), [])
     databricks_libraries = optional(object({
-      whl = optional(list(string), []),
-      egg = optional(list(string), []),
       jar = optional(list(string), []),
       pypi = optional(list(object({
         package = string,
@@ -131,10 +129,6 @@ variable "transform" {
         coordinates = string,
         repo        = optional(string),
         exclusions  = optional(list(string), [])
-      })), []),
-      cran = optional(list(object({
-        package = string,
-        repo    = optional(string)
       })), [])
     }), {}),
     databricks_cluster = optional(object({

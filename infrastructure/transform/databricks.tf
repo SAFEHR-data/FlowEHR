@@ -139,30 +139,6 @@ resource "databricks_cluster" "cluster" {
   }
 
   dynamic "library" {
-    for_each = var.transform.databricks_libraries.cran
-    content {
-      cran {
-        package = library.value.package
-        repo    = library.value.repo
-      }
-    }
-  }
-
-  dynamic "library" {
-    for_each = var.transform.databricks_libraries.whl
-    content {
-      whl = library.value
-    }
-  }
-
-  dynamic "library" {
-    for_each = var.transform.databricks_libraries.egg
-    content {
-      egg = library.value
-    }
-  }
-
-  dynamic "library" {
     for_each = var.transform.databricks_libraries.jar
     content {
       jar = library.value

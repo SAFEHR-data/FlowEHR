@@ -46,13 +46,6 @@ transform:  # Optional
       - coordinates: "com.amazon.deequ:deequ:1.0.4"
         repo: "custom-mirror"
         exclusions: ["org.apache.avro:avro"]
-    cran:
-      - package: "rkeops"
-        repo: "my-awesome-repo"
-    whl:
-      - "dbfs:/FileStore/baz.whl"
-    egg:
-      - "dbfs:/FileStore/foo.egg"
     jar:
       - "dbfs:/FileStore/app-0.0.1.jar"
   databricks_cluster:
