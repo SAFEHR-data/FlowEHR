@@ -13,6 +13,13 @@ transform:
       - Bronze
       - Silver
       - Gold
+  spark_config:
+    spark.databricks.cluster.profile: singleNode
+    spark.master: local[*]
+  databricks_libraries:
+    pypi:
+      - package: opencensus-ext-azure==1.1.9
+      - package: opencensus-ext-logging==0.1.1
 
 serve:
   github_owner: UCLH-FlowEHR-TestBed

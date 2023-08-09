@@ -70,3 +70,12 @@ resource "databricks_secret" "flowehr_databricks_sql_database" {
   string_value = azurerm_mssql_database.feature_database.name
   scope        = databricks_secret_scope.secrets.id
 }
+
+# Additional Databricks secrets passed in from the config
+resource "databricks_secret" "databricks_config_secret" {
+  for_each = var.transform.databricks_secrets
+
+  key          = each.key
+  string_value = each.value
+  scope        = databricks_secret_scope.secrets.id
+}
