@@ -56,30 +56,26 @@ data "databricks_spark_version" "latest" {
   ]
 }
 
-data "databricks_node_type" "smallest" {
-  # Providing no required configuration, Databricks will pick the smallest node possible
+data "databricks_node_type" "node_type" {
+  min_memory_gb       = var.transform.databricks_cluster.node_type.min_memory_gb
+  min_cores           = var.transform.databricks_cluster.node_type.min_cores
+  local_disk_min_size = var.transform.databricks_cluster.node_type.local_disk_min_size
+  category            = var.transform.databricks_cluster.node_type.category
+
   depends_on = [time_sleep.wait_for_databricks_network]
 }
 
-# for prod - this will select something like E16ads v5 => ~$1.18ph whilst running
-data "databricks_node_type" "prod" {
-  min_memory_gb       = 128
-  min_cores           = 16
-  local_disk_min_size = 600
-  category            = "Memory Optimized"
-}
-
-resource "databricks_cluster" "fixed_single_node" {
+resource "databricks_cluster" "cluster" {
   cluster_name            = "Fixed Job Cluster"
   spark_version           = data.databricks_spark_version.latest.id
-  node_type_id            = var.accesses_real_data ? data.databricks_node_type.prod.id : data.databricks_node_type.smallest.id
-  autotermination_minutes = 10
+  node_type_id            = data.databricks_node_type.node_type.id
+  autotermination_minutes = var.transform.databricks_cluster.autotermination_minutes
+  autoscale {
+    min_workers = var.transform.databricks_cluster.autoscale.min_workers
+    max_workers = var.transform.databricks_cluster.autoscale.max_workers
+  }
 
   spark_conf = merge(
-    tomap({
-      "spark.databricks.cluster.profile" = "singleNode"
-      "spark.master"                     = "local[*]"
-    }),
     # Secrets for SQL Feature store
     # Formatted according to syntax for referencing secrets in Spark config:
     # https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secrets
@@ -110,18 +106,55 @@ resource "databricks_cluster" "fixed_single_node" {
     }),
     tomap({ for connection in var.data_source_connections :
       "spark.secret.${connection.name}-password" => "{{secrets/${databricks_secret_scope.secrets.name}/flowehr-dbks-${connection.name}-password}}"
-    })
+    }),
+    # Additional secrets from the config
+    tomap({ for secret_name, secret_value in var.transform.databricks_secrets :
+      "spark.secret.${secret_name}" => "{{secrets/${databricks_secret_scope.secrets.name}/${secret_name}}}"
+    }),
+    # Any values set in the config
+    var.transform.spark_config
   )
 
-  library {
-    pypi {
-      package = "opencensus-ext-azure==1.1.9"
+  dynamic "library" {
+    for_each = var.transform.databricks_libraries.pypi
+    content {
+      pypi {
+        package = library.value.package
+        repo    = library.value.repo
+      }
     }
   }
 
-  library {
-    pypi {
-      package = "opencensus-ext-logging==0.1.1"
+  dynamic "library" {
+    for_each = var.transform.databricks_libraries.maven
+    content {
+      maven {
+        coordinates = library.value.coordinates
+        repo        = library.value.repo
+        exclusions  = library.value.exclusions
+      }
+    }
+  }
+
+  dynamic "library" {
+    for_each = var.transform.databricks_libraries.jar
+    content {
+      jar = library.value
+    }
+  }
+
+  dynamic "init_scripts" {
+    for_each = var.transform.databricks_cluster.init_scripts
+    content {
+      dbfs {
+        destination = "dbfs:/${local.init_scripts_dir}/${basename(init_scripts.value)}"
+      }
+    }
+  }
+
+  cluster_log_conf {
+    dbfs {
+      destination = "dbfs:/${local.cluster_logs_dir}"
     }
   }
 
@@ -132,6 +165,16 @@ resource "databricks_cluster" "fixed_single_node" {
   custom_tags = {
     "ResourceClass" = "SingleNode"
   }
+
+  depends_on = [time_sleep.wait_for_databricks_network]
+}
+
+resource "databricks_dbfs_file" "dbfs_init_script_upload" {
+  for_each = toset(var.transform.databricks_cluster.init_scripts)
+  # Source path on local filesystem
+  source = each.key
+  # Path on DBFS
+  path = "/${local.init_scripts_dir}/${basename(each.key)}"
 
   depends_on = [time_sleep.wait_for_databricks_network]
 }

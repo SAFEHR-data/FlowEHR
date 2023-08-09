@@ -53,7 +53,7 @@ resource "azurerm_data_factory_linked_service_azure_databricks" "msi_linked" {
 
   msi_work_space_resource_id = azurerm_databricks_workspace.databricks.id
 
-  existing_cluster_id = databricks_cluster.fixed_single_node.cluster_id
+  existing_cluster_id = databricks_cluster.cluster.cluster_id
 }
 
 resource "azurerm_data_factory_linked_service_key_vault" "msi_linked" {

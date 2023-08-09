@@ -111,6 +111,34 @@ variable "transform" {
     datalake = optional(object({
       zones = set(string)
     }))
+    spark_config       = optional(map(string), {})
+    databricks_secrets = optional(map(string), {})
+    databricks_libraries = optional(object({
+      jar = optional(list(string), []),
+      pypi = optional(list(object({
+        package = string,
+        repo    = optional(string)
+      })), []),
+      maven = optional(list(object({
+        coordinates = string,
+        repo        = optional(string),
+        exclusions  = optional(list(string), [])
+      })), [])
+    }), {}),
+    databricks_cluster = optional(object({
+      node_type = optional(object({
+        min_memory_gb       = optional(number, 0),
+        min_cores           = optional(number, 0),
+        local_disk_min_size = optional(number, 0),
+        category            = optional(string, "")
+      }), {}),
+      autotermination_minutes = optional(number, 0),
+      init_scripts            = optional(list(string), [])
+      autoscale = optional(object({
+        min_workers = optional(number, 0)
+        max_workers = optional(number, 0)
+      }), {})
+    }), {})
   })
   default = {
     spark_version = "3.3"
