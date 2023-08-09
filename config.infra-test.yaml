@@ -14,10 +14,8 @@ transform:
       - Silver
       - Gold
   spark_config:
-    - key: spark.databricks.cluster.profile
-      value: singleNode
-    - key: spark.master
-      value: local[*]
+    spark.databricks.cluster.profile: singleNode
+    spark.master: local[*]
   databricks_libraries:
     pypi:
       - package: opencensus-ext-azure==1.1.9
