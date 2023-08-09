@@ -19,8 +19,8 @@ transform:
     pypi:
       - package: opencensus-ext-azure==1.1.9
       - package: opencensus-ext-logging==0.1.1
-      - package: presidio-analyzer == 2.2.33
-      - package: presidio-anonymizer == 2.2.33
+      - package: presidio-analyzer==2.2.33
+      - package: presidio-anonymizer==2.2.33
   databricks_cluster:
     autotermination_minutes: 10
     autoscale:
