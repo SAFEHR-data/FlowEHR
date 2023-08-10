@@ -7,7 +7,7 @@ private_dns_zones_rg: rg-bootstrap-mricboot-dev
 transform:
   spark_version: 3.4
   repositories:
-    - url: git@github.com:M-RIC-TRE/mric-pipelines.git
+    - url: https://github.com/M-RIC-TRE/mric-pipelines.git
   datalake:
     zones:
       - Bronze
