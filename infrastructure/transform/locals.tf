@@ -15,10 +15,13 @@
 locals {
   sql_server_features_admin_username = "adminuser"
   sql_owner_app_name                 = "flowehr-sql-owner-${lower(var.naming_suffix)}"
-  databricks_app_name                = "flowehr-databricks-datawriter-${lower(var.naming_suffix)}"
+  databricks_adls_app_name           = "flowehr-databricks-adls-${lower(var.naming_suffix)}"
+  databricks_sql_app_name            = "flowehr-databricks-datawriter-${lower(var.naming_suffix)}"
   pipeline_file                      = "pipeline.json"
   trigger_file                       = "trigger.json"
   artifacts_dir                      = "artifacts"
+  init_scripts_dir                   = "init_scripts"
+  cluster_logs_dir                   = "cluster_logs"
   adb_linked_service_name            = "ADBLinkedServiceViaMSI"
   dbfs_storage_account_name          = "dbfs${var.naming_suffix_truncated}"
   datalake_enabled                   = try(var.transform.datalake, null) != null
@@ -95,7 +98,7 @@ locals {
   developers      = { "name" : var.developers_ad_group_display_name, "role" : "db_datareader" }
   data_scientists = { "name" : var.data_scientists_ad_group_display_name, "role" : "db_datareader" }
   apps            = { "name" : var.apps_ad_group_display_name, "role" : "db_datareader" }
-  databricks_app  = { "name" : local.databricks_app_name, "role" : "db_owner" }
+  databricks_app  = { "name" : local.databricks_sql_app_name, "role" : "db_owner" }
 
   real_data_users_groups = [
     local.apps,

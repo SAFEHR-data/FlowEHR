@@ -128,6 +128,7 @@ resource "null_resource" "create_sql_user" {
   # load a csv file into a new SQL table
   provisioner "local-exec" {
     command = <<EOF
+      set -o errexit
       SCRIPTS_DIR="../../scripts"
       $SCRIPTS_DIR/retry.sh python $SCRIPTS_DIR/sql/create_sql_user.py
       $SCRIPTS_DIR/retry.sh python $SCRIPTS_DIR/sql/load_csv_data.py
@@ -146,7 +147,7 @@ resource "null_resource" "create_sql_user" {
 
 # AAD App + SPN for Databricks -> SQL Access
 resource "azuread_application" "flowehr_databricks_sql" {
-  display_name = local.databricks_app_name
+  display_name = local.databricks_sql_app_name
   owners       = [data.azurerm_client_config.current.object_id]
 }
 resource "azuread_application_password" "flowehr_databricks_sql" {
