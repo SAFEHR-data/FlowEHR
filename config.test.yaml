@@ -26,3 +26,5 @@ transform:
     autoscale:
       min_workers: 1
       max_workers: 8
+    init_scripts:
+      - /workspaces/mric-flowehr/transform/pipelines/rio_pipeline/init_script.sh
