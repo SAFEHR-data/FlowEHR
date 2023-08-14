@@ -29,3 +29,6 @@ transform:
       max_workers: 8
     init_scripts:
       - ../../transform/pipelines/mric-pipelines/pipelines/rio_pipeline/scripts/init_script.sh
+  databricks_secrets:
+    cognitive_services_key: ${COGNITIVE_SERVICES_KEY}
+    cognitive_services_location: uksouth
