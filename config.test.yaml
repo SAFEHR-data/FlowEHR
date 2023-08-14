@@ -7,9 +7,6 @@ private_dns_zones_rg: rg-mric-landing-test
 data_source_connections:
   - rio_tre:
     name: rio-tre
-    peering:  # Optional
-      virtual_network_name: vnet-landing-mric-landing-test
-      resource_group_name: rg-mric-landing-test
     fqdn: sql-server-mriclandingtest.database.windows.net
     database: rio_tre
     username: ce5de5ba-b69b-4067-a68f-8c20ba43be53
