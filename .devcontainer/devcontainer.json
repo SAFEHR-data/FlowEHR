@@ -40,11 +40,6 @@
 			"jqVersion": "1.6",
 			"yqVersion": "4"
 		},
-		"ghcr.io/eitsupi/devcontainer-features/jq-likes:1": {
-			"jqVersion": "1.7rc1",
-			"yqVersion": "4",
-			"allowJqRcVersion": true
-		},
 		"ghcr.io/jlaundry/devcontainer-features/mssql-odbc-driver:1": {
 			"version": "18"
 		},
