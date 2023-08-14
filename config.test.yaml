@@ -32,7 +32,7 @@ transform:
       - package: synapseml==0.11.2
     maven:
       - coordinates: com.microsoft.azure:synapseml_2.12:0.11.2-spark3.3
-      - repo: https://mmlspark.azureedge.net/maven
+        repo: https://mmlspark.azureedge.net/maven
   databricks_cluster:
     autotermination_minutes: 10
     autoscale:
