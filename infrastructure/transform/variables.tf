@@ -139,6 +139,7 @@ variable "transform" {
 
       autotermination_minutes = optional(number, 0),
       init_scripts            = optional(list(string), [])
+      runtime_engine          = optional(string, "STANDARD")
       num_of_workers          = optional(number, 0)
 
       autoscale = optional(object({

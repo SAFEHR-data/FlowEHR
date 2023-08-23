@@ -57,10 +57,12 @@ data "databricks_spark_version" "latest" {
 }
 
 data "databricks_node_type" "node_type" {
-  min_memory_gb       = var.transform.databricks_cluster.node_type.min_memory_gb
-  min_cores           = var.transform.databricks_cluster.node_type.min_cores
-  local_disk_min_size = var.transform.databricks_cluster.node_type.local_disk_min_size
-  category            = var.transform.databricks_cluster.node_type.category
+  min_memory_gb         = var.transform.databricks_cluster.node_type.min_memory_gb
+  min_cores             = var.transform.databricks_cluster.node_type.min_cores
+  local_disk_min_size   = var.transform.databricks_cluster.node_type.local_disk_min_size
+  category              = var.transform.databricks_cluster.node_type.category
+  photon_worker_capable = var.transform.databricks_cluster.runtime_engine == "PHOTON"
+  photon_driver_capable = var.transform.databricks_cluster.runtime_engine == "PHOTON"
 
   depends_on = [time_sleep.wait_for_databricks_network]
 }
@@ -71,6 +73,7 @@ resource "databricks_cluster" "cluster" {
   node_type_id            = data.databricks_node_type.node_type.id
   autotermination_minutes = var.transform.databricks_cluster.autotermination_minutes
   num_workers             = !local.autoscale_cluster ? var.transform.databricks_cluster.num_of_workers : null
+  runtime_engine          = var.transform.databricks_cluster.runtime_engine
 
   dynamic "autoscale" {
     for_each = local.autoscale_cluster ? [1] : []
