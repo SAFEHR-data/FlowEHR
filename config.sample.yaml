@@ -30,8 +30,7 @@ transform:  # Optional
       - Silver
       - Gold
   spark_config:  # Optional
-    spark.databricks.cluster.profile: singleNode  # Configuration for a Single Node cluster
-    spark.master: local[*]
+    spark.configuration.key: value
   databricks_secrets:
     cog_services_key: my-super-secret-key  # On Github, this wil lbe a token replacement
   databricks_libraries:  # Optional
@@ -52,6 +51,7 @@ transform:  # Optional
       local_disk_min_size: 600
       category: "Memory Optimised"
     autotermination_minutes: 120
+    num_of_workers: 0  # Set to 0 for single node mode or any number for fixed cluster (ignored if autoscale also defined)
     autoscale:
       min_workers: 1
       max_workers: 3

@@ -66,13 +66,19 @@ data "databricks_node_type" "node_type" {
 }
 
 resource "databricks_cluster" "cluster" {
-  cluster_name            = "Fixed Job Cluster"
+  cluster_name            = "FlowEHR Cluster"
   spark_version           = data.databricks_spark_version.latest.id
   node_type_id            = data.databricks_node_type.node_type.id
   autotermination_minutes = var.transform.databricks_cluster.autotermination_minutes
-  autoscale {
-    min_workers = var.transform.databricks_cluster.autoscale.min_workers
-    max_workers = var.transform.databricks_cluster.autoscale.max_workers
+  num_workers             = !local.autoscale_cluster ? var.transform.databricks_cluster.num_of_workers : null
+
+  dynamic "autoscale" {
+    for_each = local.autoscale_cluster ? [1] : []
+
+    content {
+      min_workers = var.transform.databricks_cluster.autoscale.min_workers
+      max_workers = var.transform.databricks_cluster.autoscale.max_workers
+    }
   }
 
   spark_conf = merge(
@@ -112,7 +118,12 @@ resource "databricks_cluster" "cluster" {
       "spark.secret.${secret_name}" => "{{secrets/${databricks_secret_scope.secrets.name}/${secret_name}}}"
     }),
     # Any values set in the config
-    var.transform.spark_config
+    var.transform.spark_config,
+    # Special config if in single node configuration
+    local.single_node ? tomap({
+      "spark.databricks.cluster.profile" : "singleNode"
+      "spark.master" : "local[*]"
+    }) : tomap({})
   )
 
   dynamic "library" {
@@ -162,9 +173,9 @@ resource "databricks_cluster" "cluster" {
     "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.transform.connection_string
   }
 
-  custom_tags = {
+  custom_tags = local.single_node ? {
     "ResourceClass" = "SingleNode"
-  }
+  } : {}
 
   depends_on = [time_sleep.wait_for_databricks_network]
 }
