@@ -1,11 +1,15 @@
 ---
-flowehr_cicd_test:
-  name: FlowEHR CICD Test App
-  description: Test of app deployment
+data_access_request:
+  name: Data Access Request
+  description: App to manage data access requests and approvals
   owners:
-    flowehr-testing-app-owner: FlowEHR-testing-app-owner@uclhdif.onmicrosoft.com
+    damoodamoo: damoo_microsoft.com#EXT#@mrictredev.onmicrosoft.com
+    david-salac: David.Salac_merseycarenhsuk.onmicrosoft.com#EXT#@mrictredev.onmicrosoft.com
   contributors:
-    flowehr-testing-app-contributor: FlowEHR-testing-app-contributor@uclhdif.onmicrosoft.com
+    anastasiakuzn: anastasia.kuznetsova_microsoft.com#EXT#@mrictredev.onmicrosoft.com
+    kt1413: kabita.thapa_paconsulting.com#EXT#@mrictredev.onmicrosoft.com
+    jjgriff93: jamesgr_microsoft.com#EXT#@mrictredev.onmicrosoft.com
+    tanya-borisova: tborisova_microsoft.com#EXT#@mrictredev.onmicrosoft.com
   branch:
     num_of_approvals: 1
   env:
