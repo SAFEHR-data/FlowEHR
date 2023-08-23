@@ -1,5 +1,5 @@
 ---
-flowehr_cicd_test:
+data_access_request:
   add_testing_slot: false
   managed_repo:
     private: false
