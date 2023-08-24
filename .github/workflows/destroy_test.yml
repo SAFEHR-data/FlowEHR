@@ -27,5 +27,5 @@ jobs:
     with:
       command: destroy
       environment: test
-      runner_label: gh-runner-mric-landing-test
+      runner_label: ${{ vars.CI_GITHUB_RUNNER_LABEL }}
     secrets: inherit
