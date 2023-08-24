@@ -57,22 +57,31 @@ data "databricks_spark_version" "latest" {
 }
 
 data "databricks_node_type" "node_type" {
-  min_memory_gb       = var.transform.databricks_cluster.node_type.min_memory_gb
-  min_cores           = var.transform.databricks_cluster.node_type.min_cores
-  local_disk_min_size = var.transform.databricks_cluster.node_type.local_disk_min_size
-  category            = var.transform.databricks_cluster.node_type.category
+  min_memory_gb         = var.transform.databricks_cluster.node_type.min_memory_gb
+  min_cores             = var.transform.databricks_cluster.node_type.min_cores
+  local_disk_min_size   = var.transform.databricks_cluster.node_type.local_disk_min_size
+  category              = var.transform.databricks_cluster.node_type.category
+  photon_worker_capable = var.transform.databricks_cluster.runtime_engine == "PHOTON"
+  photon_driver_capable = var.transform.databricks_cluster.runtime_engine == "PHOTON"
 
   depends_on = [time_sleep.wait_for_databricks_network]
 }
 
 resource "databricks_cluster" "cluster" {
-  cluster_name            = "Fixed Job Cluster"
+  cluster_name            = "FlowEHR Cluster"
   spark_version           = data.databricks_spark_version.latest.id
   node_type_id            = data.databricks_node_type.node_type.id
   autotermination_minutes = var.transform.databricks_cluster.autotermination_minutes
-  autoscale {
-    min_workers = var.transform.databricks_cluster.autoscale.min_workers
-    max_workers = var.transform.databricks_cluster.autoscale.max_workers
+  num_workers             = !local.autoscale_cluster ? var.transform.databricks_cluster.num_of_workers : null
+  runtime_engine          = var.transform.databricks_cluster.runtime_engine
+
+  dynamic "autoscale" {
+    for_each = local.autoscale_cluster ? [1] : []
+
+    content {
+      min_workers = var.transform.databricks_cluster.autoscale.min_workers
+      max_workers = var.transform.databricks_cluster.autoscale.max_workers
+    }
   }
 
   spark_conf = merge(
@@ -112,7 +121,12 @@ resource "databricks_cluster" "cluster" {
       "spark.secret.${secret_name}" => "{{secrets/${databricks_secret_scope.secrets.name}/${secret_name}}}"
     }),
     # Any values set in the config
-    var.transform.spark_config
+    var.transform.spark_config,
+    # Special config if in single node configuration
+    local.single_node ? tomap({
+      "spark.databricks.cluster.profile" : "singleNode"
+      "spark.master" : "local[*]"
+    }) : tomap({})
   )
 
   dynamic "library" {
@@ -162,9 +176,19 @@ resource "databricks_cluster" "cluster" {
     "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.transform.connection_string
   }
 
-  custom_tags = {
+  custom_tags = local.single_node ? {
     "ResourceClass" = "SingleNode"
-  }
+  } : {}
+
+  depends_on = [time_sleep.wait_for_databricks_network]
+}
+
+resource "databricks_dbfs_file" "dbfs_init_script_upload" {
+  for_each = toset(var.transform.databricks_cluster.init_scripts)
+  # Source path on local filesystem
+  source = each.key
+  # Path on DBFS
+  path = "/${local.init_scripts_dir}/${basename(each.key)}"
 
   depends_on = [time_sleep.wait_for_databricks_network]
 }
