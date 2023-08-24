@@ -193,16 +193,6 @@ resource "databricks_dbfs_file" "dbfs_init_script_upload" {
   depends_on = [time_sleep.wait_for_databricks_network]
 }
 
-resource "databricks_dbfs_file" "dbfs_init_script_upload" {
-  for_each = toset(var.transform.databricks_cluster.init_scripts)
-  # Source path on local filesystem
-  source = each.key
-  # Path on DBFS
-  path = "/${local.init_scripts_dir}/${basename(each.key)}"
-
-  depends_on = [time_sleep.wait_for_databricks_network]
-}
-
 # databricks secret scope, in-built. Not able to use key vault backed scope due to limitation in databricks:
 # https://learn.microsoft.com/en-us/azure/databricks/security/secrets/secret-scopes#--create-an-azure-key-vault-backed-secret-scope-using-the-databricks-cli 
 resource "databricks_secret_scope" "secrets" {
