@@ -43,7 +43,7 @@ on:
 jobs:
   clean:
     name: Clean devcontainer & TF state
-    runs-on: [self-hosted, "${{ vars.CI_GITHUB_RUNNER_LABEL }}"]
+    runs-on: [self-hosted, "${{ vars.CI_GITHUB_RUNNER_LABEL_TEST }}"]
     environment: ${{ inputs.environment }}
     steps:
       - name: Azure Login
