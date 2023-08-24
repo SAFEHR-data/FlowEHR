@@ -51,7 +51,7 @@ transform:  # Optional
       local_disk_min_size: 600
       category: "Memory Optimised"
     autotermination_minutes: 120
-    runtime_engine: STANDARD  # Optional: STANDARD or PHOTON
+    runtime_engine: STANDARD  # Optional: STANDARD or PHOTON (https://learn.microsoft.com/en-us/azure/databricks/runtime/photon)
     num_of_workers: 0  # Set to 0 for single node mode or any number for fixed cluster (ignored if autoscale also defined)
     autoscale:
       min_workers: 1
