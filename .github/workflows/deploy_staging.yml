@@ -30,5 +30,5 @@ jobs:
     with:
       command: infrastructure-transform
       environment: staging
-      runner_label: gh-runner-mricboot-prod
+      runner_label: ${{ vars.CI_GITHUB_RUNNER_LABEL }}
     secrets: inherit
