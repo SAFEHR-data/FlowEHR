@@ -26,9 +26,9 @@ concurrency:
 jobs:
   deploy:
     uses: ./.github/workflows/devcontainer_make_command.yml
-    name: Make Transform
+    name: Make All
     with:
-      command: infrastructure-transform
+      command: all
       environment: prod
       runner_label: gh-runner-mricboot-prod
     secrets: inherit
