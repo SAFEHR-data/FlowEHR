@@ -151,6 +151,7 @@ jobs:
       environment: test
       command: ${{ needs.pr_comment.outputs.makeCommand }}
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}
+      runner_label: ${{ vars.CI_GITHUB_RUNNER_LABEL_TEST }}
     secrets: inherit
 
   destroy_cleanup: # Clean up state and dev container if destroy successful
@@ -174,6 +175,7 @@ jobs:
       environment: test
       command: ${{ needs.pr_comment.outputs.makeCommand }}
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}
+      runner_label: ${{ vars.CI_GITHUB_RUNNER_LABEL_TEST }}
     secrets: inherit
 
   test_cleanup: # Clean up state and dev container if test successful
