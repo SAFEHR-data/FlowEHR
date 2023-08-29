@@ -29,17 +29,6 @@ locals {
   testing_slot_name        = "testing"
   testing_slot_webapp_name = "${local.webapp_name}-${local.testing_slot_name}"
 
-  # List webapp names (main and slots) that require auth to be enabled
-  auth_webapp_names = (
-    var.app_config.require_auth
-    ? (
-      var.app_config.add_testing_slot
-      ? toset([local.webapp_name, local.testing_slot_webapp_name])
-      : toset([local.webapp_name])
-    )
-    : toset([])
-  )
-
   # Map deployment branch and github environment names for main & testing slot (if enabled)
   branches_and_envs = var.app_config.add_testing_slot ? {
     tostring(local.core_branch_name)    = local.core_gh_env

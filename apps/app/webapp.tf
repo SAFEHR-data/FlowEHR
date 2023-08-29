@@ -12,6 +12,15 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+module "aad_app" {
+  count                    = try(var.app_config.auth, null) != null ? 1 : 0
+  source                   = "./aad_app"
+  auth_settings            = var.app_config.auth
+  serve_key_vault_id       = var.serve_key_vault_id
+  webapp_name              = local.webapp_name
+  testing_slot_webapp_name = var.app_config.add_testing_slot ? local.testing_slot_webapp_name : ""
+}
+
 resource "azurerm_application_insights" "app" {
   for_each                   = { for branch, env in local.branches_and_envs : env => branch }
   name                       = "ai-${replace(var.app_id, "_", "-")}-${each.key}"
@@ -54,6 +63,8 @@ resource "azurerm_linux_web_app" "app" {
     FEATURE_STORE_CONNECTION_STRING            = local.feature_store_odbc
     ENVIRONMENT                                = local.core_gh_env
     TENANT_ID                                  = data.azurerm_client_config.current.tenant_id
+    CLIENT_ID                                  = try(module.aad_app[0].aad_application_id, "")
+    AAD_IDENTIFIER_URI                         = try(module.aad_app[0].aad_app_identifier_uri, "")
     SUBSCRIPTION_ID                            = data.azurerm_client_config.current.subscription_id
     KEY_VAULT_URI                              = var.serve_key_vault_uri
   })
@@ -63,15 +74,15 @@ resource "azurerm_linux_web_app" "app" {
   }
 
   dynamic "auth_settings" {
-    for_each = contains(local.auth_webapp_names, local.webapp_name) ? [1] : []
+    for_each = try(var.app_config.auth, null) != null && var.app_config.auth.easy_auth ? [1] : []
 
     content {
       enabled = true
       issuer  = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/v2.0"
 
       active_directory {
-        client_id     = module.aad_app[local.webapp_name].aad_application_id
-        client_secret = module.aad_app[local.webapp_name].aad_application_password
+        client_id     = module.aad_app[0].aad_application_id
+        client_secret = module.aad_app[0].aad_application_password
       }
     }
   }
@@ -112,6 +123,8 @@ resource "azurerm_linux_web_app_slot" "testing" {
     FEATURE_STORE_CONNECTION_STRING            = local.feature_store_odbc
     ENVIRONMENT                                = local.testing_gh_env
     TENANT_ID                                  = data.azurerm_client_config.current.tenant_id
+    CLIENT_ID                                  = try(module.aad_app[0].aad_application_id, "")
+    AAD_IDENTIFIER_URI                         = try(module.aad_app[0].aad_app_identifier_uri, "")
     SUBSCRIPTION_ID                            = data.azurerm_client_config.current.subscription_id
     KEY_VAULT_URI                              = var.serve_key_vault_uri
   })
@@ -121,15 +134,15 @@ resource "azurerm_linux_web_app_slot" "testing" {
   }
 
   dynamic "auth_settings" {
-    for_each = contains(local.auth_webapp_names, local.testing_slot_webapp_name) ? [1] : []
+    for_each = try(var.app_config.auth, null) != null && var.app_config.auth.easy_auth ? [1] : []
 
     content {
       enabled = true
       issuer  = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/v2.0"
 
       active_directory {
-        client_id     = azuread_application.webapp_auth[local.testing_slot_webapp_name].application_id
-        client_secret = azuread_application_password.webapp_auth[local.testing_slot_webapp_name].value
+        client_id     = module.aad_app[0].aad_application_id
+        client_secret = module.aad_app[0].aad_application_password
       }
     }
   }

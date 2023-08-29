@@ -12,9 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-module "aad_app" {
-  for_each           = local.auth_webapp_names
-  source             = "./aad_app"
-  auth_webapp_name   = each.value
-  serve_key_vault_id = var.serve_key_vault_id
+locals {
+  app_identifier_uri = "api://${var.webapp_name}"
 }

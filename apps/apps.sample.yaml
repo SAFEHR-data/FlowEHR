@@ -3,7 +3,23 @@ dash_seedling:  # unique ID for the app
   name: Dash Seedling  # friendly name
   description: Hello world app for Dash  # short description
   add_testing_slot: false  # Whether to add a testing slot in addition to main slot
-  require_auth: false  # Whether to require end-users to authenticate with AAD to access app
+  # Optional - include this block to provision AAD Authentication
+  auth:
+    # Enable App Service Authentication on the app (aka "Easy Auth").
+    # This wires up the app for authentication using Azure middleware without needing any custom code.
+    easy_auth: true
+    # Create 'roles' for the app, which you can use to assign users to. Requires you to use a library such as MSAL in your project.
+    app_roles:
+      - value: "Researcher"
+        display_name: "Researcher"
+        description: "A researcher can..."
+      - value: "DataManager"
+        display_name: "Data Manager"
+        description: "A data manager can..."
+    # If you're building a JavaScript front end and will need authentication there
+    single_page_application:
+      additional_redirect_uris:
+        - "http://localhost:3000/"
   owners:  # Owners to add to repo (for reviews) in format GH_USERNAME: AAD_EMAIL
     octocat: an_aad_user@mycompany.com
   contributors:  # contributors to add to repo in format GH_USERNAME: AAD_EMAIL
