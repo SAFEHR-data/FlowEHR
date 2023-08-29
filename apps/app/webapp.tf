@@ -74,7 +74,7 @@ resource "azurerm_linux_web_app" "app" {
   }
 
   dynamic "auth_settings" {
-    for_each = try(var.app_config.auth, null) != null && var.app_config.auth.easy_auth ? [1] : []
+    for_each = try(var.app_config.auth, null) != null && try(var.app_config.auth.easy_auth, false) ? [1] : []
 
     content {
       enabled = true
@@ -134,7 +134,7 @@ resource "azurerm_linux_web_app_slot" "testing" {
   }
 
   dynamic "auth_settings" {
-    for_each = try(var.app_config.auth, null) != null && var.app_config.auth.easy_auth ? [1] : []
+    for_each = try(var.app_config.auth, null) != null && try(var.app_config.auth.easy_auth, false) ? [1] : []
 
     content {
       enabled = true
