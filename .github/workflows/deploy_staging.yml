@@ -12,9 +12,11 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-name: Destroy Infra-Test
+name: Deploy Staging
 
 on:
+  push:
+    branches: [staging]
   workflow_dispatch:
 
 # Only have a single instance of this workflow running at any time
@@ -22,9 +24,11 @@ concurrency:
   group: ${{ github.workflow }}
 
 jobs:
-  destroy:
+  deploy:
     uses: ./.github/workflows/devcontainer_make_command.yml
+    name: Make Transform
     with:
-      command: destroy
-      environment: infra-test
+      command: infrastructure-transform
+      environment: staging
+      runner_label: ${{ vars.CI_GITHUB_RUNNER_LABEL_PROD }}
     secrets: inherit

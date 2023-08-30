@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-name: Deploy Infra-Test
+name: Deploy Test
 
 on:
   push:
@@ -29,5 +29,6 @@ jobs:
     name: Make All
     with:
       command: all
-      environment: infra-test
+      environment: test
+      runner_label: ${{ vars.CI_GITHUB_RUNNER_LABEL_TEST }}
     secrets: inherit

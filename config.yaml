@@ -1,3 +1,16 @@
 ---
-flowehr_id: flowehr
+flowehr_id: mricflwr
 location: uksouth
+
+transform:
+  spark_version: 3.4
+  datalake:
+    zones:
+      - Bronze
+      - Silver
+      - Gold
+
+serve:
+  github_owner: mric-apps
+  github_app_id: 379800
+  github_app_installation_id: 41009833

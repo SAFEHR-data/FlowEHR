@@ -148,9 +148,10 @@ jobs:
     uses: ./.github/workflows/devcontainer_make_command.yml
     with:
       suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
-      environment: infra-test
+      environment: test
       command: ${{ needs.pr_comment.outputs.makeCommand }}
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}
+      runner_label: ${{ vars.CI_GITHUB_RUNNER_LABEL_TEST }}
     secrets: inherit
 
   destroy_cleanup: # Clean up state and dev container if destroy successful
@@ -159,7 +160,7 @@ jobs:
     uses: ./.github/workflows/clean_state.yml
     with:
       suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
-      environment: infra-test
+      environment: test
     secrets: inherit
 
   run_test:
@@ -171,9 +172,10 @@ jobs:
     uses: ./.github/workflows/devcontainer_make_command.yml
     with:
       suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
-      environment: infra-test
+      environment: test
       command: ${{ needs.pr_comment.outputs.makeCommand }}
       sha: ${{ needs.pr_comment.outputs.prHeadSha }}
+      runner_label: ${{ vars.CI_GITHUB_RUNNER_LABEL_TEST }}
     secrets: inherit
 
   test_cleanup: # Clean up state and dev container if test successful
@@ -182,7 +184,7 @@ jobs:
     uses: ./.github/workflows/clean_state.yml
     with:
       suffix_override: flwr-${{ needs.pr_comment.outputs.prRefId }}
-      environment: infra-test
+      environment: test
     secrets: inherit
 
   summary:
@@ -190,7 +192,7 @@ jobs:
     needs: [pr_comment, run_test]
     if: always() && needs.run_test.result != 'skipped' # Run even on test failure
     runs-on: ubuntu-latest
-    environment: infra-test
+    environment: test
     steps:
       # For PR builds triggered from comment builds, the GITHUB_REF is set to main
       # so the checks aren't automatically associated with the PR

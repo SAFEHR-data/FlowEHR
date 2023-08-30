@@ -128,7 +128,6 @@ variable "transform" {
         exclusions  = optional(list(string), [])
       })), [])
     }), {}),
-
     databricks_cluster = optional(object({
       node_type = optional(object({
         min_memory_gb       = optional(number, 0),
