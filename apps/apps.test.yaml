@@ -4,5 +4,3 @@ data_access_request:
   managed_repo:
     private: false
     template: UCLH-Foundry/Dash-Seedling
-  auth:
-    easy_auth: true

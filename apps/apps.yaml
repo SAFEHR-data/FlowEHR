@@ -14,3 +14,16 @@ data_access_request:
     num_of_approvals: 1
   env:
     WEBSITES_PORT: 8000
+  auth:
+    easy_auth: false
+    app_roles:
+      - value: "Researcher"
+        display_name: "Researcher"
+        description: "A researcher can request access to datasets"
+      - value: "DataManager"
+        display_name: "Data Manager"
+        description: "A data manager can approve or reject data access requests"
+    single_page_application:
+      additional_redirect_uris:
+        - "http://localhost:3000/"
+        - "http://localhost:8000/"
