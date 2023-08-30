@@ -134,6 +134,19 @@ resource "github_actions_environment_secret" "aad_auth_client_id" {
   ]
 }
 
+resource "github_actions_environment_secret" "aad_auth_tenant_id" {
+  for_each        = local.branches_and_envs
+  repository      = local.github_repository_name
+  environment     = each.value
+  secret_name     = "AAD_AUTH_TENANT_ID"
+  plaintext_value = data.azurerm_client_config.current.tenant_id
+
+  depends_on = [
+    github_repository_environment.all,
+    module.aad_app
+  ]
+}
+
 resource "github_actions_environment_secret" "aad_auth_identifier_uri" {
   for_each        = local.branches_and_envs
   repository      = local.github_repository_name
