@@ -117,9 +117,19 @@ variable "apps" {
     name             = string
     description      = optional(string, "Created by FlowEHR")
     add_testing_slot = optional(bool, false)
-    require_auth     = optional(bool, true)
-    owners           = map(string)
-    contributors     = map(string)
+    auth = optional(object({
+      easy_auth = optional(bool, false)
+      app_roles = optional(list(object({
+        value        = string
+        display_name = string
+        description  = string
+      })))
+      single_page_application = optional(object({
+        additional_redirect_uris = optional(list(string))
+      }))
+    }))
+    owners       = map(string)
+    contributors = map(string)
 
     managed_repo = optional(object({
       private  = bool

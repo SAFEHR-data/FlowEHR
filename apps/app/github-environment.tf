@@ -121,6 +121,32 @@ resource "github_actions_environment_secret" "acr_image_name" {
   ]
 }
 
+resource "github_actions_environment_secret" "aad_auth_client_id" {
+  for_each        = local.branches_and_envs
+  repository      = local.github_repository_name
+  environment     = each.value
+  secret_name     = "AAD_AUTH_CLIENT_ID"
+  plaintext_value = try(module.aad_app[0].aad_application_id, "")
+
+  depends_on = [
+    github_repository_environment.all,
+    module.aad_app
+  ]
+}
+
+resource "github_actions_environment_secret" "aad_auth_identifier_uri" {
+  for_each        = local.branches_and_envs
+  repository      = local.github_repository_name
+  environment     = each.value
+  secret_name     = "AAD_AUTH_IDENTIFIER_URI"
+  plaintext_value = try(module.aad_app[0].aad_app_identifier_uri, "")
+
+  depends_on = [
+    github_repository_environment.all,
+    module.aad_app
+  ]
+}
+
 # If there is a testing environment defined then the SP is needed to bump the deployed
 # docker version tag and in the production slot to slot swap
 resource "github_actions_environment_secret" "sp_client_id" {
