@@ -20,7 +20,7 @@ resource "azuread_service_principal" "msgraph" {
 }
 
 resource "random_uuid" "app_role_guids" {
-  for_each = { for r in var.auth_settings.app_roles : r.value => r }
+  for_each = { for r in local.app_roles_safe : r.value => r }
 }
 
 resource "azuread_application" "webapp_auth" {
@@ -82,7 +82,7 @@ resource "azuread_application" "webapp_auth" {
   }
 
   dynamic "app_role" {
-    for_each = toset(var.auth_settings.app_roles)
+    for_each = toset(local.app_roles_safe)
 
     content {
       id                   = random_uuid.app_role_guids[app_role.value.value].result
