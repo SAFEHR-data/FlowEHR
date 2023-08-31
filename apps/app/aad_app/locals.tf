@@ -14,5 +14,5 @@
 
 locals {
   app_identifier_uri = "api://${var.webapp_name}"
-  app_roles_safe = var.auth_settings.app_roles == null ? [] : var.auth_settings.app_roles
+  app_roles_safe     = var.auth_settings.app_roles == null ? [] : var.auth_settings.app_roles
 }
