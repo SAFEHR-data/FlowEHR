@@ -19,3 +19,7 @@ output "aad_application_id" {
 output "aad_application_password" {
   value = azuread_application_password.webapp_auth.value
 }
+
+output "aad_app_identifier_uri" {
+  value = local.app_identifier_uri
+}

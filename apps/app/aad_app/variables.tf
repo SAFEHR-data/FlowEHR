@@ -12,10 +12,18 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-variable "auth_webapp_name" {
-  type = string
+variable "auth_settings" {
+  type = any # validated at top level of apps
 }
 
 variable "serve_key_vault_id" {
+  type = string
+}
+
+variable "webapp_name" {
+  type = string
+}
+
+variable "testing_slot_webapp_name" {
   type = string
 }
