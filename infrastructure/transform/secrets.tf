@@ -70,6 +70,7 @@ resource "databricks_secret" "flowehr_databricks_sql_database" {
   string_value = azurerm_mssql_database.feature_database.name
   scope        = databricks_secret_scope.secrets.id
 }
+
 # FlowEHR external app secrets
 resource "databricks_secret" "external_connection_spn_app_id" {
   key          = "flowehr-external-connection-app-id"
