@@ -94,6 +94,11 @@ resource "databricks_cluster" "cluster" {
       "spark.secret.feature-store-fqdn"       = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_fqdn.key}}}"
       "spark.secret.feature-store-database"   = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.flowehr_databricks_sql_database.key}}}"
     }),
+    # Secrets for FlowEHR External app
+    tomap({
+      "spark.secret.external-connection-app-id"    = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.external_connection_spn_app_id.key}}}"
+      "spark.secret.exernal-connection-app-secret" = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.external_connection_spn_app_secret.key}}}"
+    }),
     # MSI connection to Datalake (if enabled)
     var.transform.datalake != null ? tomap({
       "fs.azure.account.auth.type.${module.datalake[0].adls_name}.dfs.core.windows.net"              = "OAuth",

@@ -17,6 +17,7 @@ locals {
   sql_owner_app_name                 = "flowehr-sql-owner-${lower(var.naming_suffix)}"
   databricks_adls_app_name           = "flowehr-databricks-adls-${lower(var.naming_suffix)}"
   databricks_sql_app_name            = "flowehr-databricks-datawriter-${lower(var.naming_suffix)}"
+  external_connection_app_name       = "flowehr-external-${lower(var.naming_suffix)}"
   pipeline_file                      = "pipeline.json"
   trigger_file                       = "trigger.json"
   artifacts_dir                      = "artifacts"
