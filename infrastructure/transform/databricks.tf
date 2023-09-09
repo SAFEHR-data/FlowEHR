@@ -74,6 +74,7 @@ resource "databricks_cluster" "cluster" {
   autotermination_minutes = var.transform.databricks_cluster.autotermination_minutes
   num_workers             = !local.autoscale_cluster ? var.transform.databricks_cluster.num_of_workers : null
   runtime_engine          = var.transform.databricks_cluster.runtime_engine
+  data_security_mode      = var.transform.databricks_cluster.data_security_mode
 
   dynamic "autoscale" {
     for_each = local.autoscale_cluster ? [1] : []

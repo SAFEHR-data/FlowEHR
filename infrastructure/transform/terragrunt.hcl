@@ -20,13 +20,13 @@ locals {
   providers = read_terragrunt_config("${get_repo_root()}/providers.hcl")
 }
 
-terraform {
+/* terraform {
   before_hook "before_hook" {
     commands    = ["apply", "plan"]
     execute     = ["make", "transform-artifacts"]
     working_dir = get_repo_root()
   }
-}
+} */
 
 dependency "core" {
   config_path = "../core"
@@ -90,6 +90,40 @@ terraform {
 EOF
 }
 
+generate "unity_catalog_terraform" {
+  path      = "unity-catalog/terraform.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+terraform {
+  required_version = "${local.providers.locals.terraform_version}"
+
+  required_providers {
+    ${local.providers.locals.required_provider_azure}
+    ${local.providers.locals.required_provider_azapi}
+    ${local.providers.locals.required_provider_databricks}
+  }
+
+}
+EOF
+}
+
+generate "unity_catalog_metastore_terraform" {
+  path      = "unity-catalog-metastore/terraform.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+terraform {
+  required_version = "${local.providers.locals.terraform_version}"
+
+  required_providers {
+    ${local.providers.locals.required_provider_azure}
+    ${local.providers.locals.required_provider_azapi}
+    ${local.providers.locals.required_provider_databricks}
+  }
+
+}
+EOF
+}
+
 generate "provider" {
   path      = "provider.tf"
   if_exists = "overwrite_terragrunt"
@@ -100,6 +134,7 @@ provider "databricks" {
   azure_workspace_resource_id = azurerm_databricks_workspace.databricks.id
   host                        = azurerm_databricks_workspace.databricks.workspace_url
 }
+
 EOF
 }
 

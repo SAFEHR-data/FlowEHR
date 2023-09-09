@@ -26,8 +26,14 @@ locals {
   adb_linked_service_name            = "ADBLinkedServiceViaMSI"
   dbfs_storage_account_name          = "dbfs${var.naming_suffix_truncated}"
   datalake_enabled                   = try(var.transform.datalake, null) != null
-  autoscale_cluster                  = var.transform.databricks_cluster.autoscale != null
-  single_node                        = !local.autoscale_cluster && var.transform.databricks_cluster.num_of_workers == 0
+  unity_catalog_enabled              = try(var.transform.unity_catalog, null) != null
+  create_unity_catalog_metastore = (
+    local.unity_catalog_enabled
+    && try(var.transform.unity_catalog_metastore.metastore_name, null) != null
+  )
+
+  autoscale_cluster = var.transform.databricks_cluster.autoscale != null
+  single_node       = !local.autoscale_cluster && var.transform.databricks_cluster.num_of_workers == 0
 
   # IPs required for Databricks UDRs 
   # Built from https://learn.microsoft.com/en-us/azure/databricks/resources/supported-regions#--control-plane-nat-webapp-and-extended-infrastructure-ip-addresses-and-domains

@@ -16,6 +16,10 @@ output "adls_name" {
   value = azurerm_storage_account.adls.name
 }
 
+output "adls_id" {
+  value = azurerm_storage_account.adls.id
+}
+
 output "databricks_adls_app_id" {
   value = azuread_application.databricks_adls.application_id
 }
