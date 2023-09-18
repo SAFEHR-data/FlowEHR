@@ -43,6 +43,8 @@ transform:  # Optional
     storage_account_name: stgexampleuc  # Globally unique name for the Metastore storage account
     resource_group_name: examplemetastore  # Name for the resource group for Metastore resources
     metastore_id: a12abc12-abcd-abcd-abcd-abcd1234abcd  # Either metastore_name or metastore_id need to be set
+  
+  databricks_account_id: a12abc12-abcd-abcd-abcd-abcd1234abcd  # Databricks Account ID unique per tenant. Required to deploy Unity Catalog
 
   spark_config:  # Optional
     spark.configuration.key: value

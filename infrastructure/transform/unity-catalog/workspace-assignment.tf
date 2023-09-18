@@ -15,6 +15,8 @@
 resource "databricks_metastore_assignment" "workspace_assignment" {
   workspace_id = data.azurerm_databricks_workspace.workspace.workspace_id
   metastore_id = var.metastore_id
+
+  depends_on = [databricks_metastore_data_access.metastore_data_access]
 }
 
 resource "databricks_metastore_data_access" "metastore_data_access" {
@@ -26,6 +28,4 @@ resource "databricks_metastore_data_access" "metastore_data_access" {
   }
 
   is_default = var.metastore_created
-
-  depends_on = [databricks_metastore_assignment.workspace_assignment]
 }

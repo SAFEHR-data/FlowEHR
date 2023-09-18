@@ -17,7 +17,8 @@ include "shared" {
 }
 
 locals {
-  providers = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+  providers     = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+  configuration = read_terragrunt_config("${get_repo_root()}/configuration.hcl")
 }
 
 terraform {
@@ -138,7 +139,7 @@ provider "databricks" {
 provider "databricks" {
   host = "https://accounts.azuredatabricks.net"
   alias = "accounts"
-  account_id = "e5d77844-84a5-45ea-aa80-21ea9743d234"
+  account_id = "${try(local.configuration.locals.merged_root_config.transform.databricks_account_id, "")}"
 }
 
 EOF

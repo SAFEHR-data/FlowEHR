@@ -149,6 +149,8 @@ variable "transform" {
       }), null)
     }), {})
 
+    databricks_account_id = optional(string)
+
     unity_catalog = optional(object({
       catalog_name             = optional(string)
       catalog_name_prefix      = optional(string)
