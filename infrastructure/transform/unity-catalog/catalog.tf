@@ -13,25 +13,36 @@
 #  limitations under the License.
 
 resource "databricks_catalog" "catalog" {
-  depends_on   = [databricks_metastore_assignment.workspace_assignment]
   metastore_id = var.metastore_id
-  name         = try(var.catalog_name, null) != null ? var.catalog_name : "${var.catalog_name_prefix}_${replace(var.naming_suffix, "-", "")}"
+  name = (
+    try(var.catalog_name, null) != null
+    ? var.catalog_name
+    : "${var.catalog_name_prefix}_${replace(var.naming_suffix, "-", "")}"
+  )
+
+  depends_on = [databricks_metastore_assignment.workspace_assignment]
 }
 
 resource "databricks_grants" "catalog" {
-  depends_on = [databricks_metastore_assignment.workspace_assignment]
-  catalog    = databricks_catalog.catalog.name
+  catalog = databricks_catalog.catalog.name
 
   grant {
     principal  = data.databricks_group.catalog_admins.display_name
     privileges = var.catalog_admin_privileges
   }
+
+  depends_on = [databricks_metastore_assignment.workspace_assignment]
 }
 
 resource "databricks_schema" "schema" {
-  depends_on   = [databricks_catalog.catalog]
   catalog_name = databricks_catalog.catalog.name
-  name         = try(var.schema_name, null) != null ? var.schema_name : "${var.schema_name_prefix}_${replace(var.naming_suffix, "-", "")}"
+  name = (
+    try(var.schema_name, null) != null
+    ? var.schema_name
+    : "${var.schema_name_prefix}_${replace(var.naming_suffix, "-", "")}"
+  )
+
+  depends_on = [databricks_catalog.catalog]
 }
 
 resource "databricks_group_member" "adf_mi_is_catalog_admin" {

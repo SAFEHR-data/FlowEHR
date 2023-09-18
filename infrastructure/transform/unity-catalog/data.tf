@@ -26,7 +26,7 @@ data "azurerm_resource_group" "metastore_rg" {
 }
 
 data "azapi_resource" "metastore_access_connector" {
-  type      = "Microsoft.Databricks/accessConnectors@2022-04-01-preview"
+  type      = local.azapi_access_connector
   name      = var.metastore_access_connector_name
   parent_id = data.azurerm_resource_group.metastore_rg.id
 }

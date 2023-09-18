@@ -13,24 +13,25 @@
 #  limitations under the License.
 
 resource "azapi_resource" "ext_access_connector" {
-  type      = "Microsoft.Databricks/accessConnectors@2022-04-01-preview"
+  type      = local.azapi_access_connector
   name      = "${local.external_access_connector_name_prefix}-${var.naming_suffix}"
   location  = data.azurerm_resource_group.core_rg.location
   parent_id = data.azurerm_resource_group.core_rg.id
 
   identity { type = "SystemAssigned" }
-  
+
   body                      = jsonencode({ properties = {} })
   schema_validation_enabled = false
 }
 
 resource "databricks_storage_credential" "external" {
-  depends_on = [databricks_metastore_assignment.workspace_assignment]
-  name       = azapi_resource.ext_access_connector.name
-  
+  name = azapi_resource.ext_access_connector.name
+
   azure_managed_identity {
     access_connector_id = azapi_resource.ext_access_connector.id
   }
+
+  depends_on = [databricks_metastore_assignment.workspace_assignment]
 }
 
 resource "azurerm_role_assignment" "external_storage" {
@@ -47,11 +48,14 @@ resource "databricks_external_location" "external_location" {
     "${location.storage_account_name}:${location.container_name}" => location
   }
 
-  name = "external-${replace(each.key, ":", "-")}"
-  url = format("abfss://%s@%s.dfs.core.windows.net/",
-    each.value.container_name,
-  each.value.storage_account_name)
+  name            = "external-${replace(each.key, ":", "-")}"
   credential_name = databricks_storage_credential.external.id
+
+  url = format(
+    "abfss://%s@%s.dfs.core.windows.net/",
+    each.value.container_name,
+    each.value.storage_account_name
+  )
 
   depends_on = [
     azurerm_role_assignment.external_storage
@@ -59,13 +63,14 @@ resource "databricks_external_location" "external_location" {
 }
 
 resource "databricks_grants" "external_storage_credential" {
-  depends_on         = [databricks_metastore_assignment.workspace_assignment]
   storage_credential = databricks_storage_credential.external.id
-  
+
   grant {
     principal  = data.databricks_group.external_storage_admins.display_name
     privileges = var.external_storage_admin_privileges
   }
+
+  depends_on = [databricks_metastore_assignment.workspace_assignment]
 }
 
 resource "databricks_grants" "external_storage" {
@@ -74,7 +79,7 @@ resource "databricks_grants" "external_storage" {
   }
 
   external_location = databricks_external_location.external_location[each.key].id
-  
+
   grant {
     principal  = data.databricks_group.external_storage_admins.display_name
     privileges = var.external_storage_admin_privileges

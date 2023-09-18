@@ -25,4 +25,5 @@ locals {
   ])
 
   external_access_connector_name_prefix = "external-access-connector-"
+  azapi_access_connector                = "Microsoft.Databricks/accessConnectors@2022-04-01-preview"
 }

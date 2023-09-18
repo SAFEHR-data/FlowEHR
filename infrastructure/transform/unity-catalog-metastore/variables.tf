@@ -45,10 +45,12 @@ variable "metastore_access_connector_name" {
 }
 
 variable "core_rg_name" {
+  type        = string
   description = "Name of the Core Resource Group"
 }
 
 variable "naming_suffix" {
+  type        = string
   description = "Naming suffix used to name all FlowEHR resources"
 }
 

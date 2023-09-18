@@ -18,7 +18,6 @@ resource "databricks_metastore_assignment" "workspace_assignment" {
 }
 
 resource "databricks_metastore_data_access" "metastore_data_access" {
-  depends_on   = [databricks_metastore_assignment.workspace_assignment]
   metastore_id = var.metastore_id
   name         = "dbks-metastore-access-${var.naming_suffix}"
 
@@ -27,4 +26,6 @@ resource "databricks_metastore_data_access" "metastore_data_access" {
   }
 
   is_default = var.metastore_created
+
+  depends_on = [databricks_metastore_assignment.workspace_assignment]
 }
