@@ -52,6 +52,10 @@ resource "azurerm_storage_account" "unity_catalog" {
   }
 }
 
+# Private endpoint in the Core resource group
+# These private endpoints are also created in unity-catalog module, the reason it is done here too 
+# is that the storage contaner creation (see below) depends on having the private endpoint in place 
+# in this module
 resource "azurerm_private_endpoint" "metastore_pe" {
   for_each = {
     "dfs"  = var.private_dns_zones["blob"].id

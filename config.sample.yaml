@@ -29,9 +29,21 @@ transform:  # Optional
       - Bronze
       - Silver
       - Gold
-  unity_catalog:
-    zones:
+
+  unity_catalog:  # Can be left empty, in which case no Unity Catalog resources are enabled
+    catalog_name: catalog
+    catalog_name_prefix: catalog  # Either name, or prefix need to be set
+    schema_name: schema
+    schema_name_prefix: schema
+    datalake_zones:  # From datalake section above, the zones that Unity Catalog will have access to
       - Gold
+
+  unity_catalog_metastore:  # Needs to be present if unity_catalog section is present
+    metastore_name: metastore-westeurope  # Setting this will result in a new metastore being deployed
+    storage_account_name: stgexampleuc  # Globally unique name for the Metastore storage account
+    resource_group_name: examplemetastore  # Name for the resource group for Metastore resources
+    metastore_id: a12abc12-abcd-abcd-abcd-abcd1234abcd  # Either metastore_name or metastore_id need to be set
+
   spark_config:  # Optional
     spark.configuration.key: value
   databricks_secrets:
@@ -55,6 +67,7 @@ transform:  # Optional
       category: "Memory Optimised"
     autotermination_minutes: 120
     runtime_engine: STANDARD  # Optional: STANDARD or PHOTON (https://learn.microsoft.com/en-us/azure/databricks/runtime/photon)
+    data_security_mode: SINGLE_USER  # Opional: see https://registry.terraform.io/providers/databricks/databricks/latest/docs/resources/cluster#data_security_mode
     num_of_workers: 0  # Set to 0 for single node mode or any number for fixed cluster (ignored if autoscale also defined)
     autoscale:
       min_workers: 1

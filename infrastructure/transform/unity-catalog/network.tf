@@ -12,6 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+# Private endpoint in the Core Resource group
+# If the metastore is created as part of this deployment, the private endpoint will already be created
 resource "azurerm_private_endpoint" "metastore_storage" {
   for_each = var.metastore_created ? {} : {
     "dfs"  = var.private_dns_zones["blob"].id
