@@ -105,6 +105,10 @@ terraform {
   }
 
 }
+
+provider "databricks" {
+  alias = "accounts"
+}
 EOF
 }
 
@@ -121,6 +125,10 @@ terraform {
     ${local.providers.locals.required_provider_databricks}
   }
 
+}
+
+provider "databricks" {
+  alias = "accounts"
 }
 EOF
 }
