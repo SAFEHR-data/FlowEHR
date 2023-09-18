@@ -20,7 +20,6 @@ locals {
   providers = read_terragrunt_config("${get_repo_root()}/providers.hcl")
 }
 
-/*
 terraform {
   before_hook "before_hook" {
     commands    = ["apply", "plan"]
@@ -28,7 +27,6 @@ terraform {
     working_dir = get_repo_root()
   }
 }
-*/
 
 dependency "core" {
   config_path = "../core"

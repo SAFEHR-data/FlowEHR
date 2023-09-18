@@ -18,7 +18,7 @@ resource "azurerm_private_endpoint" "metastore_storage" {
     "blob" = var.private_dns_zones["dfs"].id
   }
 
-  name                = "pe-uc-${var.naming_suffix}"
+  name                = "pe-uc-${each.key}-${var.naming_suffix}"
   location            = data.azurerm_resource_group.core_rg.location
   resource_group_name = var.core_rg_name
   subnet_id           = data.azurerm_subnet.shared_subnet.id
