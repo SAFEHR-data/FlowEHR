@@ -73,7 +73,7 @@ variable "schema_name_prefix" {
 }
 
 variable "catalog_admin_group_name" {
-  description = "Name of the Catalog Admin group. The group must be created by the Catalogue Admin"
+  description = "Name of the Catalog Admin group. The group is created during the deployment of Unity Catalog Metastore."
   type        = string
 }
 
@@ -83,7 +83,7 @@ variable "catalog_admin_privileges" {
 }
 
 variable "external_storage_admin_group_name" {
-  description = "Name of the External Storage Admin group. The group must be created by the Catalogue Admin"
+  description = "Name of the External Storage Admin group. The group is created during the deployment of Unity Catalog Metastore."
   type        = string
 }
 

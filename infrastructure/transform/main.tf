@@ -47,6 +47,9 @@ module "unity_catalog_metastore" {
   storage_account_name            = var.transform.unity_catalog_metastore.storage_account_name
   metastore_access_connector_name = "metastore-access-connector"
 
+  catalog_admin_group_name          = var.transform.unity_catalog.catalog_admin_group_name
+  external_storage_admin_group_name = var.transform.unity_catalog.external_storage_admin_group_name
+
   providers = {
     databricks          = databricks
     databricks.accounts = databricks.accounts

@@ -61,6 +61,7 @@ EOF
 databricks = {
       source = "databricks/databricks"
       version = "1.9.1"
+      configuration_aliases = [ databricks.accounts ]
     }
 EOF
 

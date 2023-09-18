@@ -43,3 +43,13 @@ variable "metastore_access_connector_name" {
   default     = "metastore-access-connector"
   description = "Name of the Metastore Access Connector. Must be the same as is set in unity-catalog module."
 }
+
+variable "catalog_admin_group_name" {
+  description = "Name of the External Storage Admin group. The group will be created as part of this module."
+  type        = string
+}
+
+variable "external_storage_admin_group_name" {
+  description = "Name of the Catalog Admin group. The group will be created as part of this module."
+  type        = string
+}
