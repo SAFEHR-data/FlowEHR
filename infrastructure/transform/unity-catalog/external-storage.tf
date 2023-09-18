@@ -23,6 +23,7 @@ resource "azapi_resource" "ext_access_connector" {
 }
 
 resource "databricks_storage_credential" "external" {
+  depends_on = [databricks_metastore_assignment.workspace_assignment ]
   name = azapi_resource.ext_access_connector.name
   azure_managed_identity {
     access_connector_id = azapi_resource.ext_access_connector.id
