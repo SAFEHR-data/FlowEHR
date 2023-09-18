@@ -29,6 +29,9 @@ transform:  # Optional
       - Bronze
       - Silver
       - Gold
+  unity_catalog:
+    zones:
+      - Gold
   spark_config:  # Optional
     spark.configuration.key: value
   databricks_secrets:

@@ -1,7 +1,7 @@
 resource "databricks_catalog" "catalog" {
   depends_on   = [databricks_metastore_assignment.workspace_assignment]
   metastore_id = var.metastore_id
-  name         = try(var.catalog_name, null) != null ? var.catalog_name : "${var.catalog_name_prefix}-${var.naming_suffix}"
+  name         = try(var.catalog_name, null) != null ? var.catalog_name : "${var.catalog_name_prefix}_${var.naming_suffix}"
 }
 
 resource "databricks_grants" "catalog" {

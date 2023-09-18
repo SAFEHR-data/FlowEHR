@@ -35,13 +35,17 @@ module "unity_catalog_metastore" {
   count  = local.create_unity_catalog_metastore ? 1 : 0
   source = "./unity-catalog-metastore"
 
-  resource_group_name             = var.transform.unity_catalog_metastore.resource_group_name
-  location                        = var.core_rg_location
-  tags                            = var.tags
+  core_rg_name  = var.core_rg_name
+  naming_suffix = var.naming_suffix
+
+  resource_group_name = var.transform.unity_catalog_metastore.resource_group_name
+  location            = var.core_rg_location
+  tags                = var.tags
+
   metastore_name                  = var.transform.unity_catalog_metastore.metastore_name
   storage_account_name            = var.transform.unity_catalog_metastore.storage_account_name
-  default_metastore_workspace_id  = azurerm_databricks_workspace.databricks.workspace_id
   metastore_access_connector_name = "metastore-access-connector"
+  private_dns_zones               = var.private_dns_zones
   tf_in_automation                = var.tf_in_automation
   deployer_ip                     = var.deployer_ip
 }
@@ -61,7 +65,7 @@ module "unity_catalog" {
   metastore_rg_name               = var.transform.unity_catalog_metastore.resource_group_name
   metastore_access_connector_name = "metastore-access-connector"
   metastore_storage_account_name  = var.transform.unity_catalog_metastore.storage_account_name
-  assign_default_workspace        = local.create_unity_catalog_metastore
+  metastore_created               = local.create_unity_catalog_metastore
 
   catalog_name             = var.transform.unity_catalog.catalog_name
   catalog_name_prefix      = var.transform.unity_catalog.catalog_name_prefix

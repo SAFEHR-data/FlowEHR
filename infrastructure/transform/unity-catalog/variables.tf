@@ -39,8 +39,8 @@ variable "metastore_storage_account_name" {
   type        = string
 }
 
-variable "assign_default_workspace" {
-  description = "Whether Databricks Workspace created in FlowEHR deployment should be assigned as a default for Metastore. Set to true if this deployment deploys metastore"
+variable "metastore_created" {
+  description = "Whether Databricks Metastore is created as a part of the same FlowEHR deployment"
   type        = bool
 }
 

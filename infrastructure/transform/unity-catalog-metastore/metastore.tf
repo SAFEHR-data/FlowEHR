@@ -29,7 +29,36 @@ resource "azurerm_storage_account" "unity_catalog" {
   account_tier                  = "Standard"
   account_replication_type      = "GRS"
   is_hns_enabled                = true
-  public_network_access_enabled = false
+  public_network_access_enabled = !var.tf_in_automation
+
+  network_rules {
+    bypass         = ["AzureServices"]
+    default_action = "Deny"
+    ip_rules       = var.tf_in_automation ? null : [var.deployer_ip]
+  }
+}
+
+resource "azurerm_private_endpoint" "metastore_pe" {
+  for_each = {
+    "dfs"  = var.private_dns_zones["blob"].id
+    "blob" = var.private_dns_zones["dfs"].id
+  }
+  name                = "pe-uc-${each.key}-${lower(var.naming_suffix)}"
+  location            = data.azurerm_resource_group.core_rg.location
+  resource_group_name = var.core_rg_name
+  subnet_id           = data.azurerm_subnet.shared_subnet.id
+
+  private_service_connection {
+    name                           = "uc-${each.key}-${lower(var.naming_suffix)}"
+    is_manual_connection           = false
+    private_connection_resource_id = azurerm_storage_account.unity_catalog.id
+    subresource_names              = [each.key]
+  }
+
+  private_dns_zone_group {
+    name                 = "private-dns-zone-group-${each.key}-${var.naming_suffix}"
+    private_dns_zone_ids = [each.value]
+  }
 }
 
 resource "azurerm_storage_container" "unity_catalog" {
@@ -38,7 +67,8 @@ resource "azurerm_storage_container" "unity_catalog" {
   container_access_type = "private"
 
   depends_on = [
-    azurerm_role_assignment.deployer_contributor
+    azurerm_role_assignment.deployer_contributor,
+    azurerm_private_endpoint.metastore_pe,
   ]
 }
 

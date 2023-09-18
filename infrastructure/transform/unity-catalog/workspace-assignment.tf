@@ -11,5 +11,5 @@ resource "databricks_metastore_data_access" "metastore_data_access" {
     access_connector_id = data.azapi_resource.metastore_access_connector.id
   }
 
-  is_default = var.assign_default_workspace
+  is_default = var.metastore_created
 }
