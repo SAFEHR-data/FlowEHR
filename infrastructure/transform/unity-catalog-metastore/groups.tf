@@ -12,6 +12,16 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-output "metastore_id" {
-  value = databricks_metastore.metastore.id
+resource "databricks_group" "catalog_admin" {
+  provider                   = databricks.accounts
+  display_name               = var.catalog_admin_group_name
+  allow_cluster_create       = true
+  allow_instance_pool_create = true
+}
+
+resource "databricks_group" "external_storage_admin" {
+  provider                   = databricks.accounts
+  display_name               = var.external_storage_admin_group_name
+  allow_cluster_create       = true
+  allow_instance_pool_create = true
 }

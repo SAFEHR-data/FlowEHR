@@ -20,13 +20,15 @@ locals {
   providers = read_terragrunt_config("${get_repo_root()}/providers.hcl")
 }
 
-/* terraform {
+/*
+terraform {
   before_hook "before_hook" {
     commands    = ["apply", "plan"]
     execute     = ["make", "transform-artifacts"]
     working_dir = get_repo_root()
   }
-} */
+}
+*/
 
 dependency "core" {
   config_path = "../core"
@@ -133,6 +135,12 @@ ${local.providers.locals.azure_provider}
 provider "databricks" {
   azure_workspace_resource_id = azurerm_databricks_workspace.databricks.id
   host                        = azurerm_databricks_workspace.databricks.workspace_url
+}
+
+provider "databricks" {
+  host = "https://accounts.azuredatabricks.net"
+  alias = "accounts"
+  account_id = "e5d77844-84a5-45ea-aa80-21ea9743d234"
 }
 
 EOF
