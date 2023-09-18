@@ -12,6 +12,10 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-output "metastore_id" {
-  value = databricks_metastore.metastore.id
+output "catalog_name" {
+  value = databricks_catalog.catalog.name
+}
+
+output "schema_name" {
+  value = databricks_schema.schema.name
 }

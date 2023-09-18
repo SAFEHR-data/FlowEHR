@@ -29,6 +29,11 @@ module "datalake" {
   databricks_adls_app_name   = local.databricks_adls_app_name
   databricks_secret_scope_id = databricks_secret_scope.secrets.id
   tags                       = var.tags
+
+  providers = {
+    databricks          = databricks
+    databricks.accounts = databricks.accounts
+  }
 }
 
 module "unity_catalog_metastore" {
@@ -40,10 +45,12 @@ module "unity_catalog_metastore" {
   tags                            = var.tags
   metastore_name                  = var.transform.unity_catalog_metastore.metastore_name
   storage_account_name            = var.transform.unity_catalog_metastore.storage_account_name
-  default_metastore_workspace_id  = azurerm_databricks_workspace.databricks.workspace_id
   metastore_access_connector_name = "metastore-access-connector"
-  tf_in_automation                = var.tf_in_automation
-  deployer_ip                     = var.deployer_ip
+
+  providers = {
+    databricks          = databricks
+    databricks.accounts = databricks.accounts
+  }
 }
 
 module "unity_catalog" {
@@ -56,7 +63,7 @@ module "unity_catalog" {
   metastore_id = (
     local.create_unity_catalog_metastore
     ? module.unity_catalog_metastore[0].metastore_id
-    : var.transform.unity_catalog_metastore.id
+    : var.transform.unity_catalog_metastore.metastore_id
   )
   metastore_rg_name               = var.transform.unity_catalog_metastore.resource_group_name
   metastore_access_connector_name = "metastore-access-connector"
@@ -74,7 +81,8 @@ module "unity_catalog" {
   external_storage_admin_group_name = var.transform.unity_catalog.external_storage_admin_group_name
   external_storage_admin_privileges = var.transform.unity_catalog.external_storage_admin_privileges
 
-  databricks_workspace_name = azurerm_databricks_workspace.databricks.name
+  databricks_workspace_name  = azurerm_databricks_workspace.databricks.name
+  adf_managed_identity_sp_id = databricks_service_principal.adf_managed_identity_sp.id
 
   external_storage_accounts = [{
     storage_account_id   = module.datalake[0].adls_id
@@ -84,5 +92,9 @@ module "unity_catalog" {
 
   private_dns_zones = var.private_dns_zones
 
+  providers = {
+    databricks          = databricks
+    databricks.accounts = databricks.accounts
+  }
   depends_on = [azurerm_databricks_workspace.databricks, module.unity_catalog_metastore]
 }

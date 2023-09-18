@@ -169,8 +169,8 @@ variable "transform" {
       metastore_name       = optional(string)
       storage_account_name = optional(string)
 
-      id = optional(string)
-    }))
+      metastore_id = optional(string)
+    }), {})
   })
   default = {
     spark_version = "3.3"

@@ -1,10 +1,18 @@
+#  Copyright (c) University College London Hospitals NHS Foundation Trust
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
 locals {
-  tenant_id       = data.azurerm_client_config.current.tenant_id
-  subscription_id = data.azurerm_client_config.current.subscription_id
-
-  databricks_workspace_host = data.azurerm_databricks_workspace.workspace.workspace_url
-  databricks_workspace_id   = data.azurerm_databricks_workspace.workspace.workspace_id
-
   # Example value: [ { "storage_account_id" = "...", "storage_account_name" = "stgtest1", "container_name" = "bronze" } ]
   external_storage_locations = flatten([
     for account in var.external_storage_accounts : [
@@ -16,7 +24,5 @@ locals {
     ]
   ])
 
-  external_access_connector_name = "external-access-connector"
-  # Must match the value in unity-catalog-metastore module
-  metastore_access_connector_name = "metastore-access-connector"
+  external_access_connector_name_prefix = "external-access-connector-"
 }
