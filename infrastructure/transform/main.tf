@@ -106,5 +106,6 @@ module "unity_catalog" {
     databricks          = databricks
     databricks.accounts = databricks.accounts
   }
+
   depends_on = [azurerm_databricks_workspace.databricks, module.unity_catalog_metastore]
 }

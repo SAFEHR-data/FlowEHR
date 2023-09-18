@@ -17,6 +17,7 @@ resource "azurerm_data_factory_pipeline" "pipeline" {
   name            = each.value.name
   data_factory_id = azurerm_data_factory.adf.id
   activities_json = jsonencode(each.value.properties.activities)
+  
   parameters = merge(
     tomap({
       for param_name, param in each.value.properties.parameters : param_name => param.defaultValue

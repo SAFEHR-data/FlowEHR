@@ -21,6 +21,7 @@ resource "databricks_catalog" "catalog" {
 resource "databricks_grants" "catalog" {
   depends_on = [databricks_metastore_assignment.workspace_assignment]
   catalog    = databricks_catalog.catalog.name
+
   grant {
     principal  = data.databricks_group.catalog_admins.display_name
     privileges = var.catalog_admin_privileges

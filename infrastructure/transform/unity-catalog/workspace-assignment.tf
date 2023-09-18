@@ -21,6 +21,7 @@ resource "databricks_metastore_data_access" "metastore_data_access" {
   depends_on   = [databricks_metastore_assignment.workspace_assignment]
   metastore_id = var.metastore_id
   name         = "dbks-metastore-access-${var.naming_suffix}"
+
   azure_managed_identity {
     access_connector_id = data.azapi_resource.metastore_access_connector.id
   }

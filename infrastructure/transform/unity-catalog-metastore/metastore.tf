@@ -31,8 +31,9 @@ resource "azapi_resource" "access_connector" {
   name      = var.metastore_access_connector_name
   location  = azurerm_resource_group.metastore.location
   parent_id = azurerm_resource_group.metastore.id
+  body      = jsonencode({ properties = {} })
+
   identity { type = "SystemAssigned" }
-  body = jsonencode({ properties = {} })
 }
 
 resource "azurerm_storage_account" "unity_catalog" {
