@@ -30,7 +30,7 @@ transform:  # Optional
       - Silver
       - Gold
 
-  unity_catalog:  # Can be left empty, in which case no Unity Catalog resources are enabled
+  unity_catalog:  # Optional. If you wish to disable Unity Catalog, remove this section
     catalog_name: catalog
     catalog_name_prefix: catalog  # Either name, or prefix need to be set
     schema_name: schema
