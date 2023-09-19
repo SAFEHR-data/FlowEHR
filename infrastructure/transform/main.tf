@@ -29,4 +29,83 @@ module "datalake" {
   databricks_adls_app_name   = local.databricks_adls_app_name
   databricks_secret_scope_id = databricks_secret_scope.secrets.id
   tags                       = var.tags
+
+  providers = {
+    databricks          = databricks
+    databricks.accounts = databricks.accounts
+  }
+}
+
+module "unity_catalog_metastore" {
+  count  = local.create_unity_catalog_metastore ? 1 : 0
+  source = "./unity-catalog-metastore"
+
+  core_rg_name  = var.core_rg_name
+  naming_suffix = var.naming_suffix
+
+  resource_group_name = var.transform.unity_catalog_metastore.resource_group_name
+  location            = var.core_rg_location
+  tags                = var.tags
+
+  metastore_name                  = var.transform.unity_catalog_metastore.metastore_name
+  storage_account_name            = var.transform.unity_catalog_metastore.storage_account_name
+  metastore_access_connector_name = "metastore-access-connector"
+  private_dns_zones               = var.private_dns_zones
+  tf_in_automation                = var.tf_in_automation
+  deployer_ip                     = var.deployer_ip
+
+  catalog_admin_group_name          = var.transform.unity_catalog.catalog_admin_group_name
+  external_storage_admin_group_name = var.transform.unity_catalog.external_storage_admin_group_name
+
+  providers = {
+    databricks          = databricks
+    databricks.accounts = databricks.accounts
+  }
+}
+
+module "unity_catalog" {
+  count  = local.unity_catalog_enabled ? 1 : 0
+  source = "./unity-catalog"
+
+  core_rg_name  = var.core_rg_name
+  naming_suffix = var.naming_suffix
+
+  metastore_id = (
+    local.create_unity_catalog_metastore
+    ? module.unity_catalog_metastore[0].metastore_id
+    : var.transform.unity_catalog_metastore.metastore_id
+  )
+  metastore_rg_name               = var.transform.unity_catalog_metastore.resource_group_name
+  metastore_access_connector_name = "metastore-access-connector"
+  metastore_storage_account_name  = var.transform.unity_catalog_metastore.storage_account_name
+  metastore_created               = local.create_unity_catalog_metastore
+
+  catalog_name             = var.transform.unity_catalog.catalog_name
+  catalog_name_prefix      = var.transform.unity_catalog.catalog_name_prefix
+  catalog_admin_group_name = var.transform.unity_catalog.catalog_admin_group_name
+  catalog_admin_privileges = var.transform.unity_catalog.catalog_admin_privileges
+
+  schema_name        = var.transform.unity_catalog.schema_name
+  schema_name_prefix = var.transform.unity_catalog.schema_name_prefix
+
+  external_storage_admin_group_name = var.transform.unity_catalog.external_storage_admin_group_name
+  external_storage_admin_privileges = var.transform.unity_catalog.external_storage_admin_privileges
+
+  databricks_workspace_name  = azurerm_databricks_workspace.databricks.name
+  adf_managed_identity_sp_id = databricks_service_principal.adf_managed_identity_sp.id
+
+  external_storage_accounts = [{
+    storage_account_id   = module.datalake[0].adls_id
+    storage_account_name = module.datalake[0].adls_name
+    container_names      = var.transform.unity_catalog.datalake_zones
+  }]
+
+  private_dns_zones = var.private_dns_zones
+
+  providers = {
+    databricks          = databricks
+    databricks.accounts = databricks.accounts
+  }
+
+  depends_on = [azurerm_databricks_workspace.databricks, module.unity_catalog_metastore]
 }

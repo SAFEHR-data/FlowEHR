@@ -12,22 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-output "adls_name" {
-  value = azurerm_storage_account.adls.name
-}
-
-output "adls_id" {
-  value = azurerm_storage_account.adls.id
-}
-
-output "databricks_adls_app_id" {
-  value = azuread_application.databricks_adls.application_id
-}
-
-output "databricks_adls_app_secret_key" {
-  value = databricks_secret.databricks_adls_spn_app_secret.key
-}
-
-output "databricks_adls_uri_secret_key" {
-  value = databricks_secret.adls_uri.key
+output "metastore_id" {
+  value = databricks_metastore.metastore.id
 }

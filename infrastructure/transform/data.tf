@@ -53,3 +53,8 @@ data "azurerm_log_analytics_workspace" "core" {
   name                = "log-${lower(var.naming_suffix)}"
   resource_group_name = var.core_rg_name
 }
+
+# Get "Application ID" for ADF MI
+data "azuread_service_principal" "adf_identity_sp" {
+  object_id = azurerm_data_factory.adf.identity[0].principal_id
+}

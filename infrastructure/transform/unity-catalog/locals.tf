@@ -12,22 +12,18 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-output "adls_name" {
-  value = azurerm_storage_account.adls.name
-}
+locals {
+  # Example value: [ { "storage_account_id" = "...", "storage_account_name" = "stgtest1", "container_name" = "bronze" } ]
+  external_storage_locations = flatten([
+    for account in var.external_storage_accounts : [
+      for container in account.container_names : {
+        storage_account_id   = account.storage_account_id
+        storage_account_name = account.storage_account_name
+        container_name       = container
+      }
+    ]
+  ])
 
-output "adls_id" {
-  value = azurerm_storage_account.adls.id
-}
-
-output "databricks_adls_app_id" {
-  value = azuread_application.databricks_adls.application_id
-}
-
-output "databricks_adls_app_secret_key" {
-  value = databricks_secret.databricks_adls_spn_app_secret.key
-}
-
-output "databricks_adls_uri_secret_key" {
-  value = databricks_secret.adls_uri.key
+  external_access_connector_name_prefix = "external-access-connector-"
+  azapi_access_connector                = "Microsoft.Databricks/accessConnectors@2022-04-01-preview"
 }

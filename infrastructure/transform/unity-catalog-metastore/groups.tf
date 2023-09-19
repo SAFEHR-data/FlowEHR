@@ -12,22 +12,16 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-output "adls_name" {
-  value = azurerm_storage_account.adls.name
+resource "databricks_group" "catalog_admin" {
+  provider                   = databricks.accounts
+  display_name               = var.catalog_admin_group_name
+  allow_cluster_create       = true
+  allow_instance_pool_create = true
 }
 
-output "adls_id" {
-  value = azurerm_storage_account.adls.id
-}
-
-output "databricks_adls_app_id" {
-  value = azuread_application.databricks_adls.application_id
-}
-
-output "databricks_adls_app_secret_key" {
-  value = databricks_secret.databricks_adls_spn_app_secret.key
-}
-
-output "databricks_adls_uri_secret_key" {
-  value = databricks_secret.adls_uri.key
+resource "databricks_group" "external_storage_admin" {
+  provider                   = databricks.accounts
+  display_name               = var.external_storage_admin_group_name
+  allow_cluster_create       = true
+  allow_instance_pool_create = true
 }
