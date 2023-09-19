@@ -170,7 +170,7 @@ resource "azurerm_monitor_activity_log_alert" "feature_database_firewall_update"
   }
 }
 
-resource "azurerm_mssql_server_extended_auditing_policy" "sql_server_features" {
+/* resource "azurerm_mssql_server_extended_auditing_policy" "sql_server_features" {
   storage_endpoint       = data.azurerm_storage_account.core.primary_blob_endpoint
   server_id              = azurerm_mssql_server.sql_server_features.id
   retention_in_days      = 90
@@ -182,7 +182,7 @@ resource "azurerm_mssql_server_extended_auditing_policy" "sql_server_features" {
     azurerm_role_assignment.sql_can_use_storage,
     azurerm_mssql_outbound_firewall_rule.allow_storage
   ]
-}
+} */
 
 resource "azurerm_storage_container" "mssql_vulnerability_assessment" {
   name                  = "mssqlvulnerabilityassessment"
