@@ -92,3 +92,15 @@ resource "databricks_secret" "databricks_config_secret" {
   string_value = each.value
   scope        = databricks_secret_scope.secrets.id
 }
+
+resource "databricks_secret" "unity_catalog_catalog_name" {
+  key          = "unity-catalog-catalog-name"
+  string_value = try(module.unity_catalog[0].catalog_name, "")
+  scope        = databricks_secret_scope.secrets.id
+}
+
+resource "databricks_secret" "unity_catalog_schema_name" {
+  key          = "unity-catalog-schema-name"
+  string_value = try(module.unity_catalog[0].schema_name, "")
+  scope        = databricks_secret_scope.secrets.id
+}
