@@ -153,26 +153,26 @@ variable "transform" {
 
     unity_catalog = optional(object({
       catalog_name             = optional(string)
-      catalog_name_prefix      = optional(string, "")
+      catalog_name_prefix      = optional(string)
       catalog_admin_group_name = optional(string, "unity_catalog_admins")
       catalog_admin_privileges = optional(list(string), ["ALL_PRIVILEGES"])
 
       schema_name        = optional(string)
-      schema_name_prefix = optional(string, "")
+      schema_name_prefix = optional(string)
 
       external_storage_admin_group_name = optional(string, "unity_catalog_external_storage_admins")
       external_storage_admin_privileges = optional(list(string), ["ALL_PRIVILEGES"])
 
       datalake_zones = optional(list(string), [])
-    }), {})
+    }))
 
     unity_catalog_metastore = optional(object({
       resource_group_name  = optional(string)
       metastore_name       = optional(string)
       storage_account_name = optional(string)
 
-      metastore_id = optional(string, "")
-    }), {})
+      metastore_id = optional(string)
+    }))
   })
   default = {
     spark_version = "3.3"
