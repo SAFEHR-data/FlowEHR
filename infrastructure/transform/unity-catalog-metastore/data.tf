@@ -12,22 +12,19 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-output "adls_name" {
-  value = azurerm_storage_account.adls.name
+data "azurerm_client_config" "current" {}
+
+data "azurerm_resource_group" "core_rg" {
+  name = var.core_rg_name
 }
 
-output "adls_id" {
-  value = azurerm_storage_account.adls.id
+data "azurerm_virtual_network" "core_vnet" {
+  name                = "vnet-${var.naming_suffix}"
+  resource_group_name = data.azurerm_resource_group.core_rg.name
 }
 
-output "databricks_adls_app_id" {
-  value = azuread_application.databricks_adls.application_id
-}
-
-output "databricks_adls_app_secret_key" {
-  value = databricks_secret.databricks_adls_spn_app_secret.key
-}
-
-output "databricks_adls_uri_secret_key" {
-  value = databricks_secret.adls_uri.key
+data "azurerm_subnet" "shared_subnet" {
+  name                 = "subnet-core-shared-${var.naming_suffix}"
+  virtual_network_name = data.azurerm_virtual_network.core_vnet.name
+  resource_group_name  = data.azurerm_resource_group.core_rg.name
 }

@@ -141,12 +141,38 @@ variable "transform" {
       init_scripts            = optional(list(string), [])
       runtime_engine          = optional(string, "STANDARD")
       num_of_workers          = optional(number, 0)
+      data_security_mode      = optional(string, "SINGLE_USER")
 
       autoscale = optional(object({
         min_workers = optional(number, 0)
         max_workers = optional(number, 0)
       }), null)
     }), {})
+
+    databricks_account_id = optional(string)
+
+    unity_catalog = optional(object({
+      catalog_name             = optional(string)
+      catalog_name_prefix      = optional(string)
+      catalog_admin_group_name = optional(string, "unity_catalog_admins")
+      catalog_admin_privileges = optional(list(string), ["ALL_PRIVILEGES"])
+
+      schema_name        = optional(string)
+      schema_name_prefix = optional(string)
+
+      external_storage_admin_group_name = optional(string, "unity_catalog_external_storage_admins")
+      external_storage_admin_privileges = optional(list(string), ["ALL_PRIVILEGES"])
+
+      datalake_zones = optional(list(string), [])
+    }))
+
+    unity_catalog_metastore = optional(object({
+      resource_group_name  = optional(string)
+      metastore_name       = optional(string)
+      storage_account_name = optional(string)
+
+      metastore_id = optional(string)
+    }))
   })
   default = {
     spark_version = "3.3"

@@ -17,7 +17,8 @@ include "shared" {
 }
 
 locals {
-  providers = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+  providers     = read_terragrunt_config("${get_repo_root()}/providers.hcl")
+  configuration = read_terragrunt_config("${get_repo_root()}/configuration.hcl")
 }
 
 terraform {
@@ -90,6 +91,48 @@ terraform {
 EOF
 }
 
+generate "unity_catalog_terraform" {
+  path      = "unity-catalog/terraform.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+terraform {
+  required_version = "${local.providers.locals.terraform_version}"
+
+  required_providers {
+    ${local.providers.locals.required_provider_azure}
+    ${local.providers.locals.required_provider_azapi}
+    ${local.providers.locals.required_provider_databricks}
+  }
+
+}
+
+provider "databricks" {
+  alias = "accounts"
+}
+EOF
+}
+
+generate "unity_catalog_metastore_terraform" {
+  path      = "unity-catalog-metastore/terraform.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+terraform {
+  required_version = "${local.providers.locals.terraform_version}"
+
+  required_providers {
+    ${local.providers.locals.required_provider_azure}
+    ${local.providers.locals.required_provider_azapi}
+    ${local.providers.locals.required_provider_databricks}
+  }
+
+}
+
+provider "databricks" {
+  alias = "accounts"
+}
+EOF
+}
+
 generate "provider" {
   path      = "provider.tf"
   if_exists = "overwrite_terragrunt"
@@ -100,6 +143,13 @@ provider "databricks" {
   azure_workspace_resource_id = azurerm_databricks_workspace.databricks.id
   host                        = azurerm_databricks_workspace.databricks.workspace_url
 }
+
+provider "databricks" {
+  host = "https://accounts.azuredatabricks.net"
+  alias = "accounts"
+  account_id = "${try(local.configuration.locals.merged_root_config.transform.databricks_account_id, "")}"
+}
+
 EOF
 }
 

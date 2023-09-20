@@ -74,6 +74,8 @@ resource "databricks_cluster" "cluster" {
   autotermination_minutes = var.transform.databricks_cluster.autotermination_minutes
   num_workers             = !local.autoscale_cluster ? var.transform.databricks_cluster.num_of_workers : null
   runtime_engine          = var.transform.databricks_cluster.runtime_engine
+  data_security_mode      = var.transform.databricks_cluster.data_security_mode
+  single_user_name        = var.transform.databricks_cluster.data_security_mode == "SINGLE_USER" ? databricks_service_principal.adf_managed_identity_sp.application_id : null
 
   dynamic "autoscale" {
     for_each = local.autoscale_cluster ? [1] : []
@@ -203,4 +205,9 @@ resource "databricks_dbfs_file" "dbfs_init_script_upload" {
 resource "databricks_secret_scope" "secrets" {
   name       = "flowehr-secrets"
   depends_on = [time_sleep.wait_for_databricks_network]
+}
+
+resource "databricks_service_principal" "adf_managed_identity_sp" {
+  application_id = data.azuread_service_principal.adf_identity_sp.application_id
+  display_name   = "ADF Service Principal for ${var.naming_suffix}"
 }

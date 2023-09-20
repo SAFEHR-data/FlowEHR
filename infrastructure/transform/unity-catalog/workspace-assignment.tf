@@ -12,22 +12,20 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-output "adls_name" {
-  value = azurerm_storage_account.adls.name
+resource "databricks_metastore_assignment" "workspace_assignment" {
+  workspace_id = data.azurerm_databricks_workspace.workspace.workspace_id
+  metastore_id = var.metastore_id
+
+  depends_on = [databricks_metastore_data_access.metastore_data_access]
 }
 
-output "adls_id" {
-  value = azurerm_storage_account.adls.id
-}
+resource "databricks_metastore_data_access" "metastore_data_access" {
+  metastore_id = var.metastore_id
+  name         = "dbks-metastore-access-${var.naming_suffix}"
 
-output "databricks_adls_app_id" {
-  value = azuread_application.databricks_adls.application_id
-}
+  azure_managed_identity {
+    access_connector_id = data.azapi_resource.metastore_access_connector.id
+  }
 
-output "databricks_adls_app_secret_key" {
-  value = databricks_secret.databricks_adls_spn_app_secret.key
-}
-
-output "databricks_adls_uri_secret_key" {
-  value = databricks_secret.adls_uri.key
+  is_default = var.metastore_created
 }
