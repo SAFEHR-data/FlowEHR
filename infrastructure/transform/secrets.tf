@@ -94,13 +94,15 @@ resource "databricks_secret" "databricks_config_secret" {
 }
 
 resource "databricks_secret" "unity_catalog_catalog_name" {
+  count        = local.unity_catalog_enabled ? 1 : 0
   key          = "unity-catalog-catalog-name"
-  string_value = try(module.unity_catalog[0].catalog_name, "")
+  string_value = module.unity_catalog[0].catalog_name
   scope        = databricks_secret_scope.secrets.id
 }
 
 resource "databricks_secret" "unity_catalog_schema_name" {
+  count        = local.unity_catalog_enabled ? 1 : 0
   key          = "unity-catalog-schema-name"
-  string_value = try(module.unity_catalog[0].schema_name, "")
+  string_value = module.unity_catalog[0].schema_name
   scope        = databricks_secret_scope.secrets.id
 }
