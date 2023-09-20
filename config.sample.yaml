@@ -24,11 +24,11 @@ transform:  # Optional
     - url: https://github.com/MY_TRANSFORM_CODE_REPO.git
     - url: https://github.com/MY_OTHER_TRANSFORM_CODE_REPO.git
       sha: abcd01abcd01abcd01abcd01abcd01abcd01abcd
-  datalake:  # Optional
+  datalake:  # Optional - **ensure zone names are lower case**
     zones:
-      - Bronze
-      - Silver
-      - Gold
+      - bronze
+      - silver
+      - gold
 
   unity_catalog:  # Optional. If you wish to disable Unity Catalog, remove this section
     catalog_name: catalog
@@ -36,7 +36,7 @@ transform:  # Optional
     schema_name: schema
     schema_name_prefix: schema
     datalake_zones:  # From datalake section above, the zones that Unity Catalog will have access to
-      - Gold
+      - gold
 
   unity_catalog_metastore:  # Needs to be present if unity_catalog section is present
     metastore_name: metastore-westeurope  # Setting this will result in a new metastore being deployed
