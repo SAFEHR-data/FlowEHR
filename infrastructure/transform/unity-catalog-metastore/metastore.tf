@@ -61,8 +61,8 @@ resource "azurerm_storage_account" "unity_catalog" {
 # in this module
 resource "azurerm_private_endpoint" "metastore_pe" {
   for_each = {
-    "dfs"  = var.private_dns_zones["blob"].id
-    "blob" = var.private_dns_zones["dfs"].id
+    "dfs"  = var.private_dns_zones["dfs"].id
+    "blob" = var.private_dns_zones["blob"].id
   }
   name                = "pe-uc-${each.key}-${lower(var.naming_suffix)}"
   location            = data.azurerm_resource_group.core_rg.location

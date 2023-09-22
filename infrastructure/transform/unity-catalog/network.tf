@@ -16,8 +16,8 @@
 # If the metastore is created as part of this deployment, the private endpoint will already be created
 resource "azurerm_private_endpoint" "metastore_storage" {
   for_each = var.metastore_created ? {} : {
-    "dfs"  = var.private_dns_zones["blob"].id
-    "blob" = var.private_dns_zones["dfs"].id
+    "dfs"  = var.private_dns_zones["dfs"].id
+    "blob" = var.private_dns_zones["blob"].id
   }
 
   name                = "pe-uc-${each.key}-${var.naming_suffix}"
