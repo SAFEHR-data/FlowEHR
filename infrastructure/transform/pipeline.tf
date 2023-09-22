@@ -21,11 +21,7 @@ resource "azurerm_data_factory_pipeline" "pipeline" {
   parameters = merge(
     tomap({
       for param_name, param in each.value.properties.parameters : param_name => param.defaultValue
-    }),
-    local.unity_catalog_enabled ? tomap({
-      "catalog_name" = module.unity_catalog[0].catalog_name,
-      "schema_name"  = module.unity_catalog[0].schema_name
-  }) : tomap({}))
+  }))
 
   depends_on = [
     azurerm_data_factory_linked_service_azure_databricks.msi_linked

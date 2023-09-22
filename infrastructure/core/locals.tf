@@ -24,15 +24,16 @@ locals {
   databricks_container_address_space = local.subnet_address_spaces[2]
   serve_webapps_address_space        = local.subnet_address_spaces[3]
 
-  create_dns_zones = var.private_dns_zones_rg == null
-  datalake_enabled = try(var.transform.datalake, null) != null
+  create_dns_zones      = var.private_dns_zones_rg == null
+  datalake_enabled      = try(var.transform.datalake, null) != null
+  unity_catalog_enabled = try(var.transform.unity_catalog, null) != null
   required_private_dns_zones = merge({
     blob       = "privatelink.blob.core.windows.net"
     keyvault   = "privatelink.vaultcore.azure.net"
     cosmos     = "privatelink.documents.azure.com"
     databricks = "privatelink.azuredatabricks.net"
     sql        = "privatelink.database.windows.net"
-    }, local.datalake_enabled ? {
+    }, local.datalake_enabled || local.unity_catalog_enabled ? {
     dfs = "privatelink.dfs.core.windows.net"
   } : {})
 }

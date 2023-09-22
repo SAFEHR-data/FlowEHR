@@ -127,6 +127,10 @@ resource "databricks_cluster" "cluster" {
     tomap({ for secret_name, secret_value in var.transform.databricks_secrets :
       "spark.secret.${secret_name}" => "{{secrets/${databricks_secret_scope.secrets.name}/${secret_name}}}"
     }),
+    local.unity_catalog_enabled ? tomap({
+      "spark.secret.unity-catalog-catalog-name" = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.unity_catalog_catalog_name[0].key}}}"
+      "spark.secret.unity-catalog-schema-name"  = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.unity_catalog_schema_name[0].key}}}"
+    }) : tomap({}),
     # Any values set in the config
     var.transform.spark_config,
     # Special config if in single node configuration
