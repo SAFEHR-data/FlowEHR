@@ -123,4 +123,6 @@ locals {
   ]
 
   sql_users_to_create = var.accesses_real_data ? local.real_data_users_groups : local.synth_data_users_groups
+
+  predefined_metric_name = "rows_updated"
 }
