@@ -188,11 +188,11 @@ resource "azurerm_portal_dashboard" "pipeline_status_dashboard" {
                           "resourceMetadata": {
                             "id": "${azurerm_application_insights.transform.id}"
                           },
-                          "name": "${each.key}/rows_inserted",
+                          "name": "${each.key}/${local.predefined_metric_name}",
                           "aggregationType": 4,
-                          "namespace": "${each.key}/rows_inserted",
+                          "namespace": "${each.key}/${local.predefined_metric_name}",
                           "metricVisualization": {
-                            "displayName": "${each.key}/rows_inserted"
+                            "displayName": "${each.key}/${local.predefined_metric_name}"
                           }
                         }
                       ],
