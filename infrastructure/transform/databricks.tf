@@ -98,6 +98,7 @@ resource "databricks_cluster" "cluster" {
     }),
     # Secrets for FlowEHR External app
     tomap({
+      "spark.secret.azure-tenant-id"               = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.external_connection_azure_tenant_id.key}}}"
       "spark.secret.external-connection-app-id"    = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.external_connection_spn_app_id.key}}}"
       "spark.secret.exernal-connection-app-secret" = "{{secrets/${databricks_secret_scope.secrets.name}/${databricks_secret.external_connection_spn_app_secret.key}}}"
     }),
