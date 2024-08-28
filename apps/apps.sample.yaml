@@ -26,7 +26,7 @@ dash_seedling:  # unique ID for the app
     octokitten: an_aad_user@mycompany.com
   managed_repo:  # details for repo to create/manage
     private: false  # repo visibility
-    template: UCLH-Foundry/Dash-Seedling  # template to use in format GH_ORG/TEMPLATE_NAME
+    template: SAFEHR-data/Dash-Seedling  # template to use in format GH_ORG/TEMPLATE_NAME
   branch:  # details of the branch created with a name: <environment>
     num_of_approvals: 1
   env:  # any env vars to pass to the app container
