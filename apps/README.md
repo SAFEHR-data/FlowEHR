@@ -45,7 +45,7 @@ Once created, you need to the install the app to the organization. [Follow these
 After installation, stay on the same page and check the URL. It should look like this:
 
 ```
-https://github.com/organizations/UCLH-Foundry/settings/installations/123456789
+https://github.com/organizations/SAFEHR-data/settings/installations/123456789
 ```
 
 At the end of the URL after `installations/`, you'll see a number. Record this down - it is your `GitHub App Installation Id`. (Believe it or not this is the easiest way to find it!)

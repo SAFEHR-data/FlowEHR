@@ -137,7 +137,7 @@ This step will create an AAD Application and Service Principal in the specified 
 
     For CI deployments, due to certain resources being deployed within a Virtual Network with public access disabled, we need to use private build agents (also called self-hosted GitHub runners) to run our CI pipelines. We also need somewhere to store the associated container images and Terraform state within a vnet.
 
-    You can use [the Azure Bootstrap template](https://github.com/UCLH-Foundry/Azure-Bootstrap) to deploy all these resources, or alternatively, you can reference pre-existing resources in the following steps.
+    You can use [the Azure Bootstrap template](https://github.com/SAFEHR-data/Azure-Bootstrap) to deploy all these resources, or alternatively, you can reference pre-existing resources in the following steps.
 
 5. Create a deployer identity (AAD App Registration/Service Principal) with required AAD permissions: 
 
@@ -181,7 +181,7 @@ This step will create an AAD Application and Service Principal in the specified 
 
 ### Next steps
 
-- [Deploy a data transformation pipeline](https://github.com/UCLH-Foundry/FlowEHR-Data-Pot/blob/main/README.md)
+- [Deploy a data transformation pipeline](https://github.com/SAFEHR-data/FlowEHR-Data-Pot/blob/main/README.md)
 - [Configure and deploy a FlowEHR app](./apps/README.md)
 
 
