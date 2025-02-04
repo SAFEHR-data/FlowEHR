@@ -82,7 +82,7 @@ resource "azurerm_mssql_server_transparent_data_encryption" "sql_server_features
 }
 
 # Azure SQL database, basic + small for dev
-# TODO: Rightsize for prod -> https://github.com/UCLH-Foundry/FlowEHR/issues/63
+# TODO: Rightsize for prod -> https://github.com/SAFEHR-data/FlowEHR/issues/63
 resource "azurerm_mssql_database" "feature_database" {
   name         = "sql-db-features"
   server_id    = azurerm_mssql_server.sql_server_features.id

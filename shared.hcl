@@ -68,7 +68,7 @@ inputs = merge(
     }
 })
 
-# Databricks cluster deployment failures are transient. https://github.com/UCLH-Foundry/FlowEHR/issues/141
+# Databricks cluster deployment failures are transient. https://github.com/SAFEHR-data/FlowEHR/issues/141
 retryable_errors = [
   "cannot create cluster",              # databricks
   "Waiting for deletion of application" # AD application
